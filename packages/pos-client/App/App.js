@@ -37,6 +37,7 @@ export default class App extends Component {
       ? 'Number of dogs in this Realm: ' + this.state.realm.objects('Dog').length
       : 'Loading...'
 
+    console.log('INFO ', info)
     return (
       /**
        * @see https://github.com/reduxjs/react-redux/blob/master/docs/api/Provider.md
@@ -50,28 +51,9 @@ export default class App extends Component {
          * @see https://github.com/rt2zz/redux-persist/blob/master/docs/PersistGate.md
          */}
         <PersistGate loading={null} persistor={persistor}>
-          {/* <RootScreen /> */}
-          
-          {info}
+          <RootScreen realm={this.state.realm} />
         </PersistGate>
       </Provider>
     )
   }
 }
-
-// class <project-name> extends Component {
-
-//   render() {
-//     const info = this.state.realm
-//       ? 'Number of dogs in this Realm: ' + this.state.realm.objects('Dog').length
-//       : 'Loading...';
-
-//     return (
-//       <View style={styles.container}>
-//         <Text style={styles.welcome}>
-//           {info}
-//         </Text>
-//       </View>
-//     );
-//   }
-// }

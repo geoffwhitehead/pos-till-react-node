@@ -1,12 +1,13 @@
 import React from 'react'
-import { Platform, Text, View, Button, ActivityIndicator, Image } from 'react-native'
+import { Platform, View, ActivityIndicator, Image } from 'react-native'
 import { connect } from 'react-redux'
 import { PropTypes } from 'prop-types'
 import ExampleActions from 'App/Stores/Example/Actions'
 import { liveInEurope } from 'App/Stores/Example/Selectors'
 import Style from './ExampleScreenStyle'
 import { ApplicationStyles, Helpers, Images, Metrics } from 'App/Theme'
-
+import { Container, Button, Text } from 'native-base'
+import Realm from 'realm'
 /**
  * This is an example of a container component.
  *
@@ -20,11 +21,39 @@ const instructions = Platform.select({
 })
 
 class ExampleScreen extends React.Component {
+  constructor(props) {
+    super(props)
+    this.state = { realm: null }
+  }
+
   componentDidMount() {
-    this._fetchUser()
+    // this._fetchUser()
+    Realm.open({
+      schema: [{ name: 'Dog', properties: { name: 'string' } }],
+    }).then((realm) => {
+      realm.write(() => {
+        realm.create('Dog', { name: 'Rex' })
+      })
+      this.setState({ realm })
+    })
+  }
+
+  componentWillUnmount() {
+    // Close the realm if there is one open.
+    const { realm } = this.state
+    if (realm !== null && !realm.isClosed) {
+      realm.close()
+    }
   }
 
   render() {
+    // const [x, setX] = useState(true)
+
+    const info = this.state.realm
+      ? 'Number of dogs in this Realm: ' + this.state.realm.objects('Dog').length
+      : 'Loading...'
+
+    console.log('!!!!!! ', info)
     return (
       <View
         style={[
@@ -38,29 +67,11 @@ class ExampleScreen extends React.Component {
           <ActivityIndicator size="large" color="#0000ff" />
         ) : (
           <View>
-            <View style={Style.logoContainer}>
-              <Image style={Helpers.fullSize} source={Images.logo} resizeMode={'contain'} />
-            </View>
-            <Text style={Style.text}>To get started, edit App.js</Text>
-            <Text style={Style.instructions}>{instructions}</Text>
-            {this.props.userErrorMessage ? (
-              <Text style={Style.error}>{this.props.userErrorMessage}</Text>
-            ) : (
-              <View>
-                <Text style={Style.result}>
-                  {"I'm a fake user, my name is "}
-                  {this.props.user.name}
-                </Text>
-                <Text style={Style.result}>
-                  {this.props.liveInEurope ? 'I live in Europe !' : "I don't live in Europe."}
-                </Text>
-              </View>
-            )}
-            <Button
-              style={ApplicationStyles.button}
-              onPress={() => this._fetchUser()}
-              title="Refresh"
-            />
+            <Container>
+              <Button>
+                <Text>Button</Text>
+              </Button>
+            </Container>
           </View>
         )}
       </View>
