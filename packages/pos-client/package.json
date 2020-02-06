@@ -5,7 +5,7 @@
   "scripts": {
     "android": "react-native run-android",
     "ios": "react-native run-ios",
-    "pod-install": "cd ./ios && pod install && cd .. ",
+    "pod": "cd ./ios && pod install && cd .. ",
     "start": "react-native start",
     "test": "jest --detectOpenHandles",
     "prettier-fix": "prettier --write **/*.js",
@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "axios": "^0.19.0",
+    "native-base": "^2.13.8",
     "prop-types": "^15.7.2",
     "react": "16.9.0",
     "react-native": "0.61.5",
