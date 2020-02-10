@@ -1,96 +1,95 @@
-import { User } from "../models";
-import { APIError, parseSkipLimit } from "../helpers";
+import { User } from '../models';
+import { APIError, parseSkipLimit } from '../helpers';
 
 /**
- * Validate the POST request body and create a new User
+ * Validate the POST req body and create a new User
  */
-const createUser = async (request, response, next) => {
-  console.log("!!! CREATE ", request.body);
+const createUser = async (req, res, next) => {
+    console.log('!!! CREATE ', req.body);
 
-  const user = new User(request.body);
+    const user = new User(req.body);
 
-  const errors = user.validateSync();
+    const errors = user.validateSync();
 
-  if (errors) {
-    console.log("INVALID");
-    return next(new APIError(400, "Bad Request", errors));
-  }
+    if (errors) {
+        console.log('INVALID');
+        return next(new APIError(400, 'Bad req', errors));
+    }
 
-  try {
-    await user.save();
-    return response.status(201).json(user);
-  } catch (err) {
-    return next(err);
-  }
+    try {
+        await user.save();
+        return res.status(201).json(user);
+    } catch (err) {
+        return next(err);
+    }
 };
 
 /**
  * Get a single user
  * @param {String} name - the name of the User to retrieve
  */
-const readUser = async (request, response, next) => {
-  const { name } = request.params;
-  try {
-    const user = await User.findOne(name);
-    return response.json(user);
-  } catch (err) {
-    return next(err);
-  }
+const readUser = async (req, res, next) => {
+    const { name } = req.params;
+    try {
+        const user = await User.findOne(name);
+        return res.send(user);
+    } catch (err) {
+        return next(err);
+    }
 };
 
 /**
  * List all the users. Query params ?skip=0&limit=1000 by default
  */
-async function readUsers(request, response, next) {
-  /* pagination validation */
+async function readUsers(req, res, next) {
+    /* pagination validation */
 
-  console.log("!!!!!!!!!!!!!!!! HERE");
-  console.log("!!!!!!!!!!!!!!!! HERE");
-  console.log("!!!!!!!!!!!!!!!! HERE");
-  console.log("!!!!!!!!!!!!!!!! HERE");
-  let skip = parseSkipLimit(request.query.skip) || 0;
-  let limit = parseSkipLimit(request.query.limit, 1000) || 1000;
-  if (skip instanceof APIError) {
-    return next(skip);
-  } else if (limit instanceof APIError) {
-    return next(limit);
-  }
+    console.log('!!!!!!!!!!!!!!!! HERE');
+    console.log('!!!!!!!!!!!!!!!! HERE');
+    console.log('!!!!!!!!!!!!!!!! HERE');
+    console.log('!!!!!!!!!!!!!!!! HERE');
+    const skip = parseSkipLimit(req.query.skip) || 0;
+    const limit = parseSkipLimit(req.query.limit, 1000) || 1000;
+    if (skip instanceof APIError) {
+        return next(skip);
+    } else if (limit instanceof APIError) {
+        return next(limit);
+    }
 
-  try {
-    const users = await User.find({}, {}, skip, limit);
-    console.log("USER ", users);
-    return response(users);
-  } catch (err) {
-    return next(err);
-  }
+    try {
+        const users = await User.find({}, {}, { skip, limit });
+        return res.send(users);
+    } catch (err) {
+        return next(err);
+    }
 }
 
 /**
  * Update a single user
  * @param {String} name - the name of the User to update
  */
-const updateUser = async (request, response, next) => {
-  const { id, ...props } = request.body;
-  try {
-    const user = await User.updateOne(id, props, { runValidators: true });
-    return response.json(user);
-  } catch (err) {
-    return next(err);
-  }
+const updateUser = async (req, res, next) => {
+    const { id, ...props } = req.body;
+    try {
+        const user = await User.updateOne(id, props, { runValidators: true });
+        return res.send(user);
+    } catch (err) {
+        return next(err);
+    }
 };
 
 /**
  * Remove a single user
  * @param {String} name - the name of the User to remove
  */
-const deleteUser = async (request, response, next) => {
-  const { id } = request.params;
-  try {
-    const deleteMsg = await User.deleteOne(id);
-    return response.json(deleteMsg);
-  } catch (err) {
-    return next(err);
-  }
+const deleteUser = async (req, res, next) => {
+    const { id } = req.params;
+    try {
+        const deleteMsg = await User.deleteOne(id);
+        return res.send(deleteMsg);
+    } catch (err) {
+        return next(err);
+    }
 };
 
 export { createUser, readUser, readUsers, updateUser, deleteUser };

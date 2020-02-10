@@ -1,5 +1,5 @@
 export const login = async (request, response) => {
-  const params = request;
+    const params = request;
 
-  response(params);
+    response(params);
 };
