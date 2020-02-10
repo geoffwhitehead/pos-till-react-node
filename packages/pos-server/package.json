@@ -10,7 +10,8 @@
   "main": "app/app.js",
   "scripts": {
     "test": "jest",
-    "start": "docker-compose up"
+    "start": "docker-compose up",
+    "rebuild": "docker exec -it pos-server_app_1 yarn "
   },
   "license": "MIT",
   "dependencies": {
