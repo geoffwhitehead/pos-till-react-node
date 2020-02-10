@@ -1,1 +1,0 @@
-exports.usersRouter = require('./users');

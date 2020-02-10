@@ -1,10 +1,10 @@
 {
-  "apps": [
-    {
-      "name": "Boilerplate-API",
-      "script": "./app/server.js",
-      "instances": "max",
-      "exec_mode": "cluster"
-    }
-  ]
+    "apps": [
+        {
+            "name": "Boilerplate-API",
+            "script": "./app/server.ts",
+            "instances": "max",
+            "exec_mode": "cluster"
+        }
+    ]
 }

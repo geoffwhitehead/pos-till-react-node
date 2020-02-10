@@ -1,8 +1,7 @@
-FROM node:12.14.0
-
-LABEL MAINTAINER Michael Hueter <mthueter@gmail.com>
+FROM node:13.8.0
 
 RUN npm install pm2@latest --global --quiet
+RUN cd /usr/local/lib/node_modules/pm2 && pm2 install typescript
 # add local user for security
 RUN groupadd -r nodejs \
   && useradd -m -r -g nodejs nodejs

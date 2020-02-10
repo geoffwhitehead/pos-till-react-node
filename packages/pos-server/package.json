@@ -1,44 +1,47 @@
 {
-  "author": "Michael Hueter <mthueter@gmail.com>",
-  "version": "2.0.0",
-  "name": "docker-node-express-boilerplate",
-  "description": "Boilerplate Dockerized Express code to launch new RESTful APIs.",
-  "repository": {
-    "type": "git",
-    "url": "git@github.com:mhueter/docker-node-express-boilerplate.git"
-  },
-  "main": "app/app.js",
-  "scripts": {
-    "test": "jest",
-    "start": "docker-compose up",
-    "rebuild": "docker exec -it pos-server_app_1 yarn "
-  },
-  "license": "MIT",
-  "dependencies": {
-    "bcrypt": "^3.0.8",
-    "bluebird": "3.7.2",
-    "body-parser": "^1.19.0",
-    "cors": "^2.8.5",
-    "dotenv": "8.2.0",
-    "express": "^4.17.1",
-    "helmet": "^3.21.2",
-    "jsonschema": "1.2.5",
-    "jsonwebtoken": "^8.5.1",
-    "mongoose": "5.8.3",
-    "morgan": "^1.9.1"
-  },
-  "devDependencies": {
-    "babel-eslint": "^10.0.3",
-    "babel-preset-es2017": "^6.24.1",
-    "eslint": "^6.8.0",
-    "jest": "^24.9.0",
-    "jest-environment-node": "^24.9.0",
-    "mongodb-memory-server": "^6.2.0",
-    "supertest": "^4.0.2"
-  },
-  "jest": {
-    "globalSetup": "./config/jest/setup.js",
-    "globalTeardown": "./config/jest/teardown.js",
-    "testEnvironment": "./config/jest/MongoEnvironment.js"
-  }
+    "version": "2.0.0",
+    "name": "pos-server",
+    "description": "POS backend.",
+    "main": "app/app.ts",
+    "scripts": {
+        "test": "jest",
+        "start": "docker-compose up",
+        "rebuild": "docker exec -it pos-server_app_1 yarn "
+    },
+    "license": "MIT",
+    "dependencies": {
+        "bcrypt": "^3.0.8",
+        "bluebird": "3.7.2",
+        "body-parser": "^1.19.0",
+        "cors": "^2.8.5",
+        "dotenv": "8.2.0",
+        "esm": "^3.2.25",
+        "express": "^4.17.1",
+        "global": "^4.4.0",
+        "helmet": "^3.21.2",
+        "jsonschema": "1.2.5",
+        "jsonwebtoken": "^8.5.1",
+        "mongoose": "5.8.3",
+        "morgan": "^1.9.1",
+        "typescript": "^3.7.5"
+    },
+    "devDependencies": {
+        "@types/express": "^4.17.2",
+        "@types/mongoose": "^5.7.0",
+        "@typescript-eslint/eslint-plugin": "^2.19.2",
+        "@typescript-eslint/parser": "^2.19.2",
+        "eslint": "^6.8.0",
+        "eslint-config-prettier": "^6.10.0",
+        "eslint-plugin-prettier": "^3.1.2",
+        "jest": "^24.9.0",
+        "jest-environment-node": "^24.9.0",
+        "mongodb-memory-server": "^6.2.0",
+        "prettier": "^1.19.1",
+        "supertest": "^4.0.2"
+    },
+    "jest": {
+        "globalSetup": "./config/jest/setup.js",
+        "globalTeardown": "./config/jest/teardown.js",
+        "testEnvironment": "./config/jest/MongoEnvironment.js"
+    }
 }

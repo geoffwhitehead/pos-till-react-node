@@ -2,7 +2,7 @@ version: '3'
 services:
   app:
     build: .
-    command: pm2-dev ./app/server.js
+    command: pm2-dev ./app/server.ts
     environment:
       NODE_ENV: development
     depends_on:
