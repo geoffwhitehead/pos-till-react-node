@@ -5,14 +5,10 @@ import { APIError, parseSkipLimit } from '../helpers';
  * Validate the POST req body and create a new User
  */
 const createUser = async (req, res, next) => {
-    console.log('!!! CREATE ', req.body);
-
     const user = new User(req.body);
-
     const errors = user.validateSync();
 
     if (errors) {
-        console.log('INVALID');
         return next(new APIError(400, 'Bad req', errors));
     }
 
@@ -42,12 +38,6 @@ const readUser = async (req, res, next) => {
  * List all the users. Query params ?skip=0&limit=1000 by default
  */
 async function readUsers(req, res, next) {
-    /* pagination validation */
-
-    console.log('!!!!!!!!!!!!!!!! HERE');
-    console.log('!!!!!!!!!!!!!!!! HERE');
-    console.log('!!!!!!!!!!!!!!!! HERE');
-    console.log('!!!!!!!!!!!!!!!! HERE');
     const skip = parseSkipLimit(req.query.skip) || 0;
     const limit = parseSkipLimit(req.query.limit, 1000) || 1000;
     if (skip instanceof APIError) {
