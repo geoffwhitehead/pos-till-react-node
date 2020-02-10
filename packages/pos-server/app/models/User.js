@@ -7,29 +7,29 @@ const { APIError } = require("../helpers");
 // globals
 const Schema = mongoose.Schema;
 
-const thingSchema = new Schema({
+const userSchema = new Schema({
   name: String,
   number: Number,
   stuff: [String],
   url: String
 });
 
-thingSchema.statics = {
+userSchema.statics = {
   /**
    * Create a Single New User
-   * @param {object} newThing - an instance of User
+   * @param {object} newUser - an instance of User
    * @returns {Promise<User, APIError>}
    */
-  async createThing(newThing) {
-    const duplicate = await this.findOne({ name: newThing.name });
+  async createUser(newUser) {
+    const duplicate = await this.findOne({ name: newUser.name });
     if (duplicate) {
       throw new APIError(
         409,
         "User Already Exists",
-        `There is already a user with name '${newThing.name}'.`
+        `There is already a user with name '${newUser.name}'.`
       );
     }
-    const user = await newThing.save();
+    const user = await newUser.save();
     return user.toObject();
   },
   /**
@@ -37,7 +37,7 @@ thingSchema.statics = {
    * @param {String} name - the User's name
    * @returns {Promise<User, APIError>}
    */
-  async deleteThing(name) {
+  async deleteUser(name) {
     const deleted = await this.findOneAndRemove({ name });
     if (!deleted) {
       throw new APIError(404, "User Not Found", `No user '${name}' found.`);
@@ -49,7 +49,7 @@ thingSchema.statics = {
    * @param {String} name - the User's name
    * @returns {Promise<User, APIError>}
    */
-  async readThing(name) {
+  async readUser(name) {
     const user = await this.findOne({ name });
 
     if (!user) {
@@ -65,7 +65,7 @@ thingSchema.statics = {
    * @param {String} limit - number of docs to limit by (for pagination)
    * @returns {Promise<Users, APIError>}
    */
-  async readThings(query, fields, skip, limit) {
+  async readUsers(query, fields, skip, limit) {
     const users = await this.find(query, fields)
       .skip(skip)
       .limit(limit)
@@ -79,11 +79,11 @@ thingSchema.statics = {
   /**
    * Patch/Update a single User
    * @param {String} name - the User's name
-   * @param {Object} thingUpdate - the json containing the User attributes
+   * @param {Object} userUpdate - the json containing the User attributes
    * @returns {Promise<User, APIError>}
    */
-  async updateThing(name, thingUpdate) {
-    const user = await this.findOneAndUpdate({ name }, thingUpdate, {
+  async updateUser(name, userUpdate) {
+    const user = await this.findOneAndUpdate({ name }, userUpdate, {
       new: true
     });
     if (!user) {
@@ -94,8 +94,8 @@ thingSchema.statics = {
 };
 
 /* Transform with .toObject to remove __v and _id from response */
-if (!thingSchema.options.toObject) thingSchema.options.toObject = {};
-thingSchema.options.toObject.transform = (doc, ret) => {
+if (!userSchema.options.toObject) userSchema.options.toObject = {};
+userSchema.options.toObject.transform = (doc, ret) => {
   const transformed = ret;
   delete transformed._id;
   delete transformed.__v;
@@ -103,6 +103,6 @@ thingSchema.options.toObject.transform = (doc, ret) => {
 };
 
 /** Ensure MongoDB Indices **/
-thingSchema.index({ name: 1, number: 1 }, { unique: true }); // example compound idx
+userSchema.index({ name: 1, number: 1 }, { unique: true }); // example compound idx
 
-module.exports = mongoose.model("User", thingSchema);
+module.exports = mongoose.model("User", userSchema);

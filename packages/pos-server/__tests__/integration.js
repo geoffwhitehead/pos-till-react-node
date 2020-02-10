@@ -6,7 +6,7 @@ const request = require("supertest");
 const mongoose = require("mongoose");
 
 let { User } = require("../app/models");
-let exampleThing = {
+let exampleUser = {
   name: "Example",
   number: 5,
   stuff: ["cats", "dogs"],
@@ -14,8 +14,8 @@ let exampleThing = {
 };
 
 beforeEach(async () => {
-  const testThing = new User(exampleThing);
-  await testThing.save();
+  const testUser = new User(exampleUser);
+  await testUser.save();
 });
 
 afterEach(async () => {
@@ -31,7 +31,7 @@ afterAll(async () => {
 describe("GET /users", () => {
   test("Get a list of users", async () => {
     let response = await request(app).get("/users");
-    expect(response.body).toEqual([exampleThing]);
+    expect(response.body).toEqual([exampleUser]);
   });
 });
 
@@ -43,7 +43,7 @@ describe("POST /users", () => {
     expect(response.body).toEqual({ name: "A User", stuff: [] });
   });
   test("Create a full new User", async () => {
-    const fullThing = {
+    const fullUser = {
       name: "Other User",
       stuff: ["cats", "dogs"],
       number: 5,
@@ -51,8 +51,8 @@ describe("POST /users", () => {
     };
     let response = await request(app)
       .post("/users")
-      .send(fullThing);
-    expect(response.body).toEqual(fullThing);
+      .send(fullUser);
+    expect(response.body).toEqual(fullUser);
   });
   test("Cannot Create Users with the Same Name", async () => {
     let response = await request(app)
@@ -67,13 +67,13 @@ describe("PATCH /users/:name", () => {
     let response = await request(app)
       .patch("/users/Example")
       .send({ name: "New Name" });
-    expect(response.body).toEqual({ ...exampleThing, name: "New Name" });
+    expect(response.body).toEqual({ ...exampleUser, name: "New Name" });
   });
 });
 
 describe("DELETE /users/:name", () => {
   test("Delete a user name", async () => {
     let response = await request(app).delete("/users/Example");
-    expect(response.body).toEqual(exampleThing);
+    expect(response.body).toEqual(exampleUser);
   });
 });

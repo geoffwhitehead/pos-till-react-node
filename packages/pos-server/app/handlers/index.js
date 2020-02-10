@@ -1,3 +1,3 @@
 exports.errorHandler = require("./error");
-exports.thingHandler = require("./user");
-exports.thingsHandler = require("./users");
+exports.userHandler = require("./user");
+exports.usersHandler = require("./users");

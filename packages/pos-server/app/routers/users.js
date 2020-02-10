@@ -7,12 +7,12 @@ const { userHandler, usersHandler } = require("../handlers");
 // globals
 const router = new express.Router();
 const { readUsers } = usersHandler;
-const { createUser, readUser, updateUser, deleteUser } = usersHandler;
+const { createUser, readUser, updateUser, deleteUser } = userHandler;
 
 /* All the Users Route */
 router
   .route("")
-  .get(readUser)
+  .get(readUsers)
   .post(createUser);
 
 /* Single User by Name Route */

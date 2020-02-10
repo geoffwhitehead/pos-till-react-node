@@ -5,7 +5,7 @@ const { APIError, parseSkipLimit } = require("../helpers");
 /**
  * List all the users. Query params ?skip=0&limit=1000 by default
  */
-async function readThings(request, response, next) {
+async function readUsers(request, response, next) {
   /* pagination validation */
   let skip = parseSkipLimit(request.query.skip) || 0;
   let limit = parseSkipLimit(request.query.limit, 1000) || 1000;
@@ -16,7 +16,7 @@ async function readThings(request, response, next) {
   }
 
   try {
-    const users = await User.readThings({}, {}, skip, limit);
+    const users = await User.readUsers({}, {}, skip, limit);
     return response.json(users);
   } catch (err) {
     return next(err);
@@ -24,5 +24,5 @@ async function readThings(request, response, next) {
 }
 
 module.exports = {
-  readThings
+  readUsers
 };

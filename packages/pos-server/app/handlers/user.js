@@ -4,13 +4,13 @@ const { validate } = require("jsonschema");
 // app imports
 const { User } = require("../models");
 const { APIError } = require("../helpers");
-const { thingNewSchema, thingUpdateSchema } = require("../schemas");
+const { userNewSchema, userUpdateSchema } = require("../schemas");
 
 /**
  * Validate the POST request body and create a new User
  */
-async function createThing(request, response, next) {
-  const validation = validate(request.body, thingNewSchema);
+async function createUser(request, response, next) {
+  const validation = validate(request.body, userNewSchema);
   if (!validation.valid) {
     return next(
       new APIError(
@@ -22,8 +22,8 @@ async function createThing(request, response, next) {
   }
 
   try {
-    const newThing = await User.createThing(new User(request.body));
-    return response.status(201).json(newThing);
+    const newUser = await User.createUser(new User(request.body));
+    return response.status(201).json(newUser);
   } catch (err) {
     return next(err);
   }
@@ -33,10 +33,10 @@ async function createThing(request, response, next) {
  * Get a single user
  * @param {String} name - the name of the User to retrieve
  */
-async function readThing(request, response, next) {
+async function readUser(request, response, next) {
   const { name } = request.params;
   try {
-    const user = await User.readThing(name);
+    const user = await User.readUser(name);
     return response.json(user);
   } catch (err) {
     return next(err);
@@ -47,10 +47,10 @@ async function readThing(request, response, next) {
  * Update a single user
  * @param {String} name - the name of the User to update
  */
-async function updateThing(request, response, next) {
+async function updateUser(request, response, next) {
   const { name } = request.params;
 
-  const validation = validate(request.body, thingUpdateSchema);
+  const validation = validate(request.body, userUpdateSchema);
   if (!validation.valid) {
     return next(
       new APIError(
@@ -62,7 +62,7 @@ async function updateThing(request, response, next) {
   }
 
   try {
-    const user = await User.updateThing(name, request.body);
+    const user = await User.updateUser(name, request.body);
     return response.json(user);
   } catch (err) {
     return next(err);
@@ -73,10 +73,10 @@ async function updateThing(request, response, next) {
  * Remove a single user
  * @param {String} name - the name of the User to remove
  */
-async function deleteThing(request, response, next) {
+async function deleteUser(request, response, next) {
   const { name } = request.params;
   try {
-    const deleteMsg = await User.deleteThing(name);
+    const deleteMsg = await User.deleteUser(name);
     return response.json(deleteMsg);
   } catch (err) {
     return next(err);
@@ -84,8 +84,8 @@ async function deleteThing(request, response, next) {
 }
 
 module.exports = {
-  createThing,
-  readThing,
-  updateThing,
-  deleteThing
+  createUser,
+  readUser,
+  updateUser,
+  deleteUser
 };
