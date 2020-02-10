@@ -1,13 +1,13 @@
 // npm packages
-const { validate } = require('jsonschema');
+const { validate } = require("jsonschema");
 
 // app imports
-const { Thing } = require('../models');
-const { APIError } = require('../helpers');
-const { thingNewSchema, thingUpdateSchema } = require('../schemas');
+const { User } = require("../models");
+const { APIError } = require("../helpers");
+const { thingNewSchema, thingUpdateSchema } = require("../schemas");
 
 /**
- * Validate the POST request body and create a new Thing
+ * Validate the POST request body and create a new User
  */
 async function createThing(request, response, next) {
   const validation = validate(request.body, thingNewSchema);
@@ -15,14 +15,14 @@ async function createThing(request, response, next) {
     return next(
       new APIError(
         400,
-        'Bad Request',
-        validation.errors.map(e => e.stack).join('. ')
+        "Bad Request",
+        validation.errors.map(e => e.stack).join(". ")
       )
     );
   }
 
   try {
-    const newThing = await Thing.createThing(new Thing(request.body));
+    const newThing = await User.createThing(new User(request.body));
     return response.status(201).json(newThing);
   } catch (err) {
     return next(err);
@@ -30,22 +30,22 @@ async function createThing(request, response, next) {
 }
 
 /**
- * Get a single thing
- * @param {String} name - the name of the Thing to retrieve
+ * Get a single user
+ * @param {String} name - the name of the User to retrieve
  */
 async function readThing(request, response, next) {
   const { name } = request.params;
   try {
-    const thing = await Thing.readThing(name);
-    return response.json(thing);
+    const user = await User.readThing(name);
+    return response.json(user);
   } catch (err) {
     return next(err);
   }
 }
 
 /**
- * Update a single thing
- * @param {String} name - the name of the Thing to update
+ * Update a single user
+ * @param {String} name - the name of the User to update
  */
 async function updateThing(request, response, next) {
   const { name } = request.params;
@@ -55,28 +55,28 @@ async function updateThing(request, response, next) {
     return next(
       new APIError(
         400,
-        'Bad Request',
-        validation.errors.map(e => e.stack).join('. ')
+        "Bad Request",
+        validation.errors.map(e => e.stack).join(". ")
       )
     );
   }
 
   try {
-    const thing = await Thing.updateThing(name, request.body);
-    return response.json(thing);
+    const user = await User.updateThing(name, request.body);
+    return response.json(user);
   } catch (err) {
     return next(err);
   }
 }
 
 /**
- * Remove a single thing
- * @param {String} name - the name of the Thing to remove
+ * Remove a single user
+ * @param {String} name - the name of the User to remove
  */
 async function deleteThing(request, response, next) {
   const { name } = request.params;
   try {
-    const deleteMsg = await Thing.deleteThing(name);
+    const deleteMsg = await User.deleteThing(name);
     return response.json(deleteMsg);
   } catch (err) {
     return next(err);

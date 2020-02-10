@@ -1,9 +1,9 @@
 // app imports
-const { Thing } = require('../models');
-const { APIError, parseSkipLimit } = require('../helpers');
+const { User } = require("../models");
+const { APIError, parseSkipLimit } = require("../helpers");
 
 /**
- * List all the things. Query params ?skip=0&limit=1000 by default
+ * List all the users. Query params ?skip=0&limit=1000 by default
  */
 async function readThings(request, response, next) {
   /* pagination validation */
@@ -16,8 +16,8 @@ async function readThings(request, response, next) {
   }
 
   try {
-    const things = await Thing.readThings({}, {}, skip, limit);
-    return response.json(things);
+    const users = await User.readThings({}, {}, skip, limit);
+    return response.json(users);
   } catch (err) {
     return next(err);
   }
