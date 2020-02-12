@@ -1,12 +1,6 @@
-/*eslint no-unused-vars: 2*/
 import { model, Schema, Document } from 'mongoose';
 import validator from 'validator';
-/**
- * Interface to model the User Schema for TypeScript.
- * @param email:string
- * @param password:string
- * @param avatar:string
- */
+
 interface UserProps {
     firstname: string;
     lastname: string;
@@ -15,13 +9,9 @@ interface UserProps {
     token: string;
 }
 
-interface UserMethods {
-    authenticate: (email: string, password: string) => Promise<UserProps>;
-}
+export interface UserDocument extends Document, UserProps {}
 
-export interface UserModelProps extends Document, UserProps, UserMethods {}
-
-const userSchema: Schema<UserModelProps> = new Schema({
+const UserSchema: Schema<UserDocument> = new Schema({
     firstname: {
         type: String,
         required: true,
@@ -56,6 +46,6 @@ const userSchema: Schema<UserModelProps> = new Schema({
     },
 });
 
-const User = model<Document & UserModelProps>('User', userSchema);
+const User = model<UserDocument>('User', UserSchema);
 
 export { User };

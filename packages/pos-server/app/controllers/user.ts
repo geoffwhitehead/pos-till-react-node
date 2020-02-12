@@ -45,7 +45,7 @@ const getById = async (req, res) => {
     const { id } = req.params;
     try {
         const user = await User.findById(id, PUBLIC_FIELDS);
-        return res.send(user);
+        return res.status(200).send(user);
     } catch (err) {
         res.status(400).send(err);
     }
@@ -67,7 +67,7 @@ const getAll = async (req, res) => {
     const limit = req.query.limit;
     try {
         const users = await User.find({}, 'firstname lastname email', { skip, limit });
-        return res.send(users);
+        return res.status(200).send(users);
     } catch (err) {
         res.status(400).send(err);
     }
