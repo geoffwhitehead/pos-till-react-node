@@ -5,6 +5,7 @@ services:
     command: pm2-dev ./app/server.ts
     environment:
       NODE_ENV: development
+      JWT_KEY: ${JWT_KEY}
     depends_on:
       - mongodb
     ports:

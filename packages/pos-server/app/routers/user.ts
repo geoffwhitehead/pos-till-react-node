@@ -1,18 +1,22 @@
 import { Router } from 'express';
-import { createUser, readUsers, readUser, updateUser, deleteUser } from '../controllers/user';
+import * as UserController from '../controllers/user';
+import { checkJwt } from '../middlewares';
+
 const router = Router();
 
-/* All the Users Route */
-router
-    .route('')
-    .get(readUsers)
-    .post(createUser);
+//Get all users
+router.get('/', [checkJwt], UserController.getAll);
 
-/* Single User by Name Route */
-router
-    .route('/:name')
-    .get(readUser)
-    .patch(updateUser)
-    .delete(deleteUser);
+// Get one user
+router.get('/:id', [checkJwt], UserController.getById);
+
+//Create a new user
+router.post('/', [checkJwt], UserController.create);
+
+//Edit one user
+router.patch('/:id', [checkJwt], UserController.update);
+
+//Delete one user
+router.delete('/:id', [checkJwt], UserController.remove);
 
 export default router;

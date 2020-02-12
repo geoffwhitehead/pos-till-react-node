@@ -11,7 +11,7 @@ import morgan from 'morgan';
 import { connectToDatabase } from './config';
 
 import { notAllowedHandler, notFoundHandler, serverErrorHandler } from './controllers/error';
-import { userRouter, authRouter } from './routers';
+import router from './routers';
 
 // global constants
 dotenv.config();
@@ -30,9 +30,7 @@ app.use(cors());
 // adding morgan to log HTTP requests
 app.use(morgan('combined'));
 
-app.use('/users', userRouter);
-
-app.use('/auth', authRouter);
+app.use('/', router);
 
 // catch-all for 404 "Not Found" errors
 app.get('*', notFoundHandler);

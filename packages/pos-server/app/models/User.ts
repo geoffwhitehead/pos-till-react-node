@@ -1,25 +1,22 @@
 /*eslint no-unused-vars: 2*/
-import { model, Schema, Model, Document } from 'mongoose';
+import { model, Schema, Document } from 'mongoose';
 import validator from 'validator';
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
-
 /**
  * Interface to model the User Schema for TypeScript.
  * @param email:string
  * @param password:string
  * @param avatar:string
  */
-interface UserProps extends Document, UserMethods {
+interface UserProps {
     firstname: string;
     lastname: string;
     email: string;
     password: string;
-    tokens: [string];
+    token: string;
 }
 
 interface UserMethods {
-    generateAuthToken: () => Promise<string>;
+    authenticate: (email: string, password: string) => Promise<UserProps>;
 }
 
 export interface UserModelProps extends Document, UserProps, UserMethods {}
@@ -50,36 +47,15 @@ const userSchema: Schema<UserModelProps> = new Schema({
         required: true,
         minLength: 7,
     },
-    tokens: [
-        {
-            token: {
-                type: String,
-                required: true,
-            },
-        },
-    ],
+    token: {
+        type: String,
+    },
     date: {
         type: Date,
         default: Date.now,
     },
 });
 
-userSchema.pre('save', async next => {
-    // Hash the password before saving the user model
-    if (this.isModified('password')) {
-        this.password = await bcrypt.hash(this.password, 8);
-    }
-    next();
-});
-
-userSchema.methods.generateAuthToken = async () => {
-    // Generate an auth token for the user
-    const token = jwt.sign({ _id: this._id }, process.env.JWT_KEY);
-    this.tokens = this.tokens.concat({ token });
-    await this.save();
-    return token;
-};
-
-const User: Model<UserProps> = model('User', userSchema);
+const User = model<Document & UserModelProps>('User', userSchema);
 
 export { User };
