@@ -1,20 +1,9 @@
 import { User } from '../models';
 import bcrypt from 'bcryptjs';
-// const generateAuthToken = async (user: Document & UserModelProps) => {
-//     // Generate an auth token for the user
-//     const token = jwt.sign({ _id: user._id }, process.env.JWT_KEY) as string;
-//     const tokens = user.tokens.concat(token);
-//     user.tokens = tokens;
-//     await user.save();
-//     return token;
-// };
-
-/**
- * Validate the POST req body and create a new User
- */
+import { Request, Response } from 'express';
 
 const PUBLIC_FIELDS = 'firstname lastname email';
-const create = async (req, res, next) => {
+const create = async (req: Request, res: Response) => {
     const user = new User(req.body);
     const errors = user.validateSync();
 
@@ -41,7 +30,7 @@ const create = async (req, res, next) => {
  * Get a single user
  * @param {String} name - the name of the User to retrieve
  */
-const getById = async (req, res) => {
+const getById = async (req: Request, res: Response) => {
     const { id } = req.params;
     try {
         const user = await User.findById(id, PUBLIC_FIELDS);
@@ -54,15 +43,7 @@ const getById = async (req, res) => {
 /**
  * List all the users. Query params ?skip=0&limit=1000 by default
  */
-const getAll = async (req, res) => {
-    // const skip = parseSkipLimit(req.query.skip) || 0;
-    // const limit = parseSkipLimit(req.query.limit, 1000) || 1000;
-    // if (skip instanceof APIError) {
-    //     return next(skip);
-    // } else if (limit instanceof APIError) {
-    //     return next(limit);
-    // }
-
+const getAll = async (req: Request, res: Response) => {
     const skip = req.query.skip;
     const limit = req.query.limit;
     try {
@@ -77,7 +58,7 @@ const getAll = async (req, res) => {
  * Update a single user
  * @param {String} name - the name of the User to update
  */
-const update = async (req, res) => {
+const update = async (req: Request, res: Response) => {
     const { id, ...props } = req.body;
     try {
         const user = await User.updateOne(id, props, { runValidators: true });
@@ -91,7 +72,7 @@ const update = async (req, res) => {
  * Remove a single user
  * @param {String} name - the name of the User to remove
  */
-const remove = async (req, res) => {
+const remove = async (req: Request, res: Response) => {
     const { id } = req.params;
     try {
         const deleteMsg = await User.deleteOne(id);
