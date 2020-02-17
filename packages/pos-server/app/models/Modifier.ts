@@ -33,12 +33,7 @@ const ModifierSchema: Schema<ModifierDocument> = new Schema(
         },
         mods: {
             type: Array,
-            items: [
-                {
-                    name: String,
-                    price: Number,
-                },
-            ],
+            items: [ModSchema],
         },
     },
     { timestamps: true },
