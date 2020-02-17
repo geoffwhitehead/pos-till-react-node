@@ -11,40 +11,43 @@ interface UserProps {
 
 export interface UserDocument extends Document, UserProps {}
 
-const UserSchema: Schema<UserDocument> = new Schema({
-    firstname: {
-        type: String,
-        required: true,
-    },
-    lastname: {
-        type: String,
-        required: true,
-    },
-    email: {
-        type: String,
-        required: true,
-        unique: true,
-        lowercase: true,
-        validate: (value: string): boolean => {
-            if (!validator.isEmail(value)) {
-                return false;
-            }
-            return true;
+const UserSchema: Schema<UserDocument> = new Schema(
+    {
+        firstname: {
+            type: String,
+            required: true,
+        },
+        lastname: {
+            type: String,
+            required: true,
+        },
+        email: {
+            type: String,
+            required: true,
+            unique: true,
+            lowercase: true,
+            validate: (value: string): boolean => {
+                if (!validator.isEmail(value)) {
+                    return false;
+                }
+                return true;
+            },
+        },
+        password: {
+            type: String,
+            required: true,
+            minLength: 7,
+        },
+        token: {
+            type: String,
+        },
+        date: {
+            type: Date,
+            default: Date.now,
         },
     },
-    password: {
-        type: String,
-        required: true,
-        minLength: 7,
-    },
-    token: {
-        type: String,
-    },
-    date: {
-        type: Date,
-        default: Date.now,
-    },
-});
+    { timestamps: true },
+);
 
 const User = model<UserDocument>('User', UserSchema);
 

@@ -10,23 +10,26 @@ interface ItemProps {
 
 export interface ItemDocument extends Document, ItemProps {}
 
-const ItemSchema: Schema<ItemDocument> = new Schema({
-    name: {
-        type: String,
-        required: true,
+const ItemSchema: Schema<ItemDocument> = new Schema(
+    {
+        name: {
+            type: String,
+            required: true,
+        },
+        categoryId: { type: Schema.Types.ObjectId, ref: 'Category' },
+        price: {
+            type: Number,
+        },
+        stock: {
+            type: Number,
+        },
+        modifierId: {
+            type: Schema.Types.ObjectId,
+            ref: 'Modifier',
+        },
     },
-    categoryId: { type: Schema.Types.ObjectId, ref: 'Category' },
-    price: {
-        type: Number,
-    },
-    stock: {
-        type: Number,
-    },
-    modifierId: {
-        type: Schema.Types.ObjectId,
-        ref: 'Modifier',
-    },
-});
+    { timestamps: true },
+);
 
 ItemSchema.path('price').get(function(num) {
     return (num / 100).toFixed(2);
