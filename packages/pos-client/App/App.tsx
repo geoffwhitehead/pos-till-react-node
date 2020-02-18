@@ -13,6 +13,7 @@ import { SignIn } from './pages/SignIn/SignIn'
 import AsyncStorage from '@react-native-community/async-storage'
 import { AuthContext } from './contexts/AuthContext'
 import { create } from 'apisauce'
+import { Toast } from 'native-base'
 
 const api = create({
   baseURL: 'http://localhost:5000',
@@ -91,7 +92,12 @@ export default ({ navigation }) => {
           dispatch({ type: 'SIGN_IN', token })
         }
       },
-      signOut: () => {
+      signOut: async () => {
+        try {
+          await AsyncStorage.removeItem('userToken')
+        } catch (e) {
+          console.log('sign out failed')
+        }
         api.setHeader('Authorization', '')
         dispatch({ type: 'SIGN_OUT' })
       },
