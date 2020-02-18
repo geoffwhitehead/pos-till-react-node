@@ -41,7 +41,8 @@ export const seed = async (req: Request, res: Response) => {
 
         const m = await modifier.save();
 
-        const items = new Array(ITEMS_TO_SEED).map(() => {
+        const items = [...Array(ITEMS_TO_SEED)].map(() => {
+            console.log('mappgin');
             return {
                 name: faker.commerce.product(),
                 categoryId: insertedCategories.insertedIds[rdm(CATEGORIES_TO_SEED.length)],
@@ -51,7 +52,7 @@ export const seed = async (req: Request, res: Response) => {
                         max: 15,
                     }) * 100,
                 stock: 10,
-                modifierId: faker.randomBoolean() ? m._id : null,
+                modifierId: faker.random.boolean() ? m._id : null,
             };
         });
         console.log('*************** items', JSON.stringify(items, null, 4));
@@ -65,6 +66,7 @@ export const seed = async (req: Request, res: Response) => {
 
         return res.send('Sucessfully seeded');
     } catch (err) {
+        console.log('err', err);
         return res.status(400).send(err);
     }
 };
