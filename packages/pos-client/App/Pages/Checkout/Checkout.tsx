@@ -1,6 +1,6 @@
 import React from 'react'
 import { Platform, View, ActivityIndicator, Image } from 'react-native'
-import { Helpers, Metrics } from '../../Theme'
+import { Helpers, Metrics } from '../../theme'
 import { Container, Button, Text } from 'native-base'
 import { useRealmQuery } from '../../hooks/useRealm'
 import { realm } from '../../services/Realm'

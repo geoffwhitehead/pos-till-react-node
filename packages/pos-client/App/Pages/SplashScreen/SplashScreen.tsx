@@ -7,7 +7,7 @@ export const SplashScreen: React.FC = () => {
     <View style={[styles.container]}>
       <View style={[styles.logo]}>
         {/* You will probably want to insert your logo here */}
-        <Text>LOGO</Text>
+        <Text>Loading</Text>
       </View>
     </View>
   )

@@ -12,6 +12,12 @@ import { SignUp } from './pages/SignUp/SignUp'
 import { SignIn } from './pages/SignIn/SignIn'
 import AsyncStorage from '@react-native-community/async-storage'
 import { AuthContext } from './contexts/AuthContext'
+import { create } from 'apisauce'
+
+const api = create({
+  baseURL: 'http://localhost:5000',
+  headers: { Accept: 'application/json' },
+})
 
 export default ({ navigation }) => {
   const [state, dispatch] = React.useReducer(
@@ -53,6 +59,7 @@ export default ({ navigation }) => {
       } catch (e) {
         console.log('Restoring token failed')
       }
+      api.setHeader('Authorization', userToken)
 
       // After restoring token, we may need to validate it in production apps
 
@@ -72,9 +79,22 @@ export default ({ navigation }) => {
         // After getting token, we need to persist the token using `AsyncStorage`
         // In the example, we'll use a dummy token
 
-        dispatch({ type: 'SIGN_IN', token: 'dummy-auth-token' })
+        console.log('data', data)
+        const { ok, data: token } = await api.post('/auth/login', data)
+        if (ok) {
+          api.setHeader('Authorization', token)
+          try {
+            await AsyncStorage.setItem('userToken', token)
+          } catch (e) {
+            console.log('Restoring token failed')
+          }
+          dispatch({ type: 'SIGN_IN', token })
+        }
       },
-      signOut: () => dispatch({ type: 'SIGN_OUT' }),
+      signOut: () => {
+        api.setHeader('Authorization', '')
+        dispatch({ type: 'SIGN_OUT' })
+      },
       signUp: async (data) => {
         // In a production app, we need to send user data to server and get a token
         // We will also need to handle errors if sign up failed
@@ -94,24 +114,29 @@ export default ({ navigation }) => {
 
   return (
     <AuthContext.Provider value={authContext}>
-      <Stack.Navigator>
-        {state.userToken == null ? (
-          // No token found, user isn't signed in
-          <Stack.Screen
-            name="SignIn"
-            component={SignIn}
-            options={{
-              title: 'SignIn',
-              // When logging out, a pop animation feels intuitive
-              // You can remove this if you want the default 'push' animation
-              animationTypeForReplace: state.isSignout ? 'pop' : 'push',
-            }}
-          />
-        ) : (
-          // User is signed in
-          <Stack.Screen name="Checkout" component={Checkout} />
-        )}
-      </Stack.Navigator>
+      <NavigationContainer>
+        <Stack.Navigator>
+          {state.userToken == null ? (
+            // No token found, user isn't signed in
+            <>
+              <Stack.Screen
+                name="SignIn"
+                component={SignIn}
+                options={{
+                  title: 'SignIn',
+                  // When logging out, a pop animation feels intuitive
+                  // You can remove this if you want the default 'push' animation
+                  animationTypeForReplace: state.isSignout ? 'pop' : 'push',
+                }}
+              />
+              <Stack.Screen name="SignUp" component={SignUp} />
+            </>
+          ) : (
+            // User is signed in
+            <Stack.Screen name="Checkout" component={Checkout} />
+          )}
+        </Stack.Navigator>
+      </NavigationContainer>
     </AuthContext.Provider>
   )
 }
