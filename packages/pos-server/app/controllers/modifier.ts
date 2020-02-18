@@ -3,6 +3,9 @@ import { Request, Response } from 'express';
 
 const create = async (req: Request, res: Response) => {
     const modifier = new Modifier(req.body);
+
+    console.log('*************** req.body', JSON.stringify(req.body, null, 4));
+    console.log('*************** modifier', JSON.stringify(modifier, null, 4));
     const errors = modifier.validateSync();
 
     if (errors) {
