@@ -62,6 +62,10 @@ const update = async (req: Request, res: Response) => {
     const { id, ...props } = req.body;
     try {
         const user = await User.updateOne(id, props, { runValidators: true });
+
+        if (user.err) {
+            throw new Error('Errors creating user');
+        }
         return res.send('user updated');
     } catch (err) {
         res.status(400).send(err);

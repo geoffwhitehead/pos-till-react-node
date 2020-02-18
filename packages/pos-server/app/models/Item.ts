@@ -4,8 +4,8 @@ interface ItemProps {
     name: string;
     categoryId: string;
     price: number;
-    stock: number;
-    modifierId: string;
+    stock?: number;
+    modifierId?: string;
 }
 
 export interface ItemDocument extends Document, ItemProps {}
