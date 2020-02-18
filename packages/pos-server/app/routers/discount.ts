@@ -14,7 +14,7 @@ router.get('/:id', [checkJwt], DiscountController.getById);
 router.post('/', [checkJwt], DiscountController.create);
 
 //Edit one user
-router.patch('/:id', [checkJwt], DiscountController.update);
+router.put('/:id', [checkJwt], DiscountController.update);
 
 //Delete one user
 router.delete('/:id', [checkJwt], DiscountController.remove);

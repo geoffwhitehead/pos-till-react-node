@@ -46,7 +46,15 @@ const UserSchema: Schema<UserDocument> = new Schema(
             default: Date.now,
         },
     },
-    { timestamps: true },
+    {
+        toJSON: {
+            virtuals: true,
+        },
+        toObject: {
+            virtuals: true,
+        },
+        timestamps: true,
+    },
 );
 
 const User = model<UserDocument>('User', UserSchema);
