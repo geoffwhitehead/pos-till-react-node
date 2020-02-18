@@ -1,9 +1,9 @@
 import { StyleSheet } from 'react-native'
-import { Colors } from 'App/Theme'
+import { colors } from './Colors'
 
 export default StyleSheet.create({
   backgroundReset: {
-    backgroundColor: Colors.transparent,
+    backgroundColor: colors.transparent,
   },
   center: {
     alignItems: 'center',

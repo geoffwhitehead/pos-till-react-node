@@ -1,12 +1,12 @@
 import { StyleSheet } from 'react-native'
-import { Colors } from 'App/Theme'
+import { colors } from '../../theme/Colors'
 
 export default StyleSheet.create({
   container: {
-    backgroundColor: Colors.primary,
+    backgroundColor: colors.primary,
   },
   logo: {
-    backgroundColor: Colors.white,
+    backgroundColor: colors.white,
     height: 70,
     width: 70,
   },

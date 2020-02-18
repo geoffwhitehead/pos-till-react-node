@@ -5,7 +5,7 @@
  * That allows to change them more easily later on.
  */
 
-export default {
+export const colors = {
   transparent: 'rgba(0,0,0,0)',
   // Example colors:
   white: '#ffffff',

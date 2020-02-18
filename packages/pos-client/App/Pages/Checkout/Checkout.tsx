@@ -2,8 +2,8 @@ import React from 'react'
 import { Platform, View, ActivityIndicator, Image } from 'react-native'
 import { Helpers, Metrics } from '../../Theme'
 import { Container, Button, Text } from 'native-base'
-import { useRealmQuery } from '../../Hooks/useRealm'
-import { realm } from '../../Services/Realm'
+import { useRealmQuery } from '../../hooks/useRealm'
+import { realm } from '../../services/Realm'
 
 const instructions = Platform.select({
   ios: 'Press Cmd+R to reload,\nCmd+D or shake for dev menu.',

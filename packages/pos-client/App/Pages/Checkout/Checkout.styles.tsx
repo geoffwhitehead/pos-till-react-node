@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native'
-import { Helpers, Metrics, Fonts, Colors } from 'App/Theme'
+import { Helpers, Metrics, Fonts, Colors } from '../../theme'
 
 export default StyleSheet.create({
   error: {
