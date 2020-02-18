@@ -1531,6 +1531,14 @@ anymatch@^2.0.0:
     micromatch "^3.1.4"
     normalize-path "^2.1.1"
 
+apisauce@^1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/apisauce/-/apisauce-1.1.1.tgz#8e1da3005d6b86c5e4b8309901e2aa1a3a124b1d"
+  integrity sha512-xAXMRFyv+6yjhgDIEMozAhioE2qLdxMJxIDbjwT2obttZso27WUOpVGKYK0SD2T+IjlcpNQAklYj0IG0U7YKXQ==
+  dependencies:
+    axios "^0.19.0"
+    ramda "^0.25.0"
+
 aproba@^1.0.3:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/aproba/-/aproba-1.2.0.tgz#6802e6264efd18c790a1b0d517f0f2627bf2c94a"
@@ -6411,6 +6419,11 @@ ramda@^0.24.1:
   version "0.24.1"
   resolved "https://registry.yarnpkg.com/ramda/-/ramda-0.24.1.tgz#c3b7755197f35b8dc3502228262c4c91ddb6b857"
   integrity sha1-w7d1UZfzW43DUCIoJixMkd22uFc=
+
+ramda@^0.25.0:
+  version "0.25.0"
+  resolved "https://registry.yarnpkg.com/ramda/-/ramda-0.25.0.tgz#8fdf68231cffa90bc2f9460390a0cb74a29b29a9"
+  integrity sha512-GXpfrYVPwx3K7RQ6aYT8KPS8XViSXUVJT1ONhoKPE9VAleW42YE+U+8VEyGWt41EnEQW7gwecYJriTI0pKoecQ==
 
 ramdasauce@^2.0.0:
   version "2.1.3"
