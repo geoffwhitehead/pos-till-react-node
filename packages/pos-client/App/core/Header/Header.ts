@@ -1,1 +1,0 @@
-export { Header } from "native-base"
