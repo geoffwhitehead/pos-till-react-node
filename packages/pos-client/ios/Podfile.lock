@@ -185,7 +185,7 @@ PODS:
     - React-cxxreact (= 0.61.5)
     - React-jsi (= 0.61.5)
   - React-jsinspector (0.61.5)
-  - react-native-safe-area-context (0.7.2):
+  - react-native-safe-area-context (0.7.3):
     - React
   - React-RCTActionSheet (0.61.5):
     - React-Core/RCTActionSheetHeaders (= 0.61.5)
@@ -222,18 +222,18 @@ PODS:
     - React-cxxreact (= 0.61.5)
     - React-jsi (= 0.61.5)
     - ReactCommon/jscallinvoker (= 0.61.5)
-  - RealmJS (3.6.3):
+  - RealmJS (3.6.4):
     - GCDWebServer
     - React
   - RNCAsyncStorage (1.8.0):
     - React
   - RNCMaskedView (0.1.6):
     - React
-  - RNGestureHandler (1.5.6):
+  - RNGestureHandler (1.6.0):
     - React
   - RNReanimated (1.7.0):
     - React
-  - RNScreens (2.0.0-beta.2):
+  - RNScreens (2.0.0-beta.7):
     - React
   - RNVectorIcons (6.6.0):
     - React
@@ -367,7 +367,7 @@ SPEC CHECKSUMS:
   React-jsi: cb2cd74d7ccf4cffb071a46833613edc79cdf8f7
   React-jsiexecutor: d5525f9ed5f782fdbacb64b9b01a43a9323d2386
   React-jsinspector: fa0ecc501688c3c4c34f28834a76302233e29dc0
-  react-native-safe-area-context: 4b3d1b9ebb040a4814a222703e7434b20c95fcf5
+  react-native-safe-area-context: e200d4433aba6b7e60b52da5f37af11f7a0b0392
   React-RCTActionSheet: 600b4d10e3aea0913b5a92256d2719c0cdd26d76
   React-RCTAnimation: 791a87558389c80908ed06cc5dfc5e7920dfa360
   React-RCTBlob: d89293cc0236d9cb0933d85e430b0bbe81ad1d72
@@ -378,15 +378,15 @@ SPEC CHECKSUMS:
   React-RCTText: 9ccc88273e9a3aacff5094d2175a605efa854dbe
   React-RCTVibration: a49a1f42bf8f5acf1c3e297097517c6b3af377ad
   ReactCommon: 198c7c8d3591f975e5431bec1b0b3b581aa1c5dd
-  RealmJS: c19d60dbe21606dade0f6217f4dd0d1fb8bb4e3a
+  RealmJS: efc6149c80687ae64c040148f7c2ade335a97416
   RNCAsyncStorage: 5d83b49070d41fd72906a116c5e7bdac4ea3a814
   RNCMaskedView: a88953beefbd347a29072d9eba90e42945fe291e
-  RNGestureHandler: 911d3b110a7a233a34c4f800e7188a84b75319c6
+  RNGestureHandler: dde546180bf24af0b5f737c8ad04b6f3fa51609a
   RNReanimated: 031fe8d9ea93c2bd689a40f05320ef9d96f74d7f
-  RNScreens: 5e4758109c6d35f9a009ce72af873df907548020
+  RNScreens: b9ea46d65967a1f74b9aaa1229d0f74f58d216b5
   RNVectorIcons: 0bb4def82230be1333ddaeee9fcba45f0b288ed4
   Yoga: f2a7cd4280bfe2cca5a7aed98ba0eb3d1310f18b
 
-PODFILE CHECKSUM: fffe09b5f35b127b3b86cd7b9440866ec6b2a2ec
+PODFILE CHECKSUM: 65644110b327d2dec2fd7f0e4337b3462527e0d8
 
 COCOAPODS: 1.8.4
