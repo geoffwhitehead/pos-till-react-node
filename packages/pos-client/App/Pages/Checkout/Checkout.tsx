@@ -13,19 +13,19 @@ const instructions = Platform.select({
   android: 'Double tap R on your keyboard to reload,\nShake or press menu button for dev menu.',
 })
 
-const query = () => realm.objects('Dog')
+const query = () => realm.objects('Item')
 
 export const Checkout = ({ navigation }) => {
-  const dogs = useRealmQuery(query)
+  const items = useRealmQuery(query)
   console.log('navigation', navigation)
   return (
     <Container>
       <SidebarHeader title="Checkout" onOpen={navigation.toggleDrawer()} />
-      <Text>{`Dogs: ${dogs.length}`}</Text>
+      <Text>{`Dogs: ${items.length}`}</Text>
       <Button
         onPress={() => {
           realm.write(() => {
-            realm.create('Dog', { name: 'Rex' })
+            realm.create('Item', { name: 'Rex' })
           })
         }}
       >

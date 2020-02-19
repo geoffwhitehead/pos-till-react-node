@@ -8,18 +8,20 @@ import {
   ModifierItem,
   ModifierSchema,
   OrganizationSchema,
+  CategorySchema,
 } from './schemas'
 
 const realm = new Realm({
   schema: [
     ItemSchema,
-    SelectedModsSchema,
-    BillItemSchema,
     PaymentSchema,
-    BillSchema,
     ModifierItem,
     ModifierSchema,
     OrganizationSchema,
+    SelectedModsSchema,
+    BillItemSchema,
+    BillSchema,
+    CategorySchema,
   ],
 })
 
