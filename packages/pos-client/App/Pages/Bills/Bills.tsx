@@ -1,6 +1,12 @@
 import React from 'react'
-import { Text } from '../../core'
+import { Text, Container } from '../../core'
+import { SidebarHeader } from '../../components/SidebarHeader/SidebarHeader'
 
-export const Bills: React.FC = () => {
-  return <Text>WIP Bills</Text>
+export const Bills = ({ navigation }) => {
+  return (
+    <Container>
+      <SidebarHeader title="Bills" onOpen={navigation.toggleDrawer()} />
+      <Text>WIP Bills</Text>
+    </Container>
+  )
 }

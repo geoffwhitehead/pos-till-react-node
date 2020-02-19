@@ -1,14 +1,18 @@
 import React from 'react'
-import { Text, Content, List, ListItem } from '../../core'
+import { Text, Content, List, ListItem, Container } from '../../core'
+import { SidebarHeader } from '../../components/SidebarHeader/SidebarHeader'
 
-export const Items: React.FC = () => {
+export const Items = ({ navigation }) => {
   return (
-    <Content>
-      <List>
-        <ListItem itemHeader first>
-          <Text>COMEDY</Text>
-        </ListItem>
-      </List>
-    </Content>
+    <Container>
+      <SidebarHeader title="Items" onOpen={navigation.toggleDrawer()} />
+      <Content>
+        <List>
+          <ListItem itemHeader first>
+            <Text>WIP Items</Text>
+          </ListItem>
+        </List>
+      </Content>
+    </Container>
   )
 }

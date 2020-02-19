@@ -21,16 +21,17 @@ export const Checkout = ({ navigation }) => {
   return (
     <Container>
       <SidebarHeader title="Checkout" onOpen={navigation.toggleDrawer()} />
-      <Text>{`Dogs: ${items.length}`}</Text>
-      <Button
-        onPress={() => {
-          realm.write(() => {
-            realm.create('Item', { name: 'Rex' })
-          })
-        }}
-      >
-        <Text>Add</Text>
-      </Button>
+      <Text>{`Items: ${items.length}`}</Text>
     </Container>
   )
 }
+
+// <Button
+//   onPress={() => {
+//     realm.write(() => {
+//       realm.create('Item', { name: 'Rex' })
+//     })
+//   }}
+// >
+//   <Text>Add</Text>
+// </Button> */}
