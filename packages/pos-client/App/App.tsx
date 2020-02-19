@@ -7,17 +7,15 @@ import { NavigationContainer } from '@react-navigation/native'
 import { Checkout } from './pages/Checkout/Checkout'
 import { SplashScreen } from './pages/SplashScreen/SplashScreen'
 import { createStackNavigator } from '@react-navigation/stack'
-const Stack = createStackNavigator()
-import { SignUp } from './pages/SignUp/SignUp'
 import { SignIn } from './pages/SignIn/SignIn'
 import AsyncStorage from '@react-native-community/async-storage'
 import { AuthContext } from './contexts/AuthContext'
 import { Toast } from 'native-base'
 import { Api } from './api'
 import { signUp, signIn } from './api/auth'
-import { createDrawerNavigator } from '@react-navigation/drawer'
+import { AppNavigator } from './navigators'
 
-export default ({ navigation }) => {
+export default () => {
   const [state, dispatch] = React.useReducer(
     (prevState, action) => {
       switch (action.type) {
@@ -120,52 +118,11 @@ export default ({ navigation }) => {
 
   return (
     <AuthContext.Provider value={authContext}>
-      <NavigationContainer>
-        <Stack.Navigator>
-          {state.userToken == null ? (
-            // No token found, user isn't signed in
-            <Stack.Screen name="Auth" component={AuthNavigator} />
-          ) : (
-            // User is signed in
-            <Stack.Screen name="Checkout" component={SidebarNavigator} />
-          )}
-        </Stack.Navigator>
-      </NavigationContainer>
+      <AppNavigator token={state.userToken} />
     </AuthContext.Provider>
   )
 }
 
-export const AuthNavigator = () => {
-  const Stack = createStackNavigator()
-
-  return (
-    <Stack.Navigator initialRouteName="SignIn">
-      <Stack.Screen
-        name="SignIn"
-        component={SignIn}
-        options={{
-          title: 'SignIn',
-          // When logging out, a pop animation feels intuitive
-          // You can remove this if you want the default 'push' animation
-          // animationTypeForReplace: state.isSignout ? 'pop' : 'push',
-        }}
-      />
-      <Stack.Screen name="SignUp" component={SignUp} />
-    </Stack.Navigator>
-  )
-}
-
-export const SidebarNavigator = () => {
-  const Drawer = createDrawerNavigator()
-  // const { signOut } = useContext(AuthContext)
-
-  return (
-    <Drawer.Navigator initialRouteName="Checkout">
-      <Drawer.Screen name="Checkout" component={Checkout} />
-      <Drawer.Screen name="Temp" component={SplashScreen} />
-    </Drawer.Navigator>
-  )
-}
 // export default () => {
 //   return (
 //     // <Provider store={store}>
