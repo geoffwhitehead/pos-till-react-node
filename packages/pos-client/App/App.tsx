@@ -62,10 +62,8 @@ export default ({ navigation }) => {
       }
       api.setHeader('Authorization', userToken)
 
-      // After restoring token, we may need to validate it in production apps
+      // TODO: validate token with server
 
-      // This will switch to the App screen or Auth screen and this loading
-      // screen will be unmounted and thrown away.
       dispatch({ type: 'RESTORE_TOKEN', token: userToken })
     }
 
@@ -75,39 +73,48 @@ export default ({ navigation }) => {
   const authContext = React.useMemo(
     () => ({
       signIn: async (data) => {
-        // In a production app, we need to send some data (usually username, password) to server and get a token
-        // We will also need to handle errors if sign in failed
-        // After getting token, we need to persist the token using `AsyncStorage`
-        // In the example, we'll use a dummy token
 
-        console.log('data', data)
-        const { ok, data: token } = await api.post('/auth/login', data)
-        if (ok) {
-          api.setHeader('Authorization', token)
-          try {
+        // TODO: handle errors
+        
+        try {
+          console.log('data', data)
+          const { ok, data: token } = await api.post('/auth/login', data)
+          if (ok) {
+            api.setHeader('Authorization', token)
             await AsyncStorage.setItem('userToken', token)
-          } catch (e) {
-            console.log('Restoring token failed')
+            dispatch({ type: 'SIGN_IN', token })
           }
-          dispatch({ type: 'SIGN_IN', token })
+        } catch (err) {
+          console.log('Error signing in', err)
         }
       },
       signOut: async () => {
         try {
           await AsyncStorage.removeItem('userToken')
+          api.setHeader('Authorization', '')
+          dispatch({ type: 'SIGN_OUT' })
         } catch (e) {
           console.log('sign out failed')
         }
-        api.setHeader('Authorization', '')
-        dispatch({ type: 'SIGN_OUT' })
       },
       signUp: async (data) => {
-        // In a production app, we need to send user data to server and get a token
-        // We will also need to handle errors if sign up failed
-        // After getting token, we need to persist the token using `AsyncStorage`
-        // In the example, we'll use a dummy token
 
-        dispatch({ type: 'SIGN_IN', token: 'dummy-auth-token' })
+        // TODO: handle errors
+
+        try {
+          const {ok, data: token} = await api.post<any, any>('/auth/register', data)
+
+          console.log('token', token)
+          if (ok) {
+            api.setHeader('Authorization', token)
+            await AsyncStorage.setItem('userToken', token)
+            dispatch({ type: 'SIGN_IN', token })
+          } else {
+            throw new Error('Sign up failed')
+          }
+        } catch (err) {
+          console.log('Sign up failed', err)
+        }
       },
     }),
     []
