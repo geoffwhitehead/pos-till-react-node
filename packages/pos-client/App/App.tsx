@@ -12,13 +12,11 @@ import { SignUp } from './pages/SignUp/SignUp'
 import { SignIn } from './pages/SignIn/SignIn'
 import AsyncStorage from '@react-native-community/async-storage'
 import { AuthContext } from './contexts/AuthContext'
-import { create } from 'apisauce'
 import { Toast } from 'native-base'
+import { Api } from "./api"
+import { signUp, signIn } from './api/auth'
 
-const api = create({
-  baseURL: 'http://localhost:5000',
-  headers: { Accept: 'application/json' },
-})
+
 
 export default ({ navigation }) => {
   const [state, dispatch] = React.useReducer(
@@ -60,7 +58,7 @@ export default ({ navigation }) => {
       } catch (e) {
         console.log('Restoring token failed')
       }
-      api.setHeader('Authorization', userToken)
+      Api.setHeader('Authorization', userToken)
 
       // TODO: validate token with server
 
@@ -77,10 +75,9 @@ export default ({ navigation }) => {
         // TODO: handle errors
         
         try {
-          console.log('data', data)
-          const { ok, data: token } = await api.post('/auth/login', data)
+          const { ok, data: token } = await signIn(data)
           if (ok) {
-            api.setHeader('Authorization', token)
+            Api.setHeader('Authorization', token)
             await AsyncStorage.setItem('userToken', token)
             dispatch({ type: 'SIGN_IN', token })
           }
@@ -91,7 +88,7 @@ export default ({ navigation }) => {
       signOut: async () => {
         try {
           await AsyncStorage.removeItem('userToken')
-          api.setHeader('Authorization', '')
+          Api.setHeader('Authorization', '')
           dispatch({ type: 'SIGN_OUT' })
         } catch (e) {
           console.log('sign out failed')
@@ -102,11 +99,10 @@ export default ({ navigation }) => {
         // TODO: handle errors
 
         try {
-          const {ok, data: token} = await api.post<any, any>('/auth/register', data)
+          const {ok, data: token} = await signUp(data)
 
-          console.log('token', token)
           if (ok) {
-            api.setHeader('Authorization', token)
+            Api.setHeader('Authorization', token)
             await AsyncStorage.setItem('userToken', token)
             dispatch({ type: 'SIGN_IN', token })
           } else {
