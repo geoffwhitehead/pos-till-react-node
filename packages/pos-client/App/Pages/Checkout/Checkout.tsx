@@ -15,94 +15,22 @@ const instructions = Platform.select({
 
 const query = () => realm.objects('Dog')
 
-// class Checkout extends Component {
-//   closeDrawer = () => {
-//     this.drawer._root.close()
-//   }
-//   openDrawer = () => {
-//     this.drawer._root.open()
-//   }
-//   render() {
-//     const dogs = useRealmQuery(query)
-//     return (
-//       <Drawer
-//         ref={(ref) => {
-//           this.drawer = ref
-//         }}
-//         content={<Sidebar />}
-//         onClose={() => this.closeDrawer()}
-//       >
-
-//         <Text>{`Dogs: ${dogs.length}`}</Text>
-//         <Button
-//           onPress={() => {
-//             realm.write(() => {
-//               realm.create('Dog', { name: 'Rex' })
-//             })
-//           }}
-//         >
-//           <Text>Add</Text>
-//         </Button>
-//       </Drawer>
-//     )
-//   }
-// }
-
-// export { Checkout }
 export const Checkout = ({ navigation }) => {
   const dogs = useRealmQuery(query)
-  // const openSidebar = this.openDrawer.bind(this)
-  // closeDrawer = () => {
-  //   this.drawer._root.close()
-  // };
-  // openDrawer = () => {
-  //   this.drawer._root.open()
-  // };
-
   console.log('navigation', navigation)
   return (
     <Container>
       <SidebarHeader title="Checkout" onOpen={navigation.toggleDrawer()} />
-
-      {/* <Sidebar navigation={navigation}>
-      </Sidebar> */}
-        <Text>BLA</Text>
-      {/* </Sidebar> */}
+      <Text>{`Dogs: ${dogs.length}`}</Text>
+      <Button
+        onPress={() => {
+          realm.write(() => {
+            realm.create('Dog', { name: 'Rex' })
+          })
+        }}
+      >
+        <Text>Add</Text>
+      </Button>
     </Container>
   )
-  // return (
-  //   <Container>
-  //     <Sidebar>
-  //       {({ openDrawer }) => {
-  //         console.log('props', openDrawer)
-  //         return (
-  //           <>
-  //             {/* <SidebarHeader title="Checkout" onOpen={openDrawer} /> */}
-
-  //             <Text>{`Dogs: ${dogs.length}`}</Text>
-  //             <Button
-  //               onPress={() => {
-  //                 realm.write(() => {
-  //                   realm.create('Dog', { name: 'Rex' })
-  //                 })
-  //               }}
-  //             >
-  //               <Text>Add</Text>
-  //             </Button>
-  //           </>
-  //         )
-  //       }}
-  //     </Sidebar>
-  //   </Container>
-  // )
-}
-
-// style={[
-//   Helpers.fill,
-//   Helpers.rowMain,
-//   Metrics.mediumHorizontalMargin,
-//   Metrics.mediumVerticalMargin,
-// ]}
-{
-  /* <SidebarHeader title="Checkout" onOpen={() => {}}/> */
 }

@@ -1,16 +1,16 @@
-import React, { Component } from 'react'
-import { Provider } from 'react-redux'
-import { PersistGate } from 'redux-persist/lib/integration/react'
-import Realm from 'realm'
-import { NavigationContainer } from '@react-navigation/native'
+import React from 'react'
+// import { Provider } from 'react-redux'
+// import { PersistGate } from 'redux-persist/lib/integration/react'
+// import Realm from 'realm'
+// import { NavigationContainer } from '@react-navigation/native'
 // const { store, persistor } = createStore()
-import { Checkout } from './pages/Checkout/Checkout'
+// import { Checkout } from './pages/Checkout/Checkout'
 import { SplashScreen } from './pages/SplashScreen/SplashScreen'
-import { createStackNavigator } from '@react-navigation/stack'
-import { SignIn } from './pages/SignIn/SignIn'
+// import { createStackNavigator } from '@react-navigation/stack'
+// import { SignIn } from './pages/SignIn/SignIn'
 import AsyncStorage from '@react-native-community/async-storage'
 import { AuthContext } from './contexts/AuthContext'
-import { Toast } from 'native-base'
+// import { Toast } from 'native-base'
 import { Api } from './api'
 import { signUp, signIn } from './api/auth'
 import { AppNavigator } from './navigators'
@@ -64,6 +64,8 @@ export default () => {
 
     bootstrapAsync()
   }, [])
+
+  React.useEffect(() => {})
 
   const authContext = React.useMemo(
     () => ({

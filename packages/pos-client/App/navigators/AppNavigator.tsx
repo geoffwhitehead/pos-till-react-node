@@ -16,7 +16,11 @@ export const AppNavigator = (token: any) => {
           <Stack.Screen name="Auth" component={AuthNavigator} />
         ) : (
           // User is signed in
-          <Stack.Screen name="Checkout" component={SidebarNavigator} />
+          <Stack.Screen
+            name="Sidebar"
+            component={SidebarNavigator}
+            options={{ headerShown: false }}
+          />
         )}
       </Stack.Navigator>
     </NavigationContainer>
