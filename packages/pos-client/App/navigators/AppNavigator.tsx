@@ -5,7 +5,7 @@ import { createStackNavigator } from '@react-navigation/stack'
 import React from 'react'
 
 // TODO: fix type
-export const AppNavigator = (token: any) => {
+export const AppNavigator = (token: any, isPopulated: boolean) => {
   const Stack = createStackNavigator()
 
   return (
