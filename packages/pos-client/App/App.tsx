@@ -14,11 +14,18 @@ import { AuthContext } from './contexts/AuthContext'
 import { Api } from './api'
 import { signUp, signIn } from './api/auth'
 import { AppNavigator } from './navigators'
+import { populate } from './services/populate'
+import { Loading } from './pages/Loading/Loading'
 
 export default () => {
   const [state, dispatch] = React.useReducer(
     (prevState, action) => {
       switch (action.type) {
+        case 'POPULATED':
+          return {
+            ...prevState,
+            hasPopulated: true,
+          }
         case 'RESTORE_TOKEN':
           return {
             ...prevState,
@@ -43,8 +50,25 @@ export default () => {
       isLoading: true,
       isSignout: false,
       userToken: null,
+      hasPopulated: false,
     }
   )
+  
+  React.useEffect(() => {
+    const populateAsync = async () => {
+      // TODO: use the dataId property to validate whether we need to re populate.
+      try {
+        await populate()
+      } catch (err) {
+        console.log('Populating failed', err)
+      }
+      dispatch({ type: 'POPULATED' })
+    }
+    console.log('state.userToken', state.userToken)
+    if (state.userToken) {
+      populateAsync()
+    }
+  }, [state.userToken])
 
   React.useEffect(() => {
     const bootstrapAsync = async () => {
@@ -55,7 +79,7 @@ export default () => {
       } catch (e) {
         console.log('Restoring token failed')
       }
-      Api.setHeader('Authorization', userToken)
+      Api.setHeader('Authorization', `Bearer ${userToken}`)
 
       // TODO: validate token with server
 
@@ -75,7 +99,7 @@ export default () => {
         try {
           const { ok, data: token } = await signIn(data)
           if (ok) {
-            Api.setHeader('Authorization', token)
+            Api.setHeader('Authorization', `Bearer ${token}`)
             await AsyncStorage.setItem('userToken', token)
             dispatch({ type: 'SIGN_IN', token })
           }
@@ -99,7 +123,7 @@ export default () => {
           const { ok, data: token } = await signUp(data)
 
           if (ok) {
-            Api.setHeader('Authorization', token)
+            Api.setHeader('Authorization', `Bearer ${token}`)
             await AsyncStorage.setItem('userToken', token)
             dispatch({ type: 'SIGN_IN', token })
           } else {
@@ -116,6 +140,11 @@ export default () => {
   if (state.isLoading) {
     // We haven't finished checking for the token yet
     return <SplashScreen />
+  }
+
+  if (state.userToken && !state.hasPopulated) {
+    // We haven't finished loading yet
+    return <Loading />
   }
 
   return (
