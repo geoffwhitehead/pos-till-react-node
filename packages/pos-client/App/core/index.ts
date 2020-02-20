@@ -15,5 +15,6 @@ export {
   Title,
   List,
   Drawer,
-  ListItem
+  ListItem,
+  Spinner,
 } from 'native-base'
