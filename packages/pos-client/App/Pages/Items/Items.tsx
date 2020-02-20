@@ -1,5 +1,5 @@
 import React from 'react'
-import { Text, Content, List, ListItem, Container, Badge } from '../../core'
+import { Text, Content, List, Separator, ListItem, Container, Badge } from '../../core'
 import { SidebarHeader } from '../../components/SidebarHeader/SidebarHeader'
 import { Loading } from '../Loading/Loading'
 import { useRealmQuery } from 'react-use-realm'
@@ -28,9 +28,9 @@ export const Items = ({ navigation }) => {
               </ListItem>
             )
             const Divider = (
-              <ListItem itemDivider>
+              <Separator bordered>
                 <Text>{cur.categoryId.name}</Text>
-              </ListItem>
+              </Separator>
             )
             if (firstRecord || currentRecordIsNewCategory) {
               return [...acc, Divider, Item]
