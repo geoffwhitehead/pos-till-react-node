@@ -21,6 +21,7 @@ export const populate = async () => {
         mods: modifier.mods.map((mod, index) => {
           return {
             ...mod,
+            // TODO: might be better to create _ids on server and change data structure
             _id: index.toString(),
             price: parseInt(mod.price),
           }

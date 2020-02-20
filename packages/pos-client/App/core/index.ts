@@ -17,4 +17,5 @@ export {
   Drawer,
   ListItem,
   Spinner,
+  Badge,
 } from 'native-base'
