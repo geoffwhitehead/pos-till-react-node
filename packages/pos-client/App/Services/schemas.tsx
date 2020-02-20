@@ -6,7 +6,7 @@ export const ItemSchema = {
     name: 'string',
     categoryId: 'Category',
     price: 'float',
-    modifierId: 'Modifier',
+    modifierId: { type: 'Modifier', optional: true },
   },
 }
 
@@ -80,12 +80,12 @@ export const BillItemSchema = {
 }
 
 export const CategorySchema = {
-    name: 'Category',
-    primaryKey: "_id",
-    properties: {
-        _id: "string",
-        name: "string"
-    }
+  name: 'Category',
+  primaryKey: '_id',
+  properties: {
+    _id: 'string',
+    name: 'string',
+  },
 }
 
 export const BillSchema = {
