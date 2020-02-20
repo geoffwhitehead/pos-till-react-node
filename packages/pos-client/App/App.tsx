@@ -16,16 +16,13 @@ import { signUp, signIn } from './api/auth'
 import { AppNavigator } from './navigators'
 import { populate } from './services/populate'
 import { Loading } from './pages/Loading/Loading'
+import { realm } from './services/Realm'
+import { RealmProvider } from 'react-use-realm'
 
 export default () => {
   const [state, dispatch] = React.useReducer(
     (prevState, action) => {
       switch (action.type) {
-        case 'POPULATED':
-          return {
-            ...prevState,
-            hasPopulated: true,
-          }
         case 'RESTORE_TOKEN':
           return {
             ...prevState,
@@ -50,25 +47,9 @@ export default () => {
       isLoading: true,
       isSignout: false,
       userToken: null,
-      hasPopulated: false,
     }
   )
-  
-  React.useEffect(() => {
-    const populateAsync = async () => {
-      // TODO: use the dataId property to validate whether we need to re populate.
-      try {
-        await populate()
-      } catch (err) {
-        console.log('Populating failed', err)
-      }
-      dispatch({ type: 'POPULATED' })
-    }
-    console.log('state.userToken', state.userToken)
-    if (state.userToken) {
-      populateAsync()
-    }
-  }, [state.userToken])
+
 
   React.useEffect(() => {
     const bootstrapAsync = async () => {
@@ -142,14 +123,11 @@ export default () => {
     return <SplashScreen />
   }
 
-  if (state.userToken && !state.hasPopulated) {
-    // We haven't finished loading yet
-    return <Loading />
-  }
-
   return (
     <AuthContext.Provider value={authContext}>
-      <AppNavigator token={state.userToken} />
+      <RealmProvider initialRealm={realm}>
+        <AppNavigator token={state.userToken} />
+      </RealmProvider>
     </AuthContext.Provider>
   )
 }
