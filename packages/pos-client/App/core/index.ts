@@ -18,4 +18,7 @@ export {
   ListItem,
   Spinner,
   Badge,
+  Separator,
+  Grid,
+  Col,
 } from 'native-base'
