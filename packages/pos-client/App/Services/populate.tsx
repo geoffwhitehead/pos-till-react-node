@@ -2,6 +2,7 @@ import { getItems } from '../api/items'
 import { realm } from '../services/Realm'
 import { getCategories } from '../api/category'
 import { getModifiers } from '../api/modifier'
+import { BillRegister } from './schemas'
 
 export const populate = async () => {
   try {
@@ -10,10 +11,6 @@ export const populate = async () => {
       getCategories(),
       getModifiers(),
     ])
-
-    console.log('items', items)
-    console.log('categories', categories)
-    console.log('modifiers', modifiers)
 
     const remappedModifiers = modifiers.map((modifier) => {
       return {
@@ -29,21 +26,21 @@ export const populate = async () => {
       }
     })
     realm.write(() => {
+      realm.deleteAll()
       items.map((item) => {
-        realm.create(
-          'Item',
-          {
-            ...item,
-            categoryId: categories.find((c) => c._id === item.categoryId),
-            modifierId: item.modifierId
-              ? remappedModifiers.find((m) => m._id === item.modifierId)
-              : null,
-          },
-          true
-        )
+        const i = {
+          ...item,
+          categoryId: categories.find((c) => c._id === item.categoryId),
+          modifierId: item.modifierId
+            ? remappedModifiers.find((m) => m._id === item.modifierId)
+            : null,
+        }
+        console.log('i', i)
+        realm.create('Item', i, true)
 
         // need to update item.category with object
       })
+      realm.create(BillRegister.name, {}, true)
     })
   } catch (err) {
     console.log('ERROR ', err)

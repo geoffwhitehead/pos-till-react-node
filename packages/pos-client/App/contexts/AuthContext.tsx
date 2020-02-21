@@ -10,3 +10,5 @@ export const AuthContext = React.createContext<AuthContextProps>({
   signOut: () => {},
   signUp: async (data) => {},
 })
+
+

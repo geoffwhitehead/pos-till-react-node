@@ -21,4 +21,5 @@ export {
   Separator,
   Grid,
   Col,
+  Row,
 } from 'native-base'

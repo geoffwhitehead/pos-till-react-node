@@ -93,9 +93,19 @@ export const BillSchema = {
   primaryKey: '_id',
   properties: {
     _id: 'string',
-    items: 'BillItem[]',
-    payments: 'Payment[]',
-    timestamp: 'date',
-    discount: 'int',
+    items: {type: 'BillItem[]', default: []},
+    payments: {type: 'Payment[]', default: []},
+    timestamp: {type: 'date', default: Date.now()},
+    discount: {type: 'int', optional: true},
+    tab: 'int',
+  },
+}
+
+export const BillRegister = {
+  name: 'BillRegister',
+  properties: {
+    maxBills: { type: 'int', default: 40 },
+    activeBill: 'Bill',
+    openBills: { type: 'Bill[]', default: [] },
   },
 }

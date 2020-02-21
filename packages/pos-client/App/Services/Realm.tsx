@@ -9,6 +9,7 @@ import {
   ModifierSchema,
   OrganizationSchema,
   CategorySchema,
+  BillRegister,
 } from './schemas'
 
 const realm = new Realm({
@@ -22,7 +23,12 @@ const realm = new Realm({
     BillItemSchema,
     BillSchema,
     CategorySchema,
+    BillRegister,
   ],
+  schemaVersion: 2,
+  migration: function(oldRealm, newRealm) {
+    newRealm.deleteAll()
+  },
 })
 
 export { realm }

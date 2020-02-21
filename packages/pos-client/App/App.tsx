@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 // import { Provider } from 'react-redux'
 // import { PersistGate } from 'redux-persist/lib/integration/react'
 // import Realm from 'realm'
@@ -13,11 +13,11 @@ import { AuthContext } from './contexts/AuthContext'
 // import { Toast } from 'native-base'
 import { Api } from './api'
 import { signUp, signIn } from './api/auth'
-import { AppNavigator } from './navigators'
-import { populate } from './services/populate'
-import { Loading } from './pages/Loading/Loading'
+import { AuthNavigator } from './navigators'
 import { realm } from './services/Realm'
 import { RealmProvider } from 'react-use-realm'
+import { Main } from './pages/Main/Main'
+import { NavigationContainer } from '@react-navigation/native'
 
 export default () => {
   const [state, dispatch] = React.useReducer(
@@ -49,7 +49,6 @@ export default () => {
       userToken: null,
     }
   )
-
 
   React.useEffect(() => {
     const bootstrapAsync = async () => {
@@ -124,11 +123,30 @@ export default () => {
   }
 
   return (
-    <AuthContext.Provider value={authContext}>
-      <RealmProvider initialRealm={realm}>
-        <AppNavigator token={state.userToken} />
-      </RealmProvider>
-    </AuthContext.Provider>
+    <NavigationContainer>
+      <AuthContext.Provider value={authContext}>
+        {state.userToken == null ? (
+          <AuthNavigator />
+        ) : (
+          // No token found, user isn't signed in
+          // <Stack.Screen name="Auth" component={AuthNavigator} />
+          <AuthContext.Provider value={authContext}>
+            <RealmProvider initialRealm={realm}>
+              <Main />
+            </RealmProvider>
+          </AuthContext.Provider>
+          // User is signed in
+        )}
+
+        {/* <Stack.Screen
+            name="Main"
+            component={Main}
+            options={{ headerShown: false }}
+          /> */}
+
+        {/* <AppNavigator token={state.userToken} /> */}
+      </AuthContext.Provider>
+    </NavigationContainer>
   )
 }
 

@@ -2,6 +2,8 @@ import { NavigationContainer } from '@react-navigation/native'
 import { SidebarNavigator } from './SidebarNavigator'
 import { AuthNavigator } from './AuthNavigator'
 import { createStackNavigator } from '@react-navigation/stack'
+import { Main } from "../pages/Main/Main"
+
 import React from 'react'
 
 // TODO: fix type
@@ -9,7 +11,6 @@ export const AppNavigator = (token: any, isPopulated: boolean) => {
   const Stack = createStackNavigator()
 
   return (
-    <NavigationContainer>
       <Stack.Navigator>
         {token == null ? (
           // No token found, user isn't signed in
@@ -17,12 +18,11 @@ export const AppNavigator = (token: any, isPopulated: boolean) => {
         ) : (
           // User is signed in
           <Stack.Screen
-            name="Sidebar"
-            component={SidebarNavigator}
+            name="Main"
+            component={Main}
             options={{ headerShown: false }}
           />
         )}
       </Stack.Navigator>
-    </NavigationContainer>
   )
 }
