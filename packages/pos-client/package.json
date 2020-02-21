@@ -13,7 +13,8 @@
     "lint-fix": "eslint --fix .",
     "lint-check": "eslint .",
     "rename": "react-native-rename",
-    "postinstall": "npx jetify"
+    "postinstall": "npx jetify",
+    "find:realm": "find ~/Library -type f -name 'default.realm'"
   },
   "dependencies": {
     "@react-native-community/async-storage": "^1.8.0",

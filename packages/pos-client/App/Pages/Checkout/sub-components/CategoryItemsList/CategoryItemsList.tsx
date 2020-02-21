@@ -6,27 +6,30 @@ import { ItemSchema } from '../../../../services/schemas'
 import { routes } from '../../../../navigators/CheckoutItemNavigator'
 
 export const CategoryItemsList: React.FC = ({ route, navigation }) => {
-  const { category } = route.params
+  const { category, items, modifiers, createBillItem } = route.params
 
-  console.log('category', category)
-  const items = useRealmQuery({
-    source: ItemSchema.name,
-    sort: ['name'],
-    filter: 'categoryId._id CONTAINS $0',
-    variables: category._id,
-  })
+  // console.log('category', category)
+  // const items = useRealmQuery({
+  //   source: ItemSchema.name,
+  //   sort: ['name'],
+  //   filter: 'categoryId._id CONTAINS $0',
+  //   variables: category._id,
+  // })
 
   const goBack = () => navigation.goBack()
 
   const onPressItemFactory = (item) => () => {
+    console.log('item', item)
     if (item.modifierId) {
+      const modifier = modifiers.filtered(`_id = "${item.modifierId._id}"`)[0]
+      console.log('modifier', modifier)
       navigation.navigate(routes.itemModifierList, {
         item,
+        modifier,
       })
     } else {
       // create a new bill item
-
-      goBack()
+      createBillItem(item)
     }
   }
 
@@ -44,7 +47,7 @@ export const CategoryItemsList: React.FC = ({ route, navigation }) => {
         </ListItem>
         {items.map((item) => {
           return (
-            <ListItem onPress={onPressItemFactory(item)}>
+            <ListItem key={item._id} onPress={onPressItemFactory(item)}>
               <Text>{item.name}</Text>
             </ListItem>
           )

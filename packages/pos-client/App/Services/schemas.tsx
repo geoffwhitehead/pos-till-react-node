@@ -53,12 +53,12 @@ export const OrganizationSchema = {
     dataId: 'string',
   },
 }
-export const SelectedModsSchema = {
-  name: 'SelectedMod',
+export const BillItemModifierSchema = {
+  name: 'BillItemModifier',
   primaryKey: '_id',
   properties: {
     _id: 'string',
-    modId: 'ModifierItem',
+    modId: 'string',
     name: 'string',
     price: 'float',
   },
@@ -72,9 +72,9 @@ export const BillItemSchema = {
     itemId: 'string',
     name: 'string',
     price: 'float',
-    modId: 'Modifier',
-    mods: 'SelectedMod[]',
-    categoryId: 'Category',
+    modifierId: 'string',
+    mods: 'BillItemModifier[]',
+    categoryId: 'string',
     categoryName: 'string',
   },
 }
@@ -95,17 +95,18 @@ export const BillSchema = {
     _id: 'string',
     items: { type: 'BillItem[]', default: [] },
     payments: { type: 'Payment[]', default: [] },
-    timestamp: { type: 'date', default: Date.now() },
+    timestamp: { type: 'date', default: Date() },
     discount: { type: 'int', optional: true },
     tab: 'int',
+    isClosed: { type: 'bool', default: false, indexed: true },
   },
 }
 
-export const BillRegister = {
-  name: 'BillRegister',
-  properties: {
-    maxBills: { type: 'int', default: 40 },
-    activeBill: { type: 'int', optional: true },
-    openBills: { type: 'Bill[]', default: [] },
-  },
-}
+// export const BillRegister = {
+//   name: 'BillRegister',
+//   properties: {
+//     maxBills: { type: 'int', default: 40 },
+//     activeBill: { type: 'int', optional: true },
+//     openBills: { type: 'Bill[]', default: [] },
+//   },
+// }

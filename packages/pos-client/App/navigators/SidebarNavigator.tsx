@@ -10,7 +10,7 @@ import React from 'react'
 export const SidebarNavigator = () => {
   const Drawer = createDrawerNavigator()
   return (
-    <Drawer.Navigator>
+    <Drawer.Navigator initialRouteName="Checkout">
       <Drawer.Screen name="Checkout" component={Checkout} />
       <Drawer.Screen name="Items" component={Items} />
       <Drawer.Screen name="Reports" component={Reports} />

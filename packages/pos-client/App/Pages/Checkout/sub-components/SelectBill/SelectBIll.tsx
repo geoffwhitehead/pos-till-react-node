@@ -4,56 +4,39 @@ import {
   Content,
   List,
   ListItem,
-  Button,
-  Badge,
   Left,
   Body,
   Right,
-  Icon,
 } from '../../../../core'
-import { routes } from '../../../../navigators/CheckoutItemNavigator'
-import { useRealmQuery } from 'react-use-realm'
-import { BillRegister, BillSchema } from '../../../../services/schemas'
-import { realm } from '../../../../services/Realm'
-import uuidv4 from 'uuid/v4'
 
-export const SelectBill: React.FC = ({ navigation }) => {
-  const billRegister = useRealmQuery({ source: BillRegister.name })
+interface SelectBillProps {
+  openBills: any // TODO: fix realm types
+  maxBills: number;
+  onSelectBill: (index: number, bill: any) => void
+}
 
-  const billsArr = [billRegister[0].maxBills].map((n, index) => {
-    const found = billRegister[0].openBills.find((ob) => ob.tab === index)
-    return found || {}
-  })
+export const SelectBill: React.FC<SelectBillProps> = ({ openBills, maxBills, onSelectBill }) => {
+  const bills = openBills.reduce((acc, bill) => {
+    acc[bill.tab - 1] = bill
+    return [...acc]
+  }, Array(maxBills).fill(null))
 
-  const setActiveBillFactory = (bill, index) => () => {
-    realm.write(() => {
-      if (!bill) {
-        const _id = uuidv4()
-        realm.create(BillSchema.name, { _id, tab: index })
-        billRegister[0].activeBill = _id
-      } else {
-        billRegister[0].activeBill = bill._id
-      }
-    })
-  }
-  const goBack = () => navigation.goBack()
-
+  console.log('!!!!!!!bills', bills)
+  const onSelectBillFactory = (tab, bill) => () => onSelectBill(tab, bill)
   const sum = (billPayments) => billPayments.reduce((acc, cur) => acc + cur.price, 0)
   return (
     <Content>
       <List>
         <ListItem itemHeader first>
-          <Left>
-            <Icon onPress={goBack} name="ios-arrow-back" />
-            <Text>Bills</Text>
-          </Left>
-          <Body />
-          <Right />
+          <Text>Bills</Text>
         </ListItem>
-        {billsArr.map((bill, index) => {
+        {bills.map((bill, index) => {
+          const tab = index + 1
           return (
-            <ListItem icon onPress={setActiveBillFactory(bill, index)}>
-              <Left>{bill ? <Badge success>Open</Badge> : <Badge>Closed</Badge>}</Left>
+            <ListItem key={index} icon onPress={onSelectBillFactory(tab, bill)}>
+              <Left>
+                <Text>{`${tab} ${bill ? 'Open' : 'Closed'}`}</Text>
+              </Left>
               <Body>
                 <Text>{bill ? sum(bill.payments) : ''}</Text>
               </Body>

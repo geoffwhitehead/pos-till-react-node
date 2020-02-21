@@ -2,7 +2,6 @@ import React, { useState } from 'react'
 // import { Provider } from 'react-redux'
 // import { PersistGate } from 'redux-persist/lib/integration/react'
 // import Realm from 'realm'
-// import { NavigationContainer } from '@react-navigation/native'
 // const { store, persistor } = createStore()
 // import { Checkout } from './pages/Checkout/Checkout'
 import { SplashScreen } from './pages/SplashScreen/SplashScreen'
@@ -68,8 +67,6 @@ export default () => {
 
     bootstrapAsync()
   }, [])
-
-  React.useEffect(() => {})
 
   const authContext = React.useMemo(
     () => ({
@@ -149,17 +146,3 @@ export default () => {
     </NavigationContainer>
   )
 }
-
-// export default () => {
-//   return (
-//     // <Provider store={store}>
-//     // <PersistGate loading={null} persistor={persistor}>
-//     <NavigationContainer>
-//       <Stack.Navigator initialRouteName="Checkout">
-//         <Stack.Screen name="Checkout" component={Checkout} />
-//       </Stack.Navigator>
-//     </NavigationContainer>
-//     // </PersistGate>
-//     // </Provider>
-//   )
-// }

@@ -7,6 +7,7 @@ interface SidebarHeaderProps {
 }
 
 export const SidebarHeader: React.SFC<SidebarHeaderProps> = ({ title, onOpen }) => {
+
   return (
     <Header>
       <Left>

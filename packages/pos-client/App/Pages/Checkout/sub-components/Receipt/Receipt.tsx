@@ -1,25 +1,73 @@
 import React from 'react'
-import { Text, Col, Grid, Row, Button } from '../../../../core'
-import { routes } from '../../../../navigators/CheckoutPaymentNavigator'
+import {
+  Text,
+  Col,
+  Grid,
+  Row,
+  Button,
+  Header,
+  Content,
+  List,
+  ListItem,
+  Icon,
+} from '../../../../core'
 
-export const Receipt = ({ navigation, billRegister }) => {
-  const onSelectBill = () => navigation.navigate(routes.selectBill)
-
-  console.log('billRegister', billRegister)
+export const Receipt = ({ activeBill, onSelectBill }) => {
   return (
     <Grid>
-      <Row style={{ height: 75 }}>
+      <Row style={{ height: 75, backgroundColor: 'teal' }}>
         <Col style={{ backgroundColor: 'teal' }}>
-          <Button style={{ height: 75 }} light onPress={onSelectBill}>
-            {/* <Text>{billRegister.activeBill || 'none'}</Text> */}
+          <Button light small onPress={onSelectBill}>
+            <Text>{(activeBill && activeBill.tab) || '-'}</Text>
           </Button>
         </Col>
-        <Col style={{ backgroundColor: 'yellow' }}></Col>
+        <Col style={{ backgroundColor: 'yellow' }}>
+          <Text>Something</Text>
+        </Col>
       </Row>
 
-      <Row>
-        <Text>WIP</Text>
-      </Row>
+      {activeBill && (
+        <Row>
+          <SwipableList activeBill={activeBill} />
+        </Row>
+      )}
     </Grid>
+  )
+}
+
+const deleteItem = (data) => () => {
+  // delete here
+  console.log('delete data', data)
+}
+
+const info = (data) => () => {
+  // info here
+  console.log('info data', data)
+}
+
+const SwipableList = (activeBill) => {
+  return (
+    <Content>
+      <List
+        leftOpenValue={75}
+        rightOpenValue={-75}
+        dataSource={activeBill.items}
+        renderRow={(item) => (
+          <ListItem>
+            <Text> {item.name} </Text>
+          </ListItem>
+        )}
+        renderLeftHiddenRow={(data) => (
+          <Button full onPress={info(data)}>
+            <Icon active name="information-circle" />
+          </Button>
+        )}
+        renderRightHiddenRow={(data, secId, rowId, rowMap) => (
+          <Button full danger onPress={deleteItem(data)}>
+            <Icon active name="trash" />
+          </Button>
+        )}
+      />
+    </Content>
   )
 }

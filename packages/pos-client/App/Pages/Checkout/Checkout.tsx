@@ -5,10 +5,13 @@ import { SidebarHeader } from '../../components/SidebarHeader/SidebarHeader'
 import { populate } from '../../services/populate'
 import { Loading } from '../Loading/Loading'
 import { useRealmQuery } from 'react-use-realm'
-import { ItemSchema, BillRegister } from '../../services/schemas'
+import { ItemSchema, BillSchema } from '../../services/schemas'
 import { CheckoutItemNavigator } from '../../navigators/CheckoutItemNavigator'
 import { Receipt } from './sub-components/Receipt/Receipt'
 import { CheckoutPaymentNavigator } from '../../navigators/CheckoutPaymentNavigator'
+import { SelectBill } from './sub-components/SelectBill/SelectBIll'
+import { realm } from '../../services/Realm'
+import uuidv4 from 'uuid'
 
 const instructions = Platform.select({
   ios: 'Press Cmd+R to reload,\nCmd+D or shake for dev menu.',
@@ -16,43 +19,43 @@ const instructions = Platform.select({
 })
 
 export const Checkout = ({ navigation }) => {
-  const items = useRealmQuery({ source: ItemSchema.name })
-  const bill = useRealmQuery({ source: BillRegister.name })
-  const billRegister = bill[0]
-  console.log('items', items)
-  console.log('bill', bill)
-  console.log('billRegister', billRegister)
+  const openBills = useRealmQuery({ source: BillSchema.name, filter: `isClosed = false` })
+  const [activeBill, setActiveBill] = useState(null)
 
-  if (!billRegister) {
-    return <Text>Error no register</Text>
+  const onSelectBill = (tab, bill) => {
+    console.log(' --- bill', bill)
+    console.log('tab', tab)
+    if (bill) {
+      setActiveBill(bill)
+    } else {
+      let b
+      realm.write(() => {
+        b = realm.create(BillSchema.name, { _id: uuidv4(), tab })
+      })
+      setActiveBill(b)
+    }
   }
-  return (
+
+  const clearBill = () => setActiveBill(null)
+  const openDrawer = () => navigation.openDrawer()
+
+  return !openBills ? (
+    <Loading />
+  ) : (
     <Container>
-      <SidebarHeader title="Checkout" onOpen={navigation.openDrawer()} />
+      <SidebarHeader title="Checkout" onOpen={openDrawer} />
       <Grid>
-        <Col style={{ backgroundColor: '#635DB7' }}>
-          {billRegister.activeBill ? <CheckoutItemNavigator /> : <Text>Select Bill </Text>}
+        <Col>
+          {activeBill ? (
+            <CheckoutItemNavigator activeBill={activeBill} />
+          ) : (
+            <SelectBill maxBills={40} openBills={openBills} onSelectBill={onSelectBill} />
+          )}
         </Col>
         <Col style={{ backgroundColor: '#00CE9F', width: 350 }}>
-          <CheckoutPaymentNavigator billRegister={billRegister} />
+          <Receipt activeBill={activeBill} onSelectBill={clearBill} />
         </Col>
       </Grid>
     </Container>
   )
 }
-
-{
-  /* <Content>
-        <Text>{`Items: ${items.length}`}</Text>
-        <Text>{instructions}</Text>
-      </Content> */
-}
-// <Button
-//   onPress={() => {
-//     realm.write(() => {
-//       realm.create('Item', { name: 'Rex' })
-//     })
-//   }}
-// >
-//   <Text>Add</Text>
-// </Button> */}

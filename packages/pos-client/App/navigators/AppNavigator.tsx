@@ -1,5 +1,3 @@
-import { NavigationContainer } from '@react-navigation/native'
-import { SidebarNavigator } from './SidebarNavigator'
 import { AuthNavigator } from './AuthNavigator'
 import { createStackNavigator } from '@react-navigation/stack'
 import { Main } from "../pages/Main/Main"

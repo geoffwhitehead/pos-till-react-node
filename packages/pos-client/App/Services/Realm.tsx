@@ -1,7 +1,7 @@
 import Realm from 'realm'
 import {
   ItemSchema,
-  SelectedModsSchema,
+  BillItemModifierSchema,
   BillItemSchema,
   PaymentSchema,
   BillSchema,
@@ -9,7 +9,7 @@ import {
   ModifierSchema,
   OrganizationSchema,
   CategorySchema,
-  BillRegister,
+  // BillRegister,
 } from './schemas'
 
 const realm = new Realm({
@@ -19,13 +19,13 @@ const realm = new Realm({
     ModifierItem,
     ModifierSchema,
     OrganizationSchema,
-    SelectedModsSchema,
+    BillItemModifierSchema,
     BillItemSchema,
     BillSchema,
     CategorySchema,
-    BillRegister,
+    // BillRegister,
   ],
-  schemaVersion: 3,
+  schemaVersion: 5,
   migration: function(oldRealm, newRealm) {
     newRealm.deleteAll()
   },
