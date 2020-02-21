@@ -13,10 +13,12 @@ import {
 } from '../../../../core'
 
 export const Receipt = ({ activeBill, onSelectBill }) => {
+  console.log('activeBill', activeBill)
+
   return (
     <Grid>
-      <Row style={{ height: 75, backgroundColor: 'teal' }}>
-        <Col style={{ backgroundColor: 'teal' }}>
+      <Row style={{ height: 75 }}>
+        <Col>
           <Button light small onPress={onSelectBill}>
             <Text>{(activeBill && activeBill.tab) || '-'}</Text>
           </Button>
@@ -45,25 +47,26 @@ const info = (data) => () => {
   console.log('info data', data)
 }
 
-const SwipableList = (activeBill) => {
+const SwipableList = ({ activeBill }) => {
+  console.log('List active bill', activeBill)
   return (
     <Content>
       <List
         leftOpenValue={75}
         rightOpenValue={-75}
-        dataSource={activeBill.items}
+        dataArray={activeBill.items}
         renderRow={(item) => (
-          <ListItem>
-            <Text> {item.name} </Text>
+          <ListItem key={item._id}>
+            <Text>{`${item.name} ${item.price}`}</Text>
           </ListItem>
         )}
-        renderLeftHiddenRow={(data) => (
-          <Button full onPress={info(data)}>
+        renderLeftHiddenRow={(item) => (
+          <Button full onPress={info(item)}>
             <Icon active name="information-circle" />
           </Button>
         )}
-        renderRightHiddenRow={(data, secId, rowId, rowMap) => (
-          <Button full danger onPress={deleteItem(data)}>
+        renderRightHiddenRow={(item, secId, rowId, rowMap) => (
+          <Button full danger onPress={deleteItem(item)}>
             <Icon active name="trash" />
           </Button>
         )}

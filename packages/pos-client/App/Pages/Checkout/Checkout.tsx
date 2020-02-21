@@ -52,7 +52,7 @@ export const Checkout = ({ navigation }) => {
             <SelectBill maxBills={40} openBills={openBills} onSelectBill={onSelectBill} />
           )}
         </Col>
-        <Col style={{ backgroundColor: '#00CE9F', width: 350 }}>
+        <Col style={{ border: '1px solid grey', width: 350 }}>
           <Receipt activeBill={activeBill} onSelectBill={clearBill} />
         </Col>
       </Grid>

@@ -26,6 +26,7 @@ export const CategoryItemsList: React.FC = ({ route, navigation }) => {
       navigation.navigate(routes.itemModifierList, {
         item,
         modifier,
+        createBillItem,
       })
     } else {
       // create a new bill item

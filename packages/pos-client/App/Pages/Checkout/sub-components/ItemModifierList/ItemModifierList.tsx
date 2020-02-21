@@ -16,7 +16,7 @@ export const ItemModifierList: React.FC = ({ route, navigation }) => {
 
   const onPressModifierFactory = (item, mod) => () => {
     // create a new item with modifier in a the bill
-    createBillItem(item, mod)
+    createBillItem(item, [mod])
     goBack()
   }
 

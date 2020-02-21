@@ -25,7 +25,7 @@ const realm = new Realm({
     CategorySchema,
     // BillRegister,
   ],
-  schemaVersion: 5,
+  schemaVersion: 6,
   migration: function(oldRealm, newRealm) {
     newRealm.deleteAll()
   },

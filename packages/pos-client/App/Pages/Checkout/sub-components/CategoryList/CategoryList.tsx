@@ -22,8 +22,6 @@ export const CategoryList: React.FC = ({ navigation, route }) => {
   // filter: '_id CONTAINS $0',
   // variables: item.modifierId._id,
 
-  categories.map((c) => console.log('c', c))
-
   const createBillItem = (item, mods = []) => {
     console.log('creating bill item', item, mods)
 
@@ -39,39 +37,35 @@ export const CategoryList: React.FC = ({ navigation, route }) => {
     })
 
     console.log('creating bill item')
-    const {
-      _id: itemId,
-      name,
-      categoryId: { _id: categoryId, name: categoryName },
-      modifierId: { _id: modifierId },
-      price,
-    } = item
+    const { _id: itemId, name, categoryId, modifierId, price } = item
 
-    const newBillItem = {
-      _id: uuidv4(),
-      itemId,
-      name,
-      price,
-      modifierId,
-      mods: newModItems.map((m) => m._id),
-      categoryId,
-      categoryName,
-    }
+    console.log('newModItems', newModItems)
 
     realm.write(() => {
       // create bill and items
-      newModItems.map((modItem) => realm.create(BillItemModifierSchema.name, modItem))
+      const modItems = newModItems.map((modItem) =>
+        realm.create(BillItemModifierSchema.name, modItem)
+      )
+
+      const newBillItem = {
+        _id: uuidv4(),
+        itemId,
+        name,
+        price,
+        modifierId: modifierId ? modifierId._id : null,
+        mods: modItems,
+        categoryId: categoryId._id,
+        categoryName: categoryId.name,
+      }
+      console.log('before write', newBillItem)
+
       realm.create(BillItemSchema.name, newBillItem)
       activeBill.items = [...activeBill.items, newBillItem]
     })
   }
 
   const onPressCategoryFactory = (category) => () => {
-    // console.log('category', category)
-
     const filtered = items.filtered(`categoryId._id = "${category._id}"`)
-    // filtered.map((f) => console.log('f', f))
-    // console.log('items', items)
     navigation.navigate(routes.categoryItemList, {
       category,
       items: filtered,
@@ -79,10 +73,6 @@ export const CategoryList: React.FC = ({ navigation, route }) => {
       createBillItem,
     })
   }
-
-  // const createBillMods = (mods) => {
-  //   console.log('creating mods')
-  // }
 
   return (
     <Content>

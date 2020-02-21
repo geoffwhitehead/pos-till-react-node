@@ -72,7 +72,7 @@ export const BillItemSchema = {
     itemId: 'string',
     name: 'string',
     price: 'float',
-    modifierId: 'string',
+    modifierId: 'string?',
     mods: 'BillItemModifier[]',
     categoryId: 'string',
     categoryName: 'string',
