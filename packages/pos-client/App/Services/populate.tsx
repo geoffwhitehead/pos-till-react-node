@@ -35,12 +35,12 @@ export const populate = async () => {
             ? remappedModifiers.find((m) => m._id === item.modifierId)
             : null,
         }
-        console.log('i', i)
+        // console.log('i', i)
         realm.create('Item', i, true)
 
         // need to update item.category with object
       })
-      realm.create(BillRegister.name, {}, true)
+      realm.create(BillRegister.name, {})
     })
   } catch (err) {
     console.log('ERROR ', err)

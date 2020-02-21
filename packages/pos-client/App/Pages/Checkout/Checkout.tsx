@@ -18,18 +18,23 @@ const instructions = Platform.select({
 export const Checkout = ({ navigation }) => {
   const items = useRealmQuery({ source: ItemSchema.name })
   const bill = useRealmQuery({ source: BillRegister.name })
-
+  const billRegister = bill[0]
   console.log('items', items)
   console.log('bill', bill)
+  console.log('billRegister', billRegister)
+
+  if (!billRegister) {
+    return <Text>Error no register</Text>
+  }
   return (
     <Container>
       <SidebarHeader title="Checkout" onOpen={navigation.openDrawer()} />
       <Grid>
         <Col style={{ backgroundColor: '#635DB7' }}>
-          {bill[0].activeBill ? <CheckoutItemNavigator /> : <Text>Select Bill </Text>}
+          {billRegister.activeBill ? <CheckoutItemNavigator /> : <Text>Select Bill </Text>}
         </Col>
         <Col style={{ backgroundColor: '#00CE9F', width: 350 }}>
-          <CheckoutPaymentNavigator />
+          <CheckoutPaymentNavigator billRegister={billRegister} />
         </Col>
       </Grid>
     </Container>
