@@ -5,28 +5,34 @@ import {
   BillItemSchema,
   BillPaymentSchema,
   BillSchema,
-  ModifierItem,
+  BillDiscountSchema,
+  PaymentTypeSchema,
+  ModifierItemSchema,
   ModifierSchema,
   OrganizationSchema,
   CategorySchema,
+  DiscountSchema,
 } from './schemas';
 
 const realm = new Realm({
   schema: [
     ItemSchema,
     BillPaymentSchema,
-    ModifierItem,
+    ModifierItemSchema,
     ModifierSchema,
     OrganizationSchema,
     BillItemModifierSchema,
     BillItemSchema,
     BillSchema,
     CategorySchema,
+    BillDiscountSchema,
+    PaymentTypeSchema,
+    DiscountSchema,
   ],
-  schemaVersion: 8,
-  migration: function(oldRealm, newRealm) {
-    newRealm.deleteAll();
-  },
+  schemaVersion: 10,
+  // migration: function(oldRealm, newRealm) {
+  //   newRealm.deleteAll();
+  // },
 });
 
 export { realm };
