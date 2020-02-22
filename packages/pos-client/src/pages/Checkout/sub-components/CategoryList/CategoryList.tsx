@@ -1,7 +1,7 @@
-import React from 'react'
-import { Text, Content, List, ListItem, Left, Icon, Body, Right } from '../../../../core'
-import { SearchHeader } from '../../../../components/SearchHeader/SearchHeader'
-import { useRealmQuery } from 'react-use-realm'
+import React from 'react';
+import { Text, Content, List, ListItem, Left, Icon, Body, Right } from '../../../../core';
+import { SearchHeader } from '../../../../components/SearchHeader/SearchHeader';
+import { useRealmQuery } from 'react-use-realm';
 import {
   CategorySchema,
   ItemSchema,
@@ -9,43 +9,46 @@ import {
   BillItemSchema,
   BillItemModifierSchema,
   BillSchema,
-} from '../../../../services/schemas'
-import { routes } from '../../../../navigators/CheckoutItemNavigator'
-import { realm } from '../../../../services/Realm'
-import uuidv4 from 'uuid/v4'
+  CategoryProps,
+  ItemProps,
+  ModifierProps,
+} from '../../../../services/schemas';
+import { routes } from '../../../../navigators/CheckoutItemNavigator';
+import { realm } from '../../../../services/Realm';
+import uuidv4 from 'uuid/v4';
+import { Results } from 'realm';
 
 export const CategoryList: React.FC = ({ navigation, route }) => {
-  const { activeBill } = route.params
-  const categories = useRealmQuery({ source: CategorySchema.name, sort: ['name'] })
-  const items = useRealmQuery({ source: ItemSchema.name })
-  const modifiers = useRealmQuery({ source: ModifierSchema.name })
+  const { activeBill } = route.params;
+  const categories = useRealmQuery<CategoryProps>({
+    source: CategorySchema.name,
+    sort: ['name'],
+  });
+  const items = useRealmQuery<ItemProps>({ source: ItemSchema.name });
+  const modifiers = useRealmQuery<ModifierProps>({ source: ModifierSchema.name });
   // filter: '_id CONTAINS $0',
   // variables: item.modifierId._id,
 
   const createBillItem = (item, mods = []) => {
-    console.log('creating bill item', item, mods)
-
-    const newModItems = mods.map((mod) => {
-      console.log('mod', mod)
-      const { _id: modId, name, price } = mod
+    const newModItems = mods.map(mod => {
+      console.log('mod', mod);
+      const { _id: modId, name, price } = mod;
       return {
         _id: uuidv4(),
         modId,
         name,
         price,
-      }
-    })
+      };
+    });
 
-    console.log('creating bill item')
-    const { _id: itemId, name, categoryId, modifierId, price } = item
+    console.log('creating bill item');
+    const { _id: itemId, name, categoryId, modifierId, price } = item;
 
-    console.log('newModItems', newModItems)
+    console.log('newModItems', newModItems);
 
     realm.write(() => {
       // create bill and items
-      const modItems = newModItems.map((modItem) =>
-        realm.create(BillItemModifierSchema.name, modItem)
-      )
+      const modItems = newModItems.map(modItem => realm.create(BillItemModifierSchema.name, modItem));
 
       const newBillItem = {
         _id: uuidv4(),
@@ -56,23 +59,23 @@ export const CategoryList: React.FC = ({ navigation, route }) => {
         mods: modItems,
         categoryId: categoryId._id,
         categoryName: categoryId.name,
-      }
-      console.log('before write', newBillItem)
+      };
+      console.log('before write', newBillItem);
 
-      realm.create(BillItemSchema.name, newBillItem)
-      activeBill.items = [...activeBill.items, newBillItem]
-    })
-  }
+      realm.create(BillItemSchema.name, newBillItem);
+      activeBill.items = [...activeBill.items, newBillItem];
+    });
+  };
 
-  const onPressCategoryFactory = (category) => () => {
-    const filtered = items.filtered(`categoryId._id = "${category._id}"`)
+  const onPressCategoryFactory = category => () => {
+    const filtered = items.filtered(`categoryId._id = "${category._id}"`);
     navigation.navigate(routes.categoryItemList, {
       category,
       items: filtered,
       modifiers,
       createBillItem,
-    })
-  }
+    });
+  };
 
   return (
     <Content>
@@ -81,7 +84,7 @@ export const CategoryList: React.FC = ({ navigation, route }) => {
         <ListItem itemHeader first>
           <Text>Categories</Text>
         </ListItem>
-        {categories.map((cat) => {
+        {categories.map(cat => {
           return (
             <ListItem key={cat._id} icon onPress={onPressCategoryFactory(cat)}>
               <Left>
@@ -92,9 +95,9 @@ export const CategoryList: React.FC = ({ navigation, route }) => {
               </Body>
               <Right />
             </ListItem>
-          )
+          );
         })}
       </List>
     </Content>
-  )
-}
+  );
+};
