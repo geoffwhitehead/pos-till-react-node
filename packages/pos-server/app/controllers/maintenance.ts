@@ -1,11 +1,11 @@
 import { Request, Response } from 'express';
 import faker from 'faker';
-import { Category, Modifier, Item } from '../models';
+import { Category, Modifier, Item, Discount } from '../models';
 import { rdm } from '../helpers/rdm';
 
 export const seed = async (req: Request, res: Response) => {
-    const ITEMS_TO_SEED = 10;
-    const CATEGORIES_TO_SEED = ['DEFAULT', 'STD', 'MAIN'];
+    const ITEMS_TO_SEED = 20;
+    const CATEGORIES_TO_SEED = ['Starters', 'Mains', 'Desserts', 'Wine', 'Beer'];
 
     try {
         const categories = CATEGORIES_TO_SEED.map(name => {
@@ -62,6 +62,27 @@ export const seed = async (req: Request, res: Response) => {
         if (!insertedItems.result.ok) {
             console.log('insertedItems', insertedItems);
             throw new Error('Error inserting items');
+        }
+
+        const insertedDiscounts = await Discount.collection.insert([
+            {
+                name: 'Student',
+                amount: '10',
+            },
+            {
+                name: 'Staff',
+                amount: '15',
+            },
+            {
+                name: 'Offer',
+                amount: '500',
+                isPercent: false,
+            },
+        ]);
+
+        if (!insertedDiscounts.result.ok) {
+            console.log('insertedDiscounts', insertedDiscounts);
+            throw new Error('Error inserting discounts');
         }
 
         return res.send('Sucessfully seeded');
