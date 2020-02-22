@@ -20,9 +20,6 @@ const ItemSchema: Schema<ItemDocument> = new Schema(
         price: {
             type: Number,
         },
-        stock: {
-            type: Number,
-        },
         modifierId: {
             type: Schema.Types.ObjectId,
             ref: 'Modifier',

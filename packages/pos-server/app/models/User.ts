@@ -2,8 +2,8 @@ import { model, Schema, Document } from 'mongoose';
 import validator from 'validator';
 
 interface UserProps {
-    firstname: string;
-    lastname: string;
+    firstName: string;
+    lastName: string;
     email: string;
     password: string;
     token: string;
@@ -13,11 +13,11 @@ export interface UserDocument extends Document, UserProps {}
 
 const UserSchema: Schema<UserDocument> = new Schema(
     {
-        firstname: {
+        firstName: {
             type: String,
             required: true,
         },
-        lastname: {
+        lastName: {
             type: String,
             required: true,
         },
