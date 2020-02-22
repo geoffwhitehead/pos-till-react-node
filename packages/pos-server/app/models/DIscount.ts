@@ -3,7 +3,7 @@ import { model, Schema, Document } from 'mongoose';
 interface DiscountProps {
     name: string;
     amount: number;
-    type: string;
+    isPercent: boolean;
 }
 
 export interface DiscountDocument extends Document, DiscountProps {}
@@ -16,8 +16,9 @@ const DiscountSchema: Schema<DiscountDocument> = new Schema({
     amount: {
         type: Number,
     },
-    type: {
-        type: String,
+    isPercent: {
+        type: Boolean,
+        default: true,
     },
 });
 
