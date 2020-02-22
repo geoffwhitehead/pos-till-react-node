@@ -1,21 +1,20 @@
-import Realm from 'realm'
+import Realm from 'realm';
 import {
   ItemSchema,
   BillItemModifierSchema,
   BillItemSchema,
-  PaymentSchema,
+  BillPaymentSchema,
   BillSchema,
   ModifierItem,
   ModifierSchema,
   OrganizationSchema,
   CategorySchema,
-  // BillRegister,
-} from './schemas'
+} from './schemas';
 
 const realm = new Realm({
   schema: [
     ItemSchema,
-    PaymentSchema,
+    BillPaymentSchema,
     ModifierItem,
     ModifierSchema,
     OrganizationSchema,
@@ -23,12 +22,11 @@ const realm = new Realm({
     BillItemSchema,
     BillSchema,
     CategorySchema,
-    // BillRegister,
   ],
-  schemaVersion: 6,
+  schemaVersion: 8,
   migration: function(oldRealm, newRealm) {
-    newRealm.deleteAll()
+    newRealm.deleteAll();
   },
-})
+});
 
-export { realm }
+export { realm };
