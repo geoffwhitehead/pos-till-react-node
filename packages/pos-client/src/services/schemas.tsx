@@ -157,7 +157,7 @@ export const BillSchema: Realm.ObjectSchema = {
   properties: {
     _id: 'string',
     items: { type: 'BillItem[]', default: [] },
-    payments: { type: 'Payment[]', default: [] },
+    payments: { type: 'BillPayment[]', default: [] },
     timestamp: { type: 'date', default: Date() },
     discount: { type: 'int', optional: true },
     tab: 'int',
