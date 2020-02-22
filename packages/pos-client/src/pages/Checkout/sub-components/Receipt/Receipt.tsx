@@ -8,8 +8,13 @@ import {
   Content,
   List,
   ListItem,
+  Left,
+  Right,
+  Icon,
+  Body,
 } from '../../../../core'
 import { StyleSheet } from 'react-native'
+import { realm } from '../../../../services/Realm'
 
 export const Receipt = ({ activeBill, onSelectBill }) => {
   console.log('activeBill', activeBill)
@@ -27,7 +32,7 @@ export const Receipt = ({ activeBill, onSelectBill }) => {
         </Col>
       </Row>
 
-      <Row>{activeBill && <SwipableList activeBill={activeBill} />}</Row>
+      <Row>{activeBill && <ItemList activeBill={activeBill} />}</Row>
       <Row style={styles.r3}>
         <Text>Amount due:</Text>
       </Row>
@@ -61,17 +66,15 @@ const styles = StyleSheet.create({
     height: '100%',
   },
 })
-const deleteItem = (data) => () => {
+const deleteItem = (item) => () => {
   // delete here
-  console.log('delete data', data)
+  realm.write(() => {
+    item.mods.map((m) => realm.delete(m))
+    realm.delete(item)
+  })
 }
 
-const info = (data) => () => {
-  // info here
-  console.log('info data', data)
-}
-
-const SwipableList = ({ activeBill }) => {
+const ItemList = ({ activeBill }) => {
   console.log('List active bill', activeBill)
   return (
     <Content>
@@ -79,9 +82,22 @@ const SwipableList = ({ activeBill }) => {
         {activeBill.items.map((item) => {
           return (
             <ListItem key={item._id}>
-              <Text>{`${item.name} ${item.price}`}</Text>
-
-              <Text>{`${item.name} ${item.price}`}</Text>
+              <Left>
+                <Icon name="ios-close" onPress={deleteItem(item)} />
+                <Content>
+                  <Text>{`${item.name}`}</Text>
+                  {item.mods.map((m) => (
+                    <Text key={`${m._id}name`}>{`- ${m.name}`}</Text>
+                  ))}
+                </Content>
+              </Left>
+              <Body></Body>
+              <Right>
+                <Text>{`${item.price}`}</Text>
+                {item.mods.map((m) => (
+                  <Text key={`${m._id}price`}>{m.price}</Text>
+                ))}
+              </Right>
             </ListItem>
           )
         })}
