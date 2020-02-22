@@ -21,7 +21,7 @@ interface DiscountBreakdownItemProps extends BillDiscountProps {
 export const discountBreakdown: (bill: any) => DiscountBreakdownItemProps[] = bill => {
   let rollingTotal = total(bill);
   const arrDiscounts = bill.discounts.map(d => {
-    const calculatedDiscount = d.isPercent ? rollingTotal * (d.amount / 100) : d.amount;
+    const calculatedDiscount = d.isPercent ? Math.round(rollingTotal * (d.amount / 100)) : d.amount;
     rollingTotal = rollingTotal - calculatedDiscount;
     return {
       _id: d._id,

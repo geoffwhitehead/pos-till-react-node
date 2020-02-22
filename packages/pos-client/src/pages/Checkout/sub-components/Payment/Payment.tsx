@@ -14,7 +14,7 @@ import {
   Left,
   Right,
 } from '../../../../core';
-import { DiscountProps, BillPaymentSchema, PaymentTypeProps } from '../../../../services/schemas';
+import { DiscountProps, BillPaymentSchema, PaymentTypeProps, BillDiscountSchema } from '../../../../services/schemas';
 import { realm } from '../../../../services/Realm';
 import uuidv4 from 'uuid';
 import { balance } from '../../../../utils';
@@ -36,19 +36,33 @@ export const Payment: React.FC<PaymentProps> = ({ activeBill, discounts, payment
   const currencySymbol = '£';
 
   discounts.map(d => console.log('d', d));
+
   const onValueChange = value => setValue(parseFloat(value));
-  const addPayment = (type, amt) => () => {
+
+  const addPayment = (paymentType, amt) => () => {
     realm.write(() => {
-      const payment = realm.create(BillPaymentSchema.name, {
+      const billPayment = realm.create(BillPaymentSchema.name, {
         _id: uuidv4(),
-        paymentType: type.name,
-        paymentTypeId: type._id,
+        paymentType: paymentType.name,
+        paymentTypeId: paymentType._id,
         amount: amt || balance(activeBill),
       });
-      activeBill.payments.push(payment);
+      activeBill.payments.push(billPayment);
     });
   };
 
+  const addDiscount = discount => () => {
+    realm.write(() => {
+      const billDiscount = realm.create(BillDiscountSchema.name, {
+        _id: uuidv4(),
+        discountId: discount._id,
+        name: discount.name,
+        amount: discount.amount,
+        isPercent: discount.isPercent,
+      });
+      activeBill.discounts.push(billDiscount);
+    });
+  };
 
   return (
     <Content>
@@ -61,10 +75,10 @@ export const Payment: React.FC<PaymentProps> = ({ activeBill, discounts, payment
             </Item>
           </Row>
           <Row style={styles.row}>
-            {paymentTypes.map(type => {
+            {paymentTypes.map(paymentType => {
               return (
-                <Button onPress={addPayment(type, value)}>
-                  <Text>{type.name}</Text>
+                <Button onPress={addPayment(paymentType, value)}>
+                  <Text>{paymentType.name}</Text>
                 </Button>
               );
             })}
@@ -85,7 +99,7 @@ export const Payment: React.FC<PaymentProps> = ({ activeBill, discounts, payment
               </ListItem>
               {discounts.map(discount => {
                 return (
-                  <ListItem>
+                  <ListItem onPress={addDiscount(discount)}>
                     <Left>
                       <Text>{discount.name}</Text>
                     </Left>

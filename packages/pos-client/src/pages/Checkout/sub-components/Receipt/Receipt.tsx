@@ -6,10 +6,22 @@ import { Loading } from '../../../Loading/Loading';
 import { balance, total, totalDiscount, discountBreakdown } from '../../../../utils';
 import { Fonts } from '../../../../theme';
 
-const deleteItem = item => () => {
+const voidItem = item => () => {
   realm.write(() => {
     item.mods.map(m => realm.delete(m));
     realm.delete(item);
+  });
+};
+
+const voidPayment = payment => () => {
+  realm.write(() => {
+    realm.delete(payment);
+  });
+};
+
+const voidDiscount = discount => () => {
+  realm.write(() => {
+    realm.delete(discount);
   });
 };
 
@@ -80,7 +92,7 @@ const ItemList = ({ activeBill }) => {
           return (
             <ListItem key={item._id}>
               <Left>
-                <Icon name="ios-close" onPress={deleteItem(item)} />
+                <Icon name="ios-close" onPress={voidItem(item)} />
                 <Content>
                   <Text>{`${item.name}`}</Text>
                   {item.mods.map(m => (
@@ -102,20 +114,14 @@ const ItemList = ({ activeBill }) => {
           return (
             <ListItem key={discount._id}>
               <Left>
-                <Icon name="ios-close" />
+                <Icon name="ios-close" onPress={voidDiscount(discount)} />
                 <Content>
-                  <Text>{`${discount.name} ${discount.amount}`}</Text>
-                  {/* {payment.mods.map(m => (
-                    <Text key={`${m._id}name`}>{`- ${m.name}`}</Text>
-                  ))} */}
+                  <Text>{`Discount: ${discount.name} ${discount.amount}`}</Text>
                 </Content>
               </Left>
               <Body />
               <Right>
                 <Text>{`${discount.calculatedDiscount}`}</Text>
-                {/* {payment.mods.map(m => (
-                  <Text key={`${m._id}price`}>{m.price}</Text>
-                ))} */}
               </Right>
             </ListItem>
           );
@@ -124,20 +130,14 @@ const ItemList = ({ activeBill }) => {
           return (
             <ListItem key={payment._id}>
               <Left>
-                <Icon name="ios-close" />
+                <Icon name="ios-close" onPress={voidPayment(payment)} />
                 <Content>
-                  <Text>{`Paid ${payment.paymentType}`}</Text>
-                  {/* {payment.mods.map(m => (
-                    <Text key={`${m._id}name`}>{`- ${m.name}`}</Text>
-                  ))} */}
+                  <Text>{`Payment: ${payment.paymentType}`}</Text>
                 </Content>
               </Left>
               <Body />
               <Right>
                 <Text>{`${payment.amount}`}</Text>
-                {/* {payment.mods.map(m => (
-                  <Text key={`${m._id}price`}>{m.price}</Text>
-                ))} */}
               </Right>
             </ListItem>
           );
