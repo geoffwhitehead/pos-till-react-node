@@ -4,7 +4,7 @@ import { Container, Grid, Col, Text } from '../../core';
 import { SidebarHeader } from '../../components/SidebarHeader/SidebarHeader';
 import { Loading } from '../Loading/Loading';
 import { useRealmQuery } from 'react-use-realm';
-import { BillSchema } from '../../services/schemas';
+import { BillSchema, DiscountProps, DiscountSchema, PaymentTypeProps, PaymentTypeSchema } from '../../services/schemas';
 import { CheckoutItemNavigator } from '../../navigators/CheckoutItemNavigator';
 import { Receipt } from './sub-components/Receipt/Receipt';
 import { SelectBill } from './sub-components/SelectBill/SelectBIll';
@@ -25,9 +25,22 @@ export enum Modes {
 
 export const Checkout = ({ navigation }) => {
   const openBills = useRealmQuery({ source: BillSchema.name, filter: `isClosed = false` });
-  const [activeBill, setActiveBill] = useState(null);
+  const discounts = useRealmQuery<DiscountProps>({ source: DiscountSchema.name });
+  const paymentTypes = useRealmQuery<PaymentTypeProps>({ source: PaymentTypeSchema.name });
 
+  const [activeBill, setActiveBill] = useState(null);
   const [mode, setMode] = useState<Modes>(Modes.Items);
+
+  const clearBill = () => setActiveBill(null);
+  const openDrawer = () => navigation.openDrawer();
+  const onCheckout = () => setMode(Modes.Payments);
+
+  useEffect(() => (!openBills || !paymentTypes || !discounts) && setMode(Modes.Loading), [
+    openBills,
+    paymentTypes,
+    discounts,
+  ]);
+  useEffect(() => (!activeBill ? setMode(Modes.Bills) : setMode(Modes.Items)), [activeBill]);
 
   const onSelectBill = (tab, bill) => {
     if (bill) {
@@ -41,19 +54,12 @@ export const Checkout = ({ navigation }) => {
     }
   };
 
-  const clearBill = () => setActiveBill(null);
-  const openDrawer = () => navigation.openDrawer();
-  const onCheckout = () => setMode(Modes.Payments);
-
-  useEffect(() => !openBills && setMode(Modes.Loading), [openBills]);
-  useEffect(() => (!activeBill ? setMode(Modes.Bills) : setMode(Modes.Items)), [activeBill]);
-
   const renderMain = () => {
     switch (mode) {
       case Modes.Loading:
         return <Loading />;
       case Modes.Payments:
-        return <Payment />;
+        return <Payment activeBill={activeBill} discounts={discounts} paymentTypes={paymentTypes} />;
       case Modes.Bills:
         return <SelectBill maxBills={40} openBills={openBills} onSelectBill={onSelectBill} />;
       case Modes.Items:

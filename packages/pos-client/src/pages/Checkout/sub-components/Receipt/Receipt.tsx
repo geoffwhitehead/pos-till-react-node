@@ -3,14 +3,14 @@ import { Text, Col, Grid, Row, Button, Content, List, ListItem, Left, Right, Ico
 import { StyleSheet } from 'react-native';
 import { realm } from '../../../../services/Realm';
 import { Loading } from '../../../Loading/Loading';
+import { balance, total, totalDiscount, discountBreakdown } from '../../../../utils';
+import { Fonts } from '../../../../theme';
 
-// TODO fix tpyes
-const subtotal: (bill: any) => number = bill => {
-  const amt = bill.items.reduce((acc, item) => {
-    const mods = item.mods.reduce((acc, mod) => acc + mod.price, 0);
-    return acc + mods + item.price;
-  }, 0);
-  return amt;
+const deleteItem = item => () => {
+  realm.write(() => {
+    item.mods.map(m => realm.delete(m));
+    realm.delete(item);
+  });
 };
 
 export const Receipt = ({ activeBill, onStore, onCheckout }) => {
@@ -35,7 +35,9 @@ export const Receipt = ({ activeBill, onStore, onCheckout }) => {
         <ItemList activeBill={activeBill} />
       </Row>
       <Row style={styles.r3}>
-        <Text>{`Amount due: ${subtotal(activeBill)}`}</Text>
+        <Text>{activeBill.discounts.length ? `Discount: ${totalDiscount(activeBill)}` : ''}</Text>
+        <Text>{`Total: ${total(activeBill)}`}</Text>
+        <Text style={Fonts.h3}>{`Balance: ${balance(activeBill)}`}</Text>
       </Row>
       <Row style={{ height: 50 }}>
         <Col>
@@ -61,19 +63,13 @@ const styles = StyleSheet.create({
   r3: {
     borderTopColor: 'lightgrey',
     borderTopWidth: 1,
-    height: 50,
+    height: 100,
+    flexDirection: 'column',
   },
   buttons: {
     height: '100%',
   },
 });
-const deleteItem = item => () => {
-  // delete here
-  realm.write(() => {
-    item.mods.map(m => realm.delete(m));
-    realm.delete(item);
-  });
-};
 
 const ItemList = ({ activeBill }) => {
   console.log('List active bill', activeBill);
@@ -92,12 +88,56 @@ const ItemList = ({ activeBill }) => {
                   ))}
                 </Content>
               </Left>
-              <Body></Body>
+              <Body />
               <Right>
                 <Text>{`${item.price}`}</Text>
                 {item.mods.map(m => (
                   <Text key={`${m._id}price`}>{m.price}</Text>
                 ))}
+              </Right>
+            </ListItem>
+          );
+        })}
+        {discountBreakdown(activeBill).map(discount => {
+          return (
+            <ListItem key={discount._id}>
+              <Left>
+                <Icon name="ios-close" />
+                <Content>
+                  <Text>{`${discount.name} ${discount.amount}`}</Text>
+                  {/* {payment.mods.map(m => (
+                    <Text key={`${m._id}name`}>{`- ${m.name}`}</Text>
+                  ))} */}
+                </Content>
+              </Left>
+              <Body />
+              <Right>
+                <Text>{`${discount.calculatedDiscount}`}</Text>
+                {/* {payment.mods.map(m => (
+                  <Text key={`${m._id}price`}>{m.price}</Text>
+                ))} */}
+              </Right>
+            </ListItem>
+          );
+        })}
+        {activeBill.payments.map(payment => {
+          return (
+            <ListItem key={payment._id}>
+              <Left>
+                <Icon name="ios-close" />
+                <Content>
+                  <Text>{`Paid ${payment.paymentType}`}</Text>
+                  {/* {payment.mods.map(m => (
+                    <Text key={`${m._id}name`}>{`- ${m.name}`}</Text>
+                  ))} */}
+                </Content>
+              </Left>
+              <Body />
+              <Right>
+                <Text>{`${payment.amount}`}</Text>
+                {/* {payment.mods.map(m => (
+                  <Text key={`${m._id}price`}>{m.price}</Text>
+                ))} */}
               </Right>
             </ListItem>
           );
