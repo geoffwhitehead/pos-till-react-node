@@ -1,8 +1,7 @@
 import { User } from '../models';
 import { Request, Response } from 'express';
-import * as jwt from 'jsonwebtoken';
-import config from '../../config/config';
 import bcrypt from 'bcryptjs';
+import { createToken } from '../helpers/createToken';
 
 const authenticate = async (email, password) => {
     // Search for a user by email and password.
@@ -30,12 +29,12 @@ export const login = async (req: Request, res: Response) => {
     const { email, password } = req.body;
 
     if (!(email && password)) {
-        res.status(400).send('invalid login credentials');
+        res.status(400).send('Missing email / password');
     }
 
     try {
         const user = await authenticate(email, password);
-        const token = jwt.sign({ userId: user.id, username: user.email }, config.jwtSecret);
+        const token = createToken(user.id, user.email);
 
         await User.findByIdAndUpdate(user.id, { token });
         //Send the jwt in the response
