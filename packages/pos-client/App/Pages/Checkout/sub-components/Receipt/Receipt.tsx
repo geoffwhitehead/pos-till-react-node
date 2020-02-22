@@ -5,11 +5,9 @@ import {
   Grid,
   Row,
   Button,
-  Header,
   Content,
   List,
   ListItem,
-  Icon,
 } from '../../../../core'
 import { StyleSheet } from 'react-native'
 
@@ -55,7 +53,9 @@ const styles = StyleSheet.create({
     borderLeftColor: 'lightgrey',
   },
   r3: {
-    borderTopColor: 'lightgrey', borderTopWidth: 1, height: 50
+    borderTopColor: 'lightgrey',
+    borderTopWidth: 1,
+    height: 50,
   },
   r4Buttons: {
     height: '100%',

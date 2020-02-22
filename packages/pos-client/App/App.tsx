@@ -1,15 +1,7 @@
-import React, { useState } from 'react'
-// import { Provider } from 'react-redux'
-// import { PersistGate } from 'redux-persist/lib/integration/react'
-// import Realm from 'realm'
-// const { store, persistor } = createStore()
-// import { Checkout } from './pages/Checkout/Checkout'
+import React from 'react'
 import { SplashScreen } from './pages/SplashScreen/SplashScreen'
-// import { createStackNavigator } from '@react-navigation/stack'
-// import { SignIn } from './pages/SignIn/SignIn'
 import AsyncStorage from '@react-native-community/async-storage'
 import { AuthContext } from './contexts/AuthContext'
-// import { Toast } from 'native-base'
 import { Api } from './api'
 import { signUp, signIn } from './api/auth'
 import { AuthNavigator } from './navigators'
@@ -125,23 +117,12 @@ export default () => {
         {state.userToken == null ? (
           <AuthNavigator />
         ) : (
-          // No token found, user isn't signed in
-          // <Stack.Screen name="Auth" component={AuthNavigator} />
           <AuthContext.Provider value={authContext}>
             <RealmProvider initialRealm={realm}>
               <Main />
             </RealmProvider>
           </AuthContext.Provider>
-          // User is signed in
         )}
-
-        {/* <Stack.Screen
-            name="Main"
-            component={Main}
-            options={{ headerShown: false }}
-          /> */}
-
-        {/* <AppNavigator token={state.userToken} /> */}
       </AuthContext.Provider>
     </NavigationContainer>
   )

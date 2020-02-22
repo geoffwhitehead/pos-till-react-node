@@ -1,5 +1,5 @@
 import { getItems } from '../api/items'
-import { realm } from '../services/Realm'
+import { realm } from './Realm'
 import { getCategories } from '../api/category'
 import { getModifiers } from '../api/modifier'
 

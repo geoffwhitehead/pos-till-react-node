@@ -1,5 +1,5 @@
 import React from 'react'
-import { Container, Header, Left, Right, Body, Button, Icon, Title, Drawer } from '../../core'
+import { Header, Left, Right, Body, Button, Icon, Title } from '../../core'
 
 interface SidebarHeaderProps {
   title: string;
@@ -7,7 +7,6 @@ interface SidebarHeaderProps {
 }
 
 export const SidebarHeader: React.SFC<SidebarHeaderProps> = ({ title, onOpen }) => {
-
   return (
     <Header>
       <Left>

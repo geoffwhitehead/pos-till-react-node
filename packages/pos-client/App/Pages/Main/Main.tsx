@@ -1,7 +1,4 @@
 import React, { useState } from 'react'
-import { AuthContext } from '../../contexts/AuthContext'
-import { realm } from '../../services/Realm'
-import { RealmProvider } from 'react-use-realm'
 import { populate } from '../../services/populate'
 import { SidebarNavigator } from '../../navigators'
 import { Loading } from '../Loading/Loading'
