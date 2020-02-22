@@ -10,7 +10,7 @@ import { RealmProvider } from 'react-use-realm'
 import { Main } from './pages/Main/Main'
 import { NavigationContainer } from '@react-navigation/native'
 
-export default () => {
+export const App = () => {
   const [state, dispatch] = React.useReducer(
     (prevState, action) => {
       switch (action.type) {
