@@ -6,7 +6,7 @@ import { checkJwt } from '../middlewares';
 const router = Router();
 
 router.route('/login').post(login);
-router.route('/register').post(create);
+router.route('/register').post(create); // TODO: just route to user create until org structure in place
 router.route('/change-password').post(changePassword, [checkJwt]);
 
 export default router;

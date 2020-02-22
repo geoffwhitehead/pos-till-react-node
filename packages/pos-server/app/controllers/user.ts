@@ -1,8 +1,9 @@
 import { User } from '../models';
 import bcrypt from 'bcryptjs';
 import { Request, Response } from 'express';
+import { createToken } from '../helpers/createToken';
 
-const PUBLIC_FIELDS = 'firstname lastname email';
+const PUBLIC_FIELDS = 'firstName lastName email';
 const create = async (req: Request, res: Response) => {
     const user = new User(req.body);
     const errors = user.validateSync();
@@ -19,8 +20,9 @@ const create = async (req: Request, res: Response) => {
 
     try {
         user.password = await bcrypt.hash(req.body.password, 8);
+        user.token = createToken(user.id, user.email);
         await user.save();
-        res.status(201).send('created user');
+        res.status(201).send(user.token);
     } catch (err) {
         res.status(400).send(err);
     }
@@ -47,7 +49,7 @@ const getAll = async (req: Request, res: Response) => {
     const skip = req.query.skip;
     const limit = req.query.limit;
     try {
-        const users = await User.find({}, 'firstname lastname email', { skip, limit });
+        const users = await User.find({}, 'firstName lastName email', { skip, limit });
         return res.status(200).send(users);
     } catch (err) {
         res.status(400).send(err);
