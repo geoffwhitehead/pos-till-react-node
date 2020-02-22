@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Text,
   Content,
@@ -17,25 +17,26 @@ import {
 import { DiscountProps, BillPaymentSchema, PaymentTypeProps, BillDiscountSchema } from '../../../../services/schemas';
 import { realm } from '../../../../services/Realm';
 import uuidv4 from 'uuid';
-import { balance } from '../../../../utils';
+import { balance, formatNumber } from '../../../../utils';
 import { StyleSheet } from 'react-native';
 
 interface PaymentProps {
   activeBill: any; // fix
   discounts: Realm.Collection<DiscountProps>;
   paymentTypes: Realm.Collection<PaymentTypeProps>;
+  onCompleteBill: () => void;
 }
 
-export const Payment: React.FC<PaymentProps> = ({ activeBill, discounts, paymentTypes }) => {
+export const Payment: React.FC<PaymentProps> = ({ activeBill, discounts, paymentTypes, onCompleteBill }) => {
   const [value, setValue] = useState(0);
 
   // TODO: this / payment types will need refactoring so were not having to use find
   const cashType = paymentTypes.find(pt => pt.name === 'Cash');
-  const denominations = [5, 10, 20, 30, 50];
+  const denominations = [500, 1000, 2000, 3000, 5000];
   // TODO: refactor to grab currency from org
   const currencySymbol = '£';
 
-  discounts.map(d => console.log('d', d));
+  const checkComplete = () => balance(activeBill) <= 0 && onCompleteBill();
 
   const onValueChange = value => setValue(parseFloat(value));
 
@@ -45,9 +46,10 @@ export const Payment: React.FC<PaymentProps> = ({ activeBill, discounts, payment
         _id: uuidv4(),
         paymentType: paymentType.name,
         paymentTypeId: paymentType._id,
-        amount: amt || balance(activeBill),
+        amount: amt || Math.max(balance(activeBill), 0),
       });
       activeBill.payments.push(billPayment);
+      checkComplete();
     });
   };
 
@@ -61,20 +63,21 @@ export const Payment: React.FC<PaymentProps> = ({ activeBill, discounts, payment
         isPercent: discount.isPercent,
       });
       activeBill.discounts.push(billDiscount);
+      checkComplete();
     });
   };
 
   return (
     <Content>
-      <Grid style={{ height: '100%' }}>
+      <Grid>
         <Col />
-        <Col style={{ height: '100%' }}>
+        <Col>
           <Row style={styles.row}>
-            <Item style={{ width: '100%' }} regular>
+            <Item style={{ width: '100%', height: 40 }} regular>
               <Input value={value.toString()} onChange={onValueChange} keyboardType="number-pad" />
             </Item>
           </Row>
-          <Row style={styles.row}>
+          {/* <Row style={styles.row}>
             {paymentTypes.map(paymentType => {
               return (
                 <Button onPress={addPayment(paymentType, value)}>
@@ -87,11 +90,11 @@ export const Payment: React.FC<PaymentProps> = ({ activeBill, discounts, payment
             {denominations.map(amt => {
               return (
                 <Button onPress={addPayment(cashType, amt)}>
-                  <Text>{`${currencySymbol}${amt}`}</Text>
+                  <Text>{`${currencySymbol}${formatNumber(amt, currencySymbol)}`}</Text>
                 </Button>
               );
             })}
-          </Row>
+          </Row> */}
           <Row style={styles.row}>
             <List style={{ width: '100%', height: '100%' }}>
               <ListItem itemHeader first>
@@ -103,15 +106,30 @@ export const Payment: React.FC<PaymentProps> = ({ activeBill, discounts, payment
                     <Left>
                       <Text>{discount.name}</Text>
                     </Left>
-                    <Body />
                     <Right>
-                      <Text>{discount.amount}</Text>
+                      <Text>{formatNumber(discount.amount, currencySymbol)}</Text>
                     </Right>
                   </ListItem>
                 );
               })}
             </List>
           </Row>
+        </Col>
+        <Col style={styles.buttonColumn}>
+          {paymentTypes.map(paymentType => {
+            return (
+              <Button style={styles.paymentButtons} onPress={addPayment(paymentType, value)}>
+                <Text>{paymentType.name}</Text>
+              </Button>
+            );
+          })}
+          {denominations.map(amt => {
+            return (
+              <Button bordered style={styles.paymentButtons} onPress={addPayment(cashType, amt)}>
+                <Text>{`${formatNumber(amt, currencySymbol)}`}</Text>
+              </Button>
+            );
+          })}
         </Col>
       </Grid>
     </Content>
@@ -123,5 +141,14 @@ const styles = StyleSheet.create({
     padding: 10,
     borderLeftColor: 'lightgrey',
     borderLeftWidth: 1,
+  },
+  buttonColumn: {
+    width: 125,
+    flexDirection: 'column',
+  },
+  paymentButtons: {
+    margin: 5,
+    textAlign: 'center',
+    alignContent: 'center',
   },
 });

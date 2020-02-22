@@ -4,13 +4,22 @@ import { Container, Grid, Col, Text } from '../../core';
 import { SidebarHeader } from '../../components/SidebarHeader/SidebarHeader';
 import { Loading } from '../Loading/Loading';
 import { useRealmQuery } from 'react-use-realm';
-import { BillSchema, DiscountProps, DiscountSchema, PaymentTypeProps, PaymentTypeSchema } from '../../services/schemas';
+import {
+  BillSchema,
+  DiscountProps,
+  DiscountSchema,
+  PaymentTypeProps,
+  PaymentTypeSchema,
+  BillProps,
+} from '../../services/schemas';
 import { CheckoutItemNavigator } from '../../navigators/CheckoutItemNavigator';
 import { Receipt } from './sub-components/Receipt/Receipt';
 import { SelectBill } from './sub-components/SelectBill/SelectBIll';
 import { realm } from '../../services/Realm';
 import uuidv4 from 'uuid';
 import { Payment } from './sub-components/Payment/Payment';
+import { balance } from '../../utils';
+import { CompleteBill } from './sub-components/CompleteBill/CompleteBill';
 
 const instructions = Platform.select({
   ios: 'Press Cmd+R to reload,\nCmd+D or shake for dev menu.',
@@ -21,19 +30,21 @@ export enum Modes {
   Bills = 'bills',
   Items = 'items',
   Loading = 'loading',
+  Complete = 'complete',
 }
 
 export const Checkout = ({ navigation }) => {
-  const openBills = useRealmQuery({ source: BillSchema.name, filter: `isClosed = false` });
+  const openBills = useRealmQuery<BillProps>({ source: BillSchema.name, filter: `isClosed = false` });
   const discounts = useRealmQuery<DiscountProps>({ source: DiscountSchema.name });
   const paymentTypes = useRealmQuery<PaymentTypeProps>({ source: PaymentTypeSchema.name });
 
-  const [activeBill, setActiveBill] = useState(null);
+  const [activeBill, setActiveBill] = useState<any>(null);
   const [mode, setMode] = useState<Modes>(Modes.Items);
 
   const clearBill = () => setActiveBill(null);
   const openDrawer = () => navigation.openDrawer();
   const onCheckout = () => setMode(Modes.Payments);
+  const completeBill = () => setMode(Modes.Complete);
 
   useEffect(() => (!openBills || !paymentTypes || !discounts) && setMode(Modes.Loading), [
     openBills,
@@ -46,24 +57,42 @@ export const Checkout = ({ navigation }) => {
     if (bill) {
       setActiveBill(bill);
     } else {
-      let b;
       realm.write(() => {
-        b = realm.create(BillSchema.name, { _id: uuidv4(), tab });
+        const bill = realm.create(BillSchema.name, { _id: uuidv4(), tab });
+        setActiveBill(bill);
       });
-      setActiveBill(b);
     }
   };
 
-  const renderMain = () => {
+  const closeBill = bill => {
+    if (balance(bill) <= 0) {
+      realm.write(() => {
+        bill.isClosed = true;
+      });
+      clearBill();
+      setMode(Modes.Bills);
+    }
+  };
+
+  const renderMainPanel = () => {
     switch (mode) {
       case Modes.Loading:
         return <Loading />;
       case Modes.Payments:
-        return <Payment activeBill={activeBill} discounts={discounts} paymentTypes={paymentTypes} />;
+        return (
+          <Payment
+            activeBill={activeBill}
+            discounts={discounts}
+            paymentTypes={paymentTypes}
+            onCompleteBill={completeBill}
+          />
+        );
       case Modes.Bills:
         return <SelectBill maxBills={40} openBills={openBills} onSelectBill={onSelectBill} />;
       case Modes.Items:
         return <CheckoutItemNavigator activeBill={activeBill} />;
+      case Modes.Complete:
+        return <CompleteBill activeBill={activeBill} onCloseBill={closeBill} />;
     }
   };
 
@@ -71,7 +100,7 @@ export const Checkout = ({ navigation }) => {
     <Container>
       <SidebarHeader title="Checkout" onOpen={openDrawer} />
       <Grid>
-        <Col>{renderMain()}</Col>
+        <Col>{renderMainPanel()}</Col>
         <Col style={{ width: 350 }}>
           {activeBill && <Receipt activeBill={activeBill} onStore={clearBill} onCheckout={onCheckout} />}
         </Col>
