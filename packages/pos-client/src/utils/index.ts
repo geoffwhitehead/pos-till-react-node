@@ -44,3 +44,6 @@ export const totalPayments: (bill: any) => number = bill => {
   }, 0);
   return amt;
 };
+
+export const formatNumber: (value: number, symbol?: string) => string = (value, symbol = '') =>
+  `${symbol}${(value / 100).toFixed(2)}`;

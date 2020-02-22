@@ -3,7 +3,7 @@ import { Text, Content, List, Separator, ListItem, Container, Badge } from '../.
 import { SidebarHeader } from '../../components/SidebarHeader/SidebarHeader'
 import { Loading } from '../Loading/Loading'
 import { useRealmQuery } from 'react-use-realm'
-import { ItemSchema, CategorySchema } from '../../services/schemas'
+import { ItemSchema } from '../../services/schemas'
 
 export const Items = ({ navigation }) => {
   const items = useRealmQuery({
