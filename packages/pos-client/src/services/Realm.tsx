@@ -12,6 +12,7 @@ import {
   OrganizationSchema,
   CategorySchema,
   DiscountSchema,
+  BillPeriodSchema,
 } from './schemas';
 
 const realm = new Realm({
@@ -28,11 +29,12 @@ const realm = new Realm({
     BillDiscountSchema,
     PaymentTypeSchema,
     DiscountSchema,
+    BillPeriodSchema,
   ],
-  schemaVersion: 10,
-  // migration: function(oldRealm, newRealm) {
-  //   newRealm.deleteAll();
-  // },
+  schemaVersion: 11,
+  migration: function(oldRealm, newRealm) {
+    newRealm.deleteAll();
+  },
 });
 
 export { realm };

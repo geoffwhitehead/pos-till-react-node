@@ -222,5 +222,22 @@ export const BillSchema: Realm.ObjectSchema = {
     discounts: { type: 'BillDiscount[]', default: [] },
     tab: 'int',
     isClosed: { type: 'bool', default: false, indexed: true },
+    billPeriod: 'BillPeriod',
+  },
+};
+
+export interface BillPeriodProps {
+  _id: string;
+  opened: Date;
+  closed: Date;
+}
+
+export const BillPeriodSchema: Realm.ObjectSchema = {
+  name: 'BillPeriod',
+  primaryKey: '_id',
+  properties: {
+    _id: 'string',
+    opened: { type: 'date', default: Date() },
+    closed: 'date?',
   },
 };
