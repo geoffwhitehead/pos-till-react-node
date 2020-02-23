@@ -15,7 +15,11 @@ export const routes = {
   transactions: 'Transactions',
 };
 
-export const SidebarNavigator = () => {
+interface SidebarNavigatorProps {
+  billPeriod: any; // TODO
+}
+
+export const SidebarNavigator: React.FC<SidebarNavigatorProps> = () => {
   const Drawer = createDrawerNavigator();
   return (
     <Drawer.Navigator initialRouteName="Checkout">

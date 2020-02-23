@@ -8,7 +8,6 @@ import {
   ModifierSchema,
   BillItemSchema,
   BillItemModifierSchema,
-  BillSchema,
   CategoryProps,
   ItemProps,
   ModifierProps,
@@ -16,7 +15,6 @@ import {
 import { routes } from '../../../../navigators/CheckoutItemNavigator';
 import { realm } from '../../../../services/Realm';
 import uuidv4 from 'uuid/v4';
-import { Results } from 'realm';
 
 export const CategoryList: React.FC = ({ navigation, route }) => {
   const { activeBill } = route.params;
