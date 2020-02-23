@@ -19,15 +19,20 @@ interface SidebarNavigatorProps {
   billPeriod: any; // TODO
 }
 
-export const SidebarNavigator: React.FC<SidebarNavigatorProps> = () => {
+export const SidebarNavigator: React.FC<SidebarNavigatorProps> = ({ billPeriod }) => {
   const Drawer = createDrawerNavigator();
+
+  const routeParams = {
+    initialParams: { billPeriod },
+  };
+
   return (
     <Drawer.Navigator initialRouteName="Checkout">
-      <Drawer.Screen name={routes.checkout} component={Checkout} />
+      <Drawer.Screen {...routeParams} name={routes.checkout} component={Checkout} />
       <Drawer.Screen name={routes.items} component={Items} />
-      <Drawer.Screen name={routes.reports} component={Reports} />
+      <Drawer.Screen {...routeParams} name={routes.reports} component={Reports} />
       <Drawer.Screen name={routes.bills} component={Bills} />
-      <Drawer.Screen name={routes.transactions} component={Transactions} />
+      <Drawer.Screen {...routeParams} name={routes.transactions} component={Transactions} />
     </Drawer.Navigator>
   );
 };

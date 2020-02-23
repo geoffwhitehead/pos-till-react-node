@@ -12,9 +12,6 @@ export const Main: React.FC = () => {
   const billPeriods = useRealmQuery<BillPeriodProps>({ source: BillPeriodSchema.name, filter: 'closed = null' });
   const [billPeriod, setBillPeriod] = useState(null);
 
-  console.log('billPeriods', billPeriods);
-  console.log('billPeriod', billPeriod);
-  console.log('populating', populating);
   React.useEffect(() => {
     const populateAsync = async () => {
       // TODO: use the dataId property to validate whether we need to re populate.
