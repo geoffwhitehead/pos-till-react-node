@@ -32,7 +32,7 @@ export const populate = async () => {
     });
 
     realm.write(() => {
-      realm.deleteAll();
+      // realm.deleteAll();
       paymentTypes.map(paymentType => realm.create(PaymentTypeSchema.name, paymentType));
       discounts.map(discount => realm.create(DiscountSchema.name, discount));
       items.map(item => {

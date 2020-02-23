@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, createContext } from 'react';
 import { Platform } from 'react-native';
 import { Container, Grid, Col, Text } from '../../core';
 import { SidebarHeader } from '../../components/SidebarHeader/SidebarHeader';
@@ -39,17 +39,9 @@ interface CheckoutProps {
 }
 
 export const Checkout: React.FC<CheckoutProps> = ({ navigation, initialBill = null }) => {
-  console.log('Before contexct call');
   const { billPeriod, setBillPeriod } = useContext(BillPeriodContext);
-  console.log('billPeriodContext', { billPeriod, setBillPeriod });
-  console.log('01 HERERERE');
-
   const openBills = useRealmQuery<BillProps>({ source: BillSchema.name, filter: `isClosed = false` });
-  console.log('02 HERERERE');
-
   const discounts = useRealmQuery<DiscountProps>({ source: DiscountSchema.name });
-  console.log('03 HERERERE');
-
   const paymentTypes = useRealmQuery<PaymentTypeProps>({ source: PaymentTypeSchema.name });
 
   const [activeBill, setActiveBill] = useState<null | any>(initialBill); // TODO: type
@@ -60,14 +52,10 @@ export const Checkout: React.FC<CheckoutProps> = ({ navigation, initialBill = nu
   const onCheckout = () => setMode(Modes.Payments);
   const completeBill = () => setMode(Modes.Complete);
 
-  console.log('1 HERERERE');
-
   useEffect(() => {
     (!openBills || !paymentTypes || !discounts) && setMode(Modes.Loading);
     return () => {};
   }, [openBills, paymentTypes, discounts]);
-
-  console.log('2 HERERERE');
 
   useEffect(() => {
     !activeBill ? setMode(Modes.Bills) : setMode(Modes.Items);
@@ -76,7 +64,6 @@ export const Checkout: React.FC<CheckoutProps> = ({ navigation, initialBill = nu
 
   // TODO:  function duped in drawer->bills ... refactor
   const onSelectBill = (tab, bill) => {
-    console.log('!!!!!!!billPeriod', billPeriod);
     if (bill) {
       setActiveBill(bill);
     } else {
@@ -119,7 +106,6 @@ export const Checkout: React.FC<CheckoutProps> = ({ navigation, initialBill = nu
     }
   };
 
-  console.log('3 HERERERE');
   return (
     <Container>
       <SidebarHeader title="Checkout" onOpen={openDrawer} />
