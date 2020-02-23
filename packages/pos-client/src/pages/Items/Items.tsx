@@ -18,22 +18,22 @@ export const Items = ({ navigation }) => {
       <SidebarHeader title="Items" onOpen={navigation.toggleDrawer()} />
       <Content>
         <List>
-          {items.reduce((acc, cur, index) => {
+          {items.reduce((acc, item, index) => {
             const firstRecord = index === 0
             const currentRecordIsNewCategory =
-              !firstRecord && items[index - 1].categoryId.name !== cur.categoryId.name
+              !firstRecord && items[index - 1].categoryId.name !== item.categoryId.name
             const Item = (
-              <ListItem>
-                <Text>{cur.name}</Text>
+              <ListItem key={`${item._id}-li`}>
+                <Text>{item.name}</Text>
               </ListItem>
             )
-            const Divider = (
-              <Separator bordered>
-                <Text>{cur.categoryId.name}</Text>
+            const Seperator = (
+              <Separator bordered key={`${item._id}-s`}> 
+                <Text>{item.categoryId.name}</Text>
               </Separator>
             )
             if (firstRecord || currentRecordIsNewCategory) {
-              return [...acc, Divider, Item]
+              return [...acc, Seperator, Item]
             } else {
               return [...acc, Item]
             }

@@ -8,6 +8,7 @@ import {
   Body,
   Right,
 } from '../../../../core'
+import { balance } from '../../../../utils'
 
 interface SelectBillProps {
   openBills: any // TODO: fix realm types
@@ -21,7 +22,6 @@ export const SelectBill: React.FC<SelectBillProps> = ({ openBills, maxBills, onS
     return [...acc]
   }, Array(maxBills).fill(null))
 
-  console.log('!!!!!!!bills', bills)
   const onSelectBillFactory = (tab, bill) => () => onSelectBill(tab, bill)
   const sum = (billPayments) => billPayments.reduce((acc, cur) => acc + cur.price, 0)
   return (
@@ -38,7 +38,7 @@ export const SelectBill: React.FC<SelectBillProps> = ({ openBills, maxBills, onS
                 <Text>{`${tab} ${bill ? 'Open' : 'Closed'}`}</Text>
               </Left>
               <Body>
-                <Text>{bill ? sum(bill.payments) : ''}</Text>
+                <Text>{bill ? balance(bill) : ''}</Text>
               </Body>
               <Right></Right>
             </ListItem>

@@ -21,10 +21,6 @@ import { Payment } from './sub-components/Payment/Payment';
 import { balance } from '../../utils';
 import { CompleteBill } from './sub-components/CompleteBill/CompleteBill';
 
-const instructions = Platform.select({
-  ios: 'Press Cmd+R to reload,\nCmd+D or shake for dev menu.',
-  android: 'Double tap R on your keyboard to reload,\nShake or press menu button for dev menu.',
-});
 export enum Modes {
   Payments = 'payments',
   Bills = 'bills',
@@ -33,12 +29,20 @@ export enum Modes {
   Complete = 'complete',
 }
 
-export const Checkout = ({ navigation }) => {
+// TODO: move to org
+const maxBills = 40;
+
+interface CheckoutProps {
+  navigation: any; // TODO: fix
+  initialBill: any; // TODO
+}
+
+export const Checkout: React.FC<CheckoutProps> = ({ navigation, initialBill = null }) => {
   const openBills = useRealmQuery<BillProps>({ source: BillSchema.name, filter: `isClosed = false` });
   const discounts = useRealmQuery<DiscountProps>({ source: DiscountSchema.name });
   const paymentTypes = useRealmQuery<PaymentTypeProps>({ source: PaymentTypeSchema.name });
 
-  const [activeBill, setActiveBill] = useState<any>(null);
+  const [activeBill, setActiveBill] = useState<null | any>(initialBill); // TODO: type
   const [mode, setMode] = useState<Modes>(Modes.Items);
 
   const clearBill = () => setActiveBill(null);
@@ -53,6 +57,7 @@ export const Checkout = ({ navigation }) => {
   ]);
   useEffect(() => (!activeBill ? setMode(Modes.Bills) : setMode(Modes.Items)), [activeBill]);
 
+  // TODO:  function duped in drawer->bills ... refactor
   const onSelectBill = (tab, bill) => {
     if (bill) {
       setActiveBill(bill);
@@ -88,7 +93,7 @@ export const Checkout = ({ navigation }) => {
           />
         );
       case Modes.Bills:
-        return <SelectBill maxBills={40} openBills={openBills} onSelectBill={onSelectBill} />;
+        return <SelectBill maxBills={maxBills} openBills={openBills} onSelectBill={onSelectBill} />;
       case Modes.Items:
         return <CheckoutItemNavigator activeBill={activeBill} />;
       case Modes.Complete:
