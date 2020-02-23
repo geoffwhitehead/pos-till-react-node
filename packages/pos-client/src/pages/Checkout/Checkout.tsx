@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Platform } from 'react-native';
 import { Container, Grid, Col, Text } from '../../core';
 import { SidebarHeader } from '../../components/SidebarHeader/SidebarHeader';
@@ -20,6 +20,7 @@ import uuidv4 from 'uuid';
 import { Payment } from './sub-components/Payment/Payment';
 import { balance } from '../../utils';
 import { CompleteBill } from './sub-components/CompleteBill/CompleteBill';
+import { BillPeriodContext } from '../../contexts/BillPeriodContext';
 
 export enum Modes {
   Payments = 'payments',
@@ -38,8 +39,17 @@ interface CheckoutProps {
 }
 
 export const Checkout: React.FC<CheckoutProps> = ({ navigation, initialBill = null }) => {
+  console.log('Before contexct call');
+  const { billPeriod, setBillPeriod } = useContext(BillPeriodContext);
+  console.log('billPeriodContext', { billPeriod, setBillPeriod });
+  console.log('01 HERERERE');
+
   const openBills = useRealmQuery<BillProps>({ source: BillSchema.name, filter: `isClosed = false` });
+  console.log('02 HERERERE');
+
   const discounts = useRealmQuery<DiscountProps>({ source: DiscountSchema.name });
+  console.log('03 HERERERE');
+
   const paymentTypes = useRealmQuery<PaymentTypeProps>({ source: PaymentTypeSchema.name });
 
   const [activeBill, setActiveBill] = useState<null | any>(initialBill); // TODO: type
@@ -50,20 +60,28 @@ export const Checkout: React.FC<CheckoutProps> = ({ navigation, initialBill = nu
   const onCheckout = () => setMode(Modes.Payments);
   const completeBill = () => setMode(Modes.Complete);
 
-  useEffect(() => (!openBills || !paymentTypes || !discounts) && setMode(Modes.Loading), [
-    openBills,
-    paymentTypes,
-    discounts,
-  ]);
-  useEffect(() => (!activeBill ? setMode(Modes.Bills) : setMode(Modes.Items)), [activeBill]);
+  console.log('1 HERERERE');
+
+  useEffect(() => {
+    (!openBills || !paymentTypes || !discounts) && setMode(Modes.Loading);
+    return () => {};
+  }, [openBills, paymentTypes, discounts]);
+
+  console.log('2 HERERERE');
+
+  useEffect(() => {
+    !activeBill ? setMode(Modes.Bills) : setMode(Modes.Items);
+    return () => {};
+  }, [activeBill]);
 
   // TODO:  function duped in drawer->bills ... refactor
   const onSelectBill = (tab, bill) => {
+    console.log('!!!!!!!billPeriod', billPeriod);
     if (bill) {
       setActiveBill(bill);
     } else {
       realm.write(() => {
-        const bill = realm.create(BillSchema.name, { _id: uuidv4(), tab });
+        const bill = realm.create(BillSchema.name, { _id: uuidv4(), tab, billPeriod });
         setActiveBill(bill);
       });
     }
@@ -101,6 +119,7 @@ export const Checkout: React.FC<CheckoutProps> = ({ navigation, initialBill = nu
     }
   };
 
+  console.log('3 HERERERE');
   return (
     <Container>
       <SidebarHeader title="Checkout" onOpen={openDrawer} />

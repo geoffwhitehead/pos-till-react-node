@@ -15,24 +15,18 @@ export const routes = {
   transactions: 'Transactions',
 };
 
-interface SidebarNavigatorProps {
-  billPeriod: any; // TODO
-}
+interface SidebarNavigatorProps {}
 
-export const SidebarNavigator: React.FC<SidebarNavigatorProps> = ({ billPeriod }) => {
+export const SidebarNavigator: React.FC<SidebarNavigatorProps> = () => {
   const Drawer = createDrawerNavigator();
-
-  const routeParams = {
-    initialParams: { billPeriod },
-  };
 
   return (
     <Drawer.Navigator initialRouteName="Checkout">
-      <Drawer.Screen {...routeParams} name={routes.checkout} component={Checkout} />
+      <Drawer.Screen name={routes.checkout} component={Checkout} />
       <Drawer.Screen name={routes.items} component={Items} />
-      <Drawer.Screen {...routeParams} name={routes.reports} component={Reports} />
+      <Drawer.Screen name={routes.reports} component={Reports} />
       <Drawer.Screen name={routes.bills} component={Bills} />
-      <Drawer.Screen {...routeParams} name={routes.transactions} component={Transactions} />
+      <Drawer.Screen name={routes.transactions} component={Transactions} />
     </Drawer.Navigator>
   );
 };

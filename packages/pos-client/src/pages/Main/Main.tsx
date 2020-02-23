@@ -6,12 +6,14 @@ import { useRealmQuery } from 'react-use-realm';
 import { BillPeriodProps, BillPeriodSchema } from '../../services/schemas';
 import { realm } from '../../services/Realm';
 import uuidv4 from 'uuid/v4';
+import { BillPeriodContext } from '../../contexts/BillPeriodContext';
 
 export const Main: React.FC = () => {
   const [populating, setPopulating] = useState(true);
   const billPeriods = useRealmQuery<BillPeriodProps>({ source: BillPeriodSchema.name, filter: 'closed = null' });
   const [billPeriod, setBillPeriod] = useState(null);
 
+  console.log('billPeriods', billPeriods);
   React.useEffect(() => {
     const populateAsync = async () => {
       // TODO: use the dataId property to validate whether we need to re populate.
@@ -30,8 +32,8 @@ export const Main: React.FC = () => {
       switch (billPeriods.length) {
         case 0:
           return realm.write(() => {
-            const billPeriod = realm.create(BillPeriodSchema.name, { _id: uuidv4() });
-            setBillPeriod(billPeriod);
+            const newBillPeriod = realm.create(BillPeriodSchema.name, { _id: uuidv4() });
+            setBillPeriod(newBillPeriod);
           });
         case 1:
           return setBillPeriod(billPeriods[0]);
@@ -41,5 +43,11 @@ export const Main: React.FC = () => {
     }
   }, [billPeriods]);
 
-  return populating || !billPeriod ? <Loading /> : <SidebarNavigator billPeriod={billPeriod} />;
+  return populating || !billPeriod ? (
+    <Loading />
+  ) : (
+    <BillPeriodContext.Provider value={{ billPeriod, setBillPeriod }}>
+      <SidebarNavigator />
+    </BillPeriodContext.Provider>
+  );
 };

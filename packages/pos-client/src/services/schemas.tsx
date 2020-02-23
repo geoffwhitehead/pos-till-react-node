@@ -173,7 +173,7 @@ export const BillItemSchema: Realm.ObjectSchema = {
   primaryKey: '_id',
   properties: {
     _id: 'string',
-    itemId: 'string',
+  itemId: 'string',
     name: 'string',
     price: 'float',
     modifierId: 'string?',
