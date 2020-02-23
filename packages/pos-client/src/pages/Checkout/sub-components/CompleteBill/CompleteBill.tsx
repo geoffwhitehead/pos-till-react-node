@@ -11,7 +11,7 @@ interface CompleteBillProps {
 }
 
 // TODO : move this
-const currencySymbol = '£'
+const currencySymbol = '£';
 
 export const CompleteBill: React.FC<CompleteBillProps> = ({ activeBill, onCloseBill }) => {
   const onCloseFactory = (bill: any) => () => onCloseBill(bill);

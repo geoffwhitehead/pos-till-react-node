@@ -10,12 +10,13 @@ export const Items = ({ navigation }) => {
     source: ItemSchema.name,
     sort: ['categoryId.name', 'name'],
   })
+  const openDrawer = () => navigation.openDrawer();
 
   return !items ? (
     <Loading />
   ) : (
     <Container>
-      <SidebarHeader title="Items" onOpen={navigation.toggleDrawer()} />
+      <SidebarHeader title="Items" onOpen={openDrawer} />
       <Content>
         <List>
           {items.reduce((acc, item, index) => {

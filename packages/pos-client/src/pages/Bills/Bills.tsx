@@ -13,6 +13,7 @@ const maxBills = 40;
 
 export const Bills = ({ navigation }) => {
   const openBills = useRealmQuery<BillProps>({ source: BillSchema.name, filter: `isClosed = false` });
+  const openDrawer = () => navigation.openDrawer();
 
   const navigateToCheckout = bill => navigation.navigate(routes.checkout, { initialBill: bill });
 
@@ -30,8 +31,10 @@ export const Bills = ({ navigation }) => {
 
   return (
     <Container>
-      <SidebarHeader title="Bills" onOpen={navigation.toggleDrawer()} />
+      <SidebarHeader title="Bills" onOpen={openDrawer} />
+
       <SelectBill openBills={openBills} maxBills={maxBills} onSelectBill={onSelectBill} />
     </Container>
   );
 };
+
