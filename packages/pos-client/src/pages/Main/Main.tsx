@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { populate } from '../../services/populate';
 import { SidebarNavigator } from '../../navigators';
 import { Loading } from '../Loading/Loading';
@@ -13,8 +13,7 @@ export const Main: React.FC = () => {
   const billPeriods = useRealmQuery<BillPeriodProps>({ source: BillPeriodSchema.name, filter: 'closed = null' });
   const [billPeriod, setBillPeriod] = useState(null);
 
-  console.log('billPeriods', billPeriods);
-  React.useEffect(() => {
+  useEffect(() => {
     const populateAsync = async () => {
       // TODO: use the dataId property to validate whether we need to re populate.
       try {
@@ -27,8 +26,12 @@ export const Main: React.FC = () => {
     populateAsync();
   }, []);
 
-  React.useEffect(() => {
-    if (billPeriods) {
+  useEffect(() => {
+    /**
+     * If refreshing data in populate - make sure to only run after population is complete
+     */
+
+    if (billPeriods && !populating) {
       switch (billPeriods.length) {
         case 0:
           return realm.write(() => {
@@ -41,7 +44,7 @@ export const Main: React.FC = () => {
           console.error('Invalid state: Multiple open bill periods');
       }
     }
-  }, [billPeriods]);
+  }, [billPeriods, populating]);
 
   return populating || !billPeriod ? (
     <Loading />
