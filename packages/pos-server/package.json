@@ -2,11 +2,13 @@
     "version": "2.0.0",
     "name": "positive-server",
     "description": "POS backend.",
-    "main": "app/app.ts",
+    "main": "index.js",
     "scripts": {
         "test": "jest",
-        "start": "docker-compose up",
-        "rebuild": "docker exec -it pos-server_app_1 yarn "
+        "dev": "docker-compose up",
+        "start": "node ./dist/app/server.js",
+        "rebuild": "docker exec -it pos-server_app_1 yarn ",
+        "build": "yarn tsc"
     },
     "license": "MIT",
     "dependencies": {

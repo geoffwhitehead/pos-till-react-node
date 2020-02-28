@@ -8,6 +8,6 @@ node_modules
 
 # Optional npm cache directory
 .npm
-
+dist
 # Auto-Generated Jest MongoDB config
 globalConfig.json
