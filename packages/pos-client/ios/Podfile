@@ -39,10 +39,12 @@ target 'Boilerplate' do
 
   pod 'RealmJS', :path => '../node_modules/realm'
 
-  target 'BoilerplateTests' do
-    inherit! :search_paths
-    # Pods for testing
-  end
+  pod 'RNStarPrnt', :path => '../node_modules/react-native-star-prnt'
+
+  # target 'BoilerplateTests' do
+  #   inherit! :search_paths
+  #   # Pods for testing
+  # end
   use_native_modules!
 end
 target 'Boilerplate-tvOS' do

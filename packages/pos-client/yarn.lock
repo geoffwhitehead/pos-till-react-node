@@ -6489,6 +6489,11 @@ react-native-screens@^2.0.0-beta.2:
   dependencies:
     debounce "^1.2.0"
 
+react-native-star-prnt@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/react-native-star-prnt/-/react-native-star-prnt-1.1.0.tgz#6b5836d07ffd4e693e449f5c48e546504c51f6ad"
+  integrity sha512-jt10brbKj4dVh4fjPXTJGfW/7OXy4qSfNdJOmU7iUmQbroR49Y5/UzpqoSMhzjpuY36Fv352k2czpIj+04298Q==
+
 react-native-vector-icons@^6.6.0:
   version "6.6.0"
   resolved "https://registry.yarnpkg.com/react-native-vector-icons/-/react-native-vector-icons-6.6.0.tgz#66cf004918eb05d90778d64bd42077c1800d481b"

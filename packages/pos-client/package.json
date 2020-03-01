@@ -34,6 +34,7 @@
     "react-native-reanimated": "^1.7.0",
     "react-native-safe-area-context": "^0.7.2",
     "react-native-screens": "^2.0.0-beta.2",
+    "react-native-star-prnt": "^1.1.0",
     "react-native-vector-icons": "^6.6.0",
     "react-redux": "^6.0.1",
     "react-use-realm": "^0.2.0",
