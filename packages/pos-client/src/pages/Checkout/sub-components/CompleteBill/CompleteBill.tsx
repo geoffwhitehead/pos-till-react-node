@@ -14,24 +14,10 @@ interface CompleteBillProps {
 // TODO : move this
 const currencySymbol = '£';
 
-import { StarPRNT } from 'react-native-star-prnt';
-
-async function portDiscovery() {
-  try {
-    let printers = await StarPRNT.portDiscovery('USB:TSP100');
-    console.log('******************** printers', JSON.stringify(printers, null, 4));
-    console.log(printers);
-    return printers;
-  } catch (e) {
-    console.error('ERROR ', e);
-    return e;
-  }
-}
-
 export const CompleteBill: React.FC<CompleteBillProps> = ({ activeBill, onCloseBill }) => {
   const onCloseFactory = (bill: any) => () => onCloseBill(bill);
-  const onPrint = () => print();
-  portDiscovery();
+  const onPrint = async () => await print(activeBill);
+
   return (
     <View style={styles.container}>
       <Text style={styles.text}>{`Change due: ${formatNumber(Math.abs(balance(activeBill)), currencySymbol)}`}</Text>

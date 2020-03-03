@@ -1,3 +1,5 @@
+import Realm from 'realm';
+
 export interface ItemProps {
   _id: string;
   name: string;
