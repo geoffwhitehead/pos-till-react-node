@@ -208,7 +208,7 @@ export interface BillProps {
   items: Realm.Collection<BillItemProps>;
   payments: Realm.Collection<BillPaymentProps>;
   timestamp: Date;
-  discount: Realm.Collection<BillDiscountProps>;
+  discounts: Realm.Collection<BillDiscountProps>;
   tab: number;
   isClosed: boolean;
 }
