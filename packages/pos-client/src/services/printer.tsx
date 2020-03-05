@@ -67,7 +67,6 @@ export async function print(bill: BillProps, openDrawer: boolean = false) {
       c.push({ appendBitmapText: alignLeftRight(modPrefix + mod.name, formatNumber(mod.price, symbol)) });
     });
   });
-  c.push(divider);
   c.push({ appendBitmapText: alignLeftRight('TOTAL: ', formatNumber(total(bill), symbol)) });
 
   bill.discounts && addHeader(c, 'Discounts');
