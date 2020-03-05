@@ -9,6 +9,10 @@ export const total: (bill: any) => number = bill => {
   return amt;
 };
 
+export const totalPayable: (bill: any) => number = bill => {
+  return total(bill) - totalDiscount(bill)
+}
+
 // TODO fix tpyes
 export const balance: (bill: any) => number = bill => {
   return total(bill) - totalDiscount(bill) - totalPayments(bill);
