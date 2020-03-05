@@ -24,6 +24,7 @@
     "@react-navigation/stack": "^5.0.0",
     "apisauce": "^1.1.1",
     "axios": "^0.19.0",
+    "dayjs": "^1.8.21",
     "formik": "^2.1.4",
     "lodash": "^4.17.15",
     "native-base": "^2.13.8",
