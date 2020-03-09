@@ -50,7 +50,14 @@ export const Checkout: React.FC<CheckoutProps> = ({ navigation, initialBill = nu
   const clearBill = () => setActiveBill(null);
   const openDrawer = () => navigation.openDrawer();
   const onCheckout = () => setMode(Modes.Payments);
-  const completeBill = () => setMode(Modes.Complete);
+  const completeBill = bill => {
+    if (balance(bill) <= 0) {
+      realm.write(() => {
+        bill.isClosed = true;
+      });
+      setMode(Modes.Complete);
+    }
+  };
 
   useEffect(() => {
     (!openBills || !paymentTypes || !discounts) && setMode(Modes.Loading);
@@ -75,13 +82,8 @@ export const Checkout: React.FC<CheckoutProps> = ({ navigation, initialBill = nu
   };
 
   const closeBill = bill => {
-    if (balance(bill) <= 0) {
-      realm.write(() => {
-        bill.isClosed = true;
-      });
-      clearBill();
-      setMode(Modes.Bills);
-    }
+    clearBill();
+    setMode(Modes.Bills);
   };
 
   const renderMainPanel = () => {
@@ -108,11 +110,11 @@ export const Checkout: React.FC<CheckoutProps> = ({ navigation, initialBill = nu
 
   return (
     <Container>
-      <SidebarHeader title="Checkout" onOpen={openDrawer} />
+      <SidebarHeader title="Checkout" onOpen={openDrawer} disableNav={mode === Modes.Complete} />
       <Grid>
         <Col>{renderMainPanel()}</Col>
         <Col style={{ width: 350 }}>
-          {activeBill && <Receipt activeBill={activeBill} onStore={clearBill} onCheckout={onCheckout} />}
+          {activeBill && <Receipt activeBill={activeBill} onStore={clearBill} onCheckout={onCheckout} complete={mode === Modes.Complete}/>}
         </Col>
       </Grid>
     </Container>

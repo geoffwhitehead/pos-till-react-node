@@ -14,7 +14,7 @@ import {
   Left,
   Right,
 } from '../../../../core';
-import { DiscountProps, BillPaymentSchema, PaymentTypeProps, BillDiscountSchema } from '../../../../services/schemas';
+import { DiscountProps, BillPaymentSchema, PaymentTypeProps, BillDiscountSchema, BillProps } from '../../../../services/schemas';
 import { realm } from '../../../../services/Realm';
 import uuidv4 from 'uuid';
 import { balance, formatNumber } from '../../../../utils';
@@ -24,7 +24,7 @@ interface PaymentProps {
   activeBill: any; // fix
   discounts: Realm.Collection<DiscountProps>;
   paymentTypes: Realm.Collection<PaymentTypeProps>;
-  onCompleteBill: () => void;
+  onCompleteBill: (bill: BillProps) => void;
 }
 
 export const Payment: React.FC<PaymentProps> = ({ activeBill, discounts, paymentTypes, onCompleteBill }) => {
@@ -36,7 +36,7 @@ export const Payment: React.FC<PaymentProps> = ({ activeBill, discounts, payment
   // TODO: refactor to grab currency from org
   const currencySymbol = '£';
 
-  const checkComplete = () => balance(activeBill) <= 0 && onCompleteBill();
+  const checkComplete = () => balance(activeBill) <= 0 && onCompleteBill(activeBill);
 
   const onValueChange = value => setValue(parseFloat(value));
 
@@ -49,8 +49,8 @@ export const Payment: React.FC<PaymentProps> = ({ activeBill, discounts, payment
         amount: amt || Math.max(balance(activeBill), 0),
       });
       activeBill.payments.push(billPayment);
-      checkComplete();
     });
+    checkComplete();
   };
 
   const addDiscount = discount => () => {
@@ -63,8 +63,8 @@ export const Payment: React.FC<PaymentProps> = ({ activeBill, discounts, payment
         isPercent: discount.isPercent,
       });
       activeBill.discounts.push(billDiscount);
-      checkComplete();
     });
+    checkComplete();
   };
 
   return (
