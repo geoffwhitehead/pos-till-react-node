@@ -226,7 +226,7 @@ export const BillSchema: Realm.ObjectSchema = {
     tab: 'int',
     isClosed: { type: 'bool', default: false, indexed: true },
     closedAt: 'date?',
-    billPeriod: 'BillPeriod',
+    billPeriod: {type: 'BillPeriod', indexed: true},
   },
 };
 
