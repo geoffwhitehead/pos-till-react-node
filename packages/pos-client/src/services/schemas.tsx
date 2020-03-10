@@ -211,6 +211,7 @@ export interface BillProps {
   discounts: Realm.Collection<BillDiscountProps>;
   tab: number;
   isClosed: boolean;
+  closedAt?: Date;
 }
 
 export const BillSchema: Realm.ObjectSchema = {
@@ -224,6 +225,7 @@ export const BillSchema: Realm.ObjectSchema = {
     discounts: { type: 'BillDiscount[]', default: [] },
     tab: 'int',
     isClosed: { type: 'bool', default: false, indexed: true },
+    closedAt: 'date?',
     billPeriod: 'BillPeriod',
   },
 };
@@ -231,7 +233,7 @@ export const BillSchema: Realm.ObjectSchema = {
 export interface BillPeriodProps {
   _id: string;
   opened: Date;
-  closed: Date;
+  closed?: Date;
 }
 
 export const BillPeriodSchema: Realm.ObjectSchema = {

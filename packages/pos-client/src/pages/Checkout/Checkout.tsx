@@ -21,6 +21,7 @@ import { Payment } from './sub-components/Payment/Payment';
 import { balance } from '../../utils';
 import { CompleteBill } from './sub-components/CompleteBill/CompleteBill';
 import { BillPeriodContext } from '../../contexts/BillPeriodContext';
+import dayjs from 'dayjs';
 
 export enum Modes {
   Payments = 'payments',
@@ -54,6 +55,7 @@ export const Checkout: React.FC<CheckoutProps> = ({ navigation, initialBill = nu
     if (balance(bill) <= 0) {
       realm.write(() => {
         bill.isClosed = true;
+        bill.closedAt = dayjs();
       });
       setMode(Modes.Complete);
     }
@@ -111,10 +113,20 @@ export const Checkout: React.FC<CheckoutProps> = ({ navigation, initialBill = nu
   return (
     <Container>
       <SidebarHeader title="Checkout" onOpen={openDrawer} disableNav={mode === Modes.Complete} />
+      <Text>{dayjs(billPeriod.opened).toString()}</Text>
+      <Text>{dayjs(billPeriod.closed).toString()}</Text>
+
       <Grid>
         <Col>{renderMainPanel()}</Col>
         <Col style={{ width: 350 }}>
-          {activeBill && <Receipt activeBill={activeBill} onStore={clearBill} onCheckout={onCheckout} complete={mode === Modes.Complete}/>}
+          {activeBill && (
+            <Receipt
+              activeBill={activeBill}
+              onStore={clearBill}
+              onCheckout={onCheckout}
+              complete={mode === Modes.Complete}
+            />
+          )}
         </Col>
       </Grid>
     </Container>

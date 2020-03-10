@@ -71,7 +71,7 @@ export const ReceiptItems: React.FC<ReceiptItemsProps> = ({ activeBill, readonly
           return (
             <ListItem key={discount._id}>
               <Left>
-                <Icon name="ios-close" onPress={voidDiscount(discount)} />
+                {!readonly && <Icon name="ios-close" onPress={voidDiscount(discount)} />}
                 <Content>
                   {discount.isPercent ? (
                     <Text>{`Discount: ${discount.name} ${discount.amount}%`}</Text>
@@ -95,7 +95,7 @@ export const ReceiptItems: React.FC<ReceiptItemsProps> = ({ activeBill, readonly
           return (
             <ListItem key={payment._id}>
               <Left>
-                <Icon name="ios-close" onPress={voidPayment(payment)} />
+                {!readonly && <Icon name="ios-close" onPress={voidPayment(payment)} />}
                 <Content>
                   <Text>{`Payment: ${payment.paymentType}`}</Text>
                 </Content>

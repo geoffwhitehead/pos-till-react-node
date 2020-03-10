@@ -10,8 +10,8 @@ const currencySymbol = '£';
 
 interface ReceiptProps {
   activeBill: any; // TODO
-  onStore: () => void;
-  onCheckout: () => void;
+  onStore?: () => void;
+  onCheckout?: () => void;
   complete: boolean;
 }
 
