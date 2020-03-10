@@ -80,7 +80,7 @@ export const CategoryList: React.FC = ({ navigation, route }) => {
       <SearchHeader />
       <List>
         <ListItem itemHeader first>
-          <Text>Categories</Text>
+          <Text style={{ fontWeight: 'bold' }}>Categories</Text>
         </ListItem>
         {categories.map(cat => {
           return (

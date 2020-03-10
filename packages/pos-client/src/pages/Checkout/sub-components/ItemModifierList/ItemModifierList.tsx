@@ -23,7 +23,7 @@ export const ItemModifierList: React.FC = ({ route, navigation }) => {
         <ListItem itemHeader first>
           <Left>
             <Icon onPress={goBack} name="ios-arrow-back" />
-            <Text>{`${item.name} / Modifiers`}</Text>
+            <Text style={{ fontWeight: 'bold' }}>{`${item.name} / Modifiers`}</Text>
           </Left>
           <Body></Body>
           <Right />
