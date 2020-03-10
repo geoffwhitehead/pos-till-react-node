@@ -4,6 +4,7 @@ import { StyleSheet } from 'react-native';
 import { balance, total, totalDiscount, formatNumber } from '../../../../utils';
 import { Fonts } from '../../../../theme';
 import { ReceiptItems } from './ReceiptItems';
+import dayjs from 'dayjs';
 
 // TODO: move into org and fetch from db or something
 const currencySymbol = '£';
@@ -20,14 +21,18 @@ export const Receipt: React.FC<ReceiptProps> = ({ activeBill, onStore, onCheckou
     <Text>Select bill</Text>
   ) : (
     <Grid style={styles.grid}>
-      <Row style={{ height: 45 }}>
+      <Row style={styles.r1}>
         <Col>
           <Button style={styles.buttons} light onPress={onStore}>
             <Text>Bill / Table: {(activeBill && activeBill.tab) || '-'}</Text>
           </Button>
         </Col>
         <Col>
-          <Text>Something</Text>
+          <Text style={styles.dateText}>
+            {dayjs(activeBill.timestamp)
+              .format('DD/MM/YYYY HH:mm')
+              .toString()}
+          </Text>
         </Col>
       </Row>
 
@@ -41,15 +46,20 @@ export const Receipt: React.FC<ReceiptProps> = ({ activeBill, onStore, onCheckou
         <Text>{`Total: ${formatNumber(total(activeBill), currencySymbol)}`}</Text>
         <Text style={Fonts.h3}>{`Balance: ${formatNumber(balance(activeBill), currencySymbol)}`}</Text>
       </Row>
+      <Row style={styles.r4}>
+        <Button style={styles.printButton} block small info onPress={onStore}>
+          <Text>Print</Text>
+        </Button>
+      </Row>
       {!complete && (
-        <Row style={styles.r4}>
+        <Row style={styles.r5}>
           <Col>
-            <Button style={styles.buttons} small onPress={onStore}>
+            <Button style={styles.buttons} block small onPress={onStore}>
               <Text>Store</Text>
             </Button>
           </Col>
           <Col>
-            <Button style={styles.buttons} small success onPress={onCheckout}>
+            <Button style={styles.buttons} block small success onPress={onCheckout}>
               <Text>Checkout</Text>
             </Button>
           </Col>
@@ -64,6 +74,9 @@ const styles = StyleSheet.create({
     borderLeftWidth: 1,
     borderLeftColor: 'lightgrey',
   },
+  r1: {
+    height: 45,
+  },
   r3: {
     borderTopColor: 'lightgrey',
     borderTopWidth: 1,
@@ -71,8 +84,21 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     padding: 10,
   },
-  r4: { height: 50 },
+  r4: {
+    height: 50,
+  },
+  r5: { height: 50 },
   buttons: {
     height: '100%',
+  },
+  printButton: {
+    height: '100%',
+    width: '100%',
+    textAlign: 'center',
+  },
+  dateText: {
+    textAlign: 'center',
+    lineHeight: 45,
+    backgroundColor: 'whitesmoke',
   },
 });

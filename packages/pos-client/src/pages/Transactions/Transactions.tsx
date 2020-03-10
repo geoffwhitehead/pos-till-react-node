@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Text, Container, Grid, Col, List, ListItem, Left, Body, Right, Content } from '../../core';
+import { Text, Container, Grid, Col, List, ListItem, Left, Body, Right, Content, Badge } from '../../core';
 import { SidebarHeader } from '../../components/SidebarHeader/SidebarHeader';
 import { Receipt } from '../Checkout/sub-components/Receipt/Receipt';
 import { useRealmQuery } from 'react-use-realm';
@@ -49,7 +49,7 @@ const TransactionsList: React.FC<TransactionsListProps> = ({ bills, onSelectBill
       <List>
         <ListItem itemHeader>
           <Left>
-            <Text>Bill / Date</Text>
+            <Text>Bill / Time</Text>
           </Left>
           <Body>
             <Text>Total</Text>
@@ -63,7 +63,9 @@ const TransactionsList: React.FC<TransactionsListProps> = ({ bills, onSelectBill
           return (
             <ListItem noIndent style={isSelected && styles.selected} key={bill._id} onPress={selectBillFactory(index)}>
               <Left>
-                <Text style={{ fontWeight: 'bold', color: 'blue' }}>{bill.tab}</Text>
+                <Badge style={{ minWidth: 28 }} success>
+                  <Text>{bill.tab}</Text>
+                </Badge>
                 <Text>{` / ${dayjs(bill.timestamp)
                   .format('HH:mm')
                   .toString()}`}</Text>
