@@ -32,9 +32,7 @@ export const Bills = ({ navigation }) => {
   return (
     <Container>
       <SidebarHeader title="Bills" onOpen={openDrawer} />
-
       <SelectBill openBills={openBills} maxBills={maxBills} onSelectBill={onSelectBill} />
     </Container>
   );
 };
-

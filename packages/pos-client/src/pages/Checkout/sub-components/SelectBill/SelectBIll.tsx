@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Text, Content, List, ListItem, Left, Body, Right, Button } from '../../../../core';
-import { formatNumber, balance } from '../../../../utils';
+import { Text, Content, List, ListItem, Left, Body, Right, Button, Separator } from '../../../../core';
+import { formatNumber, balance, total } from '../../../../utils';
+import { BillProps } from '../../../../services/schemas';
 
 interface SelectBillProps {
   openBills: any; // TODO: fix realm types
@@ -19,8 +20,8 @@ export const SelectBill: React.FC<SelectBillProps> = ({ openBills, maxBills, onS
 
   const [showOpen, setShowOpen] = useState<boolean>(false);
 
-  const onSelectBillFactory = (tab, bill) => () => onSelectBill(tab, bill);
-  const sum = billPayments => billPayments.reduce((acc, cur) => acc + cur.price, 0);
+  type OnSelectBillFactory = (tab: number, bill: BillProps) => () => void;
+  const onSelectBillFactory: OnSelectBillFactory = (tab, bill) => () => onSelectBill(tab, bill);
   const toggleOpenOnlyFilter = () => setShowOpen(!showOpen);
 
   const filterOpenOnly = bill => (showOpen ? bill : true);
@@ -37,18 +38,32 @@ export const SelectBill: React.FC<SelectBillProps> = ({ openBills, maxBills, onS
             </Button>
           </Right>
         </ListItem>
+        <ListItem itemHeader>
+          <Left>
+            <Text>State</Text>
+          </Left>
+          <Body>
+            <Text>Balance</Text>
+          </Body>
+          <Right>
+            <Text>Total</Text>
+          </Right>
+        </ListItem>
         {bills.filter(filterOpenOnly).map((bill, index) => {
           const tab = index + 1;
           const color = bill ? 'green' : 'red';
+
           return (
-            <ListItem key={index} icon onPress={onSelectBillFactory(tab, bill)}>
+            <ListItem key={index} onPress={onSelectBillFactory(tab, bill)}>
               <Left>
-                <Text style={{ color }}>{`${tab} ${bill ? 'Open' : 'Closed'}`}</Text>
+                <Text style={{ color }}>{`${tab}: ${bill ? 'Open' : 'Closed'}`}</Text>
               </Left>
               <Body>
-                <Text>{bill ? formatNumber(balance(bill), symbol) : ''}</Text>
+                <Text style={{ color: 'grey' }}>{bill ? formatNumber(balance(bill), symbol) : ''}</Text>
               </Body>
-              <Right></Right>
+              <Right>
+                <Text style={{ color: 'grey' }}>{bill ? formatNumber(total(bill), symbol) : ''}</Text>
+              </Right>
             </ListItem>
           );
         })}

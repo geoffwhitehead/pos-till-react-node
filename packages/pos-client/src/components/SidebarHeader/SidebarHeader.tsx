@@ -4,7 +4,7 @@ import { Header, Left, Right, Body, Button, Icon, Title } from '../../core';
 interface SidebarHeaderProps {
   title: string;
   onOpen: () => void;
-  disableNav: boolean;
+  disableNav?: boolean;
 }
 
 export const SidebarHeader: React.SFC<SidebarHeaderProps> = ({ title, onOpen, disableNav }) => {
