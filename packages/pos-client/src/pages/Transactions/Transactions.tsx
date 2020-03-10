@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Text, Container, Grid, Col, List, ListItem, Left, Body, Right, Content, Badge } from '../../core';
 import { SidebarHeader } from '../../components/SidebarHeader/SidebarHeader';
 import { Receipt } from '../Checkout/sub-components/Receipt/Receipt';
@@ -8,16 +8,19 @@ import { Collection } from 'realm';
 import dayjs from 'dayjs';
 import { total, formatNumber } from '../../utils';
 import { StyleSheet } from 'react-native';
+import { BillPeriodContext } from '../../contexts/BillPeriodContext';
 
 const symbol = '£'; // TODO move
 interface TransactionsProps {
   navigation: any; // TODO
 }
 export const Transactions: React.FC<TransactionsProps> = ({ navigation }) => {
+  const { billPeriod, setBillPeriod } = useContext(BillPeriodContext);
   const closedBills = useRealmQuery<BillProps>({
     source: BillSchema.name,
-    filter: `isClosed = true`,
+    filter: `isClosed = true AND billPeriod._id = $0`,
     sort: [['timestamp', true]],
+    variables: [billPeriod._id],
   });
   const [selectedBill, setSelectedBill] = useState<BillProps | null>(null);
   const openDrawer = () => navigation.openDrawer();
