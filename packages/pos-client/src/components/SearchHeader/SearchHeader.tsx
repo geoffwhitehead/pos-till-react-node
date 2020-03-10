@@ -1,16 +1,21 @@
-import React from 'react'
-import { Container, Item, Icon, Input, Button, Header, Text } from '../../core'
+import React from 'react';
+import { Container, Item, Icon, Input, Button, Header, Text } from '../../core';
 
-export const SearchHeader: React.FC = () => {
+interface SearchHeaderProps {
+  onChangeText: (value: string) => void;
+  value: string;
+}
+
+export const SearchHeader: React.FC<SearchHeaderProps> = ({ onChangeText, value = '' }) => {
   return (
     <Header searchBar rounded>
       <Item>
         <Icon name="ios-search" />
-        <Input placeholder="Search" />
+        <Input placeholder="Search" onChangeText={onChangeText} value={value} />
       </Item>
       <Button transparent>
         <Text>Search</Text>
       </Button>
     </Header>
-  )
-}
+  );
+};

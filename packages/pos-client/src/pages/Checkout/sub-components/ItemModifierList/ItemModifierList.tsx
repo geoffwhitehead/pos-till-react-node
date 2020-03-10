@@ -1,12 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Text, Content, List, ListItem, Left, Icon, Body, Right } from '../../../../core';
 import { SearchHeader } from '../../../../components/SearchHeader/SearchHeader';
-// import { useRealmQuery } from 'react-use-realm'
-// import { ItemSchema, ModifierSchema } from '../../../../services/schemas'
-// import { routes } from '../../../../navigators/CheckoutItemTabNavigator'
+import { ModifierProps } from '../../../../services/schemas';
 
 export const ItemModifierList: React.FC = ({ route, navigation }) => {
   const { item, modifier, createBillItem } = route.params;
+  const [searchValue, setSearchValue] = useState<string>('');
 
   const goBack = () => navigation.goBack();
 
@@ -16,9 +15,15 @@ export const ItemModifierList: React.FC = ({ route, navigation }) => {
     goBack();
   };
 
+  const onSearchHandler = (value: string) => setSearchValue(value);
+
+  const searchFilter = (modifier: ModifierProps, searchValue: string) =>
+    modifier.name.toLowerCase().includes(searchValue.toLowerCase());
+
   return (
     <Content>
-      <SearchHeader />
+      <SearchHeader onChangeText={onSearchHandler} value={searchValue} />
+
       <List>
         <ListItem itemHeader first>
           <Left>
@@ -28,13 +33,15 @@ export const ItemModifierList: React.FC = ({ route, navigation }) => {
           <Body></Body>
           <Right />
         </ListItem>
-        {modifier.mods.map(mod => {
-          return (
-            <ListItem onPress={onPressModifierFactory(item, mod)}>
-              <Text>{mod.name}</Text>
-            </ListItem>
-          );
-        })}
+        {modifier.mods
+          .filter(mod => searchFilter(mod, searchValue))
+          .map(mod => {
+            return (
+              <ListItem onPress={onPressModifierFactory(item, mod)}>
+                <Text>{mod.name}</Text>
+              </ListItem>
+            );
+          })}
       </List>
     </Content>
   );
