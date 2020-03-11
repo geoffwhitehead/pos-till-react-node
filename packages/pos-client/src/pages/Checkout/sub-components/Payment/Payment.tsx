@@ -27,7 +27,7 @@ import { balance, formatNumber } from '../../../../utils';
 import { StyleSheet, NativeSyntheticEvent } from 'react-native';
 
 interface PaymentProps {
-  activeBill: any; // fix
+  activeBill: BillProps; // fix
   discounts: Realm.Collection<DiscountProps>;
   paymentTypes: Realm.Collection<PaymentTypeProps>;
   onCompleteBill: (bill: BillProps) => void;

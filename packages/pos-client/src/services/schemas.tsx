@@ -178,7 +178,7 @@ export const BillItemSchema: Realm.ObjectSchema = {
     itemId: 'string',
     name: 'string',
     price: 'float',
-    modifierId: 'string?',
+    // modifierId: 'string?',
     mods: { type: 'BillItemModifier[]', default: [] },
     categoryId: 'string',
     categoryName: 'string',
