@@ -13,9 +13,6 @@ export const SearchHeader: React.FC<SearchHeaderProps> = ({ onChangeText, value 
         <Icon name="ios-search" />
         <Input placeholder="Search" onChangeText={onChangeText} value={value} />
       </Item>
-      <Button transparent>
-        <Text>Search</Text>
-      </Button>
     </Header>
   );
 };

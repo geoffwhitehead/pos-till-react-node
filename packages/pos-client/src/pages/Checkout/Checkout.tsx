@@ -113,9 +113,6 @@ export const Checkout: React.FC<CheckoutProps> = ({ navigation, initialBill = nu
   return (
     <Container>
       <SidebarHeader title="Checkout" onOpen={openDrawer} disableNav={mode === Modes.Complete} />
-      <Text>{dayjs(billPeriod.opened).toString()}</Text>
-      <Text>{dayjs(billPeriod.closed).toString()}</Text>
-
       <Grid>
         <Col>{renderMainPanel()}</Col>
         <Col style={{ width: 350 }}>
