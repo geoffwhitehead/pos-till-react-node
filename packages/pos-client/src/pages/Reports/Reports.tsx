@@ -19,8 +19,8 @@ export const Reports = ({ navigation }) => {
 
   const closeCurrentDay = () => {
     realm.write(() => {
-      billPeriod.closed = Date();
-      const newBillPeriod = realm.create(BillPeriodSchema.name, { _id: uuidv4() });
+      billPeriod.closed = new Date();
+      const newBillPeriod = realm.create(BillPeriodSchema.name, { _id: uuidv4(), opened: new Date() });
       setBillPeriod(newBillPeriod);
       navigation.navigate(routes.checkout);
     });
