@@ -19,7 +19,7 @@ export const Transactions: React.FC<TransactionsProps> = ({ navigation }) => {
   const closedBills = useRealmQuery<BillProps>({
     source: BillSchema.name,
     filter: `isClosed = true AND billPeriod._id = $0`,
-    sort: [['timestamp', true]],
+    sort: [['closedAt', true]],
     variables: [billPeriod._id],
   });
   const [selectedBill, setSelectedBill] = useState<BillProps | null>(null);
@@ -69,7 +69,7 @@ const TransactionsList: React.FC<TransactionsListProps> = ({ bills, onSelectBill
                 <Badge style={{ minWidth: 28 }} success>
                   <Text>{bill.tab}</Text>
                 </Badge>
-                <Text>{` / ${dayjs(bill.timestamp)
+                <Text>{` / ${dayjs(bill.closedAt)
                   .format('HH:mm')
                   .toString()}`}</Text>
               </Left>

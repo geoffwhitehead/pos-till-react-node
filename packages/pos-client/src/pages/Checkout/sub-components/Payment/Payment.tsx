@@ -49,7 +49,6 @@ export const Payment: React.FC<PaymentProps> = ({ activeBill, discounts, payment
 
   type AddPayment = (paymentType: PaymentTypeProps, amt: number) => () => void;
   const addPayment: AddPayment = (paymentType, amt) => () => {
-    console.log('!!!!!!amt, ', amt);
     realm.write(() => {
       const billPayment = realm.create(BillPaymentSchema.name, {
         _id: uuidv4(),
