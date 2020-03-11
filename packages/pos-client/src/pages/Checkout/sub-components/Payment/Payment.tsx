@@ -14,11 +14,17 @@ import {
   Left,
   Right,
 } from '../../../../core';
-import { DiscountProps, BillPaymentSchema, PaymentTypeProps, BillDiscountSchema, BillProps } from '../../../../services/schemas';
+import {
+  DiscountProps,
+  BillPaymentSchema,
+  PaymentTypeProps,
+  BillDiscountSchema,
+  BillProps,
+} from '../../../../services/schemas';
 import { realm } from '../../../../services/Realm';
 import uuidv4 from 'uuid';
 import { balance, formatNumber } from '../../../../utils';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, NativeSyntheticEvent } from 'react-native';
 
 interface PaymentProps {
   activeBill: any; // fix
@@ -28,8 +34,8 @@ interface PaymentProps {
 }
 
 export const Payment: React.FC<PaymentProps> = ({ activeBill, discounts, paymentTypes, onCompleteBill }) => {
-  const [value, setValue] = useState(0);
-
+  const [value, setValue] = useState<string>('');
+  console.log('value ', value);
   // TODO: this / payment types will need refactoring so were not having to use find
   const cashType = paymentTypes.find(pt => pt.name === 'Cash');
   const denominations = [500, 1000, 2000, 3000, 5000];
@@ -38,9 +44,12 @@ export const Payment: React.FC<PaymentProps> = ({ activeBill, discounts, payment
 
   const checkComplete = () => balance(activeBill) <= 0 && onCompleteBill(activeBill);
 
-  const onValueChange = value => setValue(parseFloat(value));
+  type OnValueChange = (value: string) => void;
+  const onValueChange: OnValueChange = value => setValue(value);
 
-  const addPayment = (paymentType, amt) => () => {
+  type AddPayment = (paymentType: PaymentTypeProps, amt: number) => () => void;
+  const addPayment: AddPayment = (paymentType, amt) => () => {
+    console.log('!!!!!!amt, ', amt);
     realm.write(() => {
       const billPayment = realm.create(BillPaymentSchema.name, {
         _id: uuidv4(),
@@ -53,7 +62,8 @@ export const Payment: React.FC<PaymentProps> = ({ activeBill, discounts, payment
     checkComplete();
   };
 
-  const addDiscount = discount => () => {
+  type AddDiscount = (discount: DiscountProps) => () => void;
+  const addDiscount: AddDiscount = discount => () => {
     realm.write(() => {
       const billDiscount = realm.create(BillDiscountSchema.name, {
         _id: uuidv4(),
@@ -74,7 +84,7 @@ export const Payment: React.FC<PaymentProps> = ({ activeBill, discounts, payment
         <Col>
           <Row style={styles.row}>
             <Item style={{ width: '100%', height: 40 }} regular>
-              <Input value={value.toString()} onChange={onValueChange} keyboardType="number-pad" />
+              <Input value={value} onChangeText={onValueChange} keyboardType="number-pad" />
             </Item>
           </Row>
           {/* <Row style={styles.row}>
@@ -102,7 +112,7 @@ export const Payment: React.FC<PaymentProps> = ({ activeBill, discounts, payment
               </ListItem>
               {discounts.map(discount => {
                 return (
-                  <ListItem onPress={addDiscount(discount)}>
+                  <ListItem key={discount._id} onPress={addDiscount(discount)}>
                     <Left>
                       <Text>{discount.name}</Text>
                     </Left>
@@ -118,14 +128,18 @@ export const Payment: React.FC<PaymentProps> = ({ activeBill, discounts, payment
         <Col style={styles.buttonColumn}>
           {paymentTypes.map(paymentType => {
             return (
-              <Button style={styles.paymentButtons} onPress={addPayment(paymentType, value)}>
+              <Button
+                key={paymentType._id}
+                style={styles.paymentButtons}
+                onPress={addPayment(paymentType, parseFloat(value))}
+              >
                 <Text>{paymentType.name}</Text>
               </Button>
             );
           })}
           {denominations.map(amt => {
             return (
-              <Button bordered style={styles.paymentButtons} onPress={addPayment(cashType, amt)}>
+              <Button key={amt} bordered style={styles.paymentButtons} onPress={addPayment(cashType, amt)}>
                 <Text>{`${formatNumber(amt, currencySymbol)}`}</Text>
               </Button>
             );

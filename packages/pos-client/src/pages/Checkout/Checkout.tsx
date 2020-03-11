@@ -55,7 +55,7 @@ export const Checkout: React.FC<CheckoutProps> = ({ navigation, initialBill = nu
     if (balance(bill) <= 0) {
       realm.write(() => {
         bill.isClosed = true;
-        bill.closedAt = dayjs();
+        bill.closedAt = dayjs().toDate();
       });
       setMode(Modes.Complete);
     }
