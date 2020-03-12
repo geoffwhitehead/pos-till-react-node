@@ -2,6 +2,7 @@ import { Text, Content, List, ListItem, Left, Right, Icon, Separator } from '../
 import { realm } from '../../../../services/Realm';
 import { discountBreakdown, formatNumber } from '../../../../utils';
 import React from 'react';
+import { BillProps } from '../../../../services/schemas';
 
 // TODO: move into org and fetch from db or something
 const currencySymbol = '£';
@@ -26,7 +27,7 @@ const voidDiscount = discount => () => {
 };
 
 interface ReceiptItemsProps {
-  activeBill: any; /// TODO
+  activeBill: BillProps; /// TODO
   readonly: boolean;
 }
 
@@ -42,7 +43,7 @@ export const ReceiptItems: React.FC<ReceiptItemsProps> = ({ activeBill, readonly
         </Separator>
         {activeBill.items.map(item => {
           return (
-            <ListItem key={item._id}>
+            <ListItem noIndent key={item._id}>
               <Left>
                 {!readonly && <Icon name="ios-close" onPress={voidItem(item)} />}
                 <Content>
@@ -67,46 +68,54 @@ export const ReceiptItems: React.FC<ReceiptItemsProps> = ({ activeBill, readonly
             <Text>Discounts</Text>
           </Separator>
         )}
-        {discountBreakdown(activeBill).map(discount => {
-          return (
-            <ListItem key={discount._id}>
-              <Left>
-                {!readonly && <Icon name="ios-close" onPress={voidDiscount(discount)} />}
-                <Content>
-                  {discount.isPercent ? (
-                    <Text>{`Discount: ${discount.name} ${discount.amount}%`}</Text>
-                  ) : (
-                    <Text>{`Discount: ${discount.name} ${formatNumber(discount.amount, currencySymbol)}`}</Text>
-                  )}
-                </Content>
-              </Left>
-              <Right>
-                <Text>{`${formatNumber(discount.calculatedDiscount, currencySymbol)}`}</Text>
-              </Right>
-            </ListItem>
-          );
-        })}
+        {containsDiscounts &&
+          discountBreakdown(activeBill).map(discount => {
+            return (
+              <ListItem key={discount._id}>
+                <Left>
+                  {!readonly && <Icon name="ios-close" onPress={voidDiscount(discount)} />}
+                  <Content>
+                    {discount.isPercent ? (
+                      <Text>{`Discount: ${discount.name} ${discount.amount}%`}</Text>
+                    ) : (
+                      <Text>{`Discount: ${discount.name} ${formatNumber(discount.amount, currencySymbol)}`}</Text>
+                    )}
+                  </Content>
+                </Left>
+                <Right>
+                  <Text>{`${formatNumber(discount.calculatedDiscount, currencySymbol)}`}</Text>
+                </Right>
+              </ListItem>
+            );
+          })}
         {containsPayments && (
           <Separator bordered>
             <Text>Payments</Text>
           </Separator>
         )}
-        {activeBill.payments.map(payment => {
-          return (
-            <ListItem key={payment._id}>
-              <Left>
-                {!readonly && <Icon name="ios-close" onPress={voidPayment(payment)} />}
-                <Content>
-                  <Text>{`Payment: ${payment.paymentType}`}</Text>
-                </Content>
-              </Left>
-              <Right>
-                <Text>{`${formatNumber(payment.amount, currencySymbol)}`}</Text>
-              </Right>
-            </ListItem>
-          );
-        })}
+        {containsPayments &&
+          activeBill.payments.map(payment => {
+            return (
+              <ListItem key={payment._id}>
+                <Left>
+                  {!readonly && <Icon name="ios-close" onPress={voidPayment(payment)} />}
+                  <Content>
+                    <Text>{`Payment: ${payment.paymentType}`}</Text>
+                  </Content>
+                </Left>
+                <Right>
+                  <Text>{`${formatNumber(payment.amount, currencySymbol)}`}</Text>
+                </Right>
+              </ListItem>
+            );
+          })}
       </List>
     </Content>
   );
 };
+
+// export const ReceiptItems = React.memo(ReceiptItemsInner, (prevProps, nextProps) => {
+//   const discountsUpdated = prevProps.activeBill.discounts !== nextProps.activeBill.discounts;
+//   const itemsUpdated = prevProps.activeBill.items.length === nextProps.activeBill.items.length;
+//   return false;
+// });

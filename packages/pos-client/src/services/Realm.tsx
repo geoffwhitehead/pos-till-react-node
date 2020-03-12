@@ -31,7 +31,7 @@ const realm = new Realm({
     DiscountSchema,
     BillPeriodSchema,
   ],
-  schemaVersion: 12,
+  schemaVersion: 13,
   migration: function(oldRealm, newRealm) {
     newRealm.deleteAll();
   },

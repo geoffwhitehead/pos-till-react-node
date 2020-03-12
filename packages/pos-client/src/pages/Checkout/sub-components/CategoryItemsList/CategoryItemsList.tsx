@@ -6,7 +6,7 @@ import { CategoryProps, ItemProps, ModifierProps, BillProps, ModifierItemProps }
 import { routes } from '../../../../navigators/CheckoutItemNavigator';
 import { StyleSheet } from 'react-native';
 import Modal from 'react-native-modal';
-import { ItemModifierList } from '../ItemModifierList/ItemModifierList';
+import { ItemModifierList } from './sub-components/ItemModList/ItemModList';
 
 interface CategoryItemsListProps {
   category: CategoryProps;
@@ -15,7 +15,7 @@ interface CategoryItemsListProps {
   createBillItem: (bill: BillProps) => void;
 }
 
-export const CategoryItemsList: React.FC<CategoryItemsListProps> = ({ route, navigation }) => {
+const CategoryItemsListInner: React.FC<CategoryItemsListProps> = ({ route, navigation }) => {
   const { category, items, modifiers, createBillItem } = route.params;
   const [searchValue, setSearchValue] = useState<string>('');
   const [modalOpen, setModalOpen] = useState<boolean>(false);
@@ -106,3 +106,5 @@ const styles = StyleSheet.create({
     backgroundColor: '#cde1f9',
   },
 });
+
+export const CategoryItemsList = React.memo(CategoryItemsListInner);

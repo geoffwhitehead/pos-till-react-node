@@ -35,7 +35,7 @@ export const Main: React.FC = () => {
       switch (billPeriods.length) {
         case 0:
           return realm.write(() => {
-            const newBillPeriod = realm.create(BillPeriodSchema.name, { _id: uuidv4() });
+            const newBillPeriod = realm.create(BillPeriodSchema.name, { _id: uuidv4(), opened: new Date() });
             setBillPeriod(newBillPeriod);
           });
         case 1:
