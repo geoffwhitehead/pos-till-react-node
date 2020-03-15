@@ -1,13 +1,12 @@
-import React from 'react'
-import { Container, Input, Button, Header, Content, Item, Text } from '../../core'
-import { StyleSheet } from 'react-native'
-import { AuthContext } from '../../contexts/AuthContext'
+import React, { useState, useContext } from 'react';
+import { Container, Input, Button, Header, Content, Item, Text } from '../../core';
+import { AuthContext } from '../../contexts/AuthContext';
 
 export const SignIn = ({ navigation }) => {
-  const [email, setEmail] = React.useState('')
-  const [password, setPassword] = React.useState('')
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
-  const { signIn } = React.useContext(AuthContext)
+  const { signIn } = useContext(AuthContext);
 
   return (
     <Container>
@@ -17,12 +16,7 @@ export const SignIn = ({ navigation }) => {
           <Input placeholder="Email" onChangeText={setEmail} value={email} />
         </Item>
         <Item>
-          <Input
-            placeholder="Password"
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
-          />
+          <Input placeholder="Password" value={password} onChangeText={setPassword} secureTextEntry />
         </Item>
         <Item>
           <Button onPress={() => signIn({ email, password })}>
@@ -36,14 +30,5 @@ export const SignIn = ({ navigation }) => {
         </Item>
       </Content>
     </Container>
-  )
-}
-
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//     backgroundColor: '#fff',
-//     alignItems: 'center',
-//     justifyContent: 'center',
-//   },
-// })
+  );
+};
