@@ -14,7 +14,7 @@ const InputPasscode: React.FC<{ value: string; onChange: any }> = ({ value, onCh
 };
 export const Protected: React.FC<{ code: string; navigation }> = ({ children, code, navigation }) => {
   const [passcode, setPasscode] = useState('');
-  navigation.addListener('focus', payload => setPasscode(''));
+  navigation.addListener('focus', () => setPasscode(''));
 
   return passcode === code ? children : <InputPasscode value={passcode} onChange={setPasscode} />;
 };

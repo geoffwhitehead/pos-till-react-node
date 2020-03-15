@@ -4,8 +4,9 @@ import { BillProps } from '../../../../services/schemas';
 import { balance, formatNumber } from '../../../../utils';
 import { StyleSheet, View, BackHandler } from 'react-native';
 import { Fonts } from '../../../../theme';
-import { print, receiptBill } from '../../../../services/printer/printer';
+import { print } from '../../../../services/printer/printer';
 import { useFocusEffect } from '@react-navigation/native';
+import { receiptBill } from '../../../../services/printer/bill';
 
 interface CompleteBillProps {
   activeBill: BillProps;

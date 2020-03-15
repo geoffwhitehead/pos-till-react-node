@@ -212,6 +212,7 @@ export interface BillProps {
   tab: number;
   isClosed: boolean;
   closedAt?: Date;
+  billPeriod: BillPeriodProps;
 }
 
 export const BillSchema: Realm.ObjectSchema = {
