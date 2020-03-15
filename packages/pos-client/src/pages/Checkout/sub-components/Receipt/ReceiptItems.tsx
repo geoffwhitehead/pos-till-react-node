@@ -27,11 +27,11 @@ const voidDiscount = discount => () => {
 };
 
 interface ReceiptItemsProps {
-  activeBill: BillProps; /// TODO
+  activeBill: BillProps;
   readonly: boolean;
 }
 
-export const ReceiptItems: React.FC<ReceiptItemsProps> = ({ activeBill, readonly }) => {
+const ReceiptItemsInner: React.FC<ReceiptItemsProps> = ({ activeBill, readonly }) => {
   const containsPayments = activeBill.payments.length > 0;
   const containsDiscounts = activeBill.discounts.length > 0;
 
@@ -114,8 +114,8 @@ export const ReceiptItems: React.FC<ReceiptItemsProps> = ({ activeBill, readonly
   );
 };
 
-// export const ReceiptItems = React.memo(ReceiptItemsInner, (prevProps, nextProps) => {
-//   const discountsUpdated = prevProps.activeBill.discounts !== nextProps.activeBill.discounts;
-//   const itemsUpdated = prevProps.activeBill.items.length === nextProps.activeBill.items.length;
-//   return false;
-// });
+export const ReceiptItems = React.memo(ReceiptItemsInner, (prevProps, nextProps) => {
+  const discountsUpdated = prevProps.activeBill.discounts !== nextProps.activeBill.discounts;
+  const itemsUpdated = prevProps.activeBill.items.length === nextProps.activeBill.items.length;
+  return false;
+});
