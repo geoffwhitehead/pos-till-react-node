@@ -5,6 +5,7 @@ import { balance, total, totalDiscount, formatNumber } from '../../../../utils';
 import { Fonts } from '../../../../theme';
 import { ReceiptItems } from './ReceiptItems';
 import dayjs from 'dayjs';
+import { receiptBill, print } from '../../../../services/printer/printer';
 
 // TODO: move into org and fetch from db or something
 const currencySymbol = '£';
@@ -17,6 +18,10 @@ interface ReceiptProps {
 }
 
 export const Receipt: React.FC<ReceiptProps> = ({ activeBill, onStore, onCheckout, complete }) => {
+  const onPrint = () => {
+    const commands = receiptBill(activeBill)
+    print(commands, false)
+  }
   return !activeBill ? (
     <Text>Select bill</Text>
   ) : (
@@ -47,7 +52,7 @@ export const Receipt: React.FC<ReceiptProps> = ({ activeBill, onStore, onCheckou
         <Text style={Fonts.h3}>{`Balance: ${formatNumber(balance(activeBill), currencySymbol)}`}</Text>
       </Row>
       <Row style={styles.r4}>
-        <Button style={styles.printButton} block small info onPress={onStore}>
+        <Button style={styles.printButton} block small info onPress={onPrint}>
           <Text>Print</Text>
         </Button>
       </Row>

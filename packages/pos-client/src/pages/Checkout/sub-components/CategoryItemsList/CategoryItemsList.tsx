@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Text, Content, List, ListItem, Left, Icon, Body, Right } from '../../../../core';
 import { SearchHeader } from '../../../../components/SearchHeader/SearchHeader';
-import { useRealmQuery } from 'react-use-realm';
 import { CategoryProps, ItemProps, ModifierProps, BillProps, ModifierItemProps } from '../../../../services/schemas';
 import { routes } from '../../../../navigators/CheckoutItemNavigator';
 import { StyleSheet } from 'react-native';

@@ -4,7 +4,7 @@ import { BillProps } from '../../../../services/schemas';
 import { balance, formatNumber } from '../../../../utils';
 import { StyleSheet, View, BackHandler } from 'react-native';
 import { Fonts } from '../../../../theme';
-import { print } from '../../../../services/printer';
+import { print, receiptBill } from '../../../../services/printer/printer';
 import { useFocusEffect } from '@react-navigation/native';
 
 interface CompleteBillProps {
@@ -17,20 +17,18 @@ const currencySymbol = '£';
 
 export const CompleteBill: React.FC<CompleteBillProps> = ({ activeBill, onCloseBill }) => {
   const onCloseFactory = (bill: any) => () => onCloseBill(bill);
-  const onPrint = async () => await print(activeBill);
+  const onPrint = async () => await print(receiptBill(activeBill), true);
   useFocusEffect(
     React.useCallback(() => {
       const onBackPress = () => {
-        onCloseBill(activeBill)
+        onCloseBill(activeBill);
       };
 
       BackHandler.addEventListener('hardwareBackPress', onBackPress);
 
-      return () =>
-        BackHandler.removeEventListener('hardwareBackPress', onBackPress);
-    }, [onCloseBill, activeBill])
+      return () => BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+    }, [onCloseBill, activeBill]),
   );
-
 
   return (
     <View style={styles.container}>
