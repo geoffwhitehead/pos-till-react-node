@@ -8,6 +8,9 @@ import uuidv4 from 'uuid';
 import { routes } from '../../navigators/SidebarNavigator';
 import { Fonts } from '../../theme';
 import { StyleSheet, View } from 'react-native';
+import { Protected } from './Protected';
+
+const ORG_PASSCODE = '1234'; // TODO: move to an org setting
 
 export const Reports = ({ navigation }) => {
   const { billPeriod, setBillPeriod } = useContext(BillPeriodContext);
@@ -29,14 +32,16 @@ export const Reports = ({ navigation }) => {
   return (
     <Container>
       <SidebarHeader title="Reports" onOpen={openDrawer} />
-      <View style={styles.container}>
-        <Button bordered style={styles.button} onPress={printEndOfDayReport}>
-          <Text>Print daily report</Text>
-        </Button>
-        <Button large style={styles.button} onPress={closeCurrentDay}>
-          <Text>End current day</Text>
-        </Button>
-      </View>
+      <Protected code={ORG_PASSCODE} navigation={navigation}>
+        <View style={styles.container}>
+          <Button bordered style={styles.button} onPress={printEndOfDayReport}>
+            <Text>Print daily report</Text>
+          </Button>
+          <Button large style={styles.button} onPress={closeCurrentDay}>
+            <Text>End current day</Text>
+          </Button>
+        </View>
+      </Protected>
     </Container>
   );
 };
