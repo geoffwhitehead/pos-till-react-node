@@ -1,9 +1,10 @@
-import { BillProps } from '../schemas';
+import { BillProps, CategoryProps, DiscountProps, PaymentTypeProps } from '../schemas';
 import { StarPRNT } from 'react-native-star-prnt';
 import { formatNumber, total, discountBreakdown, totalPayable, balance } from '../../utils';
 import { alignCenter, alignLeftRight, addHeader, divider, RECEIPT_WIDTH } from './printer';
 import dayjs from 'dayjs';
-import { Collection } from 'realm';
+import { Collection, Results } from 'realm';
+import { acc } from 'react-native-reanimated';
 
 const symbol = '£';
 const modPrefix = ' -';
@@ -20,8 +21,42 @@ const org = {
   vat: '123 345 567',
 };
 
-export const periodReport = (bills: BillProps[]) => {
+export const periodReport = (
+  bills: Results<BillProps>,
+  categories: Collection<CategoryProps>,
+  discounts: Collection<DiscountProps>,
+  paymentTypes: Collection<PaymentTypeProps>,
+) => {
   let c = [];
+
+  const allItems = bills.map(bill => bill.items)
+  const allPayments = bills.map(bill => bill.payments)
+
+  const categoryTotals: Record<string, number> = categories.reduce(
+    (acc, category) => ({ ...acc, [category._id]: 0 }),
+    {},
+  );
+
+  const paymentTypeTotals: Record<string, number> = paymentTypes.reduce(
+    (acc, paymentType) => ({ ...acc, [paymentType._id]: 0 }),
+    {},
+  );
+
+  const discountTotals: Record<string, number> = discounts.reduce(
+    (acc, paymentType) => ({ ...acc, [paymentType._id]: 0 }),
+    {},
+  );
+
+  const grandTotal = allItems.reduce((acc, item) => );
+  // totals breakdown by category
+
+  // total discounts
+
+  // total voids
+
+  // totals by payment type
+
+  // grand total
 
   console.log('BILS ', bills);
   console.log('bill', bills[0]);

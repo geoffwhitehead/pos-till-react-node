@@ -1,7 +1,18 @@
-import React, { useContext } from 'react';
+import React, { useContext, useCallback } from 'react';
 import { Text, Container, Button, List, ListItem, Left, Body, Right } from '../../core';
 import { SidebarHeader } from '../../components/SidebarHeader/SidebarHeader';
-import { BillPeriodSchema, BillProps, BillSchema, BillPeriodProps } from '../../services/schemas';
+import {
+  BillPeriodSchema,
+  BillProps,
+  BillSchema,
+  BillPeriodProps,
+  CategoryProps,
+  CategorySchema,
+  DiscountProps,
+  DiscountSchema,
+  PaymentTypeProps,
+  PaymentTypeSchema,
+} from '../../services/schemas';
 import { BillPeriodContext } from '../../contexts/BillPeriodContext';
 import { realm } from '../../services/Realm';
 import uuidv4 from 'uuid';
@@ -19,7 +30,15 @@ const ORG_PASSCODE = '1234'; // TODO: move to an org setting
 export const Reports = ({ navigation }) => {
   const { billPeriod, setBillPeriod } = useContext(BillPeriodContext);
   const openDrawer = () => navigation.openDrawer();
-  const billPeriods = useRealmQuery<BillPeriodProps>({ source: BillPeriodSchema.name, sort: [['opened', true]] });
+  const billPeriods = useRealmQuery<BillPeriodProps>({
+    source: BillPeriodSchema.name,
+    filter: 'closed != null',
+    sort: [['opened', true]],
+  });
+  const categories = useRealmQuery<CategoryProps>({ source: CategorySchema.name });
+  const discounts = useRealmQuery<DiscountProps>({ source: DiscountSchema.name });
+  const paymentTypes = useRealmQuery<PaymentTypeProps>({ source: PaymentTypeSchema.name });
+
   const allBills = useRealmQuery<BillProps>({
     source: BillSchema.name,
   });
@@ -27,30 +46,23 @@ export const Reports = ({ navigation }) => {
   const printEndOfDayReport = () => {
     console.log('Print report');
   };
+
   const closeCurrentDay = () => {
     realm.write(() => {
       billPeriod.closed = new Date();
       const newBillPeriod = realm.create(BillPeriodSchema.name, { _id: uuidv4(), opened: new Date() });
       setBillPeriod(newBillPeriod);
-      // navigation.navigate(routes.checkout);
     });
   };
 
-  const onPrint = (billPeriod: BillPeriodProps) => () => {
-    const periodBills = allBills.filter(bill => {
-      console.log('bill', bill.billPeriod._id);
-      console.log('billPeriod', billPeriod._id);
-      return bill.billPeriod._id === billPeriod._id;
-    });
-    console.log('periodBills', periodBills);
-    // const bills = useRealmQuery<BillProps>({
-    //   source: BillSchema.name,
-    //   filter: `billPeriod._id = $0`,
-    //   variables: [billPeriod._id],
-    // });
-    // const commands = periodReport(periodBills);
-    // print(commands);
-  };
+  const onPrint = useCallback(
+    (billPeriod: BillPeriodProps) => () => {
+      const periodBills = allBills.filtered('billPeriod._id = $0', billPeriod._id);
+      const commands = periodReport(periodBills, categories, discounts, paymentTypes);
+      print(commands);
+    },
+    [allBills, categories, discounts, paymentTypes],
+  );
 
   return (
     <Container>
