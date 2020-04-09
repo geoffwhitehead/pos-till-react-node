@@ -47,9 +47,11 @@ export const periodReport = (
     {},
   );
 
-  const grandTotal = allItems.reduce((acc, item) => );
+  const grandTotal = allItems.reduce((acc, item) => {
+    
+  }
   // totals breakdown by category
-
+  
   // total discounts
 
   // total voids

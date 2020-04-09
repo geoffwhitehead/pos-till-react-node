@@ -1,5 +1,10 @@
 import uuidv4 from 'uuid/v4';
 
+export const paymentTypeNames = {
+  CASH: 'cash',
+  CARD: 'card',
+  VOUCHER: 'voucher',
+};
 // Mock API for now...
 export const getPaymentTypes = () => {
   return new Promise((resolve, reject) => {
@@ -7,15 +12,15 @@ export const getPaymentTypes = () => {
       data: [
         {
           _id: uuidv4(),
-          name: 'Cash',
+          name: paymentTypeNames.CASH,
         },
         {
           _id: uuidv4(),
-          name: 'Card',
+          name: paymentTypeNames.CARD,
         },
         {
           _id: uuidv4(),
-          name: 'Voucher',
+          name: paymentTypeNames.VOUCHER,
         },
       ],
     });

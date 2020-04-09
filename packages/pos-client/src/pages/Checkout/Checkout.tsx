@@ -11,6 +11,7 @@ import {
   PaymentTypeProps,
   PaymentTypeSchema,
   BillProps,
+  BillPaymentSchema,
 } from '../../services/schemas';
 import { CheckoutItemNavigator } from '../../navigators/CheckoutItemNavigator';
 import { Receipt } from './sub-components/Receipt/Receipt';
@@ -22,6 +23,7 @@ import { balance } from '../../utils';
 import { CompleteBill } from './sub-components/CompleteBill/CompleteBill';
 import { BillPeriodContext } from '../../contexts/BillPeriodContext';
 import dayjs from 'dayjs';
+import { paymentTypeNames } from '../../api/paymentTypes';
 
 export enum Modes {
   Payments = 'payments',
@@ -51,12 +53,26 @@ export const Checkout: React.FC<CheckoutProps> = ({ navigation, initialBill = nu
   const clearBill = () => setActiveBill(null);
   const openDrawer = () => navigation.openDrawer();
   const onCheckout = () => setMode(Modes.Payments);
+
   const completeBill = bill => {
+    const bal = balance(bill);
+
     if (balance(bill) <= 0) {
+      const cashPayment = paymentTypes.find(payment => payment.name === paymentTypeNames.CASH);
+      const changeDuePayment = realm.create(BillPaymentSchema.name, {
+        _id: uuidv4(),
+        paymentType: paymentTypeNames.CASH,
+        paymentTypeId: cashPayment._id,
+        amount: bal,
+      });
+
       realm.write(() => {
         bill.isClosed = true;
         bill.closedAt = dayjs().toDate();
+        // push a final negative payment which represents the change due in cash
+        bill.payments.push(-changeDuePayment);
       });
+
       setMode(Modes.Complete);
     }
   };
