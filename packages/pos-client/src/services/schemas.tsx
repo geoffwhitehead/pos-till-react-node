@@ -91,7 +91,7 @@ export const DiscountSchema: Realm.ObjectSchema = {
   primaryKey: '_id',
   properties: {
     _id: 'string',
-    name: 'string',
+    name: 'string', // TODO: this should be unique - not currently supported in realm
     amount: 'float',
     isPercent: 'bool',
   },
@@ -127,6 +127,7 @@ export interface BillPaymentProps {
   paymentTypeId: string;
   amount: number;
   timestamp: Date;
+  isChange: Boolean;
 }
 
 export const BillPaymentSchema: Realm.ObjectSchema = {
@@ -138,6 +139,7 @@ export const BillPaymentSchema: Realm.ObjectSchema = {
     paymentTypeId: 'string',
     amount: 'float',
     timestamp: { type: 'date', default: Date() },
+    isChange: { type: 'bool', default: false },
   },
 };
 

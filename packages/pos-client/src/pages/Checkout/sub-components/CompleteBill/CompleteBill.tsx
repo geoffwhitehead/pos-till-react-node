@@ -6,7 +6,7 @@ import { StyleSheet, View, BackHandler } from 'react-native';
 import { Fonts } from '../../../../theme';
 import { print } from '../../../../services/printer/printer';
 import { useFocusEffect } from '@react-navigation/native';
-import { receiptBill } from '../../../../services/printer/bill';
+import { receiptBill } from '../../../../services/printer/receiptBill';
 
 interface CompleteBillProps {
   activeBill: BillProps;
@@ -31,9 +31,10 @@ export const CompleteBill: React.FC<CompleteBillProps> = ({ activeBill, onCloseB
     }, [onCloseBill, activeBill]),
   );
 
+  const changePayment = activeBill.payments.find(payment => payment.isChange).amount;
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>{`Change due: ${formatNumber(Math.abs(balance(activeBill)), currencySymbol)}`}</Text>
+      <Text style={styles.text}>{`Change due: ${formatNumber(Math.abs(changePayment), currencySymbol)}`}</Text>
       <Button style={styles.button} large onPress={onPrint}>
         <Text>Print Receipt</Text>
       </Button>

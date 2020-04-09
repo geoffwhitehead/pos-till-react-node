@@ -55,22 +55,28 @@ export const Checkout: React.FC<CheckoutProps> = ({ navigation, initialBill = nu
   const onCheckout = () => setMode(Modes.Payments);
 
   const completeBill = bill => {
-    const bal = balance(bill);
+    const billBalance = balance(bill);
 
-    if (balance(bill) <= 0) {
+    if (billBalance <= 0) {
       const cashPayment = paymentTypes.find(payment => payment.name === paymentTypeNames.CASH);
-      const changeDuePayment = realm.create(BillPaymentSchema.name, {
-        _id: uuidv4(),
-        paymentType: paymentTypeNames.CASH,
-        paymentTypeId: cashPayment._id,
-        amount: bal,
-      });
+
+      // Over tenders of any payment type are given change in cash
+
+      // TODO: should all overtenders do this????
+      // TODO: vouchers overtenders should issue new voucher not refund in cash
 
       realm.write(() => {
+        const changeDuePayment = realm.create(BillPaymentSchema.name, {
+          _id: uuidv4(),
+          paymentType: paymentTypeNames.CASH,
+          paymentTypeId: cashPayment._id,
+          amount: billBalance,
+          isChange: true,
+        });
+        bill.payments.push(changeDuePayment);
         bill.isClosed = true;
         bill.closedAt = dayjs().toDate();
         // push a final negative payment which represents the change due in cash
-        bill.payments.push(-changeDuePayment);
       });
 
       setMode(Modes.Complete);

@@ -3,7 +3,7 @@ import { realm } from '../../../../services/Realm';
 import { discountBreakdown, formatNumber } from '../../../../utils';
 import React from 'react';
 import { BillProps } from '../../../../services/schemas';
-
+import { capitalize } from 'lodash';
 // TODO: move into org and fetch from db or something
 const currencySymbol = '£';
 
@@ -94,21 +94,23 @@ const ReceiptItemsInner: React.FC<ReceiptItemsProps> = ({ activeBill, readonly }
           </Separator>
         )}
         {containsPayments &&
-          activeBill.payments.map(payment => {
-            return (
-              <ListItem key={payment._id}>
-                <Left>
-                  {!readonly && <Icon name="ios-close" onPress={voidPayment(payment)} />}
-                  <Content>
-                    <Text>{`Payment: ${payment.paymentType}`}</Text>
-                  </Content>
-                </Left>
-                <Right>
-                  <Text>{`${formatNumber(payment.amount, currencySymbol)}`}</Text>
-                </Right>
-              </ListItem>
-            );
-          })}
+          activeBill.payments
+            .filter(payment => !payment.isChange)
+            .map(payment => {
+              return (
+                <ListItem key={payment._id}>
+                  <Left>
+                    {!readonly && <Icon name="ios-close" onPress={voidPayment(payment)} />}
+                    <Content>
+                      <Text>{`Payment: ${capitalize(payment.paymentType)}`}</Text>
+                    </Content>
+                  </Left>
+                  <Right>
+                    <Text>{`${formatNumber(payment.amount, currencySymbol)}`}</Text>
+                  </Right>
+                </ListItem>
+              );
+            })}
       </List>
     </Content>
   );

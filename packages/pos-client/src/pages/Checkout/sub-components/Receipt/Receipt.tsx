@@ -5,13 +5,17 @@ import { balance, total, totalDiscount, formatNumber } from '../../../../utils';
 import { Fonts } from '../../../../theme';
 import { ReceiptItems } from './ReceiptItems';
 import dayjs from 'dayjs';
-import { receiptBill, print } from '../../../../services/printer/printer';
+import { print } from '../../../../services/printer/printer';
+import { receiptBill } from '../../../../services/printer/receiptBill';
+
+import { Results } from 'realm';
+import { BillProps } from '../../../../services/schemas';
 
 // TODO: move into org and fetch from db or something
 const currencySymbol = '£';
 
 interface ReceiptProps {
-  activeBill: any; // TODO
+  activeBill: BillProps; // TODO
   onStore?: () => void;
   onCheckout?: () => void;
   complete: boolean;
@@ -19,9 +23,10 @@ interface ReceiptProps {
 
 export const Receipt: React.FC<ReceiptProps> = ({ activeBill, onStore, onCheckout, complete }) => {
   const onPrint = () => {
-    const commands = receiptBill(activeBill)
-    print(commands, false)
-  }
+    const commands = receiptBill(activeBill);
+    print(commands, false);
+  };
+
   return !activeBill ? (
     <Text>Select bill</Text>
   ) : (
@@ -49,6 +54,12 @@ export const Receipt: React.FC<ReceiptProps> = ({ activeBill, onStore, onCheckou
           {activeBill.discounts.length ? `Discount: ${formatNumber(totalDiscount(activeBill), currencySymbol)}` : ''}
         </Text>
         <Text>{`Total: ${formatNumber(total(activeBill), currencySymbol)}`}</Text>
+        {complete && (
+          <Text>{`Change Due: ${formatNumber(
+            Math.abs(activeBill.payments.find(payment => payment.isChange).amount),
+            currencySymbol,
+          )}`}</Text>
+        )}
         <Text style={Fonts.h3}>{`Balance: ${formatNumber(balance(activeBill), currencySymbol)}`}</Text>
       </Row>
       <Row style={styles.r4}>
