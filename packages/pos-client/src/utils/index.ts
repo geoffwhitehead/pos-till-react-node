@@ -1,4 +1,5 @@
-import { BillDiscountProps } from '../services/schemas';
+import { BillDiscountProps, BillItemProps } from '../services/schemas';
+import { Items } from '../pages/Items/Items';
 
 // TODO fix tpyes
 export const total: (bill: any) => number = bill => {
@@ -10,8 +11,8 @@ export const total: (bill: any) => number = bill => {
 };
 
 export const totalPayable: (bill: any) => number = bill => {
-  return total(bill) - totalDiscount(bill)
-}
+  return total(bill) - totalDiscount(bill);
+};
 
 // TODO fix tpyes
 export const balance: (bill: any) => number = bill => {
@@ -37,6 +38,8 @@ export const discountBreakdown: (bill: any) => DiscountBreakdownItemProps[] = bi
   });
   return arrDiscounts;
 };
+
+export const totalBillItem = (item: BillItemProps) => item.mods.reduce((acc, mod) => acc + mod.price, 0) + item.price;
 
 export const totalDiscount: (bill: any) => number = bill =>
   discountBreakdown(bill).reduce((acc, discount) => acc + discount.calculatedDiscount, 0);

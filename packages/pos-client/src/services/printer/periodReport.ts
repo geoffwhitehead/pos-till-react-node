@@ -1,10 +1,11 @@
-import { BillProps, CategoryProps, DiscountProps, PaymentTypeProps } from '../schemas';
+import { BillProps, CategoryProps, DiscountProps, PaymentTypeProps, BillItemProps, BillPaymentProps } from '../schemas';
 import { StarPRNT } from 'react-native-star-prnt';
-import { formatNumber, total, discountBreakdown, totalPayable, balance } from '../../utils';
+import { formatNumber, total, discountBreakdown, totalPayable, balance, totalBillItem } from '../../utils';
 import { alignCenter, alignLeftRight, addHeader, divider, RECEIPT_WIDTH } from './printer';
 import dayjs from 'dayjs';
 import { Collection, Results } from 'realm';
 import { acc } from 'react-native-reanimated';
+import { flatten } from 'lodash';
 
 const symbol = '£';
 const modPrefix = ' -';
@@ -22,15 +23,15 @@ const org = {
 };
 
 export const periodReport = (
-  bills: Results<BillProps>,
+  bills: Collection<BillProps>,
   categories: Collection<CategoryProps>,
   discounts: Collection<DiscountProps>,
   paymentTypes: Collection<PaymentTypeProps>,
 ) => {
   let c = [];
 
-  const allItems = bills.map(bill => bill.items)
-  const allPayments = bills.map(bill => bill.payments)
+  const allItems: BillItemProps[] = flatten(bills.map(bill => bill.items));
+  const allPayments: BillPaymentProps[] = flatten(bills.map(bill => bill.payments));
 
   const categoryTotals: Record<string, number> = categories.reduce(
     (acc, category) => ({ ...acc, [category._id]: 0 }),
@@ -43,25 +44,47 @@ export const periodReport = (
   );
 
   const discountTotals: Record<string, number> = discounts.reduce(
-    (acc, paymentType) => ({ ...acc, [paymentType._id]: 0 }),
+    (acc, discount) => ({ ...acc, [discount.name]: 0 }),
     {},
   );
 
-  const grandTotal = allItems.reduce((acc, item) => {
-    
-  }
+  const discountsBreakdown: ReturnType<typeof discountBreakdown> = flatten(bills.map(bill => discountBreakdown(bill)));
+
+  const finalPaymentsTotal = allPayments.reduce((acc, payment) => {
+    return {
+      ...acc,
+      [payment._id]: acc[payment._id] + payment.amount,
+    };
+  }, paymentTypeTotals);
+
+  paymentTypeTotals;
+
   // totals breakdown by category
-  
+  const finalCategoryTotals = allItems.reduce((acc, item) => {
+    return {
+      ...acc,
+      [item.categoryId]: acc[item.categoryId] + totalBillItem(item),
+    };
+  }, categoryTotals);
   // total discounts
 
+  const finalDiscountTotals = discountsBreakdown.reduce((acc, discount) => {
+    return { ...acc, [discount.name]: acc[discount.name] + discount.name };
+  }, discountTotals);
   // total voids
 
   // totals by payment type
 
   // grand total
+  const grandTotal =
+    allItems.reduce((acc, item) => acc + item.price, 0) -
+    Object.values(finalDiscountTotals).reduce((acc, discount) => acc + discount, 0);
 
-  console.log('BILS ', bills);
-  console.log('bill', bills[0]);
+  // net total
+console.log('grandTotal', grandTotal)
+console.log('finalDiscountTotals', finalDiscountTotals)
+console.log('finalCategoryTotals', finalCategoryTotals)
+console.log('finalPaymentsTotal', finalPaymentsTotal)
 
   //   c.push({ appendCodePage: StarPRNT.CodePageType.CP858 });
   //   c.push({ appendEncoding: StarPRNT.Encoding.USASCII });
