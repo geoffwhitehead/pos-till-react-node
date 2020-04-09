@@ -1,8 +1,18 @@
-import { BillDiscountProps, BillItemProps } from '../services/schemas';
+import {
+  BillDiscountProps,
+  BillItemProps,
+  BillProps,
+  PaymentTypeProps,
+  BillPaymentProps,
+  DiscountProps,
+  CategoryProps,
+} from '../services/schemas';
 import { Items } from '../pages/Items/Items';
+import { Collection, Results } from 'realm';
+import { flatten } from 'lodash';
 
 // TODO fix tpyes
-export const total: (bill: any) => number = bill => {
+export const total: (bill: BillProps) => number = bill => {
   const amt = bill.items.reduce((acc, item) => {
     const mods = item.mods.reduce((acc, mod) => acc + mod.price, 0);
     return acc + mods + item.price;
@@ -10,12 +20,12 @@ export const total: (bill: any) => number = bill => {
   return amt;
 };
 
-export const totalPayable: (bill: any) => number = bill => {
+export const totalPayable: (bill: BillProps) => number = bill => {
   return total(bill) - totalDiscount(bill);
 };
 
 // TODO fix tpyes
-export const balance: (bill: any) => number = bill => {
+export const balance: (bill: BillProps) => number = bill => {
   return total(bill) - totalDiscount(bill) - totalPayments(bill);
 };
 
@@ -23,7 +33,7 @@ interface DiscountBreakdownItemProps extends BillDiscountProps {
   calculatedDiscount: number;
 }
 // fix types
-export const discountBreakdown: (bill: any) => DiscountBreakdownItemProps[] = bill => {
+export const discountBreakdown: (bill: BillProps) => DiscountBreakdownItemProps[] = bill => {
   let rollingTotal = total(bill);
   const arrDiscounts = bill.discounts.map(d => {
     const calculatedDiscount = d.isPercent ? Math.round(rollingTotal * (d.amount / 100)) : d.amount;
@@ -39,13 +49,99 @@ export const discountBreakdown: (bill: any) => DiscountBreakdownItemProps[] = bi
   return arrDiscounts;
 };
 
-export const totalBillItem = (item: BillItemProps) => item.mods.reduce((acc, mod) => acc + mod.price, 0) + item.price;
+export const discountBreakdownBills: (bills: Collection<BillProps>) => DiscountBreakdownItemProps[] = bills =>
+  flatten(bills.map(bill => discountBreakdown(bill)));
 
-export const totalDiscount: (bill: any) => number = bill =>
+export const billCategoryTotals: (bill: BillProps) => Record<string, string> = bill => {
+  return bill.items.reduce(
+    (acc, item) => ({
+      ...acc,
+      [item.categoryId]: (acc[item.categoryId] || 0) + totalBillItem(item),
+    }),
+    {},
+  );
+};
+
+export const billItemsCategoryTotals: (
+  bills: Collection<BillProps>,
+  categories: Collection<CategoryProps>,
+) => Record<string, number> = (bills, categories) => {
+  const itemCategoriesObject: Record<string, number> = categories.reduce(
+    (acc, category) => ({ ...acc, [category._id]: 0 }),
+    {},
+  );
+
+  const billCategoryBreakdowns = bills.map(bill => billCategoryTotals(bill));
+
+  return billCategoryBreakdowns.reduce((acc, billBreakdown) => {
+    return Object.keys(billBreakdown).reduce(
+      (totals, categoryId) => ({ ...totals, [categoryId]: totals[categoryId] + billBreakdown[categoryId] }),
+      { ...acc },
+    );
+  }, itemCategoriesObject);
+};
+
+export const discountBreakdownTotals = (bills: Collection<BillProps>, discounts: Collection<DiscountProps>) => {
+  const discountTotalsObject: Record<string, number> = discounts.reduce(
+    (acc, discount) => ({ ...acc, [discount.name]: 0 }),
+    {},
+  );
+
+  const discountsBreakdown = discountBreakdownBills(bills);
+
+  const totals = discountsBreakdown.reduce((acc, discount) => {
+    return { ...acc, [discount.name]: acc[discount.name] + discount.calculatedDiscount };
+  }, discountTotalsObject);
+  return totals;
+};
+
+export const totalBillPaymentBreakdown: (
+  payments: Collection<BillPaymentProps>,
+  paymentTypes: Collection<PaymentTypeProps>,
+) => Record<string, number> = (payments, paymentTypes) => {
+  const paymentTypesObject: Record<string, number> = paymentTypes.reduce(
+    (acc, paymentType) => ({ ...acc, [paymentType._id]: 0 }),
+    {},
+  );
+  return payments.reduce((acc, payment) => {
+    return { ...acc, [payment.paymentTypeId]: acc[payment.paymentTypeId] + payment.amount };
+  }, paymentTypesObject);
+};
+
+export const totalBillsPaymentBreakdown: (
+  bills: Collection<BillProps>,
+  paymentTypes: Collection<PaymentTypeProps>,
+) => Record<string, number> = (bills, paymentTypes) => {
+  const paymentTypesObject: Record<string, number> = paymentTypes.reduce(
+    (acc, paymentType) => ({ ...acc, [paymentType._id]: 0 }),
+    {},
+  );
+
+  const paymentBreakdowns = bills.map(bill => totalBillPaymentBreakdown(bill.payments, paymentTypes));
+
+  const totalPayments = paymentBreakdowns.reduce((acc, breakdown) => {
+    return Object.keys(breakdown).reduce(
+      (totals, typeId) => {
+        return { ...totals, [typeId]: totals[typeId] + breakdown[typeId] };
+      },
+      { ...acc },
+    );
+  }, paymentTypesObject);
+
+  return totalPayments;
+};
+
+export const totalBillItem = (item: BillItemProps) =>
+  (item.mods?.reduce((acc, mod) => acc + mod.price, 0) || 0) + item.price;
+
+export const totalDiscount: (bill: BillProps) => number = bill =>
   discountBreakdown(bill).reduce((acc, discount) => acc + discount.calculatedDiscount, 0);
 
+export const totalBillsDiscount: (bills: BillProps[]) => number = bills =>
+  bills.reduce((total, bill) => totalDiscount(bill), 0);
+
 // TODO fix tpyes
-export const totalPayments: (bill: any) => number = bill => {
+export const totalPayments: (bill: BillProps) => number = bill => {
   const amt = bill.payments.reduce((acc, payment) => {
     return acc + payment.amount;
   }, 0);

@@ -1,10 +1,14 @@
 import { BillProps, CategoryProps, DiscountProps, PaymentTypeProps, BillItemProps, BillPaymentProps } from '../schemas';
-import { StarPRNT } from 'react-native-star-prnt';
-import { formatNumber, total, discountBreakdown, totalPayable, balance, totalBillItem } from '../../utils';
-import { alignCenter, alignLeftRight, addHeader, divider, RECEIPT_WIDTH } from './printer';
+import {
+  discountBreakdown,
+  totalBillItem,
+  totalBillsPaymentBreakdown,
+  discountBreakdownBills,
+  discountBreakdownTotals,
+  billItemsCategoryTotals,
+} from '../../utils';
 import dayjs from 'dayjs';
-import { Collection, Results } from 'realm';
-import { acc } from 'react-native-reanimated';
+import { Collection } from 'realm';
 import { flatten } from 'lodash';
 
 const symbol = '£';
@@ -30,61 +34,34 @@ export const periodReport = (
 ) => {
   let c = [];
 
-  const allItems: BillItemProps[] = flatten(bills.map(bill => bill.items));
-  const allPayments: BillPaymentProps[] = flatten(bills.map(bill => bill.payments));
+  const sumObject: (obj: Record<string, number>) => number = obj =>
+    Object.keys(obj).reduce((acc, id) => acc + obj[id], 0);
 
-  const categoryTotals: Record<string, number> = categories.reduce(
-    (acc, category) => ({ ...acc, [category._id]: 0 }),
-    {},
-  );
+  const categoryTotals = billItemsCategoryTotals(bills, categories);
+  console.log('categoryTotals', categoryTotals);
 
-  const paymentTypeTotals: Record<string, number> = paymentTypes.reduce(
-    (acc, paymentType) => ({ ...acc, [paymentType._id]: 0 }),
-    {},
-  );
+  const finalPaymentsTotal = totalBillsPaymentBreakdown(bills, paymentTypes);
+  console.log('finalPaymentsTotal', finalPaymentsTotal);
 
-  const discountTotals: Record<string, number> = discounts.reduce(
-    (acc, discount) => ({ ...acc, [discount.name]: 0 }),
-    {},
-  );
+  const discountTotals = discountBreakdownTotals(bills, discounts);
+  console.log('discountTotals', discountTotals);
+  const grossSalesTotal = sumObject(categoryTotals)
+  const discountTotal = sumObject(discountTotals)
+  const netSalesTotal = grossSalesTotal - discountTotal;
+  console.log('salesTotal', netSalesTotal);
 
-  const discountsBreakdown: ReturnType<typeof discountBreakdown> = flatten(bills.map(bill => discountBreakdown(bill)));
-
-  const finalPaymentsTotal = allPayments.reduce((acc, payment) => {
-    return {
-      ...acc,
-      [payment._id]: acc[payment._id] + payment.amount,
-    };
-  }, paymentTypeTotals);
-
-  paymentTypeTotals;
-
-  // totals breakdown by category
-  const finalCategoryTotals = allItems.reduce((acc, item) => {
-    return {
-      ...acc,
-      [item.categoryId]: acc[item.categoryId] + totalBillItem(item),
-    };
-  }, categoryTotals);
-  // total discounts
-
-  const finalDiscountTotals = discountsBreakdown.reduce((acc, discount) => {
-    return { ...acc, [discount.name]: acc[discount.name] + discount.name };
-  }, discountTotals);
-  // total voids
-
-  // totals by payment type
+  const grandTotal = sumObject(finalPaymentsTotal);
+  console.log('grandTotal', grandTotal);
 
   // grand total
-  const grandTotal =
-    allItems.reduce((acc, item) => acc + item.price, 0) -
-    Object.values(finalDiscountTotals).reduce((acc, discount) => acc + discount, 0);
+  // const grandTotal =
+  //   allItems.reduce((acc, item) => acc + item.price, 0) -
+  //   Object.values(discountTotals).reduce((acc, discount) => acc + discount, 0);
 
-  // net total
-console.log('grandTotal', grandTotal)
-console.log('finalDiscountTotals', finalDiscountTotals)
-console.log('finalCategoryTotals', finalCategoryTotals)
-console.log('finalPaymentsTotal', finalPaymentsTotal)
+  // // net total
+  // console.log('grandTotal', grandTotal);
+  // console.log('finalDiscountTotals', finalDiscountTotals);
+  // console.log('finalCategoryTotals', finalCategoryTotals);
 
   //   c.push({ appendCodePage: StarPRNT.CodePageType.CP858 });
   //   c.push({ appendEncoding: StarPRNT.Encoding.USASCII });
