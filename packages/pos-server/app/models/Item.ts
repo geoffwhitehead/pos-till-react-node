@@ -3,9 +3,14 @@ import { model, Schema, Document } from 'mongoose';
 interface ItemProps {
     name: string;
     categoryId: string;
-    price: number;
+    price: ItemPriceGroupProps[];
     stock?: number;
     modifierId?: string;
+}
+
+interface ItemPriceGroupProps {
+    groupId: string;
+    amount: number;
 }
 
 export interface ItemDocument extends Document, ItemProps {}
@@ -17,9 +22,7 @@ const ItemSchema: Schema<ItemDocument> = new Schema(
             required: true,
         },
         categoryId: { type: Schema.Types.ObjectId, ref: 'Category' },
-        price: {
-            type: Number,
-        },
+        price: [{ groupId: { type: Schema.Types.ObjectId, ref: 'PriceGroup' }, amount: { type: 'Number' } }],
         modifierId: {
             type: Schema.Types.ObjectId,
             ref: 'Modifier',
