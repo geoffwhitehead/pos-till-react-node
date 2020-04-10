@@ -1,4 +1,5 @@
 import { model, Schema, Document } from 'mongoose';
+import { ItemPriceGroupProps } from './PriceGroup';
 
 interface ItemProps {
     name: string;
@@ -6,11 +7,6 @@ interface ItemProps {
     price: ItemPriceGroupProps[];
     stock?: number;
     modifierId?: string;
-}
-
-interface ItemPriceGroupProps {
-    groupId: string;
-    amount: number;
 }
 
 export interface ItemDocument extends Document, ItemProps {}

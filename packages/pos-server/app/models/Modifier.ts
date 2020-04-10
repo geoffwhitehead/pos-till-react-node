@@ -1,8 +1,9 @@
 import { model, Schema, Document } from 'mongoose';
+import { ItemPriceGroupProps } from './PriceGroup';
 
 interface ModSchema {
     name: string;
-    price: number;
+    price: ItemPriceGroupProps[];
 }
 
 interface ModifierProps {
@@ -12,7 +13,7 @@ interface ModifierProps {
 
 const ModSchema: Schema<ModSchema> = new Schema({
     name: String,
-    price: Number,
+    price: [{ groupId: { type: Schema.Types.ObjectId, ref: 'PriceGroup' }, amount: { type: 'Number' } }],
 });
 
 ModSchema.path('price').get(function(num) {

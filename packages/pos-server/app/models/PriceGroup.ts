@@ -1,5 +1,10 @@
 import { model, Schema, Document } from 'mongoose';
 
+export interface ItemPriceGroupProps {
+    groupId: string;
+    amount: number;
+}
+
 interface PriceGroupProps {
     name: string;
 }
