@@ -1,12 +1,29 @@
 import { Request, Response } from 'express';
 import faker from 'faker';
-import { Category, Modifier, Item, Discount } from '../models';
+import { Category, Modifier, Item, Discount, PriceGroup } from '../models';
 import { rdm } from '../helpers/rdm';
+import { ItemPriceGroupProps, PriceGroupDocument } from '../models/PriceGroup';
+
+const ITEMS_TO_SEED = 20;
+const CATEGORIES_TO_SEED = ['Starters', 'Mains', 'Desserts', 'Wine', 'Beer'];
+const PRICE_GROUPS = ['Main', 'Take Away']; // dont change - generatePriceGroup wont handle
+
+const generatePriceGroups: (priceGroups: PriceGroupDocument[]) => ItemPriceGroupProps[] = priceGroups => {
+    const basePrice =
+        faker.random.number({
+            min: 1,
+            max: 15,
+        }) * 100;
+
+    return priceGroups.map((group, i) => {
+        return {
+            groupId: group._id,
+            price: i = 0 ? basePrice : basePrice * (1 - (i / 100) * 10),
+        };
+    });
+};
 
 export const seed = async (req: Request, res: Response) => {
-    const ITEMS_TO_SEED = 20;
-    const CATEGORIES_TO_SEED = ['Starters', 'Mains', 'Desserts', 'Wine', 'Beer'];
-
     try {
         const categories = CATEGORIES_TO_SEED.map(name => {
             return {
@@ -21,20 +38,28 @@ export const seed = async (req: Request, res: Response) => {
             throw new Error('Error inserting categories');
         }
 
+        const insertedPriceGroups = await PriceGroup.collection.insert(PRICE_GROUPS.map(name => ({ name })));
+
+        if (!insertedPriceGroups.result.ok) {
+            console.log('result', insertedPriceGroups.result);
+            throw new Error('Error inserting price groups');
+        }
+
+        const priceGroups = await PriceGroup.find({});
         const modifier = new Modifier({
             name: 'Mains',
             mods: [
                 {
                     name: 'Chicken',
-                    price: '200',
+                    price: generatePriceGroups(priceGroups),
                 },
                 {
                     name: 'Beef',
-                    price: '250',
+                    price: generatePriceGroups(priceGroups),
                 },
                 {
                     name: 'Pork',
-                    price: '150',
+                    price: generatePriceGroups(priceGroups),
                 },
             ],
         });
@@ -42,15 +67,10 @@ export const seed = async (req: Request, res: Response) => {
         const m = await modifier.save();
 
         const items = [...Array(ITEMS_TO_SEED)].map(() => {
-            console.log('mappgin');
             return {
                 name: faker.commerce.product(),
                 categoryId: insertedCategories.insertedIds[rdm(CATEGORIES_TO_SEED.length)],
-                price:
-                    faker.random.number({
-                        min: 1,
-                        max: 15,
-                    }) * 100,
+                price: generatePriceGroups(priceGroups),
                 stock: 10,
                 modifierId: faker.random.boolean() ? m._id : null,
             };
