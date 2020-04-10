@@ -59,7 +59,7 @@ export const Reports = ({ navigation }) => {
     (billPeriod: BillPeriodProps) => () => {
       const periodBills = allBills.filtered('billPeriod._id = $0', billPeriod._id);
       const commands = periodReport(periodBills, categories, discounts, paymentTypes);
-      // print(commands);
+      print(commands);
     },
     [allBills, categories, discounts, paymentTypes],
   );

@@ -3,6 +3,7 @@ import { StarPRNT } from 'react-native-star-prnt';
 import { formatNumber, total, discountBreakdown, totalPayable, balance } from '../../utils';
 import { alignCenter, alignLeftRight, addHeader, divider, RECEIPT_WIDTH } from './printer';
 import dayjs from 'dayjs';
+import { receiptTempate } from './template';
 
 const symbol = '£';
 const modPrefix = ' -';
@@ -21,24 +22,6 @@ const org = {
 
 export const receiptBill = (bill: BillProps) => {
   let c = [];
-
-  c.push({ appendCodePage: StarPRNT.CodePageType.CP858 });
-  c.push({ appendEncoding: StarPRNT.Encoding.USASCII });
-  c.push({ appendInternational: StarPRNT.InternationalType.UK });
-  c.push({ appendFontStyle: 'B' });
-
-  c.push({ appendBitmapText: ' ' });
-
-  c.push({ appendBitmapText: alignCenter(org.name) });
-  c.push({ appendBitmapText: alignCenter(org.line1) });
-  org.line2 && c.push({ appendBitmapText: alignCenter(org.line2) });
-  c.push({ appendBitmapText: alignCenter(org.city) });
-  c.push({ appendBitmapText: alignCenter(org.county) });
-  c.push({ appendBitmapText: alignCenter(org.postcode) });
-  c.push({ appendBitmapText: ' ' });
-
-  c.push({ appendBitmapText: alignLeftRight(`Date: ${date}`, `Time: ${time}`, Math.round(RECEIPT_WIDTH / 2)) });
-  c.push({ appendBitmapText: ' ' });
 
   addHeader(c, 'Items');
   bill.items.map(item => {
@@ -76,5 +59,5 @@ export const receiptBill = (bill: BillProps) => {
   c.push({ appendBitmapText: alignCenter(`VAT: ${org.vat}`) });
   c.push({ appendBitmapText: ' ' });
 
-  return c;
+  return receiptTempate(c, org);
 };

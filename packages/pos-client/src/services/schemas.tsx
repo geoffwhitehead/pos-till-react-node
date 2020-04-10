@@ -189,6 +189,7 @@ export const BillItemSchema: Realm.ObjectSchema = {
 
 export interface BillDiscountProps {
   _id: string;
+  discountId: string;
   name: string;
   amount: number;
   isPercent: boolean;

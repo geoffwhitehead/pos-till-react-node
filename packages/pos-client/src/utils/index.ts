@@ -39,10 +39,7 @@ export const discountBreakdown: (bill: BillProps) => DiscountBreakdownItemProps[
     const calculatedDiscount = d.isPercent ? Math.round(rollingTotal * (d.amount / 100)) : d.amount;
     rollingTotal = rollingTotal - calculatedDiscount;
     return {
-      _id: d._id,
-      name: d.name,
-      amount: d.amount,
-      isPercent: d.isPercent,
+      ...d,
       calculatedDiscount,
     };
   });
@@ -52,7 +49,7 @@ export const discountBreakdown: (bill: BillProps) => DiscountBreakdownItemProps[
 export const discountBreakdownBills: (bills: Collection<BillProps>) => DiscountBreakdownItemProps[] = bills =>
   flatten(bills.map(bill => discountBreakdown(bill)));
 
-export const billCategoryTotals: (bill: BillProps) => Record<string, string> = bill => {
+export const billCategoryTotals: (bill: BillProps) => Record<string, number> = bill => {
   return bill.items.reduce(
     (acc, item) => ({
       ...acc,
@@ -61,6 +58,9 @@ export const billCategoryTotals: (bill: BillProps) => Record<string, string> = b
     {},
   );
 };
+
+export const billsItemCount: (bills: Collection<BillProps>) => number = bills =>
+  bills.map(bill => bill.items.length).reduce((acc, count) => acc + count);
 
 export const billItemsCategoryTotals: (
   bills: Collection<BillProps>,
@@ -83,14 +83,14 @@ export const billItemsCategoryTotals: (
 
 export const discountBreakdownTotals = (bills: Collection<BillProps>, discounts: Collection<DiscountProps>) => {
   const discountTotalsObject: Record<string, number> = discounts.reduce(
-    (acc, discount) => ({ ...acc, [discount.name]: 0 }),
+    (acc, discount) => ({ ...acc, [discount._id]: 0 }),
     {},
   );
 
   const discountsBreakdown = discountBreakdownBills(bills);
 
   const totals = discountsBreakdown.reduce((acc, discount) => {
-    return { ...acc, [discount.name]: acc[discount.name] + discount.calculatedDiscount };
+    return { ...acc, [discount.discountId]: acc[discount.discountId] + discount.calculatedDiscount };
   }, discountTotalsObject);
   return totals;
 };
