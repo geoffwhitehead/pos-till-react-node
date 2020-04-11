@@ -15,6 +15,11 @@ export const alignCenter = string => {
   return `${' '.repeat(leftSpaces)}${string}`;
 };
 
+export const alignRight = string => {
+  const leftSpaces = Math.floor(RECEIPT_WIDTH - string.length);
+  return `${' '.repeat(leftSpaces)}${string}`;
+}
+
 export const divider = { appendBitmapText: '-'.repeat(RECEIPT_WIDTH) };
 
 export const addHeader = (c: any[], header: string): void => {

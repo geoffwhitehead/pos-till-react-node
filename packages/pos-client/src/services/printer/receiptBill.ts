@@ -1,9 +1,10 @@
 import { BillProps } from '../schemas';
 import { StarPRNT } from 'react-native-star-prnt';
 import { formatNumber, total, discountBreakdown, totalPayable, balance } from '../../utils';
-import { alignCenter, alignLeftRight, addHeader, divider, RECEIPT_WIDTH } from './printer';
+import { alignCenter, alignLeftRight, addHeader, divider, RECEIPT_WIDTH, alignRight } from './printer';
 import dayjs from 'dayjs';
 import { receiptTempate } from './template';
+import { capitalize } from 'lodash';
 
 const symbol = '£';
 const modPrefix = ' -';
@@ -25,33 +26,36 @@ export const receiptBill = (bill: BillProps) => {
 
   addHeader(c, 'Items');
   bill.items.map(item => {
-    c.push({ appendBitmapText: alignLeftRight(item.name, formatNumber(item.price, symbol)) });
+    c.push({ appendBitmapText: alignLeftRight(capitalize(item.name), formatNumber(item.price, symbol)) });
     item.mods.map(mod => {
-      c.push({ appendBitmapText: alignLeftRight(modPrefix + mod.name, formatNumber(mod.price, symbol)) });
+      c.push({ appendBitmapText: alignLeftRight(capitalize(modPrefix + mod.name), formatNumber(mod.price, symbol)) });
     });
   });
-  c.push({ appendBitmapText: alignLeftRight('TOTAL: ', formatNumber(total(bill), symbol)) });
+  c.push({ appendBitmapText: alignRight(`Total: ${formatNumber(total(bill), symbol)}`) });
 
-  bill.discounts && addHeader(c, 'Discounts');
+  bill.discounts.length > 0 && addHeader(c, 'Discounts');
   discountBreakdown(bill).map(discount => {
     c.push({
-      appendBitmapText: alignLeftRight(discount.name, `-${formatNumber(discount.calculatedDiscount, symbol)}`),
+      appendBitmapText: alignLeftRight(capitalize(discount.name), `-${formatNumber(discount.calculatedDiscount, symbol)}`),
     });
   });
 
-  bill.payments && addHeader(c, 'Payments');
-  bill.payments.map(payment => {
-    c.push({
-      appendBitmapText: alignLeftRight(payment.paymentType, formatNumber(payment.amount, symbol)),
+  bill.payments.length > 0 && addHeader(c, 'Payments');
+  bill.payments
+    .filter(p => !p.isChange)
+    .map(payment => {
+      c.push({
+        appendBitmapText: alignLeftRight(capitalize(payment.paymentType), formatNumber(payment.amount, symbol)),
+      });
     });
-  });
 
   addHeader(c, 'Totals');
   c.push({ appendBitmapText: alignLeftRight('Subtotal: ', formatNumber(totalPayable(bill), symbol)) });
   const bal = balance(bill);
   c.push({ appendBitmapText: alignLeftRight('Amount Due: ', formatNumber(Math.max(0, bal), symbol)) });
-  if (bal <= 0) {
-    c.push({ appendBitmapText: alignLeftRight('Change Due: ', formatNumber(Math.abs(bal), symbol)) });
+  const changePayment = bill.payments.find(p => p.isChange);
+  if (changePayment) {
+    c.push({ appendBitmapText: alignLeftRight('Change Due: ', formatNumber(Math.abs(changePayment.amount), symbol)) });
   }
   c.push(divider);
 
