@@ -1,5 +1,5 @@
 import React, { useContext, useCallback } from 'react';
-import { Text, Container, Button, List, ListItem, Left, Body, Right } from '../../core';
+import { Text, Toast, Container, Button, List, ListItem, Left, Body, Right } from '../../core';
 import { SidebarHeader } from '../../components/SidebarHeader/SidebarHeader';
 import {
   BillPeriodSchema,
@@ -48,11 +48,21 @@ export const Reports = ({ navigation }) => {
   };
 
   const closeCurrentDay = () => {
-    realm.write(() => {
-      billPeriod.closed = new Date();
-      const newBillPeriod = realm.create(BillPeriodSchema.name, { _id: uuidv4(), opened: new Date() });
-      setBillPeriod(newBillPeriod);
-    });
+    const openBills = allBills.filtered('isClosed = false');
+
+    if (openBills.length > 0) {
+      Toast.show({
+        text: `There are currently ${openBills.length} open bills, these must be closed to end the current day`,
+        buttonText: 'Okay',
+        duration: 5000,
+      });
+    } else {
+      realm.write(() => {
+        billPeriod.closed = new Date();
+        const newBillPeriod = realm.create(BillPeriodSchema.name, { _id: uuidv4(), opened: new Date() });
+        setBillPeriod(newBillPeriod);
+      });
+    }
   };
 
   const onPrint = useCallback(

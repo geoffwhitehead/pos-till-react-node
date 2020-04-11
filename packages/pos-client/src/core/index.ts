@@ -22,4 +22,5 @@ export {
   Grid,
   Col,
   Row,
+  Toast
 } from 'native-base'
