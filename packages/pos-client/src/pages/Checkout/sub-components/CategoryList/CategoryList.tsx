@@ -34,18 +34,14 @@ export const CategoryList: React.FC = ({ navigation, route }) => {
   const { priceGroup, setPriceGroup } = useContext(PriceGroupContext);
   console.log('1priceGroup', priceGroup);
 
-  const resolvePrice: (price: PriceGroupItemProps[], priceGroup: PriceGroupProps) => number = (price, priceGroup) => {
-    console.log('resolving price');
-    const priceGroupItem = price.find(({ groupId }) => groupId._id === priceGroup._id);
-    console.log('price', price);
-    console.log('priceGroup', priceGroup);
-    return priceGroupItem ? priceGroupItem.price : 0;
-  };
+  const resolvePrice: (price: PriceGroupItemProps[], priceGroup: PriceGroupProps) => number = (price, priceGroup) =>
+    price.find(({ groupId }) => groupId._id === priceGroup._id).price;
 
   const createBillItem = useCallback(
     (item, mods = []) => {
       console.log('creating bill item');
       const { _id: itemId, name, categoryId, modifierId, price } = item;
+      console.log('adding priceGroup', priceGroup);
 
       const newModItems = mods.map(mod => {
         const { _id: modId, name, price } = mod;
@@ -54,7 +50,6 @@ export const CategoryList: React.FC = ({ navigation, route }) => {
           modId,
           name,
           price: resolvePrice(price, priceGroup),
-          priceGroup,
         };
       });
 
@@ -70,7 +65,10 @@ export const CategoryList: React.FC = ({ navigation, route }) => {
           mods: modItems,
           categoryId: categoryId._id,
           categoryName: categoryId.name,
+          priceGroup,
         };
+
+        console.log('newBillItem', newBillItem);
         realm.create(BillItemSchema.name, newBillItem);
         activeBill.items = [...activeBill.items, newBillItem];
       });
