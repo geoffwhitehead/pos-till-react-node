@@ -1,9 +1,10 @@
 import { Text, Content, List, ListItem, Left, Right, Icon, Separator } from '../../../../core';
 import { realm } from '../../../../services/Realm';
 import { discountBreakdown, formatNumber } from '../../../../utils';
-import React from 'react';
-import { BillProps } from '../../../../services/schemas';
-import { capitalize } from 'lodash';
+import React, { useState, useEffect } from 'react';
+import { BillProps, BillItemProps } from '../../../../services/schemas';
+import { capitalize, groupBy } from 'lodash';
+
 // TODO: move into org and fetch from db or something
 const currencySymbol = '£';
 
@@ -35,32 +36,41 @@ const ReceiptItemsInner: React.FC<ReceiptItemsProps> = ({ activeBill, readonly }
   const containsPayments = activeBill.payments.length > 0;
   const containsDiscounts = activeBill.discounts.length > 0;
 
+  const billItemGroups = groupBy(activeBill.items, item => item.priceGroup._id);
+
   return (
     <Content>
       <List>
         <Separator bordered>
           <Text>Items</Text>
         </Separator>
-        {activeBill.items.map(item => {
-          return (
-            <ListItem noIndent key={item._id}>
-              <Left>
-                {!readonly && <Icon name="ios-close" onPress={voidItem(item)} />}
-                <Content>
-                  <Text>{`${item.name}`}</Text>
-                  {item.mods.map(m => (
-                    <Text key={`${m._id}name`}>{`- ${m.name}`}</Text>
-                  ))}
-                </Content>
-              </Left>
-              <Right>
-                <Text>{`${formatNumber(item.price, currencySymbol)}`}</Text>
-                {item.mods.map(m => (
-                  <Text key={`${m._id}price`}>{formatNumber(m.price, currencySymbol)}</Text>
-                ))}
-              </Right>
-            </ListItem>
-          );
+        {Object.values(billItemGroups).map(itemGroup => {
+          return [
+            <ListItem itemHeader first>
+              <Text>{capitalize(itemGroup[0].priceGroup.name)}</Text>
+            </ListItem>,
+            ...itemGroup.map(item => {
+              return (
+                <ListItem noIndent key={item._id}>
+                  <Left>
+                    {!readonly && <Icon name="ios-close" onPress={voidItem(item)} />}
+                    <Content>
+                      <Text>{`${capitalize(item.name)}`}</Text>
+                      {item.mods.map(m => (
+                        <Text key={`${m._id}name`}>{`- ${m.name}`}</Text>
+                      ))}
+                    </Content>
+                  </Left>
+                  <Right>
+                    <Text>{`${formatNumber(item.price, currencySymbol)}`}</Text>
+                    {item.mods.map(m => (
+                      <Text key={`${m._id}price`}>{formatNumber(m.price, currencySymbol)}</Text>
+                    ))}
+                  </Right>
+                </ListItem>
+              );
+            }),
+          ];
         })}
 
         {containsDiscounts && (

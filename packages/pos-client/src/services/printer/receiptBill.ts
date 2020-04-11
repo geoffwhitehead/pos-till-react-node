@@ -1,10 +1,8 @@
 import { BillProps } from '../schemas';
-import { StarPRNT } from 'react-native-star-prnt';
 import { formatNumber, total, discountBreakdown, totalPayable, balance } from '../../utils';
-import { alignCenter, alignLeftRight, addHeader, divider, RECEIPT_WIDTH, alignRight } from './printer';
-import dayjs from 'dayjs';
+import { alignCenter, alignLeftRight, addHeader, divider, alignRight } from './printer';
 import { receiptTempate } from './template';
-import { capitalize, chain, groupBy } from 'lodash';
+import { capitalize, groupBy } from 'lodash';
 
 const symbol = '£';
 const modPrefix = ' -';

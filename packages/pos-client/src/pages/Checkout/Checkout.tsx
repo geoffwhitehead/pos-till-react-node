@@ -43,7 +43,7 @@ interface CheckoutProps {
 
 export const Checkout: React.FC<CheckoutProps> = ({ navigation, initialBill = null }) => {
   const { billPeriod } = useContext(BillPeriodContext);
-  
+
   const openBills = useRealmQuery<BillProps>({ source: BillSchema.name, filter: `isClosed = false` });
   const discounts = useRealmQuery<DiscountProps>({ source: DiscountSchema.name });
   const paymentTypes = useRealmQuery<PaymentTypeProps>({ source: PaymentTypeSchema.name });
