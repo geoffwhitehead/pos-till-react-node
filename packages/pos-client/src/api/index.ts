@@ -6,7 +6,7 @@ const base = {
   prod: 'https://positive-server.herokuapp.com',
 };
 const Api = create({
-  baseURL: base.prod,
+  baseURL: base.local,
   headers: { Accept: 'application/json' },
 });
 

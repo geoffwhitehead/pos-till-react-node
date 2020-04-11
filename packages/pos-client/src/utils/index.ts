@@ -7,8 +7,7 @@ import {
   DiscountProps,
   CategoryProps,
 } from '../services/schemas';
-import { Items } from '../pages/Items/Items';
-import { Collection, Results } from 'realm';
+import { Collection } from 'realm';
 import { flatten } from 'lodash';
 
 // TODO fix tpyes

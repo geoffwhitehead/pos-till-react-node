@@ -25,7 +25,7 @@ import { realm } from '../../../../services/Realm';
 import uuidv4 from 'uuid';
 import { balance, formatNumber } from '../../../../utils';
 import { StyleSheet } from 'react-native';
-import { paymentTypeNames } from '../../../../api/paymentTypes';
+import { paymentTypeNames } from '../../../../api/paymentType';
 
 interface PaymentProps {
   activeBill: BillProps; // fix

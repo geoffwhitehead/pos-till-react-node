@@ -13,10 +13,14 @@ import {
   CategorySchema,
   DiscountSchema,
   BillPeriodSchema,
+  PriceGroupSchema,
+  PriceGroupItemSchema,
 } from './schemas';
 
 const realm = new Realm({
   schema: [
+    PriceGroupSchema,
+    PriceGroupItemSchema,
     ItemSchema,
     BillPaymentSchema,
     ModifierItemSchema,
@@ -31,7 +35,7 @@ const realm = new Realm({
     DiscountSchema,
     BillPeriodSchema,
   ],
-  schemaVersion: 14,
+  schemaVersion: 17,
   migration: function(oldRealm, newRealm) {
     newRealm.deleteAll();
   },

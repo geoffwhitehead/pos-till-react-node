@@ -23,7 +23,7 @@ import { balance } from '../../utils';
 import { CompleteBill } from './sub-components/CompleteBill/CompleteBill';
 import { BillPeriodContext } from '../../contexts/BillPeriodContext';
 import dayjs from 'dayjs';
-import { paymentTypeNames } from '../../api/paymentTypes';
+import { paymentTypeNames } from '../../api/paymentType';
 
 export enum Modes {
   Payments = 'payments',

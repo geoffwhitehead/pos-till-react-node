@@ -8,6 +8,36 @@ export interface ItemProps {
   modifierId?: Realm.Collection<ModifierProps>;
 }
 
+export interface PriceGroupItemProps {
+  // _id: string;
+  groupId: PriceGroupProps;
+  price: number;
+}
+
+export const PriceGroupItemSchema: Realm.ObjectSchema = {
+  name: 'PriceGroupItem',
+  // primaryKey: '_id',
+  properties: {
+    // _id: 'string',
+    groupId: 'PriceGroup',
+    price: 'float',
+  },
+};
+
+export interface PriceGroupProps {
+  _id: string;
+  name: string;
+}
+
+export const PriceGroupSchema: Realm.ObjectSchema = {
+  name: 'PriceGroup',
+  primaryKey: '_id',
+  properties: {
+    _id: 'string',
+    name: 'string',
+  },
+};
+
 export const ItemSchema: Realm.ObjectSchema = {
   name: 'Item',
   primaryKey: '_id',
@@ -15,7 +45,7 @@ export const ItemSchema: Realm.ObjectSchema = {
     _id: 'string',
     name: 'string',
     categoryId: 'Category',
-    price: 'float',
+    price: 'PriceGroupItem[]',
     modifierId: { type: 'Modifier', optional: true },
   },
 };
@@ -46,7 +76,7 @@ export const ModifierItemSchema: Realm.ObjectSchema = {
   properties: {
     _id: 'string',
     name: 'string',
-    price: 'float',
+    price: 'PriceGroupItem[]',
   },
 };
 
