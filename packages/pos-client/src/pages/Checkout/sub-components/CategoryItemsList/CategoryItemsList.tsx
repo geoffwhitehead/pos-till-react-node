@@ -15,16 +15,17 @@ interface CategoryItemsListProps {
 }
 
 const CategoryItemsListInner: React.FC<CategoryItemsListProps> = ({ route, navigation }) => {
-  const { category, items, modifiers, createBillItem } = route.params;
+  const { category, items, createBillItem } = route.params;
+
   const [searchValue, setSearchValue] = useState<string>('');
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [selectedItem, setSelectedItem] = useState<ItemProps>();
 
   const goBack = () => navigation.goBack();
 
-  type OnPressItemFactory = (item: ItemProps) => () => void;
-  const onPressItemFactory: OnPressItemFactory = item => () => {
+  const onPressItemFactory: (item: ItemProps) => () => void = item => () => {
     console.log('item', item);
+    console.log('route.params', route.params);
     if (item.modifierId) {
       // const modifier = modifiers.filtered(`_id = "${item.modifierId._id}"`)[0];
       // navigation.navigate(routes.itemModifierList, {

@@ -30,7 +30,7 @@ export const ItemModifierList: React.FC = ({ route, navigation }) => {
             <Icon onPress={goBack} name="ios-arrow-back" />
             <Text style={{ fontWeight: 'bold' }}>{`${item.name} / Modifiers`}</Text>
           </Left>
-          <Body></Body>
+          <Body />
           <Right />
         </ListItem>
         {modifier.mods

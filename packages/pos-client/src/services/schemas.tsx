@@ -134,7 +134,6 @@ export interface OrganizationProps {
   email: string;
   token: string;
   dataId: string;
-  allowMultipleDiscounts?: boolean;
 }
 
 export const OrganizationSchema: Realm.ObjectSchema = {
@@ -146,10 +145,22 @@ export const OrganizationSchema: Realm.ObjectSchema = {
     lastName: 'string',
     email: 'string',
     token: 'string',
-    dataId: 'string',
-    allowMultipleDiscounts: 'bool?',
+    dataId: 'string', // if a change to data on the server occurs this wont match
   },
 };
+
+// _id: 'string',
+//     name: 'string',
+//     line1: 'string',
+//     line2: { type: 'string', optional: true },
+//     city: 'string',
+//     county: 'string',
+//     postcode: 'NE61 1BA',
+//     // }
+//     vat: '123 345 567',
+//     // settings: {
+//     currency: '£',
+//     defaultPriceGroupId: '5e90eae405a18b11edbf3214',
 
 export interface BillPaymentProps {
   _id: string;
@@ -200,6 +211,7 @@ export interface BillItemProps {
   mods: Realm.Collection<BillItemModifierProps>;
   categoryId: string;
   categoryName: string;
+  priceGroup: PriceGroupProps;
 }
 
 export const BillItemSchema: Realm.ObjectSchema = {
@@ -209,11 +221,12 @@ export const BillItemSchema: Realm.ObjectSchema = {
     _id: 'string',
     itemId: 'string',
     name: 'string',
-    price: 'float',
+    price: 'float', // TODO: it might be better for all prices to be a PriceGroupItem. This is a large refactor though.
     // modifierId: 'string?',
     mods: { type: 'BillItemModifier[]', default: [] },
     categoryId: 'string',
     categoryName: 'string',
+    priceGroup: 'PriceGroup', // TODO: it might be better for all prices to be a PriceGroupItem. This is a large refactor though
   },
 };
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext, useCallback } from 'react';
 import { Text, Content, List, ListItem, Left, Icon, Body, Right } from '../../../../core';
 import { SearchHeader } from '../../../../components/SearchHeader/SearchHeader';
 import { useRealmQuery } from 'react-use-realm';
@@ -11,57 +11,74 @@ import {
   CategoryProps,
   ItemProps,
   ModifierProps,
+  PriceGroupProps,
+  PriceGroupItemProps,
 } from '../../../../services/schemas';
 import { routes } from '../../../../navigators/CheckoutItemNavigator';
 import { realm } from '../../../../services/Realm';
 import uuidv4 from 'uuid/v4';
+import { PriceGroupContext } from '../../../../contexts/PriceGroupContext';
 
 export const CategoryList: React.FC = ({ navigation, route }) => {
   const { activeBill } = route.params;
+
   const categories = useRealmQuery<CategoryProps>({
     source: CategorySchema.name,
     sort: ['name'],
   });
   const items = useRealmQuery<ItemProps>({ source: ItemSchema.name });
   const modifiers = useRealmQuery<ModifierProps>({ source: ModifierSchema.name });
+
   const [searchValue, setSearchValue] = useState<string>('');
 
-  const createBillItem = (item, mods = []) => {
-    const newModItems = mods.map(mod => {
-      console.log('mod', mod);
-      const { _id: modId, name, price } = mod;
-      return {
-        _id: uuidv4(),
-        modId,
-        name,
-        price,
-      };
-    });
+  const { priceGroup, setPriceGroup } = useContext(PriceGroupContext);
+  console.log('1priceGroup', priceGroup);
 
-    const { _id: itemId, name, categoryId, modifierId, price } = item;
-
-    realm.write(() => {
-      const modItems = newModItems.map(modItem => realm.create(BillItemModifierSchema.name, modItem));
-
-      const newBillItem = {
-        _id: uuidv4(),
-        itemId,
-        name,
-        price,
-        modifierId: modifierId ? modifierId._id : null,
-        mods: modItems,
-        categoryId: categoryId._id,
-        categoryName: categoryId.name,
-      };
-      console.log('before write', newBillItem);
-
-      realm.create(BillItemSchema.name, newBillItem);
-      activeBill.items = [...activeBill.items, newBillItem];
-    });
+  const resolvePrice: (price: PriceGroupItemProps[], priceGroup: PriceGroupProps) => number = (price, priceGroup) => {
+    console.log('resolving price');
+    const priceGroupItem = price.find(({ groupId }) => groupId._id === priceGroup._id);
+    console.log('price', price);
+    console.log('priceGroup', priceGroup);
+    return priceGroupItem ? priceGroupItem.price : 0;
   };
 
-  type OnPressCategoryFactory = (category?: CategoryProps) => () => void;
-  const onPressCategoryFactory: OnPressCategoryFactory = category => () => {
+  const createBillItem = useCallback(
+    (item, mods = []) => {
+      console.log('creating bill item');
+      const { _id: itemId, name, categoryId, modifierId, price } = item;
+
+      const newModItems = mods.map(mod => {
+        const { _id: modId, name, price } = mod;
+        return {
+          _id: uuidv4(),
+          modId,
+          name,
+          price: resolvePrice(price, priceGroup),
+          priceGroup,
+        };
+      });
+
+      realm.write(() => {
+        const modItems = newModItems.map(modItem => realm.create(BillItemModifierSchema.name, modItem));
+
+        const newBillItem = {
+          _id: uuidv4(),
+          itemId,
+          name,
+          price: resolvePrice(price, priceGroup),
+          modifierId: modifierId ? modifierId._id : null,
+          mods: modItems,
+          categoryId: categoryId._id,
+          categoryName: categoryId.name,
+        };
+        realm.create(BillItemSchema.name, newBillItem);
+        activeBill.items = [...activeBill.items, newBillItem];
+      });
+    },
+    [activeBill, priceGroup],
+  );
+
+  const onPressCategoryFactory: (category?: CategoryProps) => () => void = category => () => {
     const filtered = category ? items.filtered(`categoryId._id = "${category._id}"`) : items;
     navigation.navigate(routes.categoryItemList, {
       category,

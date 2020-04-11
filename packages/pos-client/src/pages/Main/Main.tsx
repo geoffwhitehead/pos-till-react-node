@@ -3,15 +3,22 @@ import { populate } from '../../services/populate';
 import { SidebarNavigator } from '../../navigators';
 import { Loading } from '../Loading/Loading';
 import { useRealmQuery } from 'react-use-realm';
-import { BillPeriodProps, BillPeriodSchema } from '../../services/schemas';
+import { BillPeriodProps, BillPeriodSchema, PriceGroupProps, PriceGroupSchema } from '../../services/schemas';
 import { realm } from '../../services/Realm';
 import uuidv4 from 'uuid/v4';
 import { BillPeriodContext } from '../../contexts/BillPeriodContext';
+import { PriceGroupContext } from '../../contexts/PriceGroupContext';
+
+// TODO: this needs to be moved to organizaiton => settings and queried from db
+const DEF_PRICE_GROUP_ID = '5e90eae405a18b11edbf3214';
 
 export const Main: React.FC = () => {
-  const [populating, setPopulating] = useState(true);
   const billPeriods = useRealmQuery<BillPeriodProps>({ source: BillPeriodSchema.name, filter: 'closed = null' });
+  const priceGroups = useRealmQuery<PriceGroupProps>({ source: PriceGroupSchema.name });
+
+  const [populating, setPopulating] = useState(true);
   const [billPeriod, setBillPeriod] = useState(null);
+  const [priceGroup, setPriceGroup] = useState(null);
 
   useEffect(() => {
     const populateAsync = async () => {
@@ -46,11 +53,19 @@ export const Main: React.FC = () => {
     }
   }, [billPeriods, populating]);
 
-  return populating || !billPeriod ? (
+  useEffect(() => {
+    if (priceGroups && !populating) {
+      setPriceGroup(priceGroups.find(pG => pG._id === DEF_PRICE_GROUP_ID));
+    }
+  }, [priceGroups, populating]);
+
+  return populating || !billPeriod || !priceGroup ? (
     <Loading />
   ) : (
     <BillPeriodContext.Provider value={{ billPeriod, setBillPeriod }}>
-      <SidebarNavigator />
+      <PriceGroupContext.Provider value={{ priceGroup, setPriceGroup }}>
+        <SidebarNavigator />
+      </PriceGroupContext.Provider>
     </BillPeriodContext.Provider>
   );
 };

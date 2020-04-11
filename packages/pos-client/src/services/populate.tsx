@@ -7,6 +7,7 @@ import { getPaymentTypes } from '../api/paymentType';
 import { getPriceGroups, PriceGroupItemServerProps } from '../api/priceGroup';
 import { DiscountSchema, ItemSchema, PaymentTypeSchema, PriceGroupItemProps } from './schemas';
 import uuidv4 from 'uuid/v4';
+import { getOrganization } from '../api/organization';
 
 export const populate = async () => {
   try {
@@ -17,6 +18,7 @@ export const populate = async () => {
       { data: discounts },
       { data: paymentTypes },
       { data: priceGroups },
+      // { data: organization },
     ] = await Promise.all([
       getItems(),
       getCategories(),
@@ -24,12 +26,13 @@ export const populate = async () => {
       getDiscounts(),
       getPaymentTypes(),
       getPriceGroups(),
+      // getOrganization()
     ]);
 
     // TODO: remove after dev
-    realm.write(() => {
-      realm.deleteAll();
-    });
+    // realm.write(() => {
+    //   realm.deleteAll();
+    // });
 
     const resolvePriceGroup: (price: PriceGroupItemServerProps[]) => PriceGroupItemProps[] = price => {
       try {

@@ -33,7 +33,7 @@ export enum Modes {
   Complete = 'complete',
 }
 
-// TODO: move to org
+// TODO: move to org settings
 const maxBills = 40;
 
 interface CheckoutProps {
@@ -42,7 +42,8 @@ interface CheckoutProps {
 }
 
 export const Checkout: React.FC<CheckoutProps> = ({ navigation, initialBill = null }) => {
-  const { billPeriod, setBillPeriod } = useContext(BillPeriodContext);
+  const { billPeriod } = useContext(BillPeriodContext);
+  
   const openBills = useRealmQuery<BillProps>({ source: BillSchema.name, filter: `isClosed = false` });
   const discounts = useRealmQuery<DiscountProps>({ source: DiscountSchema.name });
   const paymentTypes = useRealmQuery<PaymentTypeProps>({ source: PaymentTypeSchema.name });
@@ -63,7 +64,7 @@ export const Checkout: React.FC<CheckoutProps> = ({ navigation, initialBill = nu
       // Over tenders of any payment type are given change in cash
 
       // TODO: should all overtenders do this????
-      // TODO: vouchers overtenders should issue new voucher not refund in cash
+      // TODO: vouchers overtenders should issue new voucher not refund in cash?
 
       realm.write(() => {
         const changeDuePayment = realm.create(BillPaymentSchema.name, {
@@ -73,10 +74,10 @@ export const Checkout: React.FC<CheckoutProps> = ({ navigation, initialBill = nu
           amount: billBalance,
           isChange: true,
         });
+        // push a final negative payment which represents the change due in cash to balance the payments with the sale total
         bill.payments.push(changeDuePayment);
         bill.isClosed = true;
         bill.closedAt = dayjs().toDate();
-        // push a final negative payment which represents the change due in cash
       });
 
       setMode(Modes.Complete);

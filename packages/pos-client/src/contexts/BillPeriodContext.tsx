@@ -6,6 +6,6 @@ type BillPeriodContextProps = {
   billPeriod: BillPeriodProps; // TODO fix
 };
 export const BillPeriodContext = React.createContext<BillPeriodContextProps>({
-  setBillPeriod: null,
+  setBillPeriod: () => {},
   billPeriod: null,
 });
