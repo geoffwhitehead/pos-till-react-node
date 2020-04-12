@@ -1,4 +1,5 @@
 import { StarPRNT } from 'react-native-star-prnt';
+import { Toast } from '../../core';
 
 export const RECEIPT_WIDTH = 39; // TODO: move to settings - printer width
 const port = 'TCP:192.168.1.78';
@@ -34,6 +35,11 @@ export async function print(commands: any[], openDrawer: boolean = false) {
   try {
     await StarPRNT.print('StarGraphic', commands, port);
   } catch (e) {
-    console.error(e);
+    Toast.show({
+      text: `Failed to print. Check connection...`,
+      buttonText: 'Okay',
+      duration: 5000,
+      type: 'danger',
+    });
   }
 }

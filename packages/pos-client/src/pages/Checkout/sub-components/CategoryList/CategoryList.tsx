@@ -1,5 +1,5 @@
 import React, { useState, useContext, useCallback } from 'react';
-import { Text, Content, List, ListItem, Left, Icon, Body, Right } from '../../../../core';
+import { Text, Content, List, ListItem, Left, ActionSheet, Icon, Body, Right, Button } from '../../../../core';
 import { SearchHeader } from '../../../../components/SearchHeader/SearchHeader';
 import { useRealmQuery } from 'react-use-realm';
 import {
@@ -13,14 +13,18 @@ import {
   ModifierProps,
   PriceGroupProps,
   PriceGroupItemProps,
+  PriceGroupSchema,
 } from '../../../../services/schemas';
 import { routes } from '../../../../navigators/CheckoutItemNavigator';
 import { realm } from '../../../../services/Realm';
 import uuidv4 from 'uuid/v4';
 import { PriceGroupContext } from '../../../../contexts/PriceGroupContext';
+import { View, Grid, Col, Footer, FooterTab } from 'native-base';
 
 export const CategoryList: React.FC = ({ navigation, route }) => {
   const { activeBill } = route.params;
+
+  const { priceGroup } = useContext(PriceGroupContext);
 
   const categories = useRealmQuery<CategoryProps>({
     source: CategorySchema.name,
@@ -30,9 +34,6 @@ export const CategoryList: React.FC = ({ navigation, route }) => {
   const modifiers = useRealmQuery<ModifierProps>({ source: ModifierSchema.name });
 
   const [searchValue, setSearchValue] = useState<string>('');
-
-  const { priceGroup, setPriceGroup } = useContext(PriceGroupContext);
-  console.log('1priceGroup', priceGroup);
 
   const resolvePrice: (price: PriceGroupItemProps[], priceGroup: PriceGroupProps) => number = (price, priceGroup) =>
     price.find(({ groupId }) => groupId._id === priceGroup._id).price;
@@ -68,7 +69,6 @@ export const CategoryList: React.FC = ({ navigation, route }) => {
           priceGroup,
         };
 
-        console.log('newBillItem', newBillItem);
         realm.create(BillItemSchema.name, newBillItem);
         activeBill.items = [...activeBill.items, newBillItem];
       });
@@ -94,6 +94,7 @@ export const CategoryList: React.FC = ({ navigation, route }) => {
   return (
     <Content>
       <SearchHeader onChangeText={onSearchHandler} value={searchValue} />
+
       <List>
         <ListItem itemHeader first>
           <Text style={{ fontWeight: 'bold' }}>Categories</Text>
