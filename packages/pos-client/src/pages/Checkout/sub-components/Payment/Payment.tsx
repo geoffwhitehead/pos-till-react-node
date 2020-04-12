@@ -38,7 +38,6 @@ interface PaymentProps {
 
 export const Payment: React.FC<PaymentProps> = ({ activeBill, discounts, paymentTypes, onCompleteBill }) => {
   const [value, setValue] = useState<string>('');
-  console.log('value ', value);
   // TODO: this / payment types will need refactoring so were not having to use find
   const cashType = paymentTypes.find(pt => pt.name === paymentTypeNames.CASH);
   const denominations = [500, 1000, 2000, 3000, 5000];
@@ -60,6 +59,7 @@ export const Payment: React.FC<PaymentProps> = ({ activeBill, discounts, payment
         amount: amt || Math.max(balance(activeBill), 0),
       });
       activeBill.payments.push(billPayment);
+      setValue('');
     });
     checkComplete();
   };
