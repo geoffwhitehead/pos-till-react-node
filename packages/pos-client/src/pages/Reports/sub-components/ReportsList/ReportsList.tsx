@@ -5,14 +5,14 @@ import { BillPeriodProps } from '../../../../services/schemas';
 import { Collection } from 'realm';
 
 interface ReportsListProps {
-  reports: Collection<BillPeriodProps>;
+  billPeriods: Collection<BillPeriodProps>;
   selectedReport: BillPeriodProps | null;
   onSelectReport: (report: BillPeriodProps) => void;
-  onPressClosePeriod: () => void;
+  onPressClosePeriod: (billPeriod) => void;
 }
 
 export const ReportsList: React.FC<ReportsListProps> = ({
-  reports,
+  billPeriods,
   selectedReport,
   onSelectReport,
   onPressClosePeriod,
@@ -20,23 +20,28 @@ export const ReportsList: React.FC<ReportsListProps> = ({
   return (
     <Content>
       <List>
-        {reports.slice(0, 3).map(report => {
+        {billPeriods.slice(0, 3).map(billPeriod => {
           return (
             <ListItem
               thumbnail
-              selected={selectedReport && selectedReport._id === report._id}
-              onPress={() => onSelectReport(report)}
+              selected={selectedReport && selectedReport._id === billPeriod._id}
+              onPress={() => onSelectReport(billPeriod)}
             >
               <Left>
                 <Icon name="ios-paper" />
               </Left>
               <Body>
-                <Text>{`Opened: ${dayjs(report.opened).toString()}`}</Text>
-                <Text>{`Closed: ${report.closed ? dayjs(report.closed).toString() : ''}`}</Text>
+                <Text>{`Opened: ${dayjs(billPeriod.opened).toString()}`}</Text>
+                <Text>{`Closed: ${billPeriod.closed ? dayjs(billPeriod.closed).toString() : ''}`}</Text>
               </Body>
               <Right>
-                {!report.closed && (
-                  <Button onPress={onPressClosePeriod}>
+                {!billPeriod.closed && (
+                  <Button
+                    onPress={() => {
+                      onSelectReport(billPeriod);
+                      onPressClosePeriod(billPeriod);
+                    }}
+                  >
                     <Text>Close current period</Text>
                   </Button>
                 )}

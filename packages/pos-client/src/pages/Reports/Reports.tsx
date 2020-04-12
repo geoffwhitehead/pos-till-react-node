@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react';
-import { Toast, Container, Grid, Col } from '../../core';
+import { Toast, Container, Grid, Col, ActionSheet } from '../../core';
 import { SidebarHeader } from '../../components/SidebarHeader/SidebarHeader';
 import {
   BillPeriodSchema,
@@ -42,16 +42,16 @@ export const Reports = ({ navigation }) => {
 
   // TODO: REACT CANT DIF REALM OBJECTS
   // const onPrint = useCallback(() => {
-  const onPrint = () => {
-    const periodBills = allBills.filtered('billPeriod._id = $0', selectedBillPeriod._id);
-    const commands = periodReport(selectedBillPeriod, periodBills, categories, discounts, paymentTypes);
+  const onPrint = (billPeriod: BillPeriodProps) => {
+    const bills = allBills.filtered('billPeriod._id = $0', billPeriod._id);
+    const commands = periodReport(billPeriod, bills, categories, discounts, paymentTypes);
     print(commands);
   };
   // }, [allBills, categories, discounts, paymentTypes]);
 
   const { billPeriod, setBillPeriod } = useContext(BillPeriodContext);
 
-  const closeCurrentPeriod: () => void = () => {
+  const closePeriod: (billPeriod: BillPeriodProps) => void = () => {
     const openBills = allBills.filtered('isClosed = false');
     if (openBills.length > 0) {
       Toast.show({
@@ -65,8 +65,23 @@ export const Reports = ({ navigation }) => {
         const newBillPeriod = realm.create(BillPeriodSchema.name, { _id: uuidv4(), opened: new Date() });
         setBillPeriod(newBillPeriod);
       });
-      onPrint();
+      onPrint(billPeriod);
     }
+  };
+
+  const confirmClosePeriod = (billPeriod: BillPeriodProps) => {
+    const options = ['Yes', 'Cancel'];
+    ActionSheet.show(
+      {
+        options,
+        cancelButtonIndex: options.length,
+        title: 'Close current billing period and print report?',
+      },
+      index => {
+        console.log('index', index);
+        index === 0 && closePeriod(billPeriod);
+      },
+    );
   };
 
   return (
@@ -76,10 +91,10 @@ export const Reports = ({ navigation }) => {
         <Grid>
           <Col>
             <ReportsList
-              reports={billPeriods}
+              billPeriods={billPeriods}
               selectedReport={selectedBillPeriod}
               onSelectReport={report => setSelectedBillPeriod(report)}
-              onPressClosePeriod={closeCurrentPeriod}
+              onPressClosePeriod={confirmClosePeriod}
             />
           </Col>
           {selectedBillPeriod && (
@@ -89,7 +104,7 @@ export const Reports = ({ navigation }) => {
               categories={categories}
               paymentTypes={paymentTypes}
               discounts={discounts}
-              onPressPrint={onPrint}
+              onPressPrint={() => onPrint(selectedBillPeriod)}
             />
           )}
         </Grid>
