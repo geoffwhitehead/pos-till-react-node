@@ -1,4 +1,12 @@
-import { BillProps, CategoryProps, DiscountProps, PaymentTypeProps, BillItemProps, BillPaymentProps } from '../schemas';
+import {
+  BillProps,
+  CategoryProps,
+  DiscountProps,
+  PaymentTypeProps,
+  BillItemProps,
+  BillPaymentProps,
+  BillPeriodProps,
+} from '../schemas';
 import {
   totalBillsPaymentBreakdown,
   discountBreakdownTotals,
@@ -6,11 +14,12 @@ import {
   formatNumber,
 } from '../../utils';
 import { Collection } from 'realm';
-import { addHeader, alignLeftRight, divider } from './printer';
+import { addHeader, alignLeftRight, divider, starDivider, alignCenter, RECEIPT_WIDTH, newLine } from './printer';
 import { receiptTempate } from './template';
 import { capitalize } from 'lodash';
+import dayjs from 'dayjs';
 
-const symbol = '£';
+const symbol = '£'; // TODO: move
 
 // TODO: fetch from db
 const org = {
@@ -24,6 +33,7 @@ const org = {
 };
 
 export const periodReport = (
+  billPeriod: BillPeriodProps,
   bills: Collection<BillProps>,
   categories: Collection<CategoryProps>,
   discounts: Collection<DiscountProps>,
@@ -62,7 +72,31 @@ export const periodReport = (
 
   let c = [];
 
-  c.push({ appendBitmapText: alignLeftRight('Sales: ', bills.length.toString()) });
+  const isZReport = !!billPeriod.closed;
+
+  console.log('isZReport', isZReport);
+
+  console.log('billPeriod', billPeriod);
+  c.push(starDivider);
+  c.push({ appendBitmapText: alignCenter(isZReport ? 'Z-REPORT (CLOSED)' : 'X-REPORT (OPEN)') });
+  c.push({
+    appendBitmapText: alignLeftRight(
+      `Opened: `,
+      dayjs(billPeriod.opened).format('DD/MM/YYYY HH:mm:ss'),
+      Math.round(RECEIPT_WIDTH / 2),
+    ),
+  });
+  c.push({
+    appendBitmapText: alignLeftRight(
+      `Closed: `,
+      isZReport ? dayjs(billPeriod.opened).format('DD/MM/YYYY HH:mm:ss') : '',
+      Math.round(RECEIPT_WIDTH / 2),
+    ),
+  });
+  c.push(starDivider);
+
+  addHeader(c, 'Sales');
+  c.push({ appendBitmapText: alignLeftRight('Total: ', bills.length.toString()) });
 
   addHeader(c, 'Category Totals');
   c.push(...printGroupCommands(categoryTotals, id => resolveName(id, categories), symbol));

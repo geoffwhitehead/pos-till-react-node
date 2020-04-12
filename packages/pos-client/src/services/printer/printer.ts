@@ -22,6 +22,8 @@ export const alignRight = string => {
 };
 
 export const divider = { appendBitmapText: '-'.repeat(RECEIPT_WIDTH) };
+export const starDivider = { appendBitmapText: '*'.repeat(RECEIPT_WIDTH) };
+export const newLine = { appendBitmapText: ' \n' };
 
 export const addHeader = (c: any[], header: string): void => {
   c.push({ appendBitmapText: ' ' });
