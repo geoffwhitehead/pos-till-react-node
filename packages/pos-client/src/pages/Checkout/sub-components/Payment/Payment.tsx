@@ -13,6 +13,7 @@ import {
   ListItem,
   Left,
   Right,
+  Label,
 } from '../../../../core';
 import {
   DiscountProps,
@@ -26,6 +27,7 @@ import uuidv4 from 'uuid';
 import { balance, formatNumber } from '../../../../utils';
 import { StyleSheet } from 'react-native';
 import { paymentTypeNames } from '../../../../api/paymentType';
+import { capitalize } from 'lodash';
 
 interface PaymentProps {
   activeBill: BillProps; // fix
@@ -83,28 +85,11 @@ export const Payment: React.FC<PaymentProps> = ({ activeBill, discounts, payment
         <Col />
         <Col>
           <Row style={styles.row}>
-            <Item style={{ width: '100%', height: 40 }} regular>
+            <Item stackedLabel style={{ width: '100%', height: 40 }}>
+              <Label>Custom amount</Label>
               <Input value={value} onChangeText={onValueChange} keyboardType="number-pad" />
             </Item>
           </Row>
-          {/* <Row style={styles.row}>
-            {paymentTypes.map(paymentType => {
-              return (
-                <Button onPress={addPayment(paymentType, value)}>
-                  <Text>{paymentType.name}</Text>
-                </Button>
-              );
-            })}
-          </Row>
-          <Row style={styles.row}>
-            {denominations.map(amt => {
-              return (
-                <Button onPress={addPayment(cashType, amt)}>
-                  <Text>{`${currencySymbol}${formatNumber(amt, currencySymbol)}`}</Text>
-                </Button>
-              );
-            })}
-          </Row> */}
           <Row style={styles.row}>
             <List style={{ width: '100%', height: '100%' }}>
               <ListItem itemHeader first>
@@ -117,7 +102,9 @@ export const Payment: React.FC<PaymentProps> = ({ activeBill, discounts, payment
                       <Text>{discount.name}</Text>
                     </Left>
                     <Right>
-                      <Text>{formatNumber(discount.amount, currencySymbol)}</Text>
+                      <Text>
+                        {discount.isPercent ? discount.amount + '%' : formatNumber(discount.amount, currencySymbol)}
+                      </Text>
                     </Right>
                   </ListItem>
                 );
@@ -133,7 +120,7 @@ export const Payment: React.FC<PaymentProps> = ({ activeBill, discounts, payment
                 style={styles.paymentButtons}
                 onPress={addPayment(paymentType, parseFloat(value))}
               >
-                <Text>{paymentType.name}</Text>
+                <Text>{capitalize(paymentType.name)}</Text>
               </Button>
             );
           })}

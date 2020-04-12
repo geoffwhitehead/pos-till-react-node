@@ -50,9 +50,10 @@ export const Receipt: React.FC<ReceiptProps> = ({ activeBill, onStore, onCheckou
         <ReceiptItems readonly={complete} activeBill={activeBill} />
       </Row>
       <Row style={styles.r3}>
-        <Text>
-          {activeBill.discounts.length ? `Discount: ${formatNumber(totalDiscount(activeBill), currencySymbol)}` : ''}
-        </Text>
+        {activeBill.discounts.length > 0 && (
+          <Text>{`Discount: ${formatNumber(totalDiscount(activeBill), currencySymbol)}`}</Text>
+        )}
+
         <Text>{`Total: ${formatNumber(total(activeBill), currencySymbol)}`}</Text>
         {complete && (
           <Text>{`Change Due: ${formatNumber(
@@ -96,7 +97,7 @@ const styles = StyleSheet.create({
   r3: {
     borderTopColor: 'lightgrey',
     borderTopWidth: 1,
-    height: 100,
+    height: 110,
     flexDirection: 'column',
     padding: 10,
   },
