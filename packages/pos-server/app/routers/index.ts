@@ -8,6 +8,7 @@ import itemRouter from './item';
 import maintenanceRouter from './maintenance';
 import modifierRouter from './modifier';
 import priceGroupRouter from './priceGroup';
+import organizationRouter from './organization';
 
 const router = Router();
 
@@ -19,5 +20,6 @@ router.use('/items', itemRouter);
 router.use('/maintenance', maintenanceRouter);
 router.use('/modifiers', modifierRouter);
 router.use('/price-group', priceGroupRouter);
+router.use('/organization', organizationRouter);
 
 export default router;

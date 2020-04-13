@@ -4,3 +4,4 @@ export { Category } from './Category';
 export { Discount } from './DIscount';
 export { Modifier } from './Modifier';
 export { PriceGroup } from './PriceGroup';
+export { Organization } from './Organization';
