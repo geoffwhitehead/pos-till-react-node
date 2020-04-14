@@ -6,7 +6,7 @@
     "scripts": {
         "test": "jest",
         "dev": "docker-compose up",
-        "start": "node ./dist/app/server.js",
+        "start": "node ./dist/src/server.js",
         "rebuild": "docker exec -it pos-server_app_1 yarn ",
         "build": "yarn tsc",
         "preinstall": "bash ./scripts/preinstall.sh",

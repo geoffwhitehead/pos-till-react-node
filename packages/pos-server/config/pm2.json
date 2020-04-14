@@ -2,7 +2,7 @@
     "apps": [
         {
             "name": "Boilerplate-API",
-            "script": "./app/server.ts",
+            "script": "./src/server.ts",
             "instances": "max",
             "exec_mode": "cluster"
         }
