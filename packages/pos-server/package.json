@@ -10,7 +10,8 @@
         "rebuild": "docker exec -it pos-server_app_1 yarn ",
         "build": "yarn tsc",
         "preinstall": "bash ./scripts/preinstall.sh",
-        "postinstall": "bash ./scripts/postinstall.sh"
+        "postinstall": "bash ./scripts/postinstall.sh",
+        "run:prettier": "prettier --write 'src/**/*.ts' 'test/**/*.ts'"
     },
     "license": "MIT",
     "dependencies": {
