@@ -1,11 +1,11 @@
 import mongoose from 'mongoose';
-const APP_NAME = 'Boilerplate API';
+const APP_NAME = 'POS Server';
 const ENV = process.env.NODE_ENV;
 const PORT = process.env.PORT || 5000;
 
 // database configs
 
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://mongodb/boilerplate';
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://mongodb/pos-server';
 // if (ENV === "test") {
 //   MONGODB_URI = global.__MONGO_URI__;
 // }

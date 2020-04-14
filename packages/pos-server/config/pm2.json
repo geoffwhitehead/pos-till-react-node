@@ -1,7 +1,7 @@
 {
     "apps": [
         {
-            "name": "Boilerplate-API",
+            "name": "pos-server",
             "script": "./src/server.ts",
             "instances": "max",
             "exec_mode": "cluster"
