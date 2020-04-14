@@ -3,9 +3,11 @@ services:
   app:
     build: .
     command: pm2-dev ./src/server.ts
+    env_file: .env
     environment:
       NODE_ENV: development
       JWT_KEY: ${JWT_KEY}
+      GIT_SSH_KEY: ${GIT_SSH_KEY}
     depends_on:
       - mongodb
     ports:

@@ -8,7 +8,10 @@ RUN groupadd -r nodejs \
 
 USER nodejs
 
-# copy local files into container, set working directory and user
+# TODO: refacotr this to clean ssh keys. Can be done using squash
+ARG GIT_SSH_KEY
+
+# copy local files into container, set wor king directory and user
 RUN mkdir -p /home/nodejs/app
 WORKDIR /home/nodejs/app
 COPY . /home/nodejs/app
