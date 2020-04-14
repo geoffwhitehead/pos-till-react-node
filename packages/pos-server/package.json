@@ -9,7 +9,8 @@
         "start": "node ./dist/app/server.js",
         "rebuild": "docker exec -it pos-server_app_1 yarn ",
         "build": "yarn tsc",
-        "heroku-prebuild": "git config --global url.'https://${GITHUB_TOKEN}@github.com/'.insteadOf git@github.com:"
+        "preinstall": "bash ./scripts/preinstall.sh",
+        "postinstall": "bash ./scripts/postinstall.sh"
     },
     "license": "MIT",
     "dependencies": {
@@ -32,7 +33,7 @@
         "typescript": "^3.7.5",
         "validator": "^12.2.0",
         "faker": "^4.1.0",
-        "mongoose-mtenant": "git@github.com/geoffwhitehead/mongoose-mtenant.git"
+        "mongoose-mtenant": "geoffwhitehead/mongoose-mtenant.git"
     },
     "devDependencies": {
         "@types/express": "^4.17.2",
