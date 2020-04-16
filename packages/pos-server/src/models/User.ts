@@ -26,12 +26,12 @@ const UserSchema: Schema<UserDocument> = new Schema(
             required: true,
             unique: true,
             lowercase: true,
-            validate: (value: string): boolean => {
-                if (!validator.isEmail(value)) {
-                    return false;
-                }
-                return true;
-            },
+            // validate: (value: string): boolean => {
+            //     if (!validator.isEmail(value)) {
+            //         return false;
+            //     }
+            //     return true;
+            // },
         },
         password: {
             type: String,
