@@ -37,7 +37,7 @@ app.use(morgan('combined'));
 app.use(
     extendAuthorize({}).unless({
         // path: ['/index.html', { url: '/', methods: ['GET', 'PUT'] }],
-        path: ['/test', { url: '/', methods: ['POST', 'PUT'] }],
+        path: ['/', { url: '/organization', methods: ['POST'] }],
     }),
 );
 // router

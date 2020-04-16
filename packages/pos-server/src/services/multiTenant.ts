@@ -26,7 +26,7 @@ export const tenantModel: <T>(
     };
 };
 
-export const tenantlessModel: <T extends mongoose.Document>(
-    name: string,
-    schema: Schema<T>,
-) => () => Model<T & Document, {}> = (name, schema) => (): any => mongoose.model(name, schema); // TODO: fix types
+export const tenantlessModel: <T>(name: string, schema: Schema<T>) => () => Model<T & Document, {}> = (
+    name,
+    schema,
+) => (): any => mongoose.model(name, schema); // TODO: fix types
