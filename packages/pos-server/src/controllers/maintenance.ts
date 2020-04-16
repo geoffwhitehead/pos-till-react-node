@@ -23,7 +23,7 @@ const generatePriceGroups: (priceGroups: PriceGroupDocument[]) => ItemPriceGroup
     });
 };
 
-export const seed = async (req: Request, res: Response) => {
+export const seed = async (req: Request, res: Response): Promise<void> => {
     try {
         const categories = CATEGORIES_TO_SEED.map(name => {
             return {
@@ -31,22 +31,23 @@ export const seed = async (req: Request, res: Response) => {
             };
         });
 
-        const insertedCategories = await Category.collection.insert(categories);
+        const insertedCategories = await Category().collection.insert(categories);
 
         if (!insertedCategories.result.ok) {
             console.log('result', insertedCategories.result);
             throw new Error('Error inserting categories');
         }
 
-        const insertedPriceGroups = await PriceGroup.collection.insert(PRICE_GROUPS.map(name => ({ name })));
+        const insertedPriceGroups = await PriceGroup().collection.insert(PRICE_GROUPS.map(name => ({ name })));
 
         if (!insertedPriceGroups.result.ok) {
             console.log('result', insertedPriceGroups.result);
             throw new Error('Error inserting price groups');
         }
 
-        const priceGroups = await PriceGroup.find({});
-        const modifier = new Modifier({
+        const priceGroups = await PriceGroup().find({});
+        const ModifierModel = Modifier();
+        const modifier = new ModifierModel({
             name: 'Mains',
             mods: [
                 {
@@ -77,14 +78,14 @@ export const seed = async (req: Request, res: Response) => {
         });
         console.log('*************** items', JSON.stringify(items, null, 4));
 
-        const insertedItems = await Item.collection.insert(items);
+        const insertedItems = await Item().collection.insert(items);
 
         if (!insertedItems.result.ok) {
             console.log('insertedItems', insertedItems);
             throw new Error('Error inserting items');
         }
 
-        const insertedDiscounts = await Discount.collection.insert([
+        const insertedDiscounts = await Discount().collection.insert([
             {
                 name: 'Student',
                 amount: '10',
@@ -105,9 +106,9 @@ export const seed = async (req: Request, res: Response) => {
             throw new Error('Error inserting discounts');
         }
 
-        return res.send('Sucessfully seeded');
+        res.send('Sucessfully seeded');
     } catch (err) {
         console.log('err', err);
-        return res.status(400).send(err);
+        res.status(400).send(err);
     }
 };

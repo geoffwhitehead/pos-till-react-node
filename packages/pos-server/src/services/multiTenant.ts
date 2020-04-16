@@ -5,7 +5,7 @@ import { getTenantId } from '../contexts';
 export const tenantModel: <T>(
     name: string,
     schema: Schema<T>,
-) => (args: { skipTenant?: boolean }) => Model<T & Document> = (name, schema) => {
+) => (options?: { skipTenant?: boolean }) => Model<T & Document, {}> = (name, schema) => {
     return ({ skipTenant }): any => {
         // TODO: fix types here
         schema.add({ tenantId: String });
@@ -16,6 +16,9 @@ export const tenantModel: <T>(
         Model.schema.set('discriminatorKey', 'tenantId');
 
         const tenantId = getTenantId();
+        if (!tenantId) {
+            throw new Error('No tenant id found');
+        }
         const discriminatorName = `${Model.modelName}-${tenantId}`;
         const existingDiscriminator = (Model.discriminators || {})[discriminatorName];
 
@@ -26,4 +29,4 @@ export const tenantModel: <T>(
 export const tenantlessModel: <T extends mongoose.Document>(
     name: string,
     schema: Schema<T>,
-) => () => Model<T & Document> = (name, schema) => (): any => mongoose.model(name, schema); // TODO: fix types
+) => () => Model<T & Document, {}> = (name, schema) => (): any => mongoose.model(name, schema); // TODO: fix types

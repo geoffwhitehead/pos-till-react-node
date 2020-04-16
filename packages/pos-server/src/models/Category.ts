@@ -1,18 +1,17 @@
-import { model, Schema, Document } from 'mongoose';
+import { Schema } from 'mongoose';
+import { tenantModel } from '../services/multiTenant';
 
 interface CategoryProps {
     name: string;
 }
 
-export interface CategoryDocument extends Document, CategoryProps {}
-
-const CategorySchema: Schema<CategoryDocument> = new Schema({
+const CategorySchema: Schema<CategoryProps> = new Schema({
     name: {
         type: String,
         required: true,
     },
 });
 
-const Category = model<CategoryDocument>('Category', CategorySchema);
+const Category = tenantModel<CategoryProps>('Category', CategorySchema);
 
 export { Category };

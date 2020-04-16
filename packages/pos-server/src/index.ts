@@ -34,7 +34,12 @@ app.use(bindNamespace);
 app.use(morgan('combined'));
 
 // auth
-app.use(extendAuthorize);
+app.use(
+    extendAuthorize({}).unless({
+        // path: ['/index.html', { url: '/', methods: ['GET', 'PUT'] }],
+        path: ['/test', { url: '/', methods: ['POST', 'PUT'] }],
+    }),
+);
 // router
 app.use('/', router);
 

@@ -1,15 +1,14 @@
 import { Modifier } from '../models';
 import { Request, Response } from 'express';
 
-const create = async (req: Request, res: Response) => {
-    const modifier = new Modifier(req.body);
-
-    console.log('*************** req.body', JSON.stringify(req.body, null, 4));
-    console.log('*************** modifier', JSON.stringify(modifier, null, 4));
+const create = async (req: Request, res: Response): Promise<void> => {
+    const ModifierModel = Modifier();
+    const modifier = new ModifierModel(req.body);
     const errors = modifier.validateSync();
 
     if (errors) {
-        return res.status(401).send(errors);
+        res.status(401).send(errors);
+        return;
     }
 
     try {
@@ -20,45 +19,45 @@ const create = async (req: Request, res: Response) => {
     }
 };
 
-const getById = async (req: Request, res: Response) => {
+const getById = async (req: Request, res: Response): Promise<void> => {
     const { id } = req.params;
     try {
-        const modifier = await Modifier.findById(id);
-        return res.status(200).send(modifier);
+        const modifier = await Modifier().findById(id);
+        res.status(200).send(modifier);
     } catch (err) {
         res.status(400).send(err);
     }
 };
 
-const getAll = async (req: Request, res: Response) => {
+const getAll = async (req: Request, res: Response): Promise<void> => {
     const skip = req.query.skip;
     const limit = req.query.limit;
     try {
-        const modifiers = await Modifier.find({}, '', { skip, limit });
-        return res.status(200).send(modifiers);
+        const modifiers = await Modifier().find({}, '', { skip, limit });
+        res.status(200).send(modifiers);
     } catch (err) {
         res.status(400).send(err);
     }
 };
 
-const update = async (req: Request, res: Response) => {
+const update = async (req: Request, res: Response): Promise<void> => {
     const { id, ...props } = req.body;
     try {
-        const modifier = await Modifier.updateOne(id, props, { runValidators: true });
+        const modifier = await Modifier().updateOne(id, props, { runValidators: true });
         if (modifier.err) {
             throw new Error('Error occured updating modifier');
         }
-        return res.send('modifier updated');
+        res.send('modifier updated');
     } catch (err) {
         res.status(400).send(err);
     }
 };
 
-const remove = async (req: Request, res: Response) => {
+const remove = async (req: Request, res: Response): Promise<void> => {
     const { id } = req.params;
     try {
-        const deleteMsg = await Modifier.deleteOne(id);
-        return res.send(deleteMsg);
+        const deleteMsg = await Modifier().deleteOne(id);
+        res.send(deleteMsg);
     } catch (err) {
         res.status(400).send(err);
     }

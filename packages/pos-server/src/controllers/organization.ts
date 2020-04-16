@@ -1,12 +1,15 @@
 import { Organization } from '../models';
 import { Request, Response } from 'express';
 
-const create = async (req: Request, res: Response) => {
-    const organization = new Organization(req.body);
+const create = async (req: Request, res: Response): Promise<void> => {
+    const OrganizationModel = Organization();
+
+    const organization = new OrganizationModel(req.body);
     const errors = organization.validateSync();
 
     if (errors) {
-        return res.status(401).send(errors);
+        res.status(401).send(errors);
+        return;
     }
 
     try {
@@ -17,35 +20,35 @@ const create = async (req: Request, res: Response) => {
     }
 };
 
-const getById = async (req: Request, res: Response) => {
+const getById = async (req: Request, res: Response): Promise<void> => {
     const { id } = req.params;
     try {
-        const organization = await Organization.findById(id);
-        return res.status(200).send(organization);
+        const organization = await Organization().findById(id);
+        res.status(200).send(organization);
     } catch (err) {
         res.status(400).send(err);
     }
 };
 
-const getAll = async (req: Request, res: Response) => {
+const getAll = async (req: Request, res: Response): Promise<void> => {
     const skip = req.query.skip;
     const limit = req.query.limit;
     try {
-        const organizations = await Organization.find({}, '', { skip, limit });
-        return res.status(200).send(organizations);
+        const organizations = await Organization().find({}, '', { skip, limit });
+        res.status(200).send(organizations);
     } catch (err) {
         res.status(400).send(err);
     }
 };
 
-const update = async (req: Request, res: Response) => {
+const update = async (req: Request, res: Response): Promise<void> => {
     const { id, ...props } = req.body;
     try {
-        const organization = await Organization.updateOne(id, props, { runValidators: true });
+        const organization = await Organization().updateOne(id, props, { runValidators: true });
         if (organization.err) {
             throw new Error('Error occured updating item');
         }
-        return res.send('item updated');
+        res.send('item updated');
     } catch (err) {
         res.status(400).send(err);
     }

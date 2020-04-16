@@ -1,17 +1,18 @@
-import { model, Schema, Document } from 'mongoose';
+import { Schema } from 'mongoose';
 import { ItemPriceGroupProps } from './PriceGroup';
+import { tenantModel } from '../services/multiTenant';
 
-interface ModSchema {
+interface ModifierItemProps {
     name: string;
     price: ItemPriceGroupProps[];
 }
 
 interface ModifierProps {
     name: string;
-    mods: [ModSchema];
+    mods: [ModifierItemProps];
 }
 
-const ModSchema: Schema<ModSchema> = new Schema({
+const ModSchema: Schema<ModifierItemProps> = new Schema({
     name: String,
     price: [{ groupId: { type: Schema.Types.ObjectId, ref: 'PriceGroup' }, amount: { type: 'Number' } }],
 });
@@ -24,9 +25,7 @@ ModSchema.path('price').set(function(num) {
     return num * 100;
 });
 
-export interface ModifierDocument extends Document, ModifierProps {}
-
-const ModifierSchema: Schema<ModifierDocument> = new Schema(
+const ModifierSchema: Schema<ModifierProps> = new Schema(
     {
         name: {
             type: String,
@@ -40,6 +39,6 @@ const ModifierSchema: Schema<ModifierDocument> = new Schema(
     { timestamps: true },
 );
 
-const Modifier = model<ModifierDocument>('Modifier', ModifierSchema);
+const Modifier = tenantModel<ModifierProps>('Modifier', ModifierSchema);
 
 export { Modifier };

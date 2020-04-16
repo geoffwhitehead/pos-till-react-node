@@ -1,12 +1,11 @@
-import { model, Schema, Document } from 'mongoose';
+import { Schema } from 'mongoose';
+import { tenantModel } from '../services/multiTenant';
 
 interface OrganizationProps {
     name: string;
 }
 
-export interface OrganizationDocument extends Document, OrganizationProps {}
-
-const OrganizationSchema: Schema<OrganizationDocument> = new Schema(
+const OrganizationSchema: Schema<OrganizationProps> = new Schema(
     {
         name: {
             type: String,
@@ -44,6 +43,6 @@ const OrganizationSchema: Schema<OrganizationDocument> = new Schema(
     { timestamps: true },
 );
 
-const Organization = model<OrganizationDocument>('Organization', OrganizationSchema);
+const Organization = tenantModel<OrganizationProps>('Organization', OrganizationSchema);
 
 export { Organization };

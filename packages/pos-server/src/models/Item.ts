@@ -1,5 +1,6 @@
-import { model, Schema, Document } from 'mongoose';
+import { Schema } from 'mongoose';
 import { ItemPriceGroupProps } from './PriceGroup';
+import { tenantModel } from '../services/multiTenant';
 
 interface ItemProps {
     name: string;
@@ -9,9 +10,7 @@ interface ItemProps {
     modifierId?: string;
 }
 
-export interface ItemDocument extends Document, ItemProps {}
-
-const ItemSchema: Schema<ItemDocument> = new Schema(
+const ItemSchema: Schema<ItemProps> = new Schema(
     {
         name: {
             type: String,
@@ -35,6 +34,6 @@ ItemSchema.path('price').set(function(num) {
     return num * 100;
 });
 
-const Item = model<ItemDocument>('Item', ItemSchema);
+const Item = tenantModel<ItemProps>('Item', ItemSchema);
 
 export { Item };

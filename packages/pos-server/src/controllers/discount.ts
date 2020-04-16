@@ -1,12 +1,14 @@
 import { Discount } from '../models';
 import { Request, Response } from 'express';
 
-const create = async (req: Request, res: Response) => {
-    const discount = new Discount(req.body);
+const create = async (req: Request, res: Response): Promise<void> => {
+    const DiscountModel = Discount();
+    const discount = new DiscountModel(req.body);
     const errors = discount.validateSync();
 
     if (errors) {
-        return res.status(401).send(errors);
+        res.status(401).send(errors);
+        return;
     }
 
     try {
@@ -17,45 +19,45 @@ const create = async (req: Request, res: Response) => {
     }
 };
 
-const getById = async (req: Request, res: Response) => {
+const getById = async (req: Request, res: Response): Promise<void> => {
     const { id } = req.params;
     try {
-        const discount = await Discount.findById(id);
-        return res.status(200).send(discount);
+        const discount = await Discount().findById(id);
+        res.status(200).send(discount);
     } catch (err) {
         res.status(400).send(err);
     }
 };
 
-const getAll = async (req: Request, res: Response) => {
+const getAll = async (req: Request, res: Response): Promise<void> => {
     const skip = req.query.skip;
     const limit = req.query.limit;
     try {
-        const discounts = await Discount.find({}, '', { skip, limit });
-        return res.status(200).send(discounts);
+        const discounts = await Discount().find({}, '', { skip, limit });
+        res.status(200).send(discounts);
     } catch (err) {
         res.status(400).send(err);
     }
 };
 
-const update = async (req: Request, res: Response) => {
+const update = async (req: Request, res: Response): Promise<void> => {
     const { id, ...props } = req.body;
     try {
-        const discount = await Discount.updateOne(id, props, { runValidators: true });
+        const discount = await Discount().updateOne(id, props, { runValidators: true });
         if (discount.err) {
             throw new Error('Error occured updating discount');
         }
-        return res.send('discount updated');
+        res.send('discount updated');
     } catch (err) {
         res.status(400).send(err);
     }
 };
 
-const remove = async (req: Request, res: Response) => {
+const remove = async (req: Request, res: Response): Promise<void> => {
     const { id } = req.params;
     try {
-        const deleteMsg = await Discount.deleteOne(id);
-        return res.send(deleteMsg);
+        const deleteMsg = await Discount().deleteOne(id);
+        res.send(deleteMsg);
     } catch (err) {
         res.status(400).send(err);
     }

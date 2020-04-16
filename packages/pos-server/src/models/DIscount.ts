@@ -1,4 +1,5 @@
-import { model, Schema, Document } from 'mongoose';
+import { Schema } from 'mongoose';
+import { tenantModel } from '../services/multiTenant';
 
 interface DiscountProps {
     name: string;
@@ -6,9 +7,7 @@ interface DiscountProps {
     isPercent: boolean;
 }
 
-export interface DiscountDocument extends Document, DiscountProps {}
-
-const DiscountSchema: Schema<DiscountDocument> = new Schema({
+const DiscountSchema: Schema<DiscountProps> = new Schema({
     name: {
         type: String,
         required: true,
@@ -22,6 +21,6 @@ const DiscountSchema: Schema<DiscountDocument> = new Schema({
     },
 });
 
-const Discount = model<DiscountDocument>('Discount', DiscountSchema);
+const Discount = tenantModel<DiscountProps>('Discount', DiscountSchema);
 
 export { Discount };

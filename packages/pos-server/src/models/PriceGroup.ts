@@ -1,4 +1,5 @@
-import { model, Schema, Document } from 'mongoose';
+import { Schema, Document } from 'mongoose';
+import { tenantModel } from '../services/multiTenant';
 
 export interface ItemPriceGroupProps {
     groupId: string;
@@ -9,9 +10,8 @@ export interface PriceGroupProps {
     name: string;
 }
 
-export interface PriceGroupDocument extends Document, PriceGroupProps {}
-
-const PriceGroupSchema: Schema<PriceGroupDocument> = new Schema(
+export interface PriceGroupDocument extends PriceGroupProps, Document {}
+const PriceGroupSchema: Schema<PriceGroupProps> = new Schema(
     {
         name: {
             type: String,
@@ -21,6 +21,6 @@ const PriceGroupSchema: Schema<PriceGroupDocument> = new Schema(
     { timestamps: true },
 );
 
-const PriceGroup = model<PriceGroupDocument>('PriceGroup', PriceGroupSchema);
+const PriceGroup = tenantModel<PriceGroupProps>('PriceGroup', PriceGroupSchema);
 
 export { PriceGroup };

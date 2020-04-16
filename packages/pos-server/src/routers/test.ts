@@ -6,12 +6,12 @@ import { getTenantId } from '../contexts';
 
 const router = Router();
 
-router.get('/', async (req: AuthRequest, res: Response) => {
+router.post('/', async (req: AuthRequest, res: Response) => {
     console.log('req.user', req.user);
     console.log('getTenantId', getTenantId());
     try {
-        await Test({}).find();
-        res.status(201).send('created item');
+        await Test({}).create({ name: 'test' });
+        res.status(201).send('test get');
     } catch (err) {
         res.status(400).send(err);
     }
