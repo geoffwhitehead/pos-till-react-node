@@ -9,10 +9,9 @@ import maintenanceRouter from './maintenance';
 import modifierRouter from './modifier';
 import priceGroupRouter from './priceGroup';
 import organizationRouter from './organization';
-import testRouter from './test';
+
 const router = Router();
 
-router.use('/test', testRouter);
 router.use('/auth', authRouter);
 router.use('/users', userRouter);
 router.use('/categories', categoryRouter);

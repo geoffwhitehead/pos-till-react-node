@@ -1,5 +1,5 @@
 import { Schema } from 'mongoose';
-import { tenantModel } from '../services/multiTenant';
+import { tenantlessModel } from '../services/multiTenant';
 
 interface OrganizationProps {
     name: string;
@@ -43,6 +43,6 @@ const OrganizationSchema: Schema<OrganizationProps> = new Schema(
     { timestamps: true },
 );
 
-const Organization = tenantModel<OrganizationProps>('Organization', OrganizationSchema);
+const Organization = tenantlessModel<OrganizationProps>('Organization', OrganizationSchema);
 
 export { Organization };
