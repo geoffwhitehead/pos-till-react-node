@@ -1,8 +1,16 @@
 import { Request, Response, NextFunction } from 'express';
 import * as jwt from 'jsonwebtoken';
 import config from '../../config/config';
+import { setTenantId } from '../contexts';
 
-export const checkJwt = (req: Request, res: Response, next: NextFunction) => {
+export interface AuthRequest extends Request {
+    user: {
+        organizationId: string;
+        userId: string;
+    };
+}
+
+export const extendAuthorize = (req: AuthRequest, res: Response, next: NextFunction) => {
     //Get the jwt token from the head
     const authHeader = req.headers['authorization'] as string;
 
@@ -13,9 +21,13 @@ export const checkJwt = (req: Request, res: Response, next: NextFunction) => {
         }
         const token = authHeader.slice(7, authHeader.length).trimLeft();
         const jwtPayload = jwt.verify(token, config.jwtSecret);
+
+        // send jwt back to user. TODO: needs updating. sessions. new token etc
         res.locals.jwtPayload = jwtPayload;
+
+        setTenantId('test');
     } catch (error) {
-        //If token is not valid, respond with 401 (unauthorized)
+        console.error('error', error);
         res.status(401).send('invalid jwt');
         return;
     }

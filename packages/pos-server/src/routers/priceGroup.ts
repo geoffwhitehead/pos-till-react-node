@@ -1,12 +1,11 @@
 import { Router } from 'express';
 import * as PriceGroupController from '../controllers/priceGroup';
-import { checkJwt } from '../middlewares';
 
 const router = Router();
 
-router.get('/', [checkJwt], PriceGroupController.getAll);
-router.get('/:id', [checkJwt], PriceGroupController.getById);
-router.post('/', [checkJwt], PriceGroupController.create);
-router.put('/:id', [checkJwt], PriceGroupController.update);
+router.get('/', PriceGroupController.getAll);
+router.get('/:id', PriceGroupController.getById);
+router.post('/', PriceGroupController.create);
+router.put('/:id', PriceGroupController.update);
 
 export default router;

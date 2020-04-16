@@ -1,22 +1,21 @@
 import { Router } from 'express';
 import * as ItemController from '../controllers/item';
-import { checkJwt } from '../middlewares';
 
 const router = Router();
 
 //Get all users
-router.get('/', [checkJwt], ItemController.getAll);
+router.get('/', ItemController.getAll);
 
 // Get one user
-router.get('/:id', [checkJwt], ItemController.getById);
+router.get('/:id', ItemController.getById);
 
 //Create a new user
-router.post('/', [checkJwt], ItemController.create);
+router.post('/', ItemController.create);
 
 //Edit one user
-router.put('/:id', [checkJwt], ItemController.update);
+router.put('/:id', ItemController.update);
 
 //Delete one user
-router.delete('/:id', [checkJwt], ItemController.remove);
+router.delete('/:id', ItemController.remove);
 
 export default router;

@@ -1,1 +1,0 @@
-export { checkJwt } from './checkJwt';
