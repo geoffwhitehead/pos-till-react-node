@@ -58,4 +58,4 @@ const UserSchema: Schema<UserProps> = new Schema(
 
 const User = model<UserProps & Document>('User', UserSchema);
 
-export { User };
+export default User;
