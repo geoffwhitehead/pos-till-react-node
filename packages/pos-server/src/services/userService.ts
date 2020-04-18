@@ -1,9 +1,10 @@
-// import { User } from '../models';
-// import bcrypt from 'bcryptjs';
-// import { Request, Response } from 'express';
-// import { createToken } from '../helpers/createToken';
+import { User } from '../models';
+import bcrypt from 'bcryptjs';
+import { Request, Response } from 'express';
+import { createToken } from '../helpers/createToken';
+import { UserProps } from '../models/User';
 
-// const PUBLIC_FIELDS = 'firstName lastName email';
+const PUBLIC_FIELDS = 'firstName lastName email';
 
 // const create = async (req: Request, res: Response): Promise<void> => {
 //     const UserModel = User();
@@ -50,20 +51,26 @@
 //     }
 // };
 
-// /**
-//  * List all the users. Query params ?skip=0&limit=1000 by default
-//  */
-// const getAll = async (req: Request, res: Response): Promise<void> => {
-//     const skip = req.query.skip;
-//     const limit = req.query.limit;
-//     try {
-//         const users = await User().find({}, 'firstName lastName email', { skip, limit });
+/**
+ * List all the users. Query params ?skip=0&limit=1000 by default
+ */
 
-//         res.status(200).send(users);
-//     } catch (err) {
-//         res.status(400).send(err);
-//     }
-// };
+interface Params {
+    query: {
+        skip: number;
+        limit: number;
+    };
+}
+const getAll = async (params: Params): Promise<UserProps[]> => {
+    const skip = params.query.skip;
+    const limit = params.query.limit;
+    try {
+        const users = await User.find({}, PUBLIC_FIELDS, { skip, limit });
+        return users;
+    } catch (err) {
+        throw new Error('Error fetching users');
+    }
+};
 
 // /**
 //  * Update a single user
@@ -98,3 +105,4 @@
 // };
 
 // export { create, update, remove, getById, getAll };
+export default { getAll };

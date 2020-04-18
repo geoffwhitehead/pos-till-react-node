@@ -1,57 +1,64 @@
-import { Organization } from '../models';
-import { Request, Response } from 'express';
+// import { Organization } from '../models';
+// import { Request, Response } from 'express';
+// import * as userController from './user';
 
-const create = async (req: Request, res: Response): Promise<void> => {
-    const OrganizationModel = Organization();
+// const create = async (req: Request, res: Response): Promise<void> => {
+//     const OrganizationModel = Organization();
 
-    const organization = new OrganizationModel(req.body);
-    const errors = organization.validateSync();
+//     const { name, email, phone, address } = req.body;
+//     const organization = new OrganizationModel({ name, email, phone, address });
 
-    if (errors) {
-        res.status(401).send(errors);
-        return;
-    }
+//     const errors = organization.validateSync();
 
-    try {
-        await organization.save();
-        res.status(201).send('created item');
-    } catch (err) {
-        res.status(400).send(err);
-    }
-};
+//     if (errors) {
+//         res.status(401).send(errors);
+//         return;
+//     }
 
-const getById = async (req: Request, res: Response): Promise<void> => {
-    const { id } = req.params;
-    try {
-        const organization = await Organization().findById(id);
-        res.status(200).send(organization);
-    } catch (err) {
-        res.status(400).send(err);
-    }
-};
+//     try {
+//         await organization.save();
 
-const getAll = async (req: Request, res: Response): Promise<void> => {
-    const skip = req.query.skip;
-    const limit = req.query.limit;
-    try {
-        const organizations = await Organization().find({}, '', { skip, limit });
-        res.status(200).send(organizations);
-    } catch (err) {
-        res.status(400).send(err);
-    }
-};
+//         // create initial user
+//         await userController.create(req, res);
 
-const update = async (req: Request, res: Response): Promise<void> => {
-    const { id, ...props } = req.body;
-    try {
-        const organization = await Organization().updateOne(id, props, { runValidators: true });
-        if (organization.err) {
-            throw new Error('Error occured updating item');
-        }
-        res.send('item updated');
-    } catch (err) {
-        res.status(400).send(err);
-    }
-};
+//         res.status(201).send('created item');
+//     } catch (err) {
+//         res.status(400).send(err);
+//     }
+// };
 
-export { create, update, getById, getAll };
+// const getById = async (req: Request, res: Response): Promise<void> => {
+//     const { id } = req.params;
+//     try {
+//         const organization = await Organization().findById(id);
+//         res.status(200).send(organization);
+//     } catch (err) {
+//         res.status(400).send(err);
+//     }
+// };
+
+// const getAll = async (req: Request, res: Response): Promise<void> => {
+//     const skip = req.query.skip;
+//     const limit = req.query.limit;
+//     try {
+//         const organizations = await Organization().find({}, '', { skip, limit });
+//         res.status(200).send(organizations);
+//     } catch (err) {
+//         res.status(400).send(err);
+//     }
+// };
+
+// const update = async (req: Request, res: Response): Promise<void> => {
+//     const { id, ...props } = req.body;
+//     try {
+//         const organization = await Organization().updateOne(id, props, { runValidators: true });
+//         if (organization.err) {
+//             throw new Error('Error occured updating item');
+//         }
+//         res.send('item updated');
+//     } catch (err) {
+//         res.status(400).send(err);
+//     }
+// };
+
+// export { create, update, getById, getAll };

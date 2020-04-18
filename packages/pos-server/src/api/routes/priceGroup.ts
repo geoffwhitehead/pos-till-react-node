@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import * as PriceGroupController from '../controllers/priceGroup';
+import * as PriceGroupController from '../../controllers/priceGroup';
 
 const router = Router();
 

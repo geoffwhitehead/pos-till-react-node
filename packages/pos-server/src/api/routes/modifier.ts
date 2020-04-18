@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import * as ModifierController from '../controllers/modifier';
+import * as ModifierController from '../../controllers/modifier';
 
 const router = Router();
 

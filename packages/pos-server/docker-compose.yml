@@ -2,12 +2,12 @@ version: '3'
 services:
   app:
     build: .
-    command: pm2-dev ./src/server.ts
+    command: pm2-dev ./src/index.ts
     env_file: .env
-    environment:
-      NODE_ENV: development
-      JWT_KEY: ${JWT_KEY}
-      GIT_SSH_KEY: ${GIT_SSH_KEY}
+    # environment:
+    #   NODE_ENV: development
+    #   JWT_SECRET: ${JWT_SECRET}
+    #   GIT_SSH_KEY: ${GIT_SSH_KEY}
     depends_on:
       - mongodb
     ports:

@@ -2,7 +2,7 @@
     "apps": [
         {
             "name": "pos-server",
-            "script": "./src/server.ts",
+            "script": "./src/index.ts",
             "instances": "max",
             "exec_mode": "cluster"
         }

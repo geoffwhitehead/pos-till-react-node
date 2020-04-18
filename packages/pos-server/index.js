@@ -1,2 +1,2 @@
 require = require('esm')(module /*, options*/);
-module.exports = require('./src/server.ts');
+module.exports = require('./src/index.ts');

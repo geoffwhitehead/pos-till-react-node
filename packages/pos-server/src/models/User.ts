@@ -1,8 +1,8 @@
-import { Schema } from 'mongoose';
+import { Schema, model, Document } from 'mongoose';
 import validator from 'validator';
 import { tenantModel } from '../services/multiTenant';
 
-interface UserProps {
+export interface UserProps {
     firstName: string;
     lastName: string;
     email: string;
@@ -56,6 +56,6 @@ const UserSchema: Schema<UserProps> = new Schema(
     },
 );
 
-const User = tenantModel<UserProps>('User', UserSchema);
+const User = model<UserProps & Document>('User', UserSchema);
 
 export { User };

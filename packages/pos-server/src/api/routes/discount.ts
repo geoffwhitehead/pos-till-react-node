@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import * as DiscountController from '../controllers/discount';
+import * as DiscountController from '../../controllers/discount';
 
 const router = Router();
 
