@@ -1,7 +1,7 @@
 import attachCurrentUser from './attachCurrentUser';
-import isAuth from './isAuth';
-
+import extendAuthorize from './extendAuthorize';
+import attachTenant from './attachTenant';
 export default {
-    // attachCurrentUser,
-    isAuth,
+    attachCurrentUser,
+    extendAuthorize,
 };

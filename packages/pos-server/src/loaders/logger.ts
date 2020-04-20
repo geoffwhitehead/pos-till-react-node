@@ -8,6 +8,8 @@ const transports = [];
 //       format: winston.format.simple()
 //     }));
 
+export type LoggerService = winston.Logger;
+
 if (process.env.NODE_ENV !== 'development') {
     transports.push(new winston.transports.Console({ format: winston.format.simple() }));
 } else {

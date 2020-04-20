@@ -2,44 +2,48 @@ import expressLoader from './express';
 import dependencyInjectorLoader from './dependencyInjector';
 import mongooseLoader from './mongoose';
 import jobsLoader from './jobs';
-import Logger from './logger';
+import logger from './logger';
+import extendAuthorize from '../api/middlewares/extendAuthorize';
+import { models } from 'mongoose';
+import attachTenant from '../api/middlewares/attachTenant';
+import express from 'express';
 
-export default async ({ expressApp }) => {
-    console.log('process.env.NODE_ENV', process.env.NODE_ENV);
+export default async ({ expressApp }: { expressApp: express.Application }) => {
     const mongoConnection = await mongooseLoader();
-    Logger.info(`✌️ DB loaded and connected!`);
-    console.log('!!!!! logger loaded');
-    // use expressApp to parse the jwt and grab the org id
-    Logger.info('testtstetstettstet');
-    Logger.info('testtstetstettstet');
-    Logger.info('testtstetstettstet');
-    Logger.info('testtstetstettstet');
-    Logger.info('testtstetstettstet');
-    Logger.info('testtstetstettstet');
-    Logger.info('testtstetstettstet');
-    Logger.info('testtstetstettstet');
-    Logger.info('testtstetstettstet');
-    // inject all the models
-    const userModel = {
-        name: 'userModel',
-        // Notice the require syntax and the '.default'
-        model: require('../models/user').default,
-    };
+    logger.info(`✌️ DB loaded and connected!`);
 
-    // It returns the agenda instance because it's needed in the subsequent loaders
+    // 1. auth middleware - decodes jwt and adds to req
+    expressApp.use(
+        extendAuthorize.unless({
+            path: ['/', { url: '/organization', methods: ['POST'] }],
+        }),
+    );
+
+    // 2. sets user details on the container
+    expressApp.use(attachTenant);
+
+    // inject all the models
+    // const userModel = {
+    //     name: 'userModel',
+    //     // Notice the require syntax and the '.default'
+    //     model: require('../models/User').default,
+    // };
+
+    // const organizationModel = {
+    //     name: 'organizationModel',
+    //     model: require('../models/Organization').default,
+    // };
+
+    // 3. attaches app dependencies / services to container.
     const { agenda } = await dependencyInjectorLoader({
         mongoConnection,
-        models: [
-            userModel,
-            // salaryModel,
-            // whateverModel
-        ],
     });
-    Logger.info('✌️ Dependency Injector loaded');
+    logger.info('✌️ Dependency Injector loaded');
 
     await jobsLoader({ agenda });
-    Logger.info('✌️ Jobs loaded');
+    logger.info('✌️ Jobs loaded');
 
+    // use expressApp to parse the jwt and grab the org id
     await expressLoader({ app: expressApp });
-    Logger.info('✌️ Express loaded');
+    logger.info('✌️ Express loaded');
 };

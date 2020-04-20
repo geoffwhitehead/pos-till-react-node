@@ -10,6 +10,8 @@ export interface UserProps {
     token: string;
 }
 
+export const modelName = 'User';
+
 const UserSchema: Schema<UserProps> = new Schema(
     {
         firstName: {
@@ -56,6 +58,4 @@ const UserSchema: Schema<UserProps> = new Schema(
     },
 );
 
-const User = model<UserProps & Document>('User', UserSchema);
-
-export default User;
+export const User = tenantModel<UserProps>(modelName, UserSchema);

@@ -1,7 +1,12 @@
-export { User } from './User';
-export { Item } from './Item';
-export { Category } from './Category';
-export { Discount } from './DIscount';
-export { Modifier } from './Modifier';
-export { PriceGroup } from './PriceGroup';
-export { Organization } from './Organization';
+import { User } from './User';
+import { Item } from './Item';
+import { Category } from './Category';
+import { Discount } from './DIscount';
+import { Modifier } from './Modifier';
+import { PriceGroup } from './PriceGroup';
+import { Organization } from './Organization';
+
+export default {
+    User,
+    Organization,
+};

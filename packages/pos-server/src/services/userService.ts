@@ -1,10 +1,10 @@
-import { User } from '../models';
-import bcrypt from 'bcryptjs';
-import { Request, Response } from 'express';
-import { createToken } from '../helpers/createToken';
-import { UserProps } from '../models/User';
+// import { User } from '../models';
+// import bcrypt from 'bcryptjs';
+// import { Request, Response } from 'express';
+// import { createToken } from '../helpers/createToken';
+// import { UserProps } from '../models/User';
 
-const PUBLIC_FIELDS = 'firstName lastName email';
+// const PUBLIC_FIELDS = 'firstName lastName email';
 
 // const create = async (req: Request, res: Response): Promise<void> => {
 //     const UserModel = User();
@@ -55,22 +55,22 @@ const PUBLIC_FIELDS = 'firstName lastName email';
  * List all the users. Query params ?skip=0&limit=1000 by default
  */
 
-interface Params {
-    query: {
-        skip: number;
-        limit: number;
-    };
-}
-const getAll = async (params: Params): Promise<UserProps[]> => {
-    const skip = params.query.skip;
-    const limit = params.query.limit;
-    try {
-        const users = await User.find({}, PUBLIC_FIELDS, { skip, limit });
-        return users;
-    } catch (err) {
-        throw new Error('Error fetching users');
-    }
-};
+// interface Params {
+//     query: {
+//         skip: number;
+//         limit: number;
+//     };
+// }
+// const getAll = async (params: Params): Promise<UserProps[]> => {
+//     const skip = params.query.skip;
+//     const limit = params.query.limit;
+//     try {
+//         const users = await User.find({}, PUBLIC_FIELDS, { skip, limit });
+//         return users;
+//     } catch (err) {
+//         throw new Error('Error fetching users');
+//     }
+// };
 
 // /**
 //  * Update a single user
@@ -105,4 +105,61 @@ const getAll = async (params: Params): Promise<UserProps[]> => {
 // };
 
 // export { create, update, remove, getById, getAll };
-export default { getAll };
+// export default { getAll };
+// import Models from '../models';
+// import MailerService from './mailer';
+// import { Logger } from 'mongodb';
+// import { LoggerService } from '../loaders/logger';
+import { InjectedDependencies } from '.';
+import { UserProps } from '../models/User';
+// interface InjectorArgs {
+//     userId: string;
+//     organizationId: string;
+// }
+
+export interface UserService {
+    findAll: () => Promise<UserProps[]>;
+}
+
+export const usersService = ({ repositories: { userRepository }, logger }: InjectedDependencies): UserService => {
+    const findAll = async () => await userRepository.findAll();
+    // const create = user => {
+    //     await usersRepository.createUser(user);
+    //     logger.info('User created');
+    // };
+
+    return {
+        findAll,
+        // create
+    };
+};
+
+// const service = usersService({
+//     usersRepository,
+//     mailer,
+//     logger,
+// });
+// interface ResolverArgs {
+//     models:
+//     services: {
+//         userService: {
+
+//         }
+//     }
+// }
+
+// export const userService = (injectorArgs: InjectorArgs) => {
+//     const models = Models.register(injectorArgs.organizationId);
+
+//     const resolverArgs: ResolverArgs = {
+//         ...injectorArgs,
+//         models
+//     };
+
+//     return {
+//         createReport: createReportFactory(resolverArgs),
+//         deleteReport: deleteReportFactory(resolverArgs),
+//         getAllReports: getAllReportsFactory(resolverArgs),
+//         getReportById: getReportByIdFactory(resolverArgs),
+//     };
+// };

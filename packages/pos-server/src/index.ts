@@ -2,7 +2,7 @@ import express from 'express';
 import config from './config';
 import Logger from './loaders/logger';
 import 'reflect-metadata'; // We need this in order to use @Decorators - remove once refactored to  use functions
-
+import loaders from './loaders';
 // Promise = require('bluebird'); // eslint-disable-line
 // import bodyParser from 'body-parser';
 // import cors from 'cors';
@@ -17,19 +17,7 @@ import 'reflect-metadata'; // We need this in order to use @Decorators - remove 
 const startServer = async () => {
     const app = express();
 
-    /**
-     * A little hack here
-     * Import/Export can only be used in 'top-level code'
-     * Well, at least in node 10 without babel and at the time of writing
-     * So we are using good old require.
-     **/
-
-    console.log('!!!!!!!!!!!!!!!');
-    console.log('!!!!!!!!!!!!!!!');
-    console.log('!!!!!!!!!!!!!!!');
-    console.log('before loaders');
-
-    await require('./loaders').default({ expressApp: app });
+    await loaders({ expressApp: app });
 
     app.listen(config.port, err => {
         if (err) {

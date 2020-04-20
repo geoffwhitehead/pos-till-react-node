@@ -1,26 +1,29 @@
 import { Container } from 'typedi';
-import LoggerInstance from './logger';
+import logger from './logger';
 import agendaFactory from './agenda';
 import config from '../config';
 import mailgun from 'mailgun-js';
+import { registerServices } from '../services';
+import { registerRepositories } from '../repositories';
 
-export default ({ mongoConnection, models }: { mongoConnection; models: { name: string; model: any }[] }) => {
+export default ({ mongoConnection }: { mongoConnection }) => {
     try {
-        models.forEach(m => {
-            Container.set(m.name, m.model);
+        const tenantId = Container.get('tenantId') as string; // TODO: type
+        const mailer = mailgun({ apiKey: config.emails.apiKey, domain: config.emails.domain });
+
+        console.log('!!!!!!!!!!!tenantId', tenantId);
+        Container.set('agenda', agenda);
+        Container.set('logger', logger);
+        Container.set('mailer', mailer);
+
+        services.map(s => {
+            Container.set(s.name, s.service);
         });
+        logger.info('✌️ Agenda injected into container');
 
-        const agendaInstance = agendaFactory({ mongoConnection });
-
-        Container.set('agendaInstance', agendaInstance);
-        Container.set('logger', LoggerInstance);
-        Container.set('emailClient', mailgun({ apiKey: config.emails.apiKey, domain: config.emails.domain }));
-
-        LoggerInstance.info('✌️ Agenda injected into container');
-
-        return { agenda: agendaInstance };
+        return { agenda };
     } catch (e) {
-        LoggerInstance.error('🔥 Error on dependency injector loader: %o', e);
+        logger.error('🔥 Error on dependency injector loader: %o', e);
         throw e;
     }
 };

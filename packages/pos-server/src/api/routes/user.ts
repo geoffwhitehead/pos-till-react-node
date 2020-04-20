@@ -24,16 +24,17 @@ import mongoose from 'mongoose';
 
 import { Router, Request, Response, NextFunction } from 'express';
 import { UserProps } from '../../models/User';
+import { UserService } from '../../services/userService';
 
 // import middlewares from '../middlewares';
-const route = Router();
 
 export default (app: Router) => {
+    const route = Router();
     app.use('/users', route);
 
     route.get('/', async (req: Request, res: Response, next: NextFunction) => {
-        const User = Container.get('userModel') as mongoose.Model<UserProps & mongoose.Document>;
-        const users = await User.find({});
+        const userService = Container.get('userService') as UserService;
+        const users = await userService.findAll();
         console.log('users', users);
         res.status(200).send(users);
     });

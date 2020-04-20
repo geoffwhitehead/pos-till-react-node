@@ -1,7 +1,7 @@
 import { Schema } from 'mongoose';
 import { tenantlessModel } from '../services/multiTenant';
 
-interface OrganizationProps {
+export interface OrganizationProps {
     name: string;
 }
 
