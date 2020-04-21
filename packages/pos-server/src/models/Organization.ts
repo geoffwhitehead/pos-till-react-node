@@ -38,30 +38,35 @@ const OrganizationSchema: Schema<OrganizationProps> = new Schema(
         email: {
             type: String,
             required: true,
+            unique: true,
+            lowercase: true,
         },
         phone: {
             type: String,
         },
         address: {
-            line1: {
-                type: String,
-                required: true,
+            type: {
+                line1: {
+                    type: String,
+                    required: true,
+                },
+                line2: {
+                    type: String,
+                },
+                city: {
+                    type: String,
+                    required: true,
+                },
+                county: {
+                    type: String,
+                    required: true,
+                },
+                postcode: {
+                    type: String,
+                    required: true,
+                },
             },
-            line2: {
-                type: String,
-            },
-            city: {
-                type: String,
-                required: true,
-            },
-            county: {
-                type: String,
-                required: true,
-            },
-            postcode: {
-                type: String,
-                required: true,
-            },
+            required: true,
         },
     },
     { timestamps: true },

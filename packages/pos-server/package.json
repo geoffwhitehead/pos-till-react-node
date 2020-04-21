@@ -44,7 +44,6 @@
         "reflect-metadata": "^0.1.13",
         "typedi": "^0.8.0",
         "typescript": "^3.7.5",
-        "validator": "^12.2.0",
         "winston": "^3.2.1"
     },
     "devDependencies": {

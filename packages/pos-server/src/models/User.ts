@@ -1,5 +1,4 @@
-import { Schema, model, Document } from 'mongoose';
-import validator from 'validator';
+import { Schema } from 'mongoose';
 import { tenantModel } from '../services/multiTenant';
 import { Joi } from 'celebrate';
 
@@ -9,6 +8,7 @@ export interface UserProps {
     lastName: string;
     email: string;
     token?: string;
+    tenantId?: string; // TODO: fix
 }
 
 export type UserPropsFull = UserProps & PrivateUserProps;
