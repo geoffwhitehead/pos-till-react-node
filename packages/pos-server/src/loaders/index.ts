@@ -12,15 +12,7 @@ export default async ({ expressApp }: { expressApp: express.Application }) => {
     const mongoConnection = await mongooseLoader();
     logger.info(`✌️ DB loaded and connected!`);
 
-    // 1. auth middleware - decodes jwt and adds to req
-    expressApp.use(
-        extendAuthorize.unless({
-            path: ['/', { url: '/organization', methods: ['POST'] }],
-        }),
-    );
 
-    // 2. sets user details on the container
-    expressApp.use(attachTenant);
 
     // inject all the models
     // const userModel = {

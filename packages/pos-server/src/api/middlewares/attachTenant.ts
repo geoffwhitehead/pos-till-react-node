@@ -9,8 +9,12 @@ import { Logger } from 'winston';
 const attachTenant = async (req, res, next) => {
     const logger = Container.get('logger') as Logger;
     console.log('req.token', req.token);
+
+    if (!req.token) {
+        return next();
+    }
     try {
-        Container.set('tenantId', req.token.organizationId);
+        Container.set('organizationId', req.token.organizationId);
         return next();
     } catch (e) {
         logger.error('🔥 Error attaching tenant id: %o', e);

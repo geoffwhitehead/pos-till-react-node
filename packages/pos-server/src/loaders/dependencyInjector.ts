@@ -8,10 +8,12 @@ import { registerRepositories } from '../repositories';
 
 export default ({ mongoConnection }: { mongoConnection }) => {
     try {
-        const tenantId = Container.get('tenantId') as string; // TODO: type
         const mailer = mailgun({ apiKey: config.emails.apiKey, domain: config.emails.domain });
+        const agenda = agendaFactory({ mongoConnection });
+        const repositories = registerRepositories();
+        // const services = registerServices({ logger, repositories, mailer });
+        const services = registerServices({ logger, repositories, mailer });
 
-        console.log('!!!!!!!!!!!tenantId', tenantId);
         Container.set('agenda', agenda);
         Container.set('logger', logger);
         Container.set('mailer', mailer);

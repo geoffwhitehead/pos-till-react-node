@@ -119,18 +119,27 @@ import { UserProps } from '../models/User';
 
 export interface UserService {
     findAll: () => Promise<UserProps[]>;
+    create: (userProps: UserProps) => Promise<UserProps>;
+    updateById: (id: string, userProps: Partial<UserProps>) => Promise<UserProps>;
 }
 
-export const usersService = ({ repositories: { userRepository }, logger }: InjectedDependencies): UserService => {
-    const findAll = async () => await userRepository.findAll();
-    // const create = user => {
-    //     await usersRepository.createUser(user);
-    //     logger.info('User created');
-    // };
+export const userService = ({ repositories: { userRepository }, logger }: InjectedDependencies): UserService => {
+    const findAll: UserService['findAll'] = async () => await userRepository.findAll();
+    const create = async props => {
+        const user = await userRepository.create(props);
+        logger.info('User created');
+        return user;
+    };
+
+    const updateById = async (id, props) => {
+        const user = await userRepository.updateById(id, props);
+        return user;
+    };
 
     return {
         findAll,
-        // create
+        create,
+        updateById,
     };
 };
 

@@ -24,7 +24,7 @@ import mongoose from 'mongoose';
 
 import { Router, Request, Response, NextFunction } from 'express';
 import { UserProps } from '../../models/User';
-import { UserService } from '../../services/userService';
+import { UserService } from '../../services/user';
 
 // import middlewares from '../middlewares';
 
@@ -37,6 +37,13 @@ export default (app: Router) => {
         const users = await userService.findAll();
         console.log('users', users);
         res.status(200).send(users);
+    });
+
+    route.post('/', async (req: Request, res: Response, next: NextFunction) => {
+        const userService = Container.get('userService') as UserService;
+        const msg = await userService.create(req.body);
+        console.log('msg', msg);
+        res.status(200).send(msg);
     });
 
     // route.get('/me', middlewares.isAuth, middlewares.attachCurrentUser, (req: Request, res: Response) => {

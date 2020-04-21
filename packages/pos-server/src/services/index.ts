@@ -25,7 +25,8 @@
 //         };
 //     };
 // }
-import { usersService } from './userService';
+import { userService } from './user';
+import { authService } from './auth';
 import MailerService from './mailer';
 import { LoggerService } from '../loaders/logger';
 import { RepositoryService } from '../repositories';
@@ -39,7 +40,11 @@ type Service = { name: string; service: any }; // TODO: figure out how to tpye t
 const services = [
     {
         name: 'userService',
-        service: usersService,
+        service: userService,
+    },
+    {
+        name: 'authService',
+        service: authService,
     },
 ];
 export const registerServices = (dependencies: InjectedDependencies): Service[] => {

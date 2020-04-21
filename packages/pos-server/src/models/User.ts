@@ -1,18 +1,36 @@
 import { Schema, model, Document } from 'mongoose';
 import validator from 'validator';
 import { tenantModel } from '../services/multiTenant';
+import { Joi } from 'celebrate';
 
 export interface UserProps {
+    _id?: string;
     firstName: string;
     lastName: string;
     email: string;
-    password: string;
-    token: string;
+    token?: string;
 }
 
-export const modelName = 'User';
+export type UserPropsFull = UserProps & PrivateUserProps;
 
-const UserSchema: Schema<UserProps> = new Schema(
+interface PrivateUserProps {
+    password: string;
+    token?: string;
+}
+
+export const UserValidation = {
+    firstName: Joi.string().required(),
+    lastName: Joi.string().required(),
+    email: Joi.string().required(),
+    password: Joi.string().required(),
+};
+
+export const CreateUserValidation = {
+    ...UserValidation,
+    password: Joi.string().required(),
+};
+
+const UserSchema: Schema<UserPropsFull> = new Schema(
     {
         firstName: {
             type: String,
@@ -27,12 +45,6 @@ const UserSchema: Schema<UserProps> = new Schema(
             required: true,
             unique: true,
             lowercase: true,
-            // validate: (value: string): boolean => {
-            //     if (!validator.isEmail(value)) {
-            //         return false;
-            //     }
-            //     return true;
-            // },
         },
         password: {
             type: String,
@@ -42,20 +54,10 @@ const UserSchema: Schema<UserProps> = new Schema(
         token: {
             type: String,
         },
-        date: {
-            type: Date,
-            default: Date.now,
-        },
     },
     {
-        toJSON: {
-            virtuals: true,
-        },
-        toObject: {
-            virtuals: true,
-        },
         timestamps: true,
     },
 );
 
-export const User = tenantModel<UserProps>(modelName, UserSchema);
+export const User = tenantModel<UserPropsFull>('User', UserSchema);

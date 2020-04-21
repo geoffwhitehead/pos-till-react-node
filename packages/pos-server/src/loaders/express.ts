@@ -4,6 +4,8 @@ import cors from 'cors';
 import routes from '../api';
 import config from '../config';
 import helmet from 'helmet';
+import attachTenant from '../api/middlewares/attachTenant';
+import extendAuthorize from '../api/middlewares/extendAuthorize';
 
 export default ({ app }: { app: express.Application }) => {
     // healthcheck
@@ -27,6 +29,21 @@ export default ({ app }: { app: express.Application }) => {
     app.use(bodyParser.urlencoded({ extended: true })); // parse application/x-www-form-urlencoded
     app.use(bodyParser.raw()); // parse raw form data
     app.use(bodyParser.json()); // parse application / json
+
+    // auth middleware - decodes jwt and adds to req
+    app.use(
+        extendAuthorize.unless({
+            path: [
+                { url: '/api/organization', methods: ['POST'] },
+                { url: '/api/auth/signup', methods: ['POST'] },
+                '/api/auth/signup',
+                '/api/auth',
+            ],
+        }),
+    );
+
+    // sets user details on the container
+    app.use(attachTenant);
 
     // Load API routes
     app.use(config.api.prefix, routes());

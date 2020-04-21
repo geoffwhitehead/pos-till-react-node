@@ -9,15 +9,15 @@ export interface RepositoryService {
 
 export interface InjectedRepositoryDependencies {
     models: {
-        OrganizationModel: ReturnType<typeof Models.Organization>;
-        UserModel: ReturnType<typeof Models.User>;
+        OrganizationModel: typeof Models.Organization;
+        UserModel: typeof Models.User;
     };
 }
 
-export const registerRepositories = (organizationId: string): RepositoryService => {
-    const tenantedModels = {
-        OrganizationModel: Models.Organization(), // tenantless
-        UserModel: Models.User({ tenantId: organizationId }),
+export const registerRepositories = (): RepositoryService => {
+    const models = {
+        OrganizationModel: Models.Organization, // tenantless
+        UserModel: Models.User,
     };
 
     const repositories = [
@@ -34,7 +34,7 @@ export const registerRepositories = (organizationId: string): RepositoryService 
     return repositories.reduce((out, { name, repo }) => {
         return {
             ...out,
-            [name]: repo({ models: tenantedModels }),
+            [name]: repo({ models }),
         };
     }, {} as RepositoryService);
 };
