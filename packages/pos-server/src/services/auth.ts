@@ -67,7 +67,7 @@ export const authService = ({
             logger.silly(`Sign JWT for userId: ${userRecord._id}, org: ${organizationRecord._id}`);
 
             // save the generated token to the user object
-            await userRepository.updateById(userRecord._id, { token });
+            await userRepository.findByIdAndUpdate(userRecord._id, { token });
 
             logger.silly('Sending welcome email');
             await mailer.sendWelcomeEmail(userRecord.email);
@@ -118,7 +118,7 @@ export const authService = ({
             logger.silly('Generating JWT');
             const token = generateToken({ organizationId: organization._id, userId: user._id });
 
-            userRepository.updateById(user._id, { token });
+            userRepository.findByIdAndUpdate(user._id, { token });
 
             const { firstName, lastName, email } = user;
             return { firstName, lastName, email, token };

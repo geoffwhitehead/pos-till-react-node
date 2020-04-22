@@ -1,7 +1,7 @@
 import { Schema } from 'mongoose';
 import { tenantModel } from '../services/multiTenant';
 
-interface CategoryProps {
+export interface CategoryProps {
     name: string;
 }
 

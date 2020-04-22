@@ -1,52 +1,54 @@
-// import { Router } from 'express';
-// // import * as UserController from '../controllers/user';
-
-// const router = Router();
-
-// //Get all users
-// router.get('/', UserController.getAll);
-
-// // Get one user
-// router.get('/:id', UserController.getById);
-
-// //Create a new user
-// router.post('/', UserController.create);
-
-// //Edit one user
-// router.put('/:id', UserController.update);
-
-// //Delete one user
-// router.delete('/:id', UserController.remove);
-
-// export default router;
-import { Container, ContainerInstance } from 'typedi';
-import mongoose from 'mongoose';
-
+import { Container } from 'typedi';
 import { Router, Request, Response, NextFunction } from 'express';
-import { UserProps } from '../../models/User';
 import { UserService } from '../../services/user';
-
-// import middlewares from '../middlewares';
+import { LoggerService } from '../../loaders/logger';
 
 export default (app: Router) => {
     const route = Router();
     app.use('/users', route);
 
     route.get('/', async (req: Request, res: Response, next: NextFunction) => {
+        const logger = Container.get('logger') as LoggerService;
         const userService = Container.get('userService') as UserService;
-        const users = await userService.findAll();
-        console.log('users', users);
-        res.status(200).send(users);
+
+        logger.debug(`Calling get user endpoint with body: ${req.body}`);
+
+        try {
+            const users = await userService.findAll();
+            res.json({ users }).status(200);
+        } catch (err) {
+            logger.error(`🔥 error: ${err}`);
+            return next(err);
+        }
     });
 
     route.post('/', async (req: Request, res: Response, next: NextFunction) => {
+        const logger = Container.get('logger') as LoggerService;
         const userService = Container.get('userService') as UserService;
-        const msg = await userService.create(req.body);
-        console.log('msg', msg);
-        res.status(200).send(msg);
+
+        logger.debug(`Calling create user endpoint with body: ${req.body}`);
+
+        try {
+            const user = await userService.create(req.body);
+            res.json({ user }).status(200);
+        } catch (err) {
+            logger.error(`🔥 error: ${err}`);
+            return next(err);
+        }
     });
 
-    // route.get('/me', middlewares.isAuth, middlewares.attachCurrentUser, (req: Request, res: Response) => {
-    //     return res.json({ user: req.currentUser }).status(200);
-    // });
+    route.put('/:id', async (req: Request, res: Response, next: NextFunction) => {
+        const logger = Container.get('logger') as LoggerService;
+        const userService = Container.get('userService') as UserService;
+
+        logger.debug(`Calling update user endpoint with params: ${req.params}, body: ${req.body}`);
+
+        try {
+            const user = await userService.findByIdAndUpdate(req.params.id, req.body);
+            res.json({ user }).status(200);
+        } catch (err) {
+            logger.error(`🔥 error: ${err}`);
+            return next(err);
+        }
+    });
 };

@@ -1,9 +1,7 @@
 import mongoose, { model, Document, Schema, Model } from 'mongoose';
 
-export const tenantModel: <T>(
-    name: string,
-    schema: Schema<T>,
-) => (options?: { skipTenant?: boolean; tenantId: string }) => Model<T & Document, {}> = (name, schema) => {
+export type TenantModel<T> = (options?: { skipTenant?: boolean; tenantId: string }) => Model<T & Document, {}>;
+export const tenantModel: <T>(name: string, schema: Schema<T>) => TenantModel<T> = (name, schema) => {
     return ({ tenantId, skipTenant }): any => {
         // TODO: fix types here
         schema.add({ tenantId: String });
@@ -24,7 +22,5 @@ export const tenantModel: <T>(
     };
 };
 
-export const tenantlessModel: <T>(name: string, schema: Schema<T>) => () => Model<T & Document, {}> = (
-    name,
-    schema,
-) => (): any => mongoose.model(name, schema); // TODO: fix types
+export const tenantlessModel: <T>(name: string, schema: Schema<T>) => TenantModel<T> = (name, schema) => () =>
+    mongoose.model(name, schema); // TODO: fix types

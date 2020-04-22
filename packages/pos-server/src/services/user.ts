@@ -120,7 +120,7 @@ import { UserProps } from '../models/User';
 export interface UserService {
     findAll: () => Promise<UserProps[]>;
     create: (userProps: UserProps) => Promise<UserProps>;
-    updateById: (id: string, userProps: Partial<UserProps>) => Promise<UserProps>;
+    findByIdAndUpdate: (id: string, userProps: Partial<UserProps>) => Promise<UserProps>;
 }
 
 export const userService = ({ repositories: { userRepository }, logger }: InjectedDependencies): UserService => {
@@ -131,15 +131,15 @@ export const userService = ({ repositories: { userRepository }, logger }: Inject
         return user;
     };
 
-    const updateById = async (id, props) => {
-        const user = await userRepository.updateById(id, props);
+    const findByIdAndUpdate = async (id, props) => {
+        const user = await userRepository.findByIdAndUpdate(id, props);
         return user;
     };
 
     return {
         findAll,
         create,
-        updateById,
+        findByIdAndUpdate,
     };
 };
 

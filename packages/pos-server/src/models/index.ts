@@ -9,4 +9,9 @@ import { Organization } from './Organization';
 export default {
     User,
     Organization,
+    Category,
+    Item,
+    Discount,
+    Modifier,
+    PriceGroup,
 };

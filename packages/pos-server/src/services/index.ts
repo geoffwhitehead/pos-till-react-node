@@ -1,5 +1,6 @@
 import { userService } from './user';
 import { authService } from './auth';
+import { categoryService } from './category';
 import { LoggerService } from '../loaders/logger';
 import { RepositoryService } from '../repositories';
 import { MailerService } from './mailer';
@@ -19,6 +20,10 @@ const services = [
     {
         name: 'authService',
         service: authService,
+    },
+    {
+        name: 'categoryService',
+        service: categoryService,
     },
 ];
 export const registerServices = (dependencies: InjectedDependencies): Service[] => {
