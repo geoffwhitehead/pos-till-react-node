@@ -18,7 +18,7 @@ export const mailerService = ({ mailer, logger }: InjectedMailerDependencies): M
             from: config.emails.domain,
             to,
             subject: 'Hello',
-            text: 'Testing Sendgrid!',
+            text: 'Welcome to !',
         };
         await mailer.send(data);
     };

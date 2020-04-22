@@ -1,7 +1,5 @@
 import mongoose, { model, Document, Schema, Model } from 'mongoose';
-// import { getTenantId } from '../contexts';
 
-// export const tenantModel: TenantModel<T> => <T extends Document>(name, schema, options) => {
 export const tenantModel: <T>(
     name: string,
     schema: Schema<T>,

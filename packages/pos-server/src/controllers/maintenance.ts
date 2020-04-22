@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import faker from 'faker';
 import { Category, Modifier, Item, Discount, PriceGroup } from '../models';
-import { rdm } from '../helpers/rdm';
+import { random } from 'lodash';
 import { ItemPriceGroupProps, PriceGroupDocument } from '../models/PriceGroup';
 
 const ITEMS_TO_SEED = 20;
@@ -70,7 +70,7 @@ export const seed = async (req: Request, res: Response): Promise<void> => {
         const items = [...Array(ITEMS_TO_SEED)].map(() => {
             return {
                 name: faker.commerce.product(),
-                categoryId: insertedCategories.insertedIds[rdm(CATEGORIES_TO_SEED.length)],
+                categoryId: insertedCategories.insertedIds[random(CATEGORIES_TO_SEED.length)],
                 price: generatePriceGroups(priceGroups),
                 stock: 10,
                 modifierId: faker.random.boolean() ? m._id : null,
