@@ -13,7 +13,7 @@ export interface UserRepository {
 }
 
 const clean = (userRecord: UserPropsFull & mongoose.Document): UserProps => {
-    return pick(userRecord.toObject(), '_id', 'firstName', 'lastName', 'email', 'token', 'tenantId');
+    return pick(userRecord.toObject(), '_id', 'firstName', 'lastName', 'email', 'token');
 };
 
 export const userRepository = ({ models: { UserModel } }: InjectedRepositoryDependencies): UserRepository => {

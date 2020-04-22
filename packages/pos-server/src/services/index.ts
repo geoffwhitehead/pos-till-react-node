@@ -1,35 +1,9 @@
-// export const baseService =() => {
-//     interface InjectorArgs {
-//         userId: string;
-//         organizationId: string;
-//     }
-
-//     interface ResolverArgs {
-//         models:
-
-//     }
-
-//     export const userService = (injectorArgs: InjectorArgs) => {
-//         const models = Models.register(injectorArgs.organizationId);
-
-//         const resolverArgs: ResolverArgs = {
-//             ...injectorArgs,
-//             models
-//         };
-
-//         return {
-//             userService: createReportFactory(resolverArgs),
-//             deleteReport: deleteReportFactory(resolverArgs),
-//             getAllReports: getAllReportsFactory(resolverArgs),
-//             getReportById: getReportByIdFactory(resolverArgs),
-//         };
-//     };
-// }
 import { userService } from './user';
 import { authService } from './auth';
-import MailerService from './mailer';
 import { LoggerService } from '../loaders/logger';
 import { RepositoryService } from '../repositories';
+import { MailerService } from './mailer';
+
 export interface InjectedDependencies {
     mailer: MailerService;
     logger: LoggerService;

@@ -2,21 +2,25 @@ import { Container } from 'typedi';
 import logger from './logger';
 import agendaFactory from './agenda';
 import config from '../config';
-import mailgun from 'mailgun-js';
+import mail from '@sendgrid/mail';
 import { registerServices } from '../services';
 import { registerRepositories } from '../repositories';
+import { mailerService } from '../services/mailer';
 
 export default ({ mongoConnection }: { mongoConnection }) => {
     try {
-        const mailer = mailgun({ apiKey: config.emails.apiKey, domain: config.emails.domain });
+        mail.setApiKey(config.emails.apiKey);
+
         const agenda = agendaFactory({ mongoConnection });
+        const mailer = mailerService({ mailer: mail, logger });
         const repositories = registerRepositories();
-        // const services = registerServices({ logger, repositories, mailer });
+
+        // inject loaders into services
         const services = registerServices({ logger, repositories, mailer });
 
         Container.set('agenda', agenda);
         Container.set('logger', logger);
-        Container.set('mailer', mailer);
+        Container.set('mailer', mail);
 
         services.map(s => {
             Container.set(s.name, s.service);

@@ -94,8 +94,3 @@ process.on('exit', code => {
     // Only synchronous calls
     console.log(`Process exited with code: ${code}`);
 });
-/**
- * This file does NOT run the app. It merely builds and configures it then exports it.config
- *  This is for integration tests with supertest (see __tests__).
- */
-// export default app;

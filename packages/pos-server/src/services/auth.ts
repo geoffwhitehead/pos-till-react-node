@@ -32,6 +32,7 @@ const generateToken = (params: { organizationId: string; userId: string }): stri
 export const authService = ({
     repositories: { userRepository, organizationRepository },
     logger,
+    mailer,
 }: InjectedDependencies): AuthService => {
     const signUp = async params => {
         try {
@@ -69,7 +70,7 @@ export const authService = ({
             await userRepository.updateById(userRecord._id, { token });
 
             logger.silly('Sending welcome email');
-            // await mailer.SendWelcomeEmail(userRecord); // TODO:
+            await mailer.sendWelcomeEmail(userRecord.email);
 
             // TODO: events
             // eventDispatcher.dispatch(events.user.signUp, { user: userRecord });

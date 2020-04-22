@@ -29,7 +29,7 @@ export default {
         prefix: '/api',
     },
     emails: {
-        apiKey: 'API key from mailgun',
-        domain: 'Domain Name from mailgun',
+        apiKey: process.env.SENDGRID_API_KEY,
+        domain: process.env.SENDGRID_DOMAIN,
     },
 };
