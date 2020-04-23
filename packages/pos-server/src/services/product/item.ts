@@ -1,13 +1,16 @@
 import { ItemProps } from '../../models/Item';
 import { InjectedDependencies } from '..';
+import { RepositoryFns } from '../../repositories/utils';
 
-export interface ItemService {
-    findAll: () => Promise<ItemProps[]>;
-    create: (userProps: ItemProps) => Promise<ItemProps>;
-    findByIdAndUpdate: (id: string, userProps: Partial<ItemProps>) => Promise<ItemProps>;
-    findOne: (props: ItemProps) => Promise<ItemProps>;
-    findById: (id: string) => Promise<ItemProps>;
-}
+// export interface ItemService {
+//     findAll: () => Promise<ItemProps[]>;
+//     create: (userProps: ItemProps) => Promise<ItemProps>;
+//     findByIdAndUpdate: (id: string, userProps: Partial<ItemProps>) => Promise<ItemProps>;
+//     findOne: (props: ItemProps) => Promise<ItemProps>;
+//     findById: (id: string) => Promise<ItemProps>;
+// }
+
+export type ItemService = RepositoryFns<ItemProps>;
 
 export const itemService = ({ repositories: { itemRepository }, logger }: InjectedDependencies): ItemService => {
     const findAll = async () => await itemRepository.findAll();
@@ -36,5 +39,6 @@ export const itemService = ({ repositories: { itemRepository }, logger }: Inject
         findByIdAndUpdate,
         findOne,
         findById,
+        insert: itemRepository.insert,
     };
 };

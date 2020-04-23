@@ -1,8 +1,25 @@
-import { Router } from 'express';
-import * as MaintenanceController from '../../controllers/maintenance';
+import { Router, Request, Response, NextFunction } from 'express';
+import { Container } from 'typedi';
+import { LoggerService } from '../../loaders/logger';
+import { MaintenanceService } from '../../services/maintenance';
 
-const router = Router();
+export default (app: Router) => {
+    const route = Router();
+    app.use('/maintenance', route);
 
-router.post('/seed', MaintenanceController.seed);
+    route.post('/seed', async (req: Request, res: Response, next: NextFunction) => {
+        const logger = Container.get('logger') as LoggerService;
+        const maintenanceService = Container.get('maintenanceService') as MaintenanceService;
+        const organizationId = Container.get('organizationId') as string;
 
-export default router;
+        logger.debug(`Seeding data for org: ${JSON.stringify(organizationId)}`);
+
+        try {
+            await maintenanceService.seed();
+            res.json({ success: true }).status(200);
+        } catch (err) {
+            logger.error(`🔥 error: ${err}`);
+            return next(err);
+        }
+    });
+};

@@ -2,6 +2,7 @@ import { TenantModel } from '../../models/utils/multiTenant';
 import mongoose from 'mongoose';
 import { Container } from 'typedi';
 import { omit } from 'lodash';
+import { InsertWriteOpResult } from 'mongodb';
 
 export interface RepositoryFns<T> {
     findAll: () => Promise<T[]>;
@@ -9,6 +10,7 @@ export interface RepositoryFns<T> {
     findOne: (props: Partial<T>) => Promise<T>;
     findByIdAndUpdate: (id: string, props: Partial<T>) => Promise<T>;
     findById: (id: string) => Promise<T>;
+    insert: (docs: T[]) => Promise<InsertWriteOpResult<any>>; // TODO: fix type
 }
 
 const getTenant = () => ({
@@ -41,6 +43,12 @@ export const repository = <T, U>({
         return clean(doc);
     };
 
+    const insert = async docs => {
+        const filteredDocs = docs.map(doc => omit(doc, 'tenantId'));
+        const result = await model(tenanted && getTenant()).collection.insert(filteredDocs);
+        return result;
+    };
+
     const findOne = async props => {
         const doc = await model(tenanted && getTenant()).findOne(props);
         return clean(doc);
@@ -54,5 +62,5 @@ export const repository = <T, U>({
 
     const findById = async id => await model(tenanted && getTenant()).findById(id);
 
-    return fns({ findAll, create, findOne, findByIdAndUpdate, findById });
+    return fns({ findAll, create, findOne, findByIdAndUpdate, findById, insert });
 };

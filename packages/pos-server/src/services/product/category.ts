@@ -1,13 +1,8 @@
 import { CategoryProps } from '../../models/Category';
 import { InjectedDependencies } from '..';
+import { RepositoryFns } from '../../repositories/utils';
 
-export interface CategoryService {
-    findAll: () => Promise<CategoryProps[]>;
-    create: (userProps: CategoryProps) => Promise<CategoryProps>;
-    findByIdAndUpdate: (id: string, userProps: Partial<CategoryProps>) => Promise<CategoryProps>;
-    findOne: (props: CategoryProps) => Promise<CategoryProps>;
-    findById: (id: string) => Promise<CategoryProps>;
-}
+export type CategoryService = RepositoryFns<CategoryProps>;
 
 export const categoryService = ({
     repositories: { categoryRepository },
@@ -31,12 +26,17 @@ export const categoryService = ({
     };
 
     const findById = async id => categoryRepository.findById(id);
-
+    const insert = async docs => {
+        const success = await categoryRepository.insert(docs);
+        logger.info('Inserted categories created');
+        return success;
+    };
     return {
         findAll,
         create,
         findByIdAndUpdate,
         findOne,
         findById,
+        insert,
     };
 };

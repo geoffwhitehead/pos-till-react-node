@@ -4,6 +4,7 @@ import { LoggerService } from '../loaders/logger';
 import { RepositoryService } from '../repositories';
 import { MailerService } from './mailer';
 import { productService } from './product';
+import { maintenanceService } from './maintenance';
 
 export interface InjectedDependencies {
     mailer: MailerService;
@@ -24,6 +25,10 @@ const services = [
     {
         name: 'productService',
         service: productService,
+    },
+    {
+        name: 'maintenanceService',
+        service: maintenanceService,
     },
 ];
 export const registerServices = (dependencies: InjectedDependencies): Service[] => {

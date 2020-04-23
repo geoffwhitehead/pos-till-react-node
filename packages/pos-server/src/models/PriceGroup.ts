@@ -1,4 +1,4 @@
-import { Schema, Document } from 'mongoose';
+import { Schema } from 'mongoose';
 import { tenantModel } from './utils/multiTenant';
 
 export interface ItemPriceGroupProps {
@@ -8,10 +8,10 @@ export interface ItemPriceGroupProps {
 }
 
 export interface PriceGroupProps {
+    _id?: string;
     name: string;
 }
 
-export interface PriceGroupDocument extends PriceGroupProps, Document {}
 const PriceGroupSchema: Schema<PriceGroupProps> = new Schema(
     {
         name: {

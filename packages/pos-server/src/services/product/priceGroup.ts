@@ -1,13 +1,8 @@
 import { PriceGroupProps } from '../../models/PriceGroup';
 import { InjectedDependencies } from '..';
+import { RepositoryFns } from '../../repositories/utils';
 
-export interface PriceGroupService {
-    findAll: () => Promise<PriceGroupProps[]>;
-    create: (userProps: PriceGroupProps) => Promise<PriceGroupProps>;
-    findByIdAndUpdate: (id: string, userProps: Partial<PriceGroupProps>) => Promise<PriceGroupProps>;
-    findOne: (props: PriceGroupProps) => Promise<PriceGroupProps>;
-    findById: (id: string) => Promise<PriceGroupProps>;
-}
+export type PriceGroupService = RepositoryFns<PriceGroupProps>;
 
 export const priceGroupService = ({
     repositories: { priceGroupRepository },
@@ -40,5 +35,6 @@ export const priceGroupService = ({
         findByIdAndUpdate,
         findOne,
         findById,
+        insert: priceGroupRepository.insert,
     };
 };

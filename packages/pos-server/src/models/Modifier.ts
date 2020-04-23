@@ -9,8 +9,9 @@ interface ModifierItemProps {
 }
 
 export interface ModifierProps {
+    _id?: string;
     name: string;
-    mods: [ModifierItemProps];
+    mods: ModifierItemProps[];
 }
 
 const ModSchema: Schema<ModifierItemProps> = new Schema({

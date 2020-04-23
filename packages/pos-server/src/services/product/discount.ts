@@ -1,13 +1,8 @@
 import { DiscountProps } from '../../models/Discount';
 import { InjectedDependencies } from '..';
+import { RepositoryFns } from '../../repositories/utils';
 
-export interface DiscountService {
-    findAll: () => Promise<DiscountProps[]>;
-    create: (userProps: DiscountProps) => Promise<DiscountProps>;
-    findByIdAndUpdate: (id: string, userProps: Partial<DiscountProps>) => Promise<DiscountProps>;
-    findOne: (props: DiscountProps) => Promise<DiscountProps>;
-    findById: (id: string) => Promise<DiscountProps>;
-}
+export type DiscountService = RepositoryFns<DiscountProps>;
 
 export const discountService = ({
     repositories: { discountRepository },
@@ -36,5 +31,6 @@ export const discountService = ({
         findByIdAndUpdate,
         findOne,
         findById,
+        insert: discountRepository.insert,
     };
 };

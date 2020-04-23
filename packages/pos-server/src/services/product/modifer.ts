@@ -1,13 +1,16 @@
 import { ModifierProps } from '../../models/Modifier';
 import { InjectedDependencies } from '..';
+import { RepositoryFns } from '../../repositories/utils';
 
-export interface ModifierService {
-    findAll: () => Promise<ModifierProps[]>;
-    create: (userProps: ModifierProps) => Promise<ModifierProps>;
-    findByIdAndUpdate: (id: string, userProps: Partial<ModifierProps>) => Promise<ModifierProps>;
-    findOne: (props: ModifierProps) => Promise<ModifierProps>;
-    findById: (id: string) => Promise<ModifierProps>;
-}
+// export interface ModifierService {
+//     findAll: () => Promise<ModifierProps[]>;
+//     create: (userProps: ModifierProps) => Promise<ModifierProps>;
+//     findByIdAndUpdate: (id: string, userProps: Partial<ModifierProps>) => Promise<ModifierProps>;
+//     findOne: (props: ModifierProps) => Promise<ModifierProps>;
+//     findById: (id: string) => Promise<ModifierProps>;
+// }
+
+export type ModifierService = RepositoryFns<ModifierProps>;
 
 export const modifierService = ({
     repositories: { modifierRepository },
@@ -40,5 +43,6 @@ export const modifierService = ({
         findByIdAndUpdate,
         findOne,
         findById,
+        insert: modifierRepository.insert,
     };
 };
