@@ -1,5 +1,5 @@
 import { Schema, Document } from 'mongoose';
-import { tenantModel } from '../services/multiTenant';
+import { tenantModel } from './utils/multiTenant';
 
 export interface ItemPriceGroupProps {
     groupId: string;

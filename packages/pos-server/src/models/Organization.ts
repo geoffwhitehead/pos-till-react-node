@@ -1,5 +1,5 @@
 import { Schema } from 'mongoose';
-import { tenantlessModel } from '../services/multiTenant';
+import { tenantlessModel } from './utils/multiTenant';
 import { Joi } from 'celebrate';
 
 export interface OrganizationProps {

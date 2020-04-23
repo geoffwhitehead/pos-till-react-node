@@ -1,5 +1,5 @@
-import { CategoryProps } from '../models/Category';
-import { InjectedDependencies } from '.';
+import { DiscountProps } from '../../models/Discount';
+import { InjectedDependencies } from '..';
 
 export interface CategoryService {
     findAll: () => Promise<CategoryProps[]>;

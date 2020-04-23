@@ -1,7 +1,7 @@
 import { Schema } from 'mongoose';
-import { tenantModel } from '../services/multiTenant';
+import { tenantModel } from './utils/multiTenant';
 
-interface DiscountProps {
+export interface DiscountProps {
     name: string;
     amount: number;
     isPercent: boolean;

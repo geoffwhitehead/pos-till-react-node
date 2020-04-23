@@ -1,21 +1,24 @@
-import { Router } from 'express';
-import * as DiscountController from '../../controllers/discount';
+import { Router, Request, Response, NextFunction } from 'express';
+import { Container } from 'typedi';
+import { LoggerService } from '../../loaders/logger';
+import { ProductService } from '../../services/product';
 
-const router = Router();
+export default (app: Router) => {
+    const route = Router();
+    app.use('/discounts', route);
 
-//Get all users
-router.get('/', DiscountController.getAll);
+    route.get('/', async (req: Request, res: Response, next: NextFunction) => {
+        const logger = Container.get('logger') as LoggerService;
+        const { discount: discountService } = Container.get('productService') as ProductService;
 
-// Get one user
-router.get('/:id', DiscountController.getById);
+        logger.debug(`Calling get discounts endpoint with body: ${JSON.stringify(req.body)}`);
 
-//Create a new user
-router.post('/', DiscountController.create);
-
-//Edit one user
-router.put('/:id', DiscountController.update);
-
-//Delete one user
-router.delete('/:id', DiscountController.remove);
-
-export default router;
+        try {
+            const discounts = await discountService.findAll();
+            res.json({ discounts }).status(200);
+        } catch (err) {
+            logger.error(`🔥 error: ${err}`);
+            return next(err);
+        }
+    });
+};

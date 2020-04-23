@@ -1,5 +1,5 @@
 import { Router, Request, Response, NextFunction } from 'express';
-import { CategoryService } from '../../services/category';
+import { ProductService } from '../../services/product';
 import { Container } from 'typedi';
 import { LoggerService } from '../../loaders/logger';
 
@@ -9,7 +9,7 @@ export default (app: Router) => {
 
     route.get('/', async (req: Request, res: Response, next: NextFunction) => {
         const logger = Container.get('logger') as LoggerService;
-        const categoryService = Container.get('categoryService') as CategoryService;
+        const { category: categoryService } = Container.get('productService') as ProductService;
 
         logger.debug(`Calling get categories endpoint with body: ${JSON.stringify(req.body)}`);
 
@@ -24,7 +24,7 @@ export default (app: Router) => {
 
     route.post('/', async (req: Request, res: Response, next: NextFunction) => {
         const logger = Container.get('logger') as LoggerService;
-        const categoryService = Container.get('categoryService') as CategoryService;
+        const { category: categoryService } = Container.get('productService') as ProductService;
 
         logger.debug(`Calling create category endpoint with body: ${JSON.stringify(req.body)}`);
 
@@ -39,7 +39,7 @@ export default (app: Router) => {
 
     route.put('/:id', async (req: Request, res: Response, next: NextFunction) => {
         const logger = Container.get('logger') as LoggerService;
-        const categoryService = Container.get('categoryService') as CategoryService;
+        const { category: categoryService } = Container.get('productService') as ProductService;
 
         logger.debug(`Calling update category endpoint with body: ${JSON.stringify(req.body)}`);
 
@@ -54,7 +54,7 @@ export default (app: Router) => {
 
     route.get('/:id', async (req: Request, res: Response, next: NextFunction) => {
         const logger = Container.get('logger') as LoggerService;
-        const categoryService = Container.get('categoryService') as CategoryService;
+        const { category: categoryService } = Container.get('productService') as ProductService;
 
         logger.debug(`Calling get category endpoint with body: ${JSON.stringify(req.body)}`);
 

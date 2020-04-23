@@ -1,6 +1,6 @@
 import { Schema } from 'mongoose';
 import { ItemPriceGroupProps } from './PriceGroup';
-import { tenantModel } from '../services/multiTenant';
+import { tenantModel } from './utils/multiTenant';
 
 interface ModifierItemProps {
     name: string;

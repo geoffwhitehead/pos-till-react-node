@@ -2,7 +2,7 @@ import { userRepository, UserRepository } from './userRepository';
 import Models from '../models';
 import { organizationRepository, OrganizationRepository } from './organizationRepository';
 import Container from 'typedi';
-import { TenantModel } from '../services/multiTenant';
+import { TenantModel } from '../models/utils/multiTenant';
 import { categoryRepository, CategoryRepository } from './categoryRepository';
 import mongoose from 'mongoose';
 import { omit } from 'lodash';
