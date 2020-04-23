@@ -3,11 +3,12 @@ import { ItemPriceGroupProps } from './PriceGroup';
 import { tenantModel } from './utils/multiTenant';
 
 interface ModifierItemProps {
+    _id?: string;
     name: string;
     price: ItemPriceGroupProps[];
 }
 
-interface ModifierProps {
+export interface ModifierProps {
     name: string;
     mods: [ModifierItemProps];
 }

@@ -1,11 +1,8 @@
-import { InjectedRepositoryDependencies, repository, RepositoryFns } from '.';
+import { InjectedRepositoryDependencies } from '.';
 import { OrganizationProps } from '../models/Organization';
+import { RepositoryFns, repository } from './utils';
 
-export type OrganizationRepository = RepositoryFns<OrganizationProps> & {};
-
-// findAll: () => Promise<OrganizationProps[]>;
-// create: (p: OrganizationProps) => Promise<OrganizationProps>;
-// findOne: (p: Partial<OrganizationProps>) => Promise<OrganizationProps>;
+export type OrganizationRepository = RepositoryFns<OrganizationProps>;
 
 export const organizationRepository = ({ models: { OrganizationModel } }: InjectedRepositoryDependencies) =>
     repository<OrganizationProps, OrganizationRepository>({

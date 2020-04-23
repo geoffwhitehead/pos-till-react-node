@@ -1,7 +1,7 @@
 import { User } from './User';
 import { Item } from './Item';
 import { Category } from './Category';
-import { Discount } from './DIscount';
+import { Discount } from './Discount';
 import { Modifier } from './Modifier';
 import { PriceGroup } from './PriceGroup';
 import { Organization } from './Organization';

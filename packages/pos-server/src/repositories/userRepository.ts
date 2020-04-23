@@ -1,15 +1,8 @@
 import { UserProps, UserPropsFull } from '../models/User';
-import { InjectedRepositoryDependencies, repository, RepositoryFns } from '.';
+import { InjectedRepositoryDependencies } from '.';
 import { Container } from 'typedi';
 import { pick } from 'lodash';
-
-// export interface UserRepository {
-//     findAll: () => Promise<UserProps[]>;
-//     create: (user: UserPropsFull) => Promise<UserProps>;
-//     findByIdAndUpdate: (id: string, user: Partial<UserProps>) => Promise<UserProps>;
-//     findOne: (userProps: Partial<UserProps>) => Promise<UserProps | null>;
-//     findOneFull: (userProps: Partial<UserProps>) => Promise<UserPropsFull | null>;
-// }
+import { repository } from './utils';
 
 export type UserRepository = {
     findAll: () => Promise<UserProps[]>;
@@ -17,6 +10,7 @@ export type UserRepository = {
     findOne: (props: Partial<UserPropsFull>) => Promise<UserProps>;
     findByIdAndUpdate: (id: string, props: Partial<UserPropsFull>) => Promise<UserProps>;
     findOneFull: (userProps: Partial<UserProps>) => Promise<UserPropsFull | null>;
+    findById: (id: string) => Promise<UserProps>;
 };
 
 const clean = (userRecord: UserPropsFull): UserProps => {
@@ -26,7 +20,13 @@ const clean = (userRecord: UserPropsFull): UserProps => {
 export const userRepository = ({ models: { UserModel } }: InjectedRepositoryDependencies): UserRepository =>
     repository<UserPropsFull, UserRepository>({
         model: UserModel,
-        fns: ({ create: _create, findAll: _findAll, findByIdAndUpdate: _findByIdAndUpdate, findOne: _findOne }) => {
+        fns: ({
+            findById: _findById,
+            create: _create,
+            findAll: _findAll,
+            findByIdAndUpdate: _findByIdAndUpdate,
+            findOne: _findOne,
+        }) => {
             const findAll = async () => (await _findAll()).map(user => clean(user));
             const findByIdAndUpdate = async (id, props) => clean(await _findByIdAndUpdate(id, props));
             const findOne = async props => clean(await _findOne(props));
@@ -35,12 +35,14 @@ export const userRepository = ({ models: { UserModel } }: InjectedRepositoryDepe
                 const tenantId = Container.get('organizationId') as string;
                 return (await UserModel({ tenantId }).findOne(props)).toObject();
             };
+            const findById = async id => clean(await _findById(id));
             return {
                 findAll,
                 findByIdAndUpdate,
                 findOne,
                 create,
                 findOneFull,
+                findById,
             };
         },
     });

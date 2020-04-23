@@ -1,7 +1,7 @@
 import { Router, Request, Response, NextFunction } from 'express';
-import { ProductService } from '../../services/product';
+import { ProductService } from '../../../services/product';
 import { Container } from 'typedi';
-import { LoggerService } from '../../loaders/logger';
+import { LoggerService } from '../../../loaders/logger';
 
 export default (app: Router) => {
     const route = Router();
@@ -59,7 +59,7 @@ export default (app: Router) => {
         logger.debug(`Calling get category endpoint with body: ${JSON.stringify(req.body)}`);
 
         try {
-            const category = await categoryService.findOne(req.body);
+            const category = await categoryService.findById(req.params.id);
             res.json({ category }).status(200);
         } catch (err) {
             logger.error(`🔥 error: ${err}`);

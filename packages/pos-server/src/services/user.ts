@@ -121,6 +121,7 @@ export interface UserService {
     findAll: () => Promise<UserProps[]>;
     create: (userProps: UserProps) => Promise<UserProps>;
     findByIdAndUpdate: (id: string, userProps: Partial<UserProps>) => Promise<UserProps>;
+    findById: (id: string) => Promise<UserProps>;
 }
 
 export const userService = ({ repositories: { userRepository }, logger }: InjectedDependencies): UserService => {
@@ -136,39 +137,12 @@ export const userService = ({ repositories: { userRepository }, logger }: Inject
         return user;
     };
 
+    const findById = async id => userRepository.findById(id);
+
     return {
         findAll,
         create,
         findByIdAndUpdate,
+        findById,
     };
 };
-
-// const service = usersService({
-//     usersRepository,
-//     mailer,
-//     logger,
-// });
-// interface ResolverArgs {
-//     models:
-//     services: {
-//         userService: {
-
-//         }
-//     }
-// }
-
-// export const userService = (injectorArgs: InjectorArgs) => {
-//     const models = Models.register(injectorArgs.organizationId);
-
-//     const resolverArgs: ResolverArgs = {
-//         ...injectorArgs,
-//         models
-//     };
-
-//     return {
-//         createReport: createReportFactory(resolverArgs),
-//         deleteReport: deleteReportFactory(resolverArgs),
-//         getAllReports: getAllReportsFactory(resolverArgs),
-//         getReportById: getReportByIdFactory(resolverArgs),
-//     };
-// };

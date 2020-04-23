@@ -2,6 +2,7 @@ import { Schema } from 'mongoose';
 import { tenantModel } from './utils/multiTenant';
 
 export interface DiscountProps {
+    _id?: string;
     name: string;
     amount: number;
     isPercent: boolean;

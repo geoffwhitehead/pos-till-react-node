@@ -2,6 +2,7 @@ import { Schema } from 'mongoose';
 import { tenantModel } from './utils/multiTenant';
 
 export interface CategoryProps {
+    _id?: string;
     name: string;
 }
 

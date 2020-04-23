@@ -2,7 +2,8 @@ import { Schema } from 'mongoose';
 import { ItemPriceGroupProps } from './PriceGroup';
 import { tenantModel } from './utils/multiTenant';
 
-interface ItemProps {
+export interface ItemProps {
+    _id?: string;
     name: string;
     categoryId: string;
     price: ItemPriceGroupProps[];

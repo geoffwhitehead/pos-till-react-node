@@ -2,6 +2,7 @@ import { Schema, Document } from 'mongoose';
 import { tenantModel } from './utils/multiTenant';
 
 export interface ItemPriceGroupProps {
+    _id?: string;
     groupId: string;
     price: number;
 }

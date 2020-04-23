@@ -51,4 +51,19 @@ export default (app: Router) => {
             return next(err);
         }
     });
+
+    route.get('/:id', async (req: Request, res: Response, next: NextFunction) => {
+        const logger = Container.get('logger') as LoggerService;
+        const userService = Container.get('userService') as UserService;
+
+        logger.debug(`Calling get user endpoint with params: ${JSON.stringify(req.params)}`);
+
+        try {
+            const user = await userService.findById(req.params.id);
+            res.json({ user }).status(200);
+        } catch (err) {
+            logger.error(`🔥 error: ${err}`);
+            return next(err);
+        }
+    });
 };
