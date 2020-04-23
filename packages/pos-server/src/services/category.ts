@@ -4,7 +4,8 @@ import { InjectedDependencies } from '.';
 export interface CategoryService {
     findAll: () => Promise<CategoryProps[]>;
     create: (userProps: CategoryProps) => Promise<CategoryProps>;
-    updateById: (id: string, userProps: Partial<CategoryProps>) => Promise<CategoryProps>;
+    findByIdAndUpdate: (id: string, userProps: Partial<CategoryProps>) => Promise<CategoryProps>;
+    findOne: (props: CategoryProps) => Promise<CategoryProps>;
 }
 
 export const categoryService = ({
@@ -18,14 +19,20 @@ export const categoryService = ({
         return category;
     };
 
-    const updateById = async (id, props) => {
+    const findByIdAndUpdate = async (id, props) => {
         const category = await categoryRepository.findByIdAndUpdate(id, props);
+        return category;
+    };
+
+    const findOne = async props => {
+        const category = await categoryRepository.findOne(props);
         return category;
     };
 
     return {
         findAll,
         create,
-        updateById,
+        findByIdAndUpdate,
+        findOne,
     };
 };
