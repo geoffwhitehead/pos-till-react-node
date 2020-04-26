@@ -5,6 +5,7 @@ import { Discount } from './Discount';
 import { Modifier } from './Modifier';
 import { PriceGroup } from './PriceGroup';
 import { Organization } from './Organization';
+import { Printer } from './Printer';
 
 export default {
     User,
@@ -14,4 +15,5 @@ export default {
     Discount,
     Modifier,
     PriceGroup,
+    Printer,
 };

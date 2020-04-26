@@ -3,13 +3,12 @@ import userRoutes from './user';
 import authRoutes from './auth';
 import productRoutes from './product';
 import maintenanceRoutes from './maintenance';
+import printerRoutes from './printer';
 
 export default () => {
     const app = Router();
 
-    const routes = [userRoutes, authRoutes, productRoutes, maintenanceRoutes];
-
-    routes.map(route => route(app));
+    [userRoutes, authRoutes, productRoutes, maintenanceRoutes, printerRoutes].map(route => route(app));
 
     return app;
 };

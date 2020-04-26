@@ -3,9 +3,6 @@ import dependencyInjectorLoader from './dependencyInjector';
 import mongooseLoader from './mongoose';
 // import jobsLoader from './jobs';
 import logger from './logger';
-import extendAuthorize from '../api/middlewares/extendAuthorize';
-import { models } from 'mongoose';
-import attachTenant from '../api/middlewares/attachTenant';
 import express from 'express';
 
 export default async ({ expressApp }: { expressApp: express.Application }) => {
@@ -16,6 +13,7 @@ export default async ({ expressApp }: { expressApp: express.Application }) => {
     const { agenda } = await dependencyInjectorLoader({
         mongoConnection,
     });
+
     logger.info('✌️ Dependency Injector loaded');
 
     // await jobsLoader({ agenda });

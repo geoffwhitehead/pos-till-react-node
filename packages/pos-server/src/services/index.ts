@@ -5,6 +5,7 @@ import { RepositoryService } from '../repositories';
 import { MailerService } from './mailer';
 import { productService } from './product';
 import { maintenanceService } from './maintenance';
+import { printerService } from './printer';
 
 export interface InjectedDependencies {
     mailer: MailerService;
@@ -30,7 +31,11 @@ const services = [
         name: 'maintenanceService',
         service: maintenanceService,
     },
+    {
+        name: 'printerService',
+        service: printerService,
+    },
 ];
 export const registerServices = (dependencies: InjectedDependencies): Service[] => {
-    return services.map(s => ({ name: s.name, service: s.service(dependencies) }));
+    return services.map(({ name, service }) => ({ name, service: service(dependencies) }));
 };

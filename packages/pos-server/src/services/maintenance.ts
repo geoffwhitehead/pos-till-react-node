@@ -72,7 +72,7 @@ export const maintenanceService = ({
                 ],
             };
 
-            const m = await modifierRepository.create(modifier);
+            const newModifier = await modifierRepository.create(modifier);
 
             const items = [...Array(ITEMS_TO_SEED)].map(() => {
                 return {
@@ -80,10 +80,9 @@ export const maintenanceService = ({
                     categoryId: insertedCategories.insertedIds[random(CATEGORIES_TO_SEED.length)],
                     price: generatePriceGroups(priceGroups),
                     stock: 10,
-                    modifierId: faker.random.boolean() ? m._id : null,
+                    modifierId: faker.random.boolean() ? newModifier._id : null,
                 };
             });
-            console.log('*************** items', JSON.stringify(items, null, 4));
 
             const insertedItems = await itemRepository.insert(items);
 
