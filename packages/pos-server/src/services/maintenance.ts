@@ -8,7 +8,6 @@ export interface MaintenanceService {
 }
 
 const ITEMS_TO_SEED = 20;
-const CATEGORIES_TO_SEED = ['Starters', 'Mains', 'Desserts', 'Wine', 'Beer'];
 const PRICE_GROUPS = ['Main', 'Take Away']; // TODO: fix so generate price grouips handles varuious sizes
 
 const generatePriceGroups: (priceGroups: PriceGroupProps[]) => ItemPriceGroupProps[] = priceGroups => {
@@ -27,16 +26,44 @@ const generatePriceGroups: (priceGroups: PriceGroupProps[]) => ItemPriceGroupPro
 };
 
 export const maintenanceService = ({
-    repositories: { categoryRepository, discountRepository, priceGroupRepository, modifierRepository, itemRepository },
+    repositories: {
+        categoryRepository,
+        discountRepository,
+        priceGroupRepository,
+        modifierRepository,
+        itemRepository,
+        printerRepository,
+    },
     logger,
 }: InjectedDependencies): MaintenanceService => {
     const seed = async () => {
         try {
-            const categories = CATEGORIES_TO_SEED.map(name => {
-                return {
-                    name,
-                };
-            });
+            const result = await printerRepository.insert([{ name: 'Kitchen', type: '', address: '' }]);
+
+            const printer = result.ops[0];
+
+            const categories = [
+                {
+                    name: 'Starters',
+                    linkedPrinters: [printer._id],
+                },
+                {
+                    name: 'Mains',
+                    linkedPrinters: [printer._id],
+                },
+                {
+                    name: 'Desserts',
+                    linkedPrinters: [printer._id],
+                },
+                {
+                    name: 'Wine',
+                    linkedPrinters: [],
+                },
+                {
+                    name: 'Beer',
+                    linkedPrinters: [],
+                },
+            ];
 
             const insertedCategories = await categoryRepository.insert(categories);
 
@@ -77,10 +104,11 @@ export const maintenanceService = ({
             const items = [...Array(ITEMS_TO_SEED)].map(() => {
                 return {
                     name: faker.commerce.product(),
-                    categoryId: insertedCategories.insertedIds[random(CATEGORIES_TO_SEED.length)],
+                    categoryId: insertedCategories.insertedIds[random(categories.length)],
                     price: generatePriceGroups(priceGroups),
                     stock: 10,
                     modifierId: faker.random.boolean() ? newModifier._id : null,
+                    linkedPrinters: [],
                 };
             });
 

@@ -1,6 +1,7 @@
 import { Schema } from 'mongoose';
 import { ItemPriceGroupProps } from './PriceGroup';
 import { tenantModel } from './utils/multiTenant';
+import { PrinterProps } from './Printer';
 
 export interface ItemProps {
     _id?: string;
@@ -9,6 +10,7 @@ export interface ItemProps {
     price: ItemPriceGroupProps[];
     stock?: number;
     modifierId?: string;
+    linkedPrinters: PrinterProps[];
 }
 
 const ItemSchema: Schema<ItemProps> = new Schema(
@@ -17,6 +19,7 @@ const ItemSchema: Schema<ItemProps> = new Schema(
             type: String,
             required: true,
         },
+        linkedPrinters: [{ groupId: { type: Schema.Types.ObjectId, ref: 'Printer' }, default: [] }],
         categoryId: { type: Schema.Types.ObjectId, ref: 'Category' },
         price: [{ groupId: { type: Schema.Types.ObjectId, ref: 'PriceGroup' }, amount: { type: 'Number' } }],
         modifierId: {
