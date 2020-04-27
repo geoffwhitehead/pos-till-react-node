@@ -1,7 +1,14 @@
 {
-  "name": "root",
-  "private": true,
-  "devDependencies": {
-    "lerna": "^3.20.2"
-  }
+    "name": "monorepo-pos",
+    "private": true,
+    "scripts": {
+        "dev:app": "concurrently --restartTries=3 --restartDelay=3000 \"cd packages/pos-client && yarn start\" \"cd packages/pos-client && yarn ios\"",
+        "dev:api": "cd packages/pos-server && yarn dev",
+        "dev:all": "concurrently \"yarn dev:app\" \"yarn dev:api\"",
+        "bootstrap": "lerna bootstrap --ignore-prepublish"
+    },
+    "devDependencies": {
+        "concurrently": "^5.2.0",
+        "lerna": "^3.20.2"
+    }
 }

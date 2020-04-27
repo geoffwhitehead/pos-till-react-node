@@ -1,5 +1,5 @@
 {
-  "name": "Positive",
+  "name": "pos-client",
   "version": "0.0.1",
   "private": true,
   "scripts": {
@@ -13,7 +13,7 @@
     "lint-fix": "eslint --fix .",
     "lint-check": "eslint .",
     "rename": "react-native-rename",
-    "postinstall": "npx jetify",
+    "postinstall": "npx jetify",  
     "find:realm": "find ~/Library -type f -name 'default.realm'"
   },
   "dependencies": {
