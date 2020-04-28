@@ -1,1 +1,2 @@
-name=positive-server
+name: positive-server
+web: cd packages/pos-server && yarn build && yarn start
