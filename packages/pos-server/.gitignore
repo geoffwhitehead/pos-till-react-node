@@ -11,3 +11,5 @@ node_modules
 dist
 # Auto-Generated Jest MongoDB config
 globalConfig.json
+
+build
