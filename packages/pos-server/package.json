@@ -12,7 +12,9 @@
         "build": "yarn tsc",
         "preinstall": "bash ./scripts/preinstall.sh",
         "postinstall": "bash ./scripts/postinstall.sh",
-        "run:prettier": "prettier --write 'src/**/*.ts' 'test/**/*.ts'"
+        "run:prettier": "prettier --write 'src/**/*.ts' 'test/**/*.ts'",
+        "heroku:logs": "heroku logs -a positive-server --tail",
+        "heroku:deploy": "git push git@heroku.com:positive-server.git master"
     },
     "license": "MIT",
     "dependencies": {
