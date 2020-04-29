@@ -3,18 +3,22 @@
     "name": "positive-server",
     "description": "POS backend.",
     "main": "index.js",
+    "engines": {
+        "node": ">=12.0.0",
+        "npm": ">=6.0.0"
+    },
     "scripts": {
         "test": "jest",
         "dev": "docker-compose up",
         "docker:build": "docker-compose build --build-arg GIT_SSH_KEY=$(cat ~/.ssh/heroku_deploy | base64)",
-        "start": "node ./dist/src/server.js",
+        "start": "node ./build/index.js",
         "docker:packages": "docker exec -it pos-server_app_1 yarn ",
         "build": "yarn tsc",
         "preinstall": "bash ./scripts/preinstall.sh",
         "postinstall": "bash ./scripts/postinstall.sh",
         "run:prettier": "prettier --write 'src/**/*.ts' 'test/**/*.ts'",
         "heroku:logs": "heroku logs -a positive-server --tail",
-        "heroku:deploy": "git push git@heroku.com:positive-server.git master"
+        "heroku:deploy": "git push -f git@heroku.com:positive-server.git master"
     },
     "license": "MIT",
     "dependencies": {

@@ -1,11 +1,17 @@
 {
     "name": "monorepo-pos",
     "private": true,
+    "engines": {
+        "node": ">=12.0.0",
+        "npm": ">=6.0.0"
+    },
     "scripts": {
+        "start": "cd ./packages/pos-server/ && yarn start",
         "dev:app": "concurrently --restartTries=3 --restartDelay=3000 \"cd packages/pos-client && yarn start\" \"cd packages/pos-client && yarn ios\"",
         "dev:api": "cd packages/pos-server && yarn dev",
         "dev:all": "concurrently \"yarn dev:app\" \"yarn dev:api\"",
-        "bootstrap": "lerna bootstrap --ignore-prepublish"
+        "bootstrap": "lerna bootstrap --ignore-prepublish",
+        "heroku-postbuild": "cd ./packages/pos-server/ && NODE_ENV=development yarn && yarn build"
     },
     "devDependencies": {
         "concurrently": "^5.2.0",
