@@ -1,4 +1,4 @@
-rootProject.name = 'Boilerplate'
+rootProject.name = 'Settled'
 include ':react-native-star-prnt'
 project(':react-native-star-prnt').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-star-prnt/android')
 include ':realm'

@@ -1,4 +1,4 @@
-package com.boilerplate;
+package com.settled;
 
 import android.app.Application;
 import android.content.Context;
