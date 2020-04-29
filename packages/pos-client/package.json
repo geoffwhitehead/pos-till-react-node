@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "android": "react-native run-android",
-    "ios": "react-native run-ios --simulator='iPad (7th generation)'",
+    "dev:ios": "react-native run-ios --simulator='iPad (7th generation)'",
+    "dev:app": "concurrently \"yarn start\" \"yarn ios\"",
     "pod": "cd ./ios && pod install && cd .. ",
     "start": "react-native start",
     "test": "jest --detectOpenHandles",
@@ -13,7 +14,7 @@
     "lint-fix": "eslint --fix .",
     "lint-check": "eslint .",
     "rename": "react-native-rename",
-    "postinstall": "npx jetify",  
+    "postinstall": "npx jetify",
     "find:realm": "find ~/Library -type f -name 'default.realm'"
   },
   "dependencies": {
