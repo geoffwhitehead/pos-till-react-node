@@ -5,7 +5,7 @@
   "scripts": {
     "android": "react-native run-android",
     "dev:ios": "react-native run-ios --simulator='iPad (7th generation)'",
-    "dev:app": "concurrently \"yarn start\" \"yarn ios\"",
+    "dev:app": "concurrently \"yarn start\" \"yarn dev:ios\"",
     "pod": "cd ./ios && pod install && cd .. ",
     "start": "react-native start",
     "test": "jest --detectOpenHandles",
@@ -60,6 +60,7 @@
     "@typescript-eslint/eslint-plugin": "^2.20.0",
     "@typescript-eslint/parser": "^2.20.0",
     "babel-jest": "^24.9.0",
+    "concurrently": "^5.2.0",
     "eslint": "^6.8.0",
     "eslint-config-prettier": "^6.10.0",
     "eslint-config-standard": "^12.0.0",
