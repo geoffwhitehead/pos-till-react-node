@@ -1,0 +1,52 @@
+# Settled POS
+
+Monorepo containing react native client app and node server.
+
+
+## Todo
+
+**Server**
+
+- logging
+	- largely not implemented throughout
+- errors
+	- define some error codes to pass to app for certain errors / reponses. 
+	- look into handling error cases for most of the db requests and handle appropriately
+	- general error handling throughout
+- unit testing (everything)
+- no results / empty responses are not handling in most places
+- auth: add an auth service that will be able to:
+	- lookup a users organization based on their email address. Not sure how to implement - might need to be untenanted so it has access to all organizations users.
+	- this should allow multiple users per organization.
+- look into sessions
+- invalidate jwt on logout
+- add events system (RabbitMQ maybe)
+- batch job - upload data
+
+**App**
+
+- CRUD screens for everything to do with products.
+- feature: Tile layout for items (pictures?)
+- Price shift functionality: receipt formatting
+- Voids
+	- add button to void
+	- override delete to update deletedOn field
+	- reports should include voids
+- send to kitchen functionality
+	- add linked printers array on items
+	- store record of sent bill items. Dont send twice.
+	- kitchen printer receipt format
+- prevent ending bill period with active bill
+- **performance**: things are a bit slow. realm objects dont work with react lifecycle and memo. Potentially lots of unnecessary re-renders. Look into using a redux layer and converting the realm objects to standard js objects. Potentially use sagas with redux.
+- sidebar brand
+- update app to use organization
+- create settings page displaying org details. 
+- create printers page configure printers
+- **auth** look into sessions
+- logout section
+- feature: the kitchen printer will need to show what time the food should be prepared for. 
+	- This can be defaulted to ASAP. 
+	- have a flag on the price group that requires the user to enter a time - no default. This will ensures take away orders are dealt with appropriately.
+	- update the kitchen printer receipt.
+- **BUGS**
+- on change bill - reset screen
