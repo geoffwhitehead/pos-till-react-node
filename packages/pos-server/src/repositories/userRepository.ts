@@ -3,14 +3,15 @@ import { InjectedRepositoryDependencies } from '.';
 import { Container } from 'typedi';
 import { pick } from 'lodash';
 import { repository } from './utils';
+import mongoose from 'mongoose';
 
 export type UserRepository = {
     findAll: () => Promise<UserProps[]>;
     create: (props: UserPropsFull) => Promise<UserProps>;
     findOne: (props: Partial<UserPropsFull>) => Promise<UserProps>;
-    findByIdAndUpdate: (id: string, props: Partial<UserPropsFull>) => Promise<UserProps>;
+    findByIdAndUpdate: (id: mongoose.Types.ObjectId, props: Partial<UserPropsFull>) => Promise<UserProps>;
     findOneFull: (userProps: Partial<UserProps>) => Promise<UserPropsFull | null>;
-    findById: (id: string) => Promise<UserProps>;
+    findById: (id: mongoose.Types.ObjectId) => Promise<UserProps>;
 };
 
 const clean = (userRecord: UserPropsFull): UserProps => {

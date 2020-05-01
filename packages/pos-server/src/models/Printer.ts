@@ -1,11 +1,11 @@
-import { Schema } from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
 import { tenantModel } from './utils/multiTenant';
 
 export interface PrinterProps {
-    _id?: string;
+    _id?: mongoose.Types.ObjectId;
     name: string;
-    type: string;
-    address: string;
+    type?: string;
+    address?: string;
 }
 
 const PrinterSchema: Schema<PrinterProps> = new Schema({
@@ -15,11 +15,9 @@ const PrinterSchema: Schema<PrinterProps> = new Schema({
     },
     type: {
         type: String,
-        required: true,
     },
     address: {
         type: String,
-        required: true,
     },
 });
 

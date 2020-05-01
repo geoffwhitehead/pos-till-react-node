@@ -1,12 +1,14 @@
-import { Schema } from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
 import { tenantlessModel } from './utils/multiTenant';
 import { Joi } from 'celebrate';
 
 export interface OrganizationProps {
-    _id?: string;
+    _id?: mongoose.Types.ObjectId;
     name: string;
     email: string;
     phone: string;
+    vat?: string;
+    defaultPriceGroup?: mongoose.Types.ObjectId;
     address: {
         line1: string;
         line2?: string;
@@ -20,9 +22,11 @@ export const OrganizationValidation = {
     name: Joi.string().required(),
     email: Joi.string().required(),
     phone: Joi.string().required(),
+    vat: Joi.string(),
+    defaultPriceGroup: Joi.string(),
     address: Joi.object({
         line1: Joi.string().required(),
-        line2: Joi.string().required(),
+        line2: Joi.string(),
         city: Joi.string().required(),
         county: Joi.string().required(),
         postcode: Joi.string().required(),
@@ -42,6 +46,12 @@ const OrganizationSchema: Schema<OrganizationProps> = new Schema(
             lowercase: true,
         },
         phone: {
+            type: String,
+        },
+        vat: {
+            type: String,
+        },
+        defaultPriceGroup: {
             type: String,
         },
         address: {

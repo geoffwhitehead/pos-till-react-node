@@ -2,6 +2,7 @@ import { Router, Request, Response, NextFunction } from 'express';
 import { Container } from 'typedi';
 import { LoggerService } from '../../../loaders/logger';
 import { ProductService } from '../../../services/product';
+import { objectId } from '../../../utils/objectId';
 
 export default (app: Router) => {
     const route = Router();
@@ -44,7 +45,7 @@ export default (app: Router) => {
         logger.debug(`Calling update item endpoint with params: ${req.params}, body: ${JSON.stringify(req.body)}`);
 
         try {
-            const item = await itemService.findByIdAndUpdate(req.params.id, req.body);
+            const item = await itemService.findByIdAndUpdate(objectId(req.params.id), req.body);
             res.json({ item }).status(200);
         } catch (err) {
             logger.error(`🔥 error: ${err}`);
@@ -59,7 +60,7 @@ export default (app: Router) => {
         logger.debug(`Calling get item endpoint with params: ${req.params}`);
 
         try {
-            const item = await itemService.findById(req.params.id);
+            const item = await itemService.findById(objectId(req.params.id));
             res.json({ item }).status(200);
         } catch (err) {
             logger.error(`🔥 error: ${err}`);

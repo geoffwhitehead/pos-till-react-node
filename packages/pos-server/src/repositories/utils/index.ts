@@ -8,9 +8,9 @@ export interface RepositoryFns<T> {
     findAll: () => Promise<T[]>;
     create: (props: T) => Promise<T>;
     findOne: (props: Partial<T>) => Promise<T>;
-    findByIdAndUpdate: (id: string, props: Partial<T>) => Promise<T>;
-    findById: (id: string) => Promise<T>;
-    insert: (docs: T[]) => Promise<InsertWriteOpResult<any>>; // TODO: fix type
+    findByIdAndUpdate: (id: mongoose.Types.ObjectId, props: Partial<T>) => Promise<T>;
+    findById: (id: mongoose.Types.ObjectId) => Promise<T>;
+    insert: (docs: T[]) => Promise<T[]>; // TODO: fix type
 }
 
 const getTenant = () => ({
@@ -18,7 +18,7 @@ const getTenant = () => ({
 });
 
 const clean = (doc: mongoose.Document) => {
-    return omit(doc.toObject(), 'tenantId');
+    return omit(doc.toObject(), 'tenantId', '__v');
 };
 
 export const repository = <T, U>({
@@ -45,8 +45,9 @@ export const repository = <T, U>({
 
     const insert = async docs => {
         const filteredDocs = docs.map(doc => omit(doc, 'tenantId'));
-        const result = await model(tenanted && getTenant()).collection.insert(filteredDocs);
-        return result;
+        const insertedDocs = await model(tenanted && getTenant()).insertMany(filteredDocs); // the mongoose type seems incorrect for this. Should return Array<T & Document>
+        //@ts-ignore
+        return insertedDocs.map(docs => clean(docs));
     };
 
     const findOne = async props => {

@@ -2,10 +2,11 @@ import { Router, Request, Response, NextFunction } from 'express';
 import { Container } from 'typedi';
 import { LoggerService } from '../../../loaders/logger';
 import { ProductService } from '../../../services/product';
+import { objectId } from '../../../utils/objectId';
 
 export default (app: Router) => {
     const route = Router();
-    app.use('/priceGroups', route);
+    app.use('/price-groups', route);
 
     route.get('/', async (req: Request, res: Response, next: NextFunction) => {
         const logger = Container.get('logger') as LoggerService;
@@ -46,7 +47,7 @@ export default (app: Router) => {
         );
 
         try {
-            const priceGroup = await priceGroupService.findByIdAndUpdate(req.params.id, req.body);
+            const priceGroup = await priceGroupService.findByIdAndUpdate(objectId(req.params.id), req.body);
             res.json({ priceGroup }).status(200);
         } catch (err) {
             logger.error(`🔥 error: ${err}`);
@@ -61,7 +62,7 @@ export default (app: Router) => {
         logger.debug(`Calling get priceGroup endpoint with params: ${req.params}`);
 
         try {
-            const priceGroup = await priceGroupService.findById(req.params.id);
+            const priceGroup = await priceGroupService.findById(objectId(req.params.id));
             res.json({ priceGroup }).status(200);
         } catch (err) {
             logger.error(`🔥 error: ${err}`);

@@ -2,6 +2,7 @@ import { Router, Request, Response, NextFunction } from 'express';
 import { PrinterService } from '../../services/printer';
 import { Container } from 'typedi';
 import { LoggerService } from '../../loaders/logger';
+import { objectId } from '../../utils/objectId';
 
 export default (app: Router) => {
     const route = Router();
@@ -38,7 +39,7 @@ export default (app: Router) => {
         const printerService = Container.get('printerService') as PrinterService;
 
         try {
-            const printer = await printerService.findByIdAndUpdate(req.params.id, req.body);
+            const printer = await printerService.findByIdAndUpdate(objectId(req.params.id), req.body);
             res.json({ printer }).status(200);
         } catch (err) {
             logger.error(`🔥 error: ${err}`);
@@ -51,7 +52,7 @@ export default (app: Router) => {
         const printerService = Container.get('printerService') as PrinterService;
 
         try {
-            const printer = await printerService.findById(req.params.id);
+            const printer = await printerService.findById(objectId(req.params.id));
             res.json({ printer }).status(200);
         } catch (err) {
             logger.error(`🔥 error: ${err}`);

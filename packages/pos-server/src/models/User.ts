@@ -1,9 +1,9 @@
-import { Schema } from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
 import { tenantModel } from './utils/multiTenant';
 import { Joi } from 'celebrate';
 
 export interface UserProps {
-    _id?: string;
+    _id?: mongoose.Types.ObjectId;
     firstName: string;
     lastName: string;
     email: string;

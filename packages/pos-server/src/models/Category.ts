@@ -1,9 +1,9 @@
-import { Schema } from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
 import { tenantModel } from './utils/multiTenant';
 import { PrinterProps } from './Printer';
 
 export interface CategoryProps {
-    _id?: string;
+    _id?: mongoose.Types.ObjectId;
     name: string;
     linkedPrinters: PrinterProps[];
 }

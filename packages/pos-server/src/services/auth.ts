@@ -7,13 +7,14 @@ import { randomBytes } from 'crypto';
 import { InjectedDependencies } from '.';
 import { OrganizationProps } from '../models/Organization';
 import { UserProps, UserPropsFull } from '../models/User';
+import { ObjectId } from '../utils/objectId';
 
 export interface AuthService {
     signUp: (params: UserPropsFull & OrganizationProps) => Promise<UserProps & { token: string }>;
     signIn: (params: { email: string; password: string }) => Promise<UserProps & { token: string }>;
 }
 
-const generateToken = (params: { organizationId: string; userId: string }): string => {
+const generateToken = (params: { organizationId: ObjectId; userId: ObjectId }): string => {
     const { userId, organizationId } = params;
     const today = new Date();
     const exp = new Date(today);

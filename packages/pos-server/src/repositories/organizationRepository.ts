@@ -8,7 +8,5 @@ export const organizationRepository = ({ models: { OrganizationModel } }: Inject
     repository<OrganizationProps, OrganizationRepository>({
         model: OrganizationModel,
         tenanted: false,
-        fns: fns => {
-            return fns;
-        },
+        fns: fns => fns,
     });

@@ -1,16 +1,16 @@
-import { Schema } from 'mongoose';
+import mongoose, { Schema, Mongoose } from 'mongoose';
 import { ItemPriceGroupProps } from './PriceGroup';
 import { tenantModel } from './utils/multiTenant';
 import { PrinterProps } from './Printer';
 
 export interface ItemProps {
-    _id?: string;
+    _id?: mongoose.Types.ObjectId;
     name: string;
-    categoryId: string;
+    categoryId: mongoose.Types.ObjectId;
     price: ItemPriceGroupProps[];
     stock?: number;
-    modifierId?: string;
-    linkedPrinters: PrinterProps[];
+    modifierId?: mongoose.Types.ObjectId;
+    linkedPrinters: mongoose.Types.ObjectId[];
 }
 
 const ItemSchema: Schema<ItemProps> = new Schema(
@@ -19,7 +19,7 @@ const ItemSchema: Schema<ItemProps> = new Schema(
             type: String,
             required: true,
         },
-        linkedPrinters: [{ groupId: { type: Schema.Types.ObjectId, ref: 'Printer' }, default: [] }],
+        linkedPrinters: [{ type: Schema.Types.ObjectId, ref: 'Printer' }],
         categoryId: { type: Schema.Types.ObjectId, ref: 'Category' },
         price: [{ groupId: { type: Schema.Types.ObjectId, ref: 'PriceGroup' }, amount: { type: 'Number' } }],
         modifierId: {
@@ -30,13 +30,13 @@ const ItemSchema: Schema<ItemProps> = new Schema(
     { timestamps: true },
 );
 
-ItemSchema.path('price').get(function(num) {
-    return (num / 100).toFixed(2);
-});
+// ItemSchema.path('price').get(function(num) {
+//     return (num / 100).toFixed(2);
+// });
 
-ItemSchema.path('price').set(function(num) {
-    return num * 100;
-});
+// ItemSchema.path('price').set(function(num) {
+//     return num * 100;
+// });
 
 const Item = tenantModel<ItemProps>('Item', ItemSchema);
 

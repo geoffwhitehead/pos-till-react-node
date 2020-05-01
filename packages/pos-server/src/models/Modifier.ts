@@ -1,15 +1,15 @@
-import { Schema } from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
 import { ItemPriceGroupProps } from './PriceGroup';
 import { tenantModel } from './utils/multiTenant';
 
 interface ModifierItemProps {
-    _id?: string;
+    _id?: mongoose.Types.ObjectId;
     name: string;
     price: ItemPriceGroupProps[];
 }
 
 export interface ModifierProps {
-    _id?: string;
+    _id?: mongoose.Types.ObjectId;
     name: string;
     mods: ModifierItemProps[];
 }

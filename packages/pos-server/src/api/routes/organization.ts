@@ -1,11 +1,49 @@
-// import { Router } from 'express';
-// import * as OrganizationController from '../../controllers/organization';
+import { Router, Request, Response, NextFunction } from 'express';
+import { OrganizationService } from '../../services/organization';
+import { Container } from 'typedi';
+import { LoggerService } from '../../loaders/logger';
+import { objectId } from '../../utils/objectId';
 
-// const router = Router();
+export default (app: Router) => {
+    const route = Router();
+    app.use('/organization', route);
 
-// router.get('/', OrganizationController.getAll);
-// router.get('/:id', OrganizationController.getById);
-// router.post('/', OrganizationController.create);
-// router.put('/:id', OrganizationController.update);
+    route.post('/', async (req: Request, res: Response, next: NextFunction) => {
+        const logger = Container.get('logger') as LoggerService;
+        const organizationService = Container.get('organizationService') as OrganizationService;
 
-// export default router;
+        try {
+            const organization = await organizationService.create(req.body);
+            res.json({ organization }).status(200);
+        } catch (err) {
+            logger.error(`🔥 error: ${err}`);
+            return next(err);
+        }
+    });
+
+    route.put('/:id', async (req: Request, res: Response, next: NextFunction) => {
+        const logger = Container.get('logger') as LoggerService;
+        const organizationService = Container.get('organizationService') as OrganizationService;
+
+        try {
+            const organization = await organizationService.findByIdAndUpdate(objectId(req.params.id), req.body);
+            res.json({ organization }).status(200);
+        } catch (err) {
+            logger.error(`🔥 error: ${err}`);
+            return next(err);
+        }
+    });
+
+    route.get('/:id', async (req: Request, res: Response, next: NextFunction) => {
+        const logger = Container.get('logger') as LoggerService;
+        const organizationService = Container.get('organizationService') as OrganizationService;
+
+        try {
+            const organization = await organizationService.findById(objectId(req.params.id));
+            res.json({ organization }).status(200);
+        } catch (err) {
+            logger.error(`🔥 error: ${err}`);
+            return next(err);
+        }
+    });
+};

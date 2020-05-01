@@ -1,6 +1,7 @@
 import { Container } from 'typedi';
 import { Router, Request, Response, NextFunction } from 'express';
 import { UserService } from '../../services/user';
+import { objectId } from '../../utils/objectId';
 import { LoggerService } from '../../loaders/logger';
 
 export default (app: Router) => {
@@ -44,7 +45,7 @@ export default (app: Router) => {
         logger.debug(`Calling update user endpoint with params: ${req.params}, body: ${req.body}`);
 
         try {
-            const user = await userService.findByIdAndUpdate(req.params.id, req.body);
+            const user = await userService.findByIdAndUpdate(objectId(req.params.id), req.body);
             res.json({ user }).status(200);
         } catch (err) {
             logger.error(`🔥 error: ${err}`);
@@ -59,7 +60,7 @@ export default (app: Router) => {
         logger.debug(`Calling get user endpoint with params: ${JSON.stringify(req.params)}`);
 
         try {
-            const user = await userService.findById(req.params.id);
+            const user = await userService.findById(objectId(req.params.id));
             res.json({ user }).status(200);
         } catch (err) {
             logger.error(`🔥 error: ${err}`);

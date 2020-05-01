@@ -112,16 +112,13 @@
 // import { LoggerService } from '../loaders/logger';
 import { InjectedDependencies } from '.';
 import { UserProps } from '../models/User';
-// interface InjectorArgs {
-//     userId: string;
-//     organizationId: string;
-// }
+import { ObjectId } from '../utils/objectId';
 
 export interface UserService {
     findAll: () => Promise<UserProps[]>;
     create: (userProps: UserProps) => Promise<UserProps>;
-    findByIdAndUpdate: (id: string, userProps: Partial<UserProps>) => Promise<UserProps>;
-    findById: (id: string) => Promise<UserProps>;
+    findByIdAndUpdate: (id: ObjectId, userProps: Partial<UserProps>) => Promise<UserProps>;
+    findById: (id: ObjectId) => Promise<UserProps>;
 }
 
 export const userService = ({ repositories: { userRepository }, logger }: InjectedDependencies): UserService => {

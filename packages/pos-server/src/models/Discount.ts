@@ -1,8 +1,8 @@
-import { Schema } from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
 import { tenantModel } from './utils/multiTenant';
 
 export interface DiscountProps {
-    _id?: string;
+    _id?: mongoose.Types.ObjectId;
     name: string;
     amount: number;
     isPercent: boolean;
