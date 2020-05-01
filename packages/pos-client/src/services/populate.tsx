@@ -69,7 +69,7 @@ export const populate = async () => {
     const resolvePriceGroup: (price: PriceGroupItemServerProps[]) => PriceGroupItemProps[] = price => {
       try {
         return price.map(priceGroup => {
-          const pG = priceGroups.find(({ _id }) => _id === priceGroup.groupId);
+          const pG = priceGroups.data.find(({ _id }) => _id === priceGroup.groupId);
           return {
             price: parseInt(priceGroup.price),
             groupId: pG,
@@ -83,7 +83,7 @@ export const populate = async () => {
     };
 
     // add ids, mongoose doesnt store them seperately on the server
-    const remappedModifiers = modifiers.map(modifier => {
+    const remappedModifiers = modifiers.data.map(modifier => {
       return {
         ...modifier,
         mods: modifier.mods.map(mod => {
@@ -97,7 +97,7 @@ export const populate = async () => {
       };
     });
 
-    const { line1, line2 = '', county, city, postcode, _id, name, email, phone } = organization;
+    const { line1, line2 = '', county, city, postcode, _id, name, email, phone } = organization.data;
 
     const orgAddress = {
       _id: uuidv4(),
@@ -118,13 +118,13 @@ export const populate = async () => {
     realm.write(() => {
       realm.create(AddressSchema.name, orgAddress);
       realm.create(OrganizationSchema.name, org);
-      printers.map(printer => realm.create(PrinterSchema.name, printer));
-      paymentTypes.map(paymentType => realm.create(PaymentTypeSchema.name, paymentType));
-      discounts.map(discount => realm.create(DiscountSchema.name, discount));
-      items.map(item => {
+      printers.data.map(printer => realm.create(PrinterSchema.name, printer));
+      paymentTypes.data.map(paymentType => realm.create(PaymentTypeSchema.name, paymentType));
+      discounts.data.map(discount => realm.create(DiscountSchema.name, discount));
+      items.data.map(item => {
         const i = {
           ...item,
-          categoryId: categories.find(c => c._id === item.categoryId),
+          categoryId: categories.data.find(c => c._id === item.categoryId),
           modifierId: item.modifierId ? remappedModifiers.find(({ _id }) => _id === item.modifierId) : null,
           price: resolvePriceGroup(item.price),
         };
