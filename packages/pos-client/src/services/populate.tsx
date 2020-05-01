@@ -21,14 +21,14 @@ import { getOrganization } from '../api/organization';
 export const populate = async () => {
   try {
     const [
-      { data: items },
-      { data: categories },
-      { data: modifiers },
-      { data: discounts },
-      { data: paymentTypes },
-      { data: priceGroups },
-      { data: printers },
-      { data: organization },
+      items,
+      categories,
+      modifiers,
+      discounts,
+      paymentTypes,
+      priceGroups,
+      printers,
+      organization,
     ] = await Promise.all([
       getItems(),
       getCategories(),
@@ -40,6 +40,27 @@ export const populate = async () => {
       getOrganization(),
     ]);
 
+    if (
+      items.errors ||
+      categories.errors ||
+      modifiers.errors ||
+      discounts.errors ||
+      paymentTypes.errors ||
+      priceGroups.errors ||
+      printers.errors ||
+      organization.errors
+    ) {
+      console.error('Failed to populate');
+    }
+
+    console.log('modifiers', modifiers);
+    console.log('items', items);
+    console.log('categories', categories);
+    console.log('discounts', discounts);
+    console.log('paymentTypes', paymentTypes);
+    console.log('priceGroups', priceGroups);
+    console.log('printers', printers);
+    console.log('organization', organization);
     // TODO: remove after dev
     // realm.write(() => {
     //   realm.deleteAll();
