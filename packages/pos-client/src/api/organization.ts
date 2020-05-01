@@ -20,4 +20,13 @@ export const getOrganization = () => {
   });
 };
 
-// TODO: not currently using
+// // TODO: not currently using
+// import { Api, ApiRequest } from './index';
+
+// export const getOrganization = () => Api.get<PrinterServerProps>('/printer', {});
+// export interface PrinterServerProps {
+//   _id: string;
+//   name: string;
+//   type: string;
+//   address: string;
+// }

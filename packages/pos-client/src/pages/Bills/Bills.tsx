@@ -15,15 +15,17 @@ export const Bills = ({ navigation }) => {
   const openBills = useRealmQuery<BillProps>({ source: BillSchema.name, filter: `isClosed = false` });
   const openDrawer = () => navigation.openDrawer();
 
-  const navigateToCheckout = bill => navigation.navigate(routes.checkout, { initialBill: bill });
-
+  const navigateToCheckout = bill => navigation.navigate(routes.checkout, { selectedBill: bill });
+  
   // TODO: onSelectBill function duped in drawer->checkout ... refactor
   const onSelectBill = (tab, bill) => {
+    console.log('onSelectBill', tab, bill);
     if (bill) {
       navigateToCheckout(bill);
     } else {
       realm.write(() => {
         const bill = realm.create(BillSchema.name, { _id: uuidv4(), tab });
+        console.log('bill', bill);
         navigateToCheckout(bill);
       });
     }

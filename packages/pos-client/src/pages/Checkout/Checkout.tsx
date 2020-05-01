@@ -38,17 +38,30 @@ const maxBills = 40;
 
 interface CheckoutProps {
   navigation: any; // TODO: fix
-  initialBill: any; // TODO
+  selectedBill: any; // TODO
+  route: any; //fix
 }
 
-export const Checkout: React.FC<CheckoutProps> = ({ navigation, initialBill = null }) => {
+export const Checkout: React.FC<CheckoutProps> = ({ navigation, route }) => {
   const { billPeriod } = useContext(BillPeriodContext);
+  // const selectedBill = route.params?.selectedBill;
 
   const openBills = useRealmQuery<BillProps>({ source: BillSchema.name, filter: `isClosed = false` });
   const discounts = useRealmQuery<DiscountProps>({ source: DiscountSchema.name });
   const paymentTypes = useRealmQuery<PaymentTypeProps>({ source: PaymentTypeSchema.name });
+  // console.log('initialBill', selectedBill);
+  const [activeBill, setActiveBill] = useState<null | any>(route.params?.selectedBill); // TODO: type
+  console.log('route.params', route.params);
+  useEffect(() => {
+    const selectedBill = route.params?.selectedBill;
+    setActiveBill(selectedBill);
 
-  const [activeBill, setActiveBill] = useState<null | any>(initialBill); // TODO: type
+    console.log('selectedBill', selectedBill);
+    // console.log('activeBill', activeBill);
+    // if (selectedBill != activeBill) {
+    // }
+  }, [route.params]);
+
   const [mode, setMode] = useState<Modes>(Modes.Items);
 
   const clearBill = () => setActiveBill(null);
@@ -96,6 +109,7 @@ export const Checkout: React.FC<CheckoutProps> = ({ navigation, initialBill = nu
 
   // TODO:  function duped in drawer->bills ... refactor
   const onSelectBill = (tab, bill) => {
+    console.log('onSelectBill cout', tab, bill);
     if (bill) {
       setActiveBill(bill);
     } else {

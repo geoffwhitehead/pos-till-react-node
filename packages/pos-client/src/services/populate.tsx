@@ -4,8 +4,17 @@ import { getCategories } from '../api/category';
 import { getModifiers } from '../api/modifier';
 import { getDiscounts } from '../api/discount';
 import { getPaymentTypes } from '../api/paymentType';
+import { getPrinters } from '../api/printer';
 import { getPriceGroups, PriceGroupItemServerProps } from '../api/priceGroup';
-import { DiscountSchema, ItemSchema, PaymentTypeSchema, PriceGroupItemProps } from './schemas';
+import {
+  DiscountSchema,
+  ItemSchema,
+  PaymentTypeSchema,
+  PriceGroupItemProps,
+  PrinterSchema,
+  AddressSchema,
+  OrganizationSchema,
+} from './schemas';
 import uuidv4 from 'uuid/v4';
 import { getOrganization } from '../api/organization';
 
@@ -18,7 +27,8 @@ export const populate = async () => {
       { data: discounts },
       { data: paymentTypes },
       { data: priceGroups },
-      // { data: organization },
+      { data: printers },
+      { data: organization },
     ] = await Promise.all([
       getItems(),
       getCategories(),
@@ -26,7 +36,8 @@ export const populate = async () => {
       getDiscounts(),
       getPaymentTypes(),
       getPriceGroups(),
-      // getOrganization()
+      getPrinters(),
+      getOrganization(),
     ]);
 
     // TODO: remove after dev
@@ -65,7 +76,28 @@ export const populate = async () => {
       };
     });
 
+    const { line1, line2 = '', county, city, postcode, _id, name, email, phone } = organization;
+
+    const orgAddress = {
+      _id: uuidv4(),
+      line1,
+      line2,
+      city,
+      county,
+      postcode,
+    };
+
+    const org = {
+      _id,
+      name,
+      email,
+      phone,
+    };
+
     realm.write(() => {
+      realm.create(AddressSchema.name, orgAddress);
+      realm.create(OrganizationSchema.name, org);
+      printers.map(printer => realm.create(PrinterSchema.name, printer));
       paymentTypes.map(paymentType => realm.create(PaymentTypeSchema.name, paymentType));
       discounts.map(discount => realm.create(DiscountSchema.name, discount));
       items.map(item => {

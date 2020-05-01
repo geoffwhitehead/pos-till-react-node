@@ -15,6 +15,7 @@ import {
   BillPeriodSchema,
   PriceGroupSchema,
   PriceGroupItemSchema,
+  PrinterSchema,
 } from './schemas';
 
 const realm = new Realm({
@@ -34,6 +35,7 @@ const realm = new Realm({
     PaymentTypeSchema,
     DiscountSchema,
     BillPeriodSchema,
+    PrinterSchema,
   ],
   schemaVersion: 18,
   migration: function(oldRealm, newRealm) {

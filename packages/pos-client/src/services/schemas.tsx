@@ -47,6 +47,25 @@ export const ItemSchema: Realm.ObjectSchema = {
     categoryId: 'Category',
     price: 'PriceGroupItem[]',
     modifierId: { type: 'Modifier', optional: true },
+    linkedPrinters: 'Printer[]',
+  },
+};
+
+export interface PrinterProps {
+  _id: string;
+  name: string;
+  type: string;
+  address: string;
+}
+
+export const PrinterSchema: Realm.ObjectSchema = {
+  name: 'Printer',
+  primaryKey: '_id',
+  properties: {
+    _id: 'string',
+    name: 'string',
+    type: 'string',
+    address: 'string',
   },
 };
 
@@ -129,11 +148,10 @@ export const DiscountSchema: Realm.ObjectSchema = {
 
 export interface OrganizationProps {
   _id: string;
-  firstName: string;
-  lastName: string;
+  name: string;
   email: string;
-  token: string;
-  dataId: string;
+  phone: string;
+  address: AddressProps;
 }
 
 export const OrganizationSchema: Realm.ObjectSchema = {
@@ -141,14 +159,34 @@ export const OrganizationSchema: Realm.ObjectSchema = {
   primaryKey: '_id',
   properties: {
     _id: 'string',
-    firstName: 'string',
-    lastName: 'string',
+    name: 'string',
     email: 'string',
-    token: 'string',
-    dataId: 'string', // if a change to data on the server occurs this wont match
+    phone: 'string',
+    address: 'Address',
   },
 };
 
+export interface AddressProps {
+  _id: string;
+  line1: string;
+  line2: string;
+  city: string;
+  county: string;
+  postcode: string;
+}
+
+export const AddressSchema: Realm.ObjectSchema = {
+  name: 'Address',
+  primaryKey: '_id',
+  properties: {
+    _id: 'string',
+    line1: 'string',
+    line2: 'string',
+    city: 'string',
+    county: 'string',
+    postcode: 'string',
+  },
+};
 // _id: 'string',
 //     name: 'string',
 //     line1: 'string',
