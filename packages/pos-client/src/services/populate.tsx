@@ -20,16 +20,7 @@ import { getOrganization } from '../api/organization';
 
 export const populate = async () => {
   try {
-    const [
-      items,
-      categories,
-      modifiers,
-      discounts,
-      paymentTypes,
-      priceGroups,
-      printers,
-      organization,
-    ] = await Promise.all([
+    const responses = await Promise.all([
       getItems(),
       getCategories(),
       getModifiers(),
@@ -40,18 +31,46 @@ export const populate = async () => {
       getOrganization(),
     ]);
 
-    if (
-      items.errors ||
-      categories.errors ||
-      modifiers.errors ||
-      discounts.errors ||
-      paymentTypes.errors ||
-      priceGroups.errors ||
-      printers.errors ||
-      organization.errors
-    ) {
-      console.error('Failed to populate');
+    // const [
+    //   items,
+    //   categories,
+    //   modifiers,
+    //   discounts,
+    //   paymentTypes,
+    //   priceGroups,
+    //   printers,
+    //   organization,
+    // ] = await Promise.all([
+    //   getItems(),
+    //   getCategories(),
+    //   getModifiers(),
+    //   getDiscounts(),
+    //   getPaymentTypes(),
+    //   getPriceGroups(),
+    //   getPrinters(),
+    //   getOrganization(),
+    // ]);
+
+    console.log('values', responses);
+    // if (
+    //   items.data.error ||
+    //   categories.data.error ||
+    //   modifiers.data.error ||
+    //   discounts.data.error ||
+    //   paymentTypes.data.error ||
+    //   priceGroups.data.error ||
+    //   printers.data.error ||
+    //   organization.data.error
+    // ) {
+    //   console.error('Failed to populate');
+    //   throw Error('Failed to populate');
+    // }
+
+    if (responses.some(r => !r.ok)) {
+      // logger.error('Failed to populate');
+      throw new Error('Failed to populate data');
     }
+    const [items, categories, modifiers, discounts, paymentTypes, priceGroups, printers, organization] = values;
 
     console.log('modifiers', modifiers);
     console.log('items', items);
