@@ -6,16 +6,17 @@ Monorepo containing react native client app and node server.
 
 **Auth**
 
--   set token expiry to 1m
--   update middleware to make sure expiry is being accounted for
--   implement refresh tokens. - store in local storage - expire 7 days - create secret that uses auth data to make it unique - send token with every request - it will be used if the access token has expired - store access and refresh token after every request
--   create refresh route that returns a new refresh and access token
--   hit the refresh route on app load with the access and refresh tokens in local store. - if refresh has expired - redirect user to login and empty local store
+-   ~set token expiry to 1m~
+-   ~update middleware to make sure expiry is being accounted for~
+-   ~implement refresh tokens. - store in local storage - expire 7 days - create secret that uses auth data to make it unique - send token with every request - it will be used if the access token has expired - store access and refresh token after every request~
+-   ~create refresh route that returns a new refresh and access token~ implemented but i think it can eb deleted
+-   ~hit the refresh route on app load with the access and refresh tokens in local store. - if refresh has expired - redirect user to login and empty local store~
 -   forgot password
 
 **Server**
 
--   logging - largely not implemented throughout
+-   ~standard error response~ look into using typescrpt to enforce. Not sure at which layer to implement
+-   logging - largely not implemented throughout - WIP
 -   errors - define some error codes to pass to app for certain errors / reponses. - look into handling error cases for most of the db requests and handle appropriately - general error handling throughout
 -   unit testing
 -   no results / empty responses are not handling in most places
@@ -26,7 +27,7 @@ Monorepo containing react native client app and node server.
 -   batch job - upload data
 -   add debug package
 -   verification process for auth. quick CRA or just hit an endpoint from an email
-- 
+-
 -   **BUGS**
 -   ids etc are not being created for subdocuments when using mongoose.insertMany
 -   fix populate to work with the api refactor
