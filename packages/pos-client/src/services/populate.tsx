@@ -44,19 +44,6 @@ export const populate = async (params: { userId: string; organizationId: string 
       getPrinters(),
     ]);
 
-    const atn = await AsyncStorage.getItem('accessToken');
-    const rtn = await AsyncStorage.getItem('refreshToken');
-
-    console.log('!!!!!!!! atn', atn);
-    console.log('!!!!!!! rtn', rtn);
-
-    console.log('values', responses);
-
-    if (responses.some(r => !r.ok)) {
-      // logger.error('Failed to populate');
-      throw new Error('Failed to populate data');
-    }
-
     const paymentTypes = await getPaymentTypes();
     const [items, categories, modifiers, discounts, priceGroups, printers] = responses;
 
@@ -72,7 +59,9 @@ export const populate = async (params: { userId: string; organizationId: string 
     // realm.write(() => {
     //   realm.deleteAll();
     // });
-
+    if (responses.some(r => !r.data?.success)) {
+      throw new Error('Failed to populate data');
+    }
     const resolvePriceGroup: (price: PriceGroupItemServerProps[]) => PriceGroupItemProps[] = price => {
       try {
         return price.map(priceGroup => {

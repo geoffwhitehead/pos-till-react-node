@@ -14,7 +14,7 @@ export default (app: Router) => {
 
         try {
             const printers = await printerService.findAll();
-            res.json({ printers }).status(200);
+            res.status(200).json({ success: true, data: printers });
         } catch (err) {
             logger.error(`🔥 error: ${err}`);
             return next(err);
@@ -27,7 +27,7 @@ export default (app: Router) => {
 
         try {
             const printer = await printerService.create(req.body);
-            res.json({ printer }).status(200);
+            res.status(200).json({ success: true, data: printer });
         } catch (err) {
             logger.error(`🔥 error: ${err}`);
             return next(err);
@@ -40,7 +40,7 @@ export default (app: Router) => {
 
         try {
             const printer = await printerService.findByIdAndUpdate(objectId(req.params.id), req.body);
-            res.json({ printer }).status(200);
+            res.status(200).json({ success: true, data: printer });
         } catch (err) {
             logger.error(`🔥 error: ${err}`);
             return next(err);
@@ -53,7 +53,7 @@ export default (app: Router) => {
 
         try {
             const printer = await printerService.findById(objectId(req.params.id));
-            res.json({ printer }).status(200);
+            res.status(200).json({ success: true, data: printer });
         } catch (err) {
             logger.error(`🔥 error: ${err}`);
             return next(err);
