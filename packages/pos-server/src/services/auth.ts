@@ -9,12 +9,17 @@ import { UserProps, UserPropsFull } from '../models/User';
 import { createLoggerContext } from '../loaders/logger';
 
 export interface AuthService {
-    signUp: (params: UserPropsFull & OrganizationProps) => Promise<ServiceResponse<UserProps & AuthToken>>;
-    signIn: (params: { email: string; password: string }) => Promise<ServiceResponse<UserProps & AuthToken>>;
+    signUp: (
+        params: UserPropsFull & OrganizationProps,
+    ) => Promise<ServiceResponse<UserProps & AuthToken & { organizationId: string }>>;
+    signIn: (params: {
+        email: string;
+        password: string;
+    }) => Promise<ServiceResponse<UserProps & AuthToken & { organizationId: string }>>;
     refreshTokens: (params: {
         accessToken: string;
         refreshToken: string;
-    }) => Promise<ServiceResponse<UserProps & AuthToken>>;
+    }) => Promise<ServiceResponse<UserProps & AuthToken & { organizationId: string }>>;
 }
 
 export const serviceName = 'authService';
@@ -126,7 +131,10 @@ export const authService = ({
         // TODO: events
         // eventDispatcher.dispatch(events.user.signUp, { user: userRecord });
 
-        return { success: true, data: { ...userRecord, accessToken, refreshToken } };
+        return {
+            success: true,
+            data: { ...userRecord, accessToken, refreshToken, organizationId: organizationRecord._id.toHexString() },
+        };
     };
 
     const constructRefreshSecret = (token: string, hashedPassword: string) => token + hashedPassword;
@@ -191,6 +199,7 @@ export const authService = ({
             _id: user._id,
             accessToken,
             refreshToken,
+            organizationId: organization._id.toHexString(),
         };
 
         return { success: true, data: response };
@@ -200,6 +209,8 @@ export const authService = ({
         accessToken: string; // not used
         refreshToken: string;
     }) => {
+        console.log('accessToken', params.accessToken);
+        console.log('refreshToken', params.refreshToken);
         const loggerContext = createLoggerContext({
             service: serviceName,
             fn: 'refreshTokens',
@@ -231,6 +242,9 @@ export const authService = ({
             return { success: false };
         }
 
+        Container.set('organizationId', refreshOrganizationId);
+        Container.set('userId', refreshUserId);
+
         const updatedCtx = { ...loggerContext, organizationId: refreshOrganizationId, userId: refreshUserId };
         logger.info('Fetching user', updatedCtx);
 
@@ -244,9 +258,10 @@ export const authService = ({
         }
 
         try {
-            jwt.verify(refreshToken, constructRefreshSecret(refreshToken, password));
+            jwt.verify(refreshToken, constructRefreshSecret(config.refreshTokenSecret, password));
         } catch (err) {
             logger.error('Failed to verify refresh token', { ...updatedCtx, err });
+            logger.debug(err);
             return { success: false };
         }
 
@@ -271,6 +286,7 @@ export const authService = ({
                 firstName,
                 lastName,
                 email,
+                organizationId: refreshOrganizationId,
                 _id,
             },
         };

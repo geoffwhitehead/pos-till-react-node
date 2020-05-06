@@ -31,19 +31,10 @@ export default ({ app }: { app: express.Application }) => {
     app.use(bodyParser.json()); // parse application / json
 
     // auth middleware - decodes jwt and adds to req
-    app.use(
-        extendAuthorize.unless({
-            path: [
-                { url: '/api/organization', methods: ['POST'] },
-                { url: '/api/auth/signup', methods: ['POST'] },
-                { url: '/api/auth/signin', methods: ['POST'] },
-                { url: '/api/auth/refresh-tokens', methods: ['PUT'] },
-            ],
-        }),
-    );
+    app.use(extendAuthorize);
 
     // sets user details on the container
-    app.use(attachTenant);
+    // app.use(attachTenant);
 
     // Load API routes
     app.use(config.api.prefix, routes());

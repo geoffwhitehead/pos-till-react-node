@@ -26,7 +26,7 @@ export const createLoggerContext = (
     };
 };
 
-if (process.env.NODE_ENV !== 'development') {
+if (config.environment !== 'development') {
     transports.push(new winston.transports.Console({ format: winston.format.simple() }));
 } else {
     transports.push(
