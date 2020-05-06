@@ -7,13 +7,13 @@ export interface UserProps extends TenantedModel {
     firstName: string;
     lastName: string;
     email: string;
-    refreshToken?: string;
 }
 
 export type UserPropsFull = UserProps & PrivateUserProps;
 
 interface PrivateUserProps {
     password: string;
+    refreshToken?: string;
 }
 
 export const UserValidation = {

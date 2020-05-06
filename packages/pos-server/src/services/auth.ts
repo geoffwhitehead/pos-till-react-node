@@ -7,26 +7,27 @@ import { InjectedDependencies, ServiceResponse } from '.';
 import { OrganizationProps } from '../models/Organization';
 import { UserProps, UserPropsFull } from '../models/User';
 import { createLoggerContext } from '../loaders/logger';
+import { omit } from 'lodash';
 
 export interface AuthService {
     signUp: (
         params: UserPropsFull & OrganizationProps,
-    ) => Promise<ServiceResponse<UserProps & AuthToken & { organizationId: string }>>;
+    ) => Promise<ServiceResponse<UserProps & { organizationId: string }> & AuthTokens>;
     signIn: (params: {
         email: string;
         password: string;
-    }) => Promise<ServiceResponse<UserProps & AuthToken & { organizationId: string }>>;
+    }) => Promise<ServiceResponse<UserProps & { organizationId: string }> & AuthTokens>;
     refreshTokens: (params: {
         accessToken: string;
         refreshToken: string;
-    }) => Promise<ServiceResponse<UserProps & AuthToken & { organizationId: string }>>;
+    }) => Promise<ServiceResponse<UserProps & { organizationId: string }> & AuthTokens>;
 }
 
 export const serviceName = 'authService';
 
-export interface AuthToken {
-    accessToken: string;
-    refreshToken: string;
+export interface AuthTokens {
+    accessToken?: string;
+    refreshToken?: string;
 }
 
 const createTokens = (params: {
@@ -133,7 +134,9 @@ export const authService = ({
 
         return {
             success: true,
-            data: { ...userRecord, accessToken, refreshToken, organizationId: organizationRecord._id.toHexString() },
+            data: { ...omit(userRecord, 'refreshToken'), organizationId: organizationRecord._id.toHexString() },
+            accessToken,
+            refreshToken,
         };
     };
 
@@ -197,12 +200,10 @@ export const authService = ({
             lastName: user.lastName,
             email: user.email,
             _id: user._id,
-            accessToken,
-            refreshToken,
             organizationId: organization._id.toHexString(),
         };
 
-        return { success: true, data: response };
+        return { success: true, data: response, accessToken, refreshToken };
     };
 
     const refreshTokens: AuthService['refreshTokens'] = async (params: {
@@ -281,14 +282,14 @@ export const authService = ({
         return {
             success: true,
             data: {
-                accessToken: newAccessToken,
-                refreshToken: newRefreshToken,
                 firstName,
                 lastName,
                 email,
                 organizationId: refreshOrganizationId,
                 _id,
             },
+            accessToken: newAccessToken,
+            refreshToken: newRefreshToken,
         };
     };
 

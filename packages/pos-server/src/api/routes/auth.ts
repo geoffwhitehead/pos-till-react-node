@@ -38,9 +38,15 @@ export default (app: Router) => {
 
             try {
                 const authService = Container.get('authService') as AuthService;
-                const user = await authService.signUp(req.body);
-                console.log('user', user);
-                res.status(200).send(user);
+                const response = await authService.signUp(req.body);
+                if (response.success) {
+                    console.log('user', response);
+                    res.set('authorization', 'Bearer ' + response.accessToken);
+                    res.set('x-refresh-token', response.refreshToken);
+                    res.status(200).send({ success: response.success, data: response.data });
+                } else {
+                    res.status(200).send({ success: response.success });
+                }
             } catch (err) {
                 logger.error(`🔥 error: ${err}`);
                 return next(err);
@@ -63,7 +69,15 @@ export default (app: Router) => {
                 const { email, password } = req.body;
                 const authService = Container.get('authService') as AuthService;
                 const response = await authService.signIn({ email, password });
-                return res.json(response).status(200);
+
+                if (response.success) {
+                    console.log('user', response);
+                    res.set('authorization', 'Bearer ' + response.accessToken);
+                    res.set('x-refresh-token', response.refreshToken);
+                    res.status(200).send({ success: response.success, data: response.data });
+                } else {
+                    res.status(200).send({ success: response.success });
+                }
             } catch (err) {
                 logger.error(`🔥 error: ${err}`);
                 return next(err);

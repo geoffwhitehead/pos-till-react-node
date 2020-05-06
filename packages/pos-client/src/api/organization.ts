@@ -1,6 +1,7 @@
-import { Api } from './index';
+import { api } from './index';
 
-export const getOrganization = () => Api.get<OrganizationServerProps>('/organization', {});
+export const getOrganization = (organizationId: string) =>
+  api.get<OrganizationServerProps>(`/organization/${organizationId}`);
 export interface OrganizationServerProps {
   _id?: string;
   name: string;

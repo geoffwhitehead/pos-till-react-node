@@ -1,3 +1,3 @@
-import { Api } from './index'
+import { api } from './index';
 
-export const getCategories = () => Api.get('/product/categories', {})
+export const getCategories = () => api.get('/product/categories', {});

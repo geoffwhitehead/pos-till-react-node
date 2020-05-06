@@ -17,60 +17,48 @@ import {
 } from './schemas';
 import uuidv4 from 'uuid/v4';
 import { getOrganization } from '../api/organization';
+import AsyncStorage from '@react-native-community/async-storage';
 
-export const populate = async () => {
+export const populate = async (params: { userId: string; organizationId: string }) => {
+  const { organizationId, userId } = params;
+
   try {
+    // fetch the organization first ao that any expired tokens can be updated
+    const { data: organization, ok: organizationResponse } = await getOrganization(organizationId);
+
+    if (!organizationResponse) {
+      throw new Error('Failed fetching organization');
+    }
+
+    // const at = await AsyncStorage.getItem('accessToken');
+    // const rt = await AsyncStorage.getItem('refreshToken');
+
+    // console.log('!!!!!!!! at', at);
+    // console.log('!!!!!!! rt', rt);
     const responses = await Promise.all([
       getItems(),
       getCategories(),
       getModifiers(),
       getDiscounts(),
-      getPaymentTypes(),
       getPriceGroups(),
       getPrinters(),
-      getOrganization(),
     ]);
 
-    // const [
-    //   items,
-    //   categories,
-    //   modifiers,
-    //   discounts,
-    //   paymentTypes,
-    //   priceGroups,
-    //   printers,
-    //   organization,
-    // ] = await Promise.all([
-    //   getItems(),
-    //   getCategories(),
-    //   getModifiers(),
-    //   getDiscounts(),
-    //   getPaymentTypes(),
-    //   getPriceGroups(),
-    //   getPrinters(),
-    //   getOrganization(),
-    // ]);
+    const atn = await AsyncStorage.getItem('accessToken');
+    const rtn = await AsyncStorage.getItem('refreshToken');
+
+    console.log('!!!!!!!! atn', atn);
+    console.log('!!!!!!! rtn', rtn);
 
     console.log('values', responses);
-    // if (
-    //   items.data.error ||
-    //   categories.data.error ||
-    //   modifiers.data.error ||
-    //   discounts.data.error ||
-    //   paymentTypes.data.error ||
-    //   priceGroups.data.error ||
-    //   printers.data.error ||
-    //   organization.data.error
-    // ) {
-    //   console.error('Failed to populate');
-    //   throw Error('Failed to populate');
-    // }
 
     if (responses.some(r => !r.ok)) {
       // logger.error('Failed to populate');
       throw new Error('Failed to populate data');
     }
-    const [items, categories, modifiers, discounts, paymentTypes, priceGroups, printers, organization] = values;
+
+    const paymentTypes = await getPaymentTypes();
+    const [items, categories, modifiers, discounts, priceGroups, printers] = responses;
 
     console.log('modifiers', modifiers);
     console.log('items', items);

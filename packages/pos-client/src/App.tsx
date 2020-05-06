@@ -2,7 +2,7 @@ import React from 'react';
 import { SplashScreen } from './pages/SplashScreen/SplashScreen';
 import AsyncStorage from '@react-native-community/async-storage';
 import { AuthContext } from './contexts/AuthContext';
-import { Api } from './api';
+import { api } from './api';
 import { signUp, signIn } from './api/auth';
 import { AuthNavigator } from './navigators';
 import { realm } from './services/Realm';
@@ -10,6 +10,7 @@ import { RealmProvider } from 'react-use-realm';
 import { Main } from './pages/Main/Main';
 import { NavigationContainer } from '@react-navigation/native';
 import { Root } from 'native-base';
+import decode from 'jwt-decode';
 
 export const App = () => {
   const [state, dispatch] = React.useReducer(
@@ -18,110 +19,199 @@ export const App = () => {
         case 'RESTORE_TOKEN':
           return {
             ...prevState,
-            userToken: action.token,
+            accessToken: action.accessToken,
+            refreshToken: action.refreshToken,
+            organizationId: action.organizationId,
+            userId: action.userId,
             isLoading: false,
           };
         case 'SIGN_IN':
           return {
             ...prevState,
             isSignout: false,
-            userToken: action.token,
+            accessToken: action.accessToken,
+            refreshToken: action.refreshToken,
+            organizationId: action.organizationId,
+            userId: action.userId,
           };
         case 'SIGN_OUT':
           return {
             ...prevState,
             isSignout: true,
-            userToken: null,
+            accessToken: null,
+            refreshToken: null,
+            organizationId: null,
+            userId: null,
           };
       }
     },
     {
       isLoading: true,
       isSignout: false,
-      userToken: null,
+      accessToken: null,
+      refreshToken: null,
+      organizationId: null,
+      userId: null,
     },
   );
 
   React.useEffect(() => {
     const bootstrapAsync = async () => {
-      let userToken;
+      let accessToken;
+      let refreshToken;
+      let organizationId;
+      let userId;
 
       try {
-        userToken = await AsyncStorage.getItem('userToken');
+        const [aToken, rToken] = await AsyncStorage.multiGet(['accessToken', 'refreshToken']);
+        accessToken = aToken[1];
+        refreshToken = rToken[1];
       } catch (e) {
-        console.log('Restoring token failed');
+        console.error('Fetching tokens from local storage failed');
       }
-      Api.setHeader('Authorization', `Bearer ${userToken}`);
 
-      // TODO: validate token with server
+      console.log('accessToken', accessToken);
+      console.log('refreshToken', refreshToken);
+      if (!accessToken || !refreshToken) {
+        unsetAuth();
+      }
 
-      dispatch({ type: 'RESTORE_TOKEN', token: userToken });
+      try {
+        const decodedToken = decode(refreshToken);
+        console.log('decodedToken', decodedToken);
+        if (decodedToken.exp < new Date().getTime() / 1000) {
+          unsetAuth();
+          return;
+        } else {
+          organizationId = decodedToken.organizationId;
+          userId = decodedToken.userId;
+        }
+      } catch (e) {
+        unsetAuth();
+        return;
+      }
+
+      console.log('settings headers');
+      api.setHeader('authorization', accessToken);
+      api.setHeader('x-refresh-token', refreshToken);
+
+      dispatch({ type: 'RESTORE_TOKEN', accessToken, refreshToken, organizationId, userId });
+      // dispatch({ type: 'SIGN_OUT' });
     };
 
     bootstrapAsync();
   }, []);
 
+  const unsetAuth = async () => {
+    await AsyncStorage.multiRemove(['accessToken', 'refreshToken']);
+    api.setHeader('authorization', '');
+    api.setHeader('x-refresh-token', '');
+    dispatch({ type: 'SIGN_OUT' });
+  };
+
+  const setAuth = async (params: {
+    accessToken: string;
+    refreshToken: string;
+    organizationId: string;
+    userId: string;
+  }) => {
+    console.log('setting auth');
+    const { accessToken, refreshToken, organizationId, userId } = params;
+    api.setHeader('authorization', accessToken);
+    api.setHeader('x-refresh-token', refreshToken);
+    await AsyncStorage.multiSet([
+      ['accessToken', accessToken],
+      ['refreshToken', refreshToken],
+    ]);
+    dispatch({ type: 'SIGN_IN', accessToken, refreshToken, organizationId, userId });
+  };
+
   const authContext = React.useMemo(
     () => ({
-      signIn: async data => {
+      signIn: async params => {
+        console.log('signing in', params);
         // TODO: handle errors
 
         try {
-          const { ok, data: token } = await signIn(data);
-          if (ok) {
-            Api.setHeader('Authorization', `Bearer ${token}`);
-            await AsyncStorage.setItem('userToken', token);
-            dispatch({ type: 'SIGN_IN', token });
+          const response = await signIn(params);
+
+          console.log('response.data', response.data);
+          if (response.data.success) {
+            const accessToken = response.headers['authorization'];
+            const refreshToken = response.headers['x-refresh-token'];
+
+            console.log('()()()()()');
+            console.log('accessToken', accessToken);
+            console.log('refreshToken', refreshToken);
+            await setAuth({
+              accessToken,
+              refreshToken,
+              organizationId: response.data.data.organizationId,
+              userId: response.data.data._id,
+            });
+          } else {
+            throw new Error('Sign in failed');
           }
         } catch (err) {
+          // TODO: alert the user
           console.log('Error signing in', err);
         }
       },
       signOut: async () => {
         try {
-          await AsyncStorage.removeItem('userToken');
-          Api.setHeader('Authorization', '');
-          dispatch({ type: 'SIGN_OUT' });
-        } catch (e) {
-          console.log('sign out failed');
+          await unsetAuth();
+        } catch (err) {
+          console.error('sign out failed', err);
         }
       },
       signUp: async data => {
         // TODO: handle errors
 
         try {
-          const { ok, data: token } = await signUp(data);
+          const response = await signUp(data);
 
-          if (ok) {
-            Api.setHeader('Authorization', `Bearer ${token}`);
-            await AsyncStorage.setItem('userToken', token);
-            dispatch({ type: 'SIGN_IN', token });
+          if (response.data.success) {
+            const accessToken = response.headers['authorization'];
+            const refreshToken = response.headers['x-refresh-token'];
+            await setAuth({
+              accessToken,
+              refreshToken,
+              organizationId: response.data.data.organizationId,
+              userId: response.data.data._id,
+            });
           } else {
             throw new Error('Sign up failed');
           }
         } catch (err) {
-          console.log('Sign up failed', err);
+          console.error('Sign up failed', err);
         }
       },
     }),
     [],
   );
 
-  if (state.isLoading) {
+  const { isLoading, refreshToken, accessToken, userId, organizationId } = state;
+
+  console.log('stateaa', state);
+  if (isLoading) {
     // We haven't finished checking for the token yet
     return <SplashScreen />;
   }
 
   return (
+    // native base wrapper
     <Root>
+      {/*  react-navigation wrapper */}
       <NavigationContainer>
         <AuthContext.Provider value={authContext}>
-          {state.userToken == null ? (
+          {!accessToken || !refreshToken || !organizationId || !userId ? (
+            // login etc
             <AuthNavigator />
           ) : (
+            // user is authenticated
             <AuthContext.Provider value={authContext}>
               <RealmProvider initialRealm={realm}>
-                <Main />
+                <Main organizationId={organizationId} userId={userId} />
               </RealmProvider>
             </AuthContext.Provider>
           )}

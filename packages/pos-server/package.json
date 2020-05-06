@@ -38,8 +38,6 @@
         "esm": "^3.2.25",
         "express": "^4.17.1",
         "express-basic-auth": "^1.2.0",
-        "express-jwt": "^5.3.3",
-        "express-unless": "^0.5.0",
         "faker": "^4.1.0",
         "global": "^4.4.0",
         "helmet": "^3.21.2",

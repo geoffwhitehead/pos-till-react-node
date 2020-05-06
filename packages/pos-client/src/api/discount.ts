@@ -1,3 +1,3 @@
-import { Api } from './index';
+import { api } from './index';
 
-export const getDiscounts = () => Api.get('/product/discounts', {});
+export const getDiscounts = () => api.get('/product/discounts', {});

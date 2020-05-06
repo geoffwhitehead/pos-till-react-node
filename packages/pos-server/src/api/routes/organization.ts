@@ -24,7 +24,8 @@ export default (app: Router) => {
     route.put('/:id', async (req: Request, res: Response, next: NextFunction) => {
         const logger = Container.get('logger') as LoggerService;
         const organizationService = Container.get('organizationService') as OrganizationService;
-
+        console.log('asdasdkjahsfiuhaiuefnaebnfiuserbf');
+        console.log('req.params', req.params);
         try {
             const organization = await organizationService.findByIdAndUpdate(objectId(req.params.id), req.body);
             res.json({ organization }).status(200);
@@ -38,6 +39,7 @@ export default (app: Router) => {
         const logger = Container.get('logger') as LoggerService;
         const organizationService = Container.get('organizationService') as OrganizationService;
 
+        console.log('req.params', req.params);
         try {
             const organization = await organizationService.findById(objectId(req.params.id));
             res.json({ organization }).status(200);

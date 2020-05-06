@@ -12,7 +12,7 @@ import { PriceGroupContext } from '../../contexts/PriceGroupContext';
 // TODO: this needs to be moved to organizaiton => settings and queried from db
 const DEF_PRICE_GROUP_ID = '5e90eae405a18b11edbf3214';
 
-export const Main: React.FC = () => {
+export const Main: React.FC<{ organizationId: string; userId: string }> = ({ organizationId, userId }) => {
   const billPeriods = useRealmQuery<BillPeriodProps>({ source: BillPeriodSchema.name, filter: 'closed = null' });
   const priceGroups = useRealmQuery<PriceGroupProps>({ source: PriceGroupSchema.name });
 
@@ -24,7 +24,7 @@ export const Main: React.FC = () => {
     const populateAsync = async () => {
       // TODO: use the dataId property to validate whether we need to re populate.
       try {
-        await populate();
+        await populate({ organizationId, userId });
         setPopulating(false);
       } catch (err) {
         console.log('Populating failed', err);
