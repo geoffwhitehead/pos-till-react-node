@@ -65,7 +65,7 @@ export const populate = async (params: { userId: string; organizationId: string 
     const resolvePriceGroup: (price: PriceGroupItemServerProps[]) => PriceGroupItemProps[] = price => {
       try {
         return price.map(priceGroup => {
-          const pG = priceGroups.data.find(({ _id }) => _id === priceGroup.groupId);
+          const pG = priceGroups.data.data.find(({ _id }) => _id === priceGroup.groupId);
           return {
             price: parseInt(priceGroup.price),
             groupId: pG,
@@ -79,7 +79,7 @@ export const populate = async (params: { userId: string; organizationId: string 
     };
 
     // add ids, mongoose doesnt store them seperately on the server
-    const remappedModifiers = modifiers.data.map(modifier => {
+    const remappedModifiers = modifiers.data.data.map(modifier => {
       return {
         ...modifier,
         mods: modifier.mods.map(mod => {
@@ -93,7 +93,13 @@ export const populate = async (params: { userId: string; organizationId: string 
       };
     });
 
-    const { line1, line2 = '', county, city, postcode, _id, name, email, phone } = organization.data;
+    const {
+      address: { line1, line2 = '', county, city, postcode },
+      _id,
+      name,
+      email,
+      phone,
+    } = organization.data;
 
     const orgAddress = {
       _id: uuidv4(),
@@ -114,13 +120,13 @@ export const populate = async (params: { userId: string; organizationId: string 
     realm.write(() => {
       realm.create(AddressSchema.name, orgAddress);
       realm.create(OrganizationSchema.name, org);
-      printers.data.map(printer => realm.create(PrinterSchema.name, printer));
-      paymentTypes.data.map(paymentType => realm.create(PaymentTypeSchema.name, paymentType));
-      discounts.data.map(discount => realm.create(DiscountSchema.name, discount));
-      items.data.map(item => {
+      printers.data.data.map(printer => realm.create(PrinterSchema.name, printer));
+      paymentTypes.data.data.map(paymentType => realm.create(PaymentTypeSchema.name, paymentType));
+      discounts.data.data.map(discount => realm.create(DiscountSchema.name, discount));
+      items.data.data.map(item => {
         const i = {
           ...item,
-          categoryId: categories.data.find(c => c._id === item.categoryId),
+          categoryId: categories.data.data.find(c => c._id === item.categoryId),
           modifierId: item.modifierId ? remappedModifiers.find(({ _id }) => _id === item.modifierId) : null,
           price: resolvePriceGroup(item.price),
         };
