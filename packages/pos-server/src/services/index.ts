@@ -19,7 +19,10 @@ export interface InjectedDependencies {
 export interface ServiceResponse<T> {
     success: boolean;
     data?: T;
-    error?: string;
+    error?: {
+        code?: string;
+        message?: string;
+    };
 }
 
 type Service = { name: string; service: any }; // TODO: figure out how to tpye thiss

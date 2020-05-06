@@ -15,8 +15,8 @@ export default (app: Router) => {
         logger.debug(`Seeding data for org: ${JSON.stringify(organizationId)}`);
 
         try {
-            await maintenanceService.seed();
-            res.json({ success: true }).status(200);
+            const response = await maintenanceService.seed();
+            res.status(200).json(response);
         } catch (err) {
             logger.error(`🔥 error: ${err}`);
             return next(err);

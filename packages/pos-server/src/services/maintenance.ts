@@ -140,6 +140,9 @@ export const maintenanceService = ({
         // }
 
         logger.info('Sucessfully seeded');
+        return {
+            success: true
+        }
     };
     return {
         // seed,

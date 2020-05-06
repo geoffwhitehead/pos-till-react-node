@@ -16,7 +16,7 @@ export default (app: Router) => {
 
         try {
             const users = await userService.findAll();
-            res.json({ users }).status(200);
+            res.status(200).json({ success: true, data: users });
         } catch (err) {
             logger.error(`🔥 error: ${err}`);
             return next(err);
@@ -31,7 +31,7 @@ export default (app: Router) => {
 
         try {
             const user = await userService.create(req.body);
-            res.json({ user }).status(200);
+            res.status(200).json({ success: true, data: user });
         } catch (err) {
             logger.error(`🔥 error: ${err}`);
             return next(err);
@@ -46,7 +46,7 @@ export default (app: Router) => {
 
         try {
             const user = await userService.findByIdAndUpdate(objectId(req.params.id), req.body);
-            res.json({ user }).status(200);
+            res.status(200).json({ success: true, data: user });
         } catch (err) {
             logger.error(`🔥 error: ${err}`);
             return next(err);
@@ -61,7 +61,7 @@ export default (app: Router) => {
 
         try {
             const user = await userService.findById(objectId(req.params.id));
-            res.json({ user }).status(200);
+            res.status(200).json({ success: true, data: user });
         } catch (err) {
             logger.error(`🔥 error: ${err}`);
             return next(err);

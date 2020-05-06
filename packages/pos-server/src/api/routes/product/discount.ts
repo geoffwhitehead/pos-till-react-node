@@ -16,7 +16,8 @@ export default (app: Router) => {
 
         try {
             const discounts = await discountService.findAll();
-            res.json({ discounts }).status(200);
+            res.status(200).json({ success: true, data: discounts })
+
         } catch (err) {
             logger.error(`🔥 error: ${err}`);
             return next(err);
@@ -31,7 +32,7 @@ export default (app: Router) => {
 
         try {
             const discount = await discountService.create(req.body);
-            res.json({ discount }).status(200);
+            res.status(200).json({ success: true, data: discount })
         } catch (err) {
             logger.error(`🔥 error: ${err}`);
             return next(err);
@@ -46,7 +47,7 @@ export default (app: Router) => {
 
         try {
             const discount = await discountService.findByIdAndUpdate(objectId(req.params.id), req.body);
-            res.json({ discount }).status(200);
+            res.status(200).json({ success: true, data: discount })
         } catch (err) {
             logger.error(`🔥 error: ${err}`);
             return next(err);
@@ -61,7 +62,7 @@ export default (app: Router) => {
 
         try {
             const discount = await discountService.findById(objectId(req.params.id));
-            res.json({ discount }).status(200);
+            res.status(200).json({ success: true, data: discount })
         } catch (err) {
             logger.error(`🔥 error: ${err}`);
             return next(err);

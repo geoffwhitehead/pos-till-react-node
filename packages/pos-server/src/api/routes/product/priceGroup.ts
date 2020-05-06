@@ -16,7 +16,8 @@ export default (app: Router) => {
 
         try {
             const priceGroups = await priceGroupService.findAll();
-            res.json({ priceGroups }).status(200);
+            res.status(200).json({ success: true, data: priceGroups })
+
         } catch (err) {
             logger.error(`🔥 error: ${err}`);
             return next(err);
@@ -31,7 +32,8 @@ export default (app: Router) => {
 
         try {
             const priceGroup = await priceGroupService.create(req.body);
-            res.json({ priceGroup }).status(200);
+            res.status(200).json({ success: true, data: priceGroup })
+
         } catch (err) {
             logger.error(`🔥 error: ${err}`);
             return next(err);
@@ -48,7 +50,8 @@ export default (app: Router) => {
 
         try {
             const priceGroup = await priceGroupService.findByIdAndUpdate(objectId(req.params.id), req.body);
-            res.json({ priceGroup }).status(200);
+            res.status(200).json({ success: true, data: priceGroup })
+
         } catch (err) {
             logger.error(`🔥 error: ${err}`);
             return next(err);
@@ -63,7 +66,8 @@ export default (app: Router) => {
 
         try {
             const priceGroup = await priceGroupService.findById(objectId(req.params.id));
-            res.json({ priceGroup }).status(200);
+            res.status(200).json({ success: true, data: priceGroup })
+
         } catch (err) {
             logger.error(`🔥 error: ${err}`);
             return next(err);

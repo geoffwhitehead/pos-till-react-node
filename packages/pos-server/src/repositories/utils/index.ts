@@ -2,7 +2,6 @@ import { TenantModel } from '../../models/utils/multiTenant';
 import mongoose from 'mongoose';
 import { Container } from 'typedi';
 import { omit } from 'lodash';
-import { InsertWriteOpResult } from 'mongodb';
 
 export interface RepositoryFns<T> {
     findAll: () => Promise<T[]>;

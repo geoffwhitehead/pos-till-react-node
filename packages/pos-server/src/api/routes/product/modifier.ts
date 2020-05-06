@@ -16,7 +16,8 @@ export default (app: Router) => {
 
         try {
             const modifiers = await modifierService.findAll();
-            res.json({ modifiers }).status(200);
+            res.status(200).json({ success: true, data: modifiers })
+
         } catch (err) {
             logger.error(`🔥 error: ${err}`);
             return next(err);
@@ -31,7 +32,8 @@ export default (app: Router) => {
 
         try {
             const modifier = await modifierService.create(req.body);
-            res.json({ modifier }).status(200);
+            res.status(200).json({ success: true, data: modifier })
+
         } catch (err) {
             logger.error(`🔥 error: ${err}`);
             return next(err);
@@ -46,7 +48,8 @@ export default (app: Router) => {
 
         try {
             const modifier = await modifierService.findByIdAndUpdate(objectId(req.params.id), req.body);
-            res.json({ modifier }).status(200);
+            res.status(200).json({ success: true, data: modifier })
+
         } catch (err) {
             logger.error(`🔥 error: ${err}`);
             return next(err);
@@ -61,7 +64,8 @@ export default (app: Router) => {
 
         try {
             const modifier = await modifierService.findById(objectId(req.params.id));
-            res.json({ modifier }).status(200);
+            res.status(200).json({ success: true, data: modifier })
+
         } catch (err) {
             logger.error(`🔥 error: ${err}`);
             return next(err);

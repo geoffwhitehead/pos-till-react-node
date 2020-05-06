@@ -16,7 +16,7 @@ export default (app: Router) => {
 
         try {
             const categories = await categoryService.findAll();
-            res.json({ categories }).status(200);
+            res.status(200).json({ success: true, data: categories });
         } catch (err) {
             logger.error(`🔥 error: ${err}`);
             return next(err);
@@ -31,7 +31,7 @@ export default (app: Router) => {
 
         try {
             const category = await categoryService.create(req.body);
-            res.json({ category }).status(200);
+            res.status(200).json({ success: true, data: category });
         } catch (err) {
             logger.error(`🔥 error: ${err}`);
             return next(err);
@@ -46,7 +46,7 @@ export default (app: Router) => {
 
         try {
             const category = await categoryService.findByIdAndUpdate(objectId(req.params.id), req.body);
-            res.json({ category }).status(200);
+            res.status(200).json({ success: true, data: category });
         } catch (err) {
             logger.error(`🔥 error: ${err}`);
             return next(err);
@@ -61,7 +61,7 @@ export default (app: Router) => {
 
         try {
             const category = await categoryService.findById(objectId(req.params.id));
-            res.json({ category }).status(200);
+            res.status(200).json({ success: true, data: category });
         } catch (err) {
             logger.error(`🔥 error: ${err}`);
             return next(err);

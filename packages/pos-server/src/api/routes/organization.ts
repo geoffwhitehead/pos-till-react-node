@@ -14,7 +14,8 @@ export default (app: Router) => {
 
         try {
             const organization = await organizationService.create(req.body);
-            res.json({ organization }).status(200);
+            res.status(200).json({ success: true, data: organization })
+
         } catch (err) {
             logger.error(`🔥 error: ${err}`);
             return next(err);
@@ -28,7 +29,8 @@ export default (app: Router) => {
         console.log('req.params', req.params);
         try {
             const organization = await organizationService.findByIdAndUpdate(objectId(req.params.id), req.body);
-            res.json({ organization }).status(200);
+            res.status(200).json({ success: true, data: organization })
+
         } catch (err) {
             logger.error(`🔥 error: ${err}`);
             return next(err);
@@ -42,7 +44,8 @@ export default (app: Router) => {
         console.log('req.params', req.params);
         try {
             const organization = await organizationService.findById(objectId(req.params.id));
-            res.json({ organization }).status(200);
+            res.status(200).json({ success: true, data: organization })
+
         } catch (err) {
             logger.error(`🔥 error: ${err}`);
             return next(err);
