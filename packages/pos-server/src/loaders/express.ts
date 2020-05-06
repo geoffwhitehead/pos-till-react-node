@@ -4,7 +4,6 @@ import cors from 'cors';
 import routes from '../api/routes';
 import config from '../config';
 import helmet from 'helmet';
-import attachTenant from '../api/middlewares/attachTenant';
 import extendAuthorize from '../api/middlewares/extendAuthorize';
 
 export default ({ app }: { app: express.Application }) => {
@@ -30,11 +29,8 @@ export default ({ app }: { app: express.Application }) => {
     app.use(bodyParser.raw()); // parse raw form data
     app.use(bodyParser.json()); // parse application / json
 
-    // auth middleware - decodes jwt and adds to req
+    // auth middleware - decodes jwt, refresh tokens, attach user to req and container
     app.use(extendAuthorize);
-
-    // sets user details on the container
-    // app.use(attachTenant);
 
     // Load API routes
     app.use(config.api.prefix, routes());
