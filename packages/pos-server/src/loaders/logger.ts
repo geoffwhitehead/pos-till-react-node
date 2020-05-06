@@ -1,5 +1,6 @@
 import winston from 'winston';
 import config from '../config';
+import Container from 'typedi';
 
 const transports = [];
 
@@ -9,6 +10,21 @@ const transports = [];
 //     }));
 
 export type LoggerService = winston.Logger;
+
+export const createLoggerContext = (
+    params: { organizationId?: string; userId?: string; service?: string; fn?: string; err?: any },
+    other: Record<string, string> = {},
+) => {
+    const { organizationId, userId, service, fn } = params;
+
+    return {
+        organizationId: organizationId,
+        userId: userId,
+        service,
+        fn,
+        ...other,
+    };
+};
 
 if (process.env.NODE_ENV !== 'development') {
     transports.push(new winston.transports.Console({ format: winston.format.simple() }));

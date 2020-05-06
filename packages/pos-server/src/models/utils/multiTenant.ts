@@ -1,6 +1,11 @@
 import mongoose, { model, Document, Schema, Model } from 'mongoose';
 
 export type TenantModel<T> = (options?: { skipTenant?: boolean; tenantId: string }) => Model<T & Document, {}>;
+
+export interface TenantedModel {
+    readonly tenantId?: string;
+}
+
 export const tenantModel: <T>(name: string, schema: Schema<T>) => TenantModel<T> = (name, schema) => {
     return ({ tenantId, skipTenant }): any => {
         // TODO: fix types here

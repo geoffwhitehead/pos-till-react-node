@@ -37,6 +37,7 @@ export default ({ app }: { app: express.Application }) => {
                 { url: '/api/organization', methods: ['POST'] },
                 { url: '/api/auth/signup', methods: ['POST'] },
                 { url: '/api/auth/signin', methods: ['POST'] },
+                { url: '/api/auth/refresh-tokens', methods: ['PUT'] },
             ],
         }),
     );

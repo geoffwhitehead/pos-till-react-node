@@ -18,7 +18,8 @@ import { UserProps, CreateUserValidation } from '../../models/User';
 import { AuthService } from '../../services/auth';
 import { celebrate, Joi } from 'celebrate';
 import { OrganizationValidation } from '../../models/Organization';
-import { Logger } from 'winston';
+import { Logger, loggers } from 'winston';
+import { getTokenFromHeader } from '../middlewares/extendAuthorize';
 
 // import middlewares from '../middlewares';
 
@@ -61,12 +62,29 @@ export default (app: Router) => {
             try {
                 const { email, password } = req.body;
                 const authService = Container.get('authService') as AuthService;
-                const user = await authService.signIn({ email, password });
-                return res.json({ user }).status(200);
+                const response = await authService.signIn({ email, password });
+                return res.json(response).status(200);
             } catch (err) {
                 logger.error(`🔥 error: ${err}`);
                 return next(err);
             }
         },
     );
+
+    route.put('/refresh-tokens', async (req: Request, res: Response, next: NextFunction) => {
+        const logger = Container.get('logger') as Logger;
+        logger.debug('Calling refresh-tokens endpoint');
+        try {
+            const authService = Container.get('authService') as AuthService;
+            const response = await authService.refreshTokens({
+                accessToken: getTokenFromHeader(req),
+                refreshToken: req.headers['x-refresh-token'] as string,
+            });
+            return res.json(response).status(200);
+        } catch (err) {
+            const logger = Container.get('logger') as Logger;
+            logger.error(`🔥 error: ${err}`);
+            return next(err);
+        }
+    });
 };

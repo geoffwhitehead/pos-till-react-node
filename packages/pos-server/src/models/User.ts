@@ -1,21 +1,19 @@
 import mongoose, { Schema } from 'mongoose';
-import { tenantModel } from './utils/multiTenant';
+import { tenantModel, TenantedModel } from './utils/multiTenant';
 import { Joi } from 'celebrate';
 
-export interface UserProps {
+export interface UserProps extends TenantedModel {
     _id?: mongoose.Types.ObjectId;
     firstName: string;
     lastName: string;
     email: string;
-    token?: string;
-    tenantId?: string; // TODO: fix
+    refreshToken?: string;
 }
 
 export type UserPropsFull = UserProps & PrivateUserProps;
 
 interface PrivateUserProps {
     password: string;
-    token?: string;
 }
 
 export const UserValidation = {
@@ -51,7 +49,7 @@ const UserSchema: Schema<UserPropsFull> = new Schema(
             required: true,
             minLength: 7,
         },
-        token: {
+        refreshToken: {
             type: String,
         },
     },

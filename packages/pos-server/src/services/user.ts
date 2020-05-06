@@ -125,7 +125,6 @@ export const userService = ({ repositories: { userRepository }, logger }: Inject
     const findAll: UserService['findAll'] = async () => await userRepository.findAll();
     const create = async props => {
         const user = await userRepository.create(props);
-        logger.info('User created');
         return user;
     };
 

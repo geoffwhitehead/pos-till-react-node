@@ -52,16 +52,21 @@ export const repository = <T, U>({
 
     const findOne = async props => {
         const doc = await model(tenanted && getTenant()).findOne(props);
-        return clean(doc);
+        return doc ? clean(doc) : doc
     };
 
     const findByIdAndUpdate = async (id, props) => {
         const filteredProps = omit(props, 'tenantId');
         const updatedDoc = await model(tenanted && getTenant()).findByIdAndUpdate(id, filteredProps, { new: true });
-        return clean(updatedDoc);
+        console.log('*************** updatedDoc', JSON.stringify(updatedDoc, null, 4));
+        return updatedDoc ? clean(updatedDoc) : updatedDoc
     };
 
-    const findById = async id => await model(tenanted && getTenant()).findById(id);
+    const findById = async id => {
+        const doc = await model(tenanted && getTenant()).findById(id);
+        console.log('*************** doc', JSON.stringify(doc, null, 4));
+        return doc ? clean(doc) : doc
+    };
 
     return fns({ findAll, create, findOne, findByIdAndUpdate, findById, insert });
 };

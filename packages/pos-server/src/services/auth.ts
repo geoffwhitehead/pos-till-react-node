@@ -1,135 +1,284 @@
 import Container from 'typedi';
 import jwt from 'jsonwebtoken';
 // import MailerService from './mailer';
-import config from '../config';
 import argon2 from 'argon2';
 import { randomBytes } from 'crypto';
-import { InjectedDependencies } from '.';
+import { InjectedDependencies, ServiceResponse } from '.';
 import { OrganizationProps } from '../models/Organization';
 import { UserProps, UserPropsFull } from '../models/User';
-import { ObjectId } from '../utils/objectId';
+import { createLoggerContext } from '../loaders/logger';
 
 export interface AuthService {
-    signUp: (params: UserPropsFull & OrganizationProps) => Promise<UserProps & { token: string }>;
-    signIn: (params: { email: string; password: string }) => Promise<UserProps & { token: string }>;
+    signUp: (params: UserPropsFull & OrganizationProps) => Promise<ServiceResponse<UserProps & AuthToken>>;
+    signIn: (params: { email: string; password: string }) => Promise<ServiceResponse<UserProps & AuthToken>>;
+    refreshTokens: (params: {
+        accessToken: string;
+        refreshToken: string;
+    }) => Promise<ServiceResponse<UserProps & AuthToken>>;
 }
 
-const generateToken = (params: { organizationId: ObjectId; userId: ObjectId }): string => {
-    const { userId, organizationId } = params;
-    const today = new Date();
-    const exp = new Date(today);
-    exp.setDate(today.getDate() + 60);
+export const serviceName = 'authService';
 
-    return jwt.sign(
+export interface AuthToken {
+    accessToken: string;
+    refreshToken: string;
+}
+
+const createTokens = (params: {
+    organizationId: string;
+    userId: string;
+    accessTokenSecret: string;
+    refreshTokenSecret: string;
+}): Promise<[string, string]> => {
+    const { userId, organizationId, accessTokenSecret, refreshTokenSecret } = params;
+
+    const createAccessToken = jwt.sign(
         {
             userId,
             organizationId,
-            exp: exp.getTime() / 1000,
         },
-        config.jwtSecret,
+        accessTokenSecret,
+        {
+            expiresIn: '1m',
+        },
     );
+
+    const createRefreshToken = jwt.sign(
+        {
+            userId,
+            organizationId,
+        },
+        refreshTokenSecret,
+        {
+            expiresIn: '7d',
+        },
+    );
+
+    return Promise.all([createAccessToken, createRefreshToken]);
 };
 
 export const authService = ({
     repositories: { userRepository, organizationRepository },
     logger,
     mailer,
+    config,
 }: InjectedDependencies): AuthService => {
-    const signUp = async params => {
-        try {
-            const { firstName, lastName, password, email, name, phone, address } = params;
+    const signUp: AuthService['signUp'] = async params => {
+        const loggerContext = createLoggerContext({ service: serviceName, fn: 'signUp' });
 
-            logger.silly('Hashing password');
-            const hashedPassword = await argon2.hash(password, { salt: randomBytes(32) });
+        const { firstName, lastName, password, email, name, phone, address } = params;
 
-            const organizationRecord = await organizationRepository.create({ name, email, phone, address });
-            logger.info(`Created organization: ${organizationRecord._id}`);
+        logger.info('Hashing password', loggerContext);
+        const hashedPassword = await argon2.hash(password, { salt: randomBytes(32) });
 
-            if (!organizationRecord) {
-                throw new Error('Organization cannot be created');
-            }
+        const organizationRecord = await organizationRepository.create({ name, email, phone, address });
+        logger.info(`Created organization: ${organizationRecord._id}`, loggerContext);
 
-            Container.set('organizationId', organizationRecord._id);
-
-            logger.silly('Creating user db record');
-            const userRecord = await userRepository.create({
-                firstName,
-                lastName,
-                email,
-                password: hashedPassword,
-            });
-
-            if (!userRecord) {
-                throw new Error('User cannot be created');
-            }
-
-            logger.silly('Generating JWT');
-            const token = generateToken({ userId: userRecord._id, organizationId: organizationRecord._id });
-            logger.silly(`Sign JWT for userId: ${userRecord._id}, org: ${organizationRecord._id}`);
-
-            // save the generated token to the user object
-            await userRepository.findByIdAndUpdate(userRecord._id, { token });
-
-            logger.silly('Sending welcome email');
-            await mailer.sendWelcomeEmail(userRecord.email);
-
-            // TODO: events
-            // eventDispatcher.dispatch(events.user.signUp, { user: userRecord });
-
-            return { ...userRecord, token };
-        } catch (e) {
-            logger.error(e);
-
-            // TODO: remove changes - org and user
-            throw e;
+        if (!organizationRecord) {
+            logger.error('Organization not found', loggerContext);
+            return {
+                success: false,
+            };
         }
+
+        Container.set('organizationId', organizationRecord._id);
+
+        logger.info('Creating user db record', { ...loggerContext, organizationId: organizationRecord._id });
+        const userRecord = await userRepository.create({
+            firstName,
+            lastName,
+            email,
+            password: hashedPassword,
+        });
+
+        if (!userRecord) {
+            logger.error('Failed to create user', { ...loggerContext, organizationId: organizationRecord._id });
+            // TODO: reverse org creation
+            return {
+                success: false,
+            };
+        }
+
+        logger.info('Generating JWT', {
+            ...loggerContext,
+            organizationId: organizationRecord._id,
+            userId: userRecord._id,
+        });
+
+        const [accessToken, refreshToken] = await createTokens({
+            userId: userRecord._id.toHexString(),
+            organizationId: organizationRecord._id.toHexString(),
+            accessTokenSecret: config.accessTokenSecret,
+            refreshTokenSecret: constructRefreshSecret(config.refreshTokenSecret, hashedPassword),
+        });
+
+        // save the generated token to the user object
+        await userRepository.findByIdAndUpdate(userRecord._id, { refreshToken });
+
+        logger.info('Sending welcome email', {
+            ...loggerContext,
+            organizationId: organizationRecord._id,
+            userId: userRecord._id,
+        });
+
+        await mailer.sendWelcomeEmail(userRecord.email);
+
+        // TODO: events
+        // eventDispatcher.dispatch(events.user.signUp, { user: userRecord });
+
+        return { success: true, data: { ...userRecord, accessToken, refreshToken } };
     };
 
-    const signIn = async params => {
+    const constructRefreshSecret = (token: string, hashedPassword: string) => token + hashedPassword;
+
+    const signIn: AuthService['signIn'] = async (params: { email: string; password: string }) => {
         /**
          * TODO: app currently only support 1 user with email address matching company email
          * In future will need to refactor this. Perhaps by creating tenantless auth model which contains
          * mapping from user to organization
          */
-
         const { email, password } = params;
-        logger.info(`Called sign in with: ${params}`);
+
+        const loggerContext = createLoggerContext({ service: serviceName, fn: 'signUp' }, { email });
+
+        logger.info(`Attempting to sign in`, loggerContext);
 
         const organization = await organizationRepository.findOne({ email });
+
         if (!organization) {
-            logger.error('Organization not found');
-            throw new Error('User not found');
+            logger.error('Organization not found', loggerContext);
+            return { success: false };
         }
 
         Container.set('organizationId', organization._id);
+
+        logger.info('Finding user', { loggerContext, organization: organization._id });
 
         const user = await userRepository.findOneFull({ email });
         if (!user) {
-            logger.error('User not found');
-            throw new Error('User not found');
+            logger.error('User not found', { loggerContext, organization: organization._id });
+            return { success: false };
         }
+
+        const updatedContext = { ...loggerContext, userId: user._id, organizationId: organization._id };
 
         Container.set('organizationId', organization._id);
 
-        logger.silly('Checking password');
+        logger.info('Checking password', updatedContext);
 
         const validPassword = await argon2.verify(user.password, password);
-        if (validPassword) {
-            logger.silly('Password is valid!');
-            logger.silly('Generating JWT');
-            const token = generateToken({ organizationId: organization._id, userId: user._id });
 
-            userRepository.findByIdAndUpdate(user._id, { token });
-
-            const { firstName, lastName, email } = user;
-            return { firstName, lastName, email, token };
-        } else {
-            throw new Error('Invalid Password');
+        if (!validPassword) {
+            logger.error('Password invalid', updatedContext);
+            return { success: false };
         }
+
+        logger.info('Generating JWT', updatedContext);
+        const [accessToken, refreshToken] = await createTokens({
+            organizationId: organization._id.toHexString(),
+            userId: user._id.toHexString(),
+            accessTokenSecret: config.accessTokenSecret,
+            refreshTokenSecret: constructRefreshSecret(config.refreshTokenSecret, user.password),
+        });
+
+        logger.info('Updating user with new refesh token', updatedContext);
+        await userRepository.findByIdAndUpdate(user._id, { refreshToken });
+
+        const response = {
+            firstName: user.firstName,
+            lastName: user.lastName,
+            email: user.email,
+            _id: user._id,
+            accessToken,
+            refreshToken,
+        };
+
+        return { success: true, data: response };
+    };
+
+    const refreshTokens: AuthService['refreshTokens'] = async (params: {
+        accessToken: string; // not used
+        refreshToken: string;
+    }) => {
+        const loggerContext = createLoggerContext({
+            service: serviceName,
+            fn: 'refreshTokens',
+        });
+
+        const { refreshToken } = params;
+
+        let refreshUserId = null;
+        let refreshOrganizationId = null;
+
+        logger.info('Decoding JWT', loggerContext);
+
+        try {
+            const decodedToken = jwt.decode(refreshToken);
+            refreshUserId = decodedToken.userId;
+            refreshOrganizationId = decodedToken.organizationId;
+        } catch (err) {
+            logger.error('Error decoding token', { ...loggerContext, err });
+            return { success: false };
+        }
+
+        if (!refreshUserId) {
+            logger.error('User id not found in refresh token', loggerContext);
+            return { success: false };
+        }
+
+        if (!refreshOrganizationId) {
+            logger.error('Org id not found in refresh token', loggerContext);
+            return { success: false };
+        }
+
+        const updatedCtx = { ...loggerContext, organizationId: refreshOrganizationId, userId: refreshUserId };
+        logger.info('Fetching user', updatedCtx);
+
+        const user = await userRepository.findOneFull({ _id: refreshUserId });
+
+        const { firstName, lastName, email, _id, password } = user;
+
+        if (!user) {
+            logger.error('User not found in db', updatedCtx);
+            return { success: false };
+        }
+
+        try {
+            jwt.verify(refreshToken, constructRefreshSecret(refreshToken, password));
+        } catch (err) {
+            logger.error('Failed to verify refresh token', { ...updatedCtx, err });
+            return { success: false };
+        }
+
+        logger.info('Creating new tokens', updatedCtx);
+        const [newAccessToken, newRefreshToken] = await createTokens({
+            organizationId: refreshOrganizationId,
+            userId: refreshUserId,
+            accessTokenSecret: config.accessTokenSecret,
+            refreshTokenSecret: constructRefreshSecret(config.refreshTokenSecret, password),
+        });
+
+        logger.info('Updating user with new refesh token', updatedCtx);
+        await userRepository.findByIdAndUpdate(_id, { refreshToken });
+
+        // TODO: check update occured
+
+        return {
+            success: true,
+            data: {
+                accessToken: newAccessToken,
+                refreshToken: newRefreshToken,
+                firstName,
+                lastName,
+                email,
+                _id,
+            },
+        };
     };
 
     return {
         signUp,
         signIn,
+        refreshTokens,
     };
 };

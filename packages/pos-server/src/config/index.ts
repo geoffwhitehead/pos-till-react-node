@@ -8,13 +8,43 @@ if (!envFound) {
     throw new Error("⚠️  Couldn't find .env file  ⚠️");
 }
 
+export interface EnvConfig {
+    environment: string;
+    appName: string;
+    port: string;
+    databaseURL: string;
+    accessTokenSecret: string;
+    refreshTokenSecret: string;
+    logs: {
+        level: string;
+    };
+    agenda: {
+        dbCollection: string;
+        pooltime: string;
+        concurrency: number;
+    };
+    agendash: {
+        user: string;
+        password: string;
+    };
+    api: {
+        prefix: string;
+    };
+    emails: {
+        apiKey: string;
+        domain: string;
+    };
+}
+
 export default {
-    appName: 'POS Server',
+    appName: 'Settled POS Server',
+    environment: process.env.NODE_ENV || 'development',
     port: process.env.PORT,
     databaseURL: process.env.MONGODB_URI,
-    jwtSecret: process.env.JWT_SECRET,
+    accessTokenSecret: process.env.ACCESS_TOKEN_SECRET,
+    refreshTokenSecret: process.env.REFRESH_TOKEN_SECRET,
     logs: {
-        level: process.env.LOG_LEVEL || 'silly',
+        level: process.env.LOG_LEVEL || 'info',
     },
     agenda: {
         dbCollection: process.env.AGENDA_DB_COLLECTION,
@@ -32,4 +62,4 @@ export default {
         apiKey: process.env.SENDGRID_API_KEY,
         domain: process.env.SENDGRID_DOMAIN,
     },
-};
+} as EnvConfig;

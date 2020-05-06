@@ -17,7 +17,7 @@ export default ({ mongoConnection }: { mongoConnection }) => {
 
         console.log('repositories', repositories);
         // inject loaders into services
-        const services = registerServices({ logger, repositories, mailer });
+        const services = registerServices({ logger, repositories, mailer, config });
         console.log('services', services);
 
         Container.set('agenda', agenda);
