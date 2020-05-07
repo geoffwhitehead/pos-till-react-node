@@ -105,7 +105,7 @@ export const maintenanceService = ({
                 categoryId: insertedCategories[random(categories.length - 1)]._id,
                 price: generatePriceGroups(priceGroups),
                 stock: 10,
-                // modifierId: faker.random.boolean() ? newModifier._id : null,
+                modifierId: faker.random.boolean() ? newModifier._id : null,
                 linkedPrinters: [printer._id],
             };
         });
