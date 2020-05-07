@@ -39,7 +39,7 @@ const realm = new Realm({
     PrinterSchema,
     AddressSchema,
   ],
-  schemaVersion: 19,
+  schemaVersion: 20,
   migration: function(oldRealm, newRealm) {
     newRealm.deleteAll();
   },

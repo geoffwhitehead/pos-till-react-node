@@ -10,7 +10,7 @@ import { BillPeriodContext } from '../../contexts/BillPeriodContext';
 import { PriceGroupContext } from '../../contexts/PriceGroupContext';
 
 // TODO: this needs to be moved to organizaiton => settings and queried from db
-const DEF_PRICE_GROUP_ID = '5e90eae405a18b11edbf3214';
+// const DEF_PRICE_GROUP_ID = '5e90eae405a18b11edbf3214';
 
 export const Main: React.FC<{ organizationId: string; userId: string }> = ({ organizationId, userId }) => {
   const billPeriods = useRealmQuery<BillPeriodProps>({ source: BillPeriodSchema.name, filter: 'closed = null' });
@@ -55,9 +55,17 @@ export const Main: React.FC<{ organizationId: string; userId: string }> = ({ org
 
   useEffect(() => {
     if (priceGroups && !populating) {
-      setPriceGroup(priceGroups.find(pG => pG._id === DEF_PRICE_GROUP_ID));
+      console.log('----- priceGroups', priceGroups);
+      priceGroups.map(pg => console.log('pg', pg));
+      setPriceGroup(priceGroups[0]); // TODO: use first price group - need to change this to use default flag
     }
   }, [priceGroups, populating]);
+
+  console.log('***********');
+  console.log('populating', populating);
+  console.log('billPeriod', billPeriod);
+  console.log('priceGroup', priceGroup);
+  console.log('***********');
 
   return populating || !billPeriod || !priceGroup ? (
     <Loading />

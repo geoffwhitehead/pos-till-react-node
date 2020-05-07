@@ -14,6 +14,9 @@ import {
   PrinterSchema,
   AddressSchema,
   OrganizationSchema,
+  PriceGroupSchema,
+  ItemProps,
+  PrinterProps,
 } from './schemas';
 import uuidv4 from 'uuid/v4';
 import { getOrganization } from '../api/organization';
@@ -47,18 +50,11 @@ export const populate = async (params: { userId: string; organizationId: string 
     const paymentTypes = await getPaymentTypes();
     const [items, categories, modifiers, discounts, priceGroups, printers] = responses;
 
-    console.log('modifiers', modifiers);
-    console.log('items', items);
-    console.log('categories', categories);
-    console.log('discounts', discounts);
-    console.log('paymentTypes', paymentTypes);
     console.log('priceGroups', priceGroups);
-    console.log('printers', printers);
-    console.log('organization', organization);
     // TODO: remove after dev
-    // realm.write(() => {
-    //   realm.deleteAll();
-    // });
+    realm.write(() => {
+      realm.deleteAll();
+    });
     if (responses.some(r => !r.data?.success)) {
       throw new Error('Failed to populate data');
     }
@@ -67,7 +63,7 @@ export const populate = async (params: { userId: string; organizationId: string 
         return price.map(priceGroup => {
           const pG = priceGroups.data.data.find(({ _id }) => _id === priceGroup.groupId);
           return {
-            price: parseInt(priceGroup.price),
+            price: parseInt(priceGroup.amount),
             groupId: pG,
           };
         });
@@ -76,6 +72,20 @@ export const populate = async (params: { userId: string; organizationId: string 
           'Error trying to resolve a price group lookup, most likely the price group added to a modifier or item no longer exists',
         );
       }
+    };
+
+    const resolveLinkedPrinters = (item: ItemProps): PrinterProps[] => {
+      const populatedPrinters = item.linkedPrinters.reduce((acc, printerId) => {
+        const linkedPrinter = printers.data.data.find(({ _id }) => _id === printerId);
+        if (!linkedPrinter) {
+          console.error(`Printer ${printerId} not found for item: ${item._id}`);
+          return acc;
+        }
+
+        return [...acc, linkedPrinter];
+      }, []);
+
+      return populatedPrinters;
     };
 
     // add ids, mongoose doesnt store them seperately on the server
@@ -117,9 +127,12 @@ export const populate = async (params: { userId: string; organizationId: string 
       phone,
     };
 
+    console.log('printers', printers);
+
     realm.write(() => {
       realm.create(AddressSchema.name, orgAddress);
       realm.create(OrganizationSchema.name, org);
+      priceGroups.data.data.map(priceGroup => realm.create(PriceGroupSchema.name, priceGroup));
       printers.data.data.map(printer => realm.create(PrinterSchema.name, printer));
       paymentTypes.data.data.map(paymentType => realm.create(PaymentTypeSchema.name, paymentType));
       discounts.data.data.map(discount => realm.create(DiscountSchema.name, discount));
@@ -129,12 +142,15 @@ export const populate = async (params: { userId: string; organizationId: string 
           categoryId: categories.data.data.find(c => c._id === item.categoryId),
           modifierId: item.modifierId ? remappedModifiers.find(({ _id }) => _id === item.modifierId) : null,
           price: resolvePriceGroup(item.price),
+          linkedPrinters: resolveLinkedPrinters(item),
         };
         realm.create(ItemSchema.name, i, true);
         // need to update item.category with object
       });
     });
+
+    console.log('Done populating');
   } catch (err) {
-    console.log('ERROR ', err);
+    console.error('Error populting ', err);
   }
 };

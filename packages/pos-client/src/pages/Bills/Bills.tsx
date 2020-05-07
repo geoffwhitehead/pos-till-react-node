@@ -16,10 +16,10 @@ export const Bills = ({ navigation }) => {
   const openDrawer = () => navigation.openDrawer();
 
   const navigateToCheckout = bill => navigation.navigate(routes.checkout, { selectedBill: bill });
-  
+
   // TODO: onSelectBill function duped in drawer->checkout ... refactor
   const onSelectBill = (tab, bill) => {
-    console.log('onSelectBill', tab, bill);
+    console.log('onSelectBill +++++ ', tab, bill);
     if (bill) {
       navigateToCheckout(bill);
     } else {

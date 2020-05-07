@@ -6,6 +6,7 @@ export interface ItemProps {
   categoryId: Realm.Collection<CategoryProps>;
   price: number;
   modifierId?: Realm.Collection<ModifierProps>;
+  linkedPrinters: Realm.Collection<PrinterProps>;
 }
 
 export interface PriceGroupItemProps {

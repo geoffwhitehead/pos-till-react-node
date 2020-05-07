@@ -14,7 +14,6 @@ const api = create({
 
 api.addMonitor(async response => {
   if (response.ok) {
-    console.log('response.headers', response.headers);
     const accessToken = response.headers['authorization'];
     const refreshToken = response.headers['x-refresh-token'];
 

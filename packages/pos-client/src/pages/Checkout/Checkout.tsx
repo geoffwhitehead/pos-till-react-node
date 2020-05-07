@@ -54,7 +54,7 @@ export const Checkout: React.FC<CheckoutProps> = ({ navigation, route }) => {
   console.log('route.params', route.params);
   useEffect(() => {
     const selectedBill = route.params?.selectedBill;
-    setActiveBill(selectedBill);
+    selectedBill && setActiveBill(selectedBill);
 
     console.log('selectedBill', selectedBill);
     // console.log('activeBill', activeBill);
@@ -109,12 +109,13 @@ export const Checkout: React.FC<CheckoutProps> = ({ navigation, route }) => {
 
   // TODO:  function duped in drawer->bills ... refactor
   const onSelectBill = (tab, bill) => {
-    console.log('onSelectBill cout', tab, bill);
+    console.log('onSelectBill cout', tab, bill, billPeriod);
     if (bill) {
       setActiveBill(bill);
     } else {
       realm.write(() => {
         const bill = realm.create(BillSchema.name, { _id: uuidv4(), tab, billPeriod });
+        console.log('created bill', bill);
         setActiveBill(bill);
       });
     }
