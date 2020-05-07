@@ -1,8 +1,20 @@
 # Settled POS
 
-Monorepo containing react native client app and node server.
-
 ## Todo
+
+**Current**
+
+-   App performance isnt great with realm. With around 1000 items in the db the UI is very unresponsive taking seconds to respond to user input.
+    Using memo and callbacks is unpredicatable because react doesnt seem to work well with the realm objects.
+    Not sure where the problems lies as its even slightly laggy with 10s of items in the UI.
+
+TODO:
+
+-   Look at watermelonDB
+-   Does it return plain js objects.
+-   look at creating a layer so it will make swapping out the db easier in the future if needed
+-   branch and create a simple demo with 1000 records.
+-   should redux be used?
 
 **Auth**
 
