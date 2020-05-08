@@ -15,6 +15,7 @@ TODO:
 -   look at creating a layer so it will make swapping out the db easier in the future if needed
 -   branch and create a simple demo with 1000 records.
 -   should redux be used?
+-   ANDROID SETUP: complete setup for watermelon: https://nozbe.github.io/WatermelonDB/Installation.html
 
 **Auth**
 
