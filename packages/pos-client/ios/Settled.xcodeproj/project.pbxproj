@@ -20,11 +20,13 @@
 		2DCD954D1E0B4F2C00145EB5 /* SettledTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* SettledTests.m */; };
 		4DAB87E83FB0F8E413EA3C28 /* libPods-Settled-tvOSTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 262FB68990FABB4B74A57DD9 /* libPods-Settled-tvOSTests.a */; };
 		63C37E8B2AC542F6BC4A8877 /* libRNGestureHandler-tvOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EB604BAD56CE40729982F1CB /* libRNGestureHandler-tvOS.a */; };
+		6F401A2C24658B2F00C02658 /* File.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F401A2B24658B2F00C02658 /* File.swift */; };
 		6F5E4DF423FD7A87001EE9DA /* rubicon-icon-font.ttf in Resources */ = {isa = PBXBuildFile; fileRef = D29623324D374A3888E38C4A /* rubicon-icon-font.ttf */; };
 		6FFE528A240C630F001623AD /* StarIO_Extension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6FFE5288240C630F001623AD /* StarIO_Extension.framework */; };
 		6FFE528B240C630F001623AD /* StarIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6FFE5289240C630F001623AD /* StarIO.framework */; };
 		6FFE528D240C6321001623AD /* CoreBluetooth.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6FFE528C240C6321001623AD /* CoreBluetooth.framework */; };
 		6FFE528F240C632A001623AD /* ExternalAccessory.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6FFE528E240C6329001623AD /* ExternalAccessory.framework */; };
+		A16C4B1F3E6B4FD89E0DDF63 /* libWatermelonDB.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D79D238921C0454A9A3EE4E9 /* libWatermelonDB.a */; };
 		BEDAA4C29F2A455594DDC00A /* libRNGestureHandler.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7ECFD547ABDD40A8941F8AC8 /* libRNGestureHandler.a */; };
 		ED297163215061F000B7C4FE /* JavaScriptCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ED297162215061F000B7C4FE /* JavaScriptCore.framework */; };
 		ED2971652150620600B7C4FE /* JavaScriptCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ED2971642150620600B7C4FE /* JavaScriptCore.framework */; };
@@ -37,6 +39,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = 2D02E47A1E0B4A5D006451C7;
 			remoteInfo = "Settled-tvOS";
+		};
+		6F401A3024658B5000C02658 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3066E71CDF5942D99CE78C94 /* WatermelonDB.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 6E660D5E213BCCD300189354;
+			remoteInfo = WatermelonDB;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -56,6 +65,7 @@
 		2D02E47B1E0B4A5D006451C7 /* Settled-tvOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Settled-tvOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2D02E4901E0B4A5D006451C7 /* Settled-tvOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Settled-tvOSTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2D16E6891FA4F8E400B85C8A /* libReact.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libReact.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		3066E71CDF5942D99CE78C94 /* WatermelonDB.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = WatermelonDB.xcodeproj; path = "../node_modules/@nozbe/watermelondb/native/ios/WatermelonDB.xcodeproj"; sourceTree = "<group>"; };
 		34E316EC11926A316EADC97C /* Pods-Settled-tvOS.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Settled-tvOS.release.xcconfig"; path = "Target Support Files/Pods-Settled-tvOS/Pods-Settled-tvOS.release.xcconfig"; sourceTree = "<group>"; };
 		392317E8F372604E55971F70 /* Pods-SettledTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SettledTests.release.xcconfig"; path = "Target Support Files/Pods-SettledTests/Pods-SettledTests.release.xcconfig"; sourceTree = "<group>"; };
 		3DB2CF04E9E745C183D9674C /* FontAwesome.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome.ttf; path = "../node_modules/react-native-vector-icons/Fonts/FontAwesome.ttf"; sourceTree = "<group>"; };
@@ -67,6 +77,8 @@
 		58168F475B2248A299533EE7 /* Roboto.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Roboto.ttf; path = "../node_modules/native-base/Fonts/Roboto.ttf"; sourceTree = "<group>"; };
 		5935ACBC51A44A649C28A5D2 /* Fontisto.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Fontisto.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Fontisto.ttf"; sourceTree = "<group>"; };
 		5C3EFA04EABA7989E628AC64 /* Pods-Settled-tvOSTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Settled-tvOSTests.debug.xcconfig"; path = "Target Support Files/Pods-Settled-tvOSTests/Pods-Settled-tvOSTests.debug.xcconfig"; sourceTree = "<group>"; };
+		6F401A2A24658B2F00C02658 /* Settled-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Settled-Bridging-Header.h"; sourceTree = "<group>"; };
+		6F401A2B24658B2F00C02658 /* File.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = File.swift; sourceTree = "<group>"; };
 		6FFE5288240C630F001623AD /* StarIO_Extension.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StarIO_Extension.framework; path = "../node_modules/react-native-star-prnt/ios/Frameworks/StarIO_Extension.framework"; sourceTree = "<group>"; };
 		6FFE5289240C630F001623AD /* StarIO.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StarIO.framework; path = "../node_modules/react-native-star-prnt/ios/Frameworks/StarIO.framework"; sourceTree = "<group>"; };
 		6FFE528C240C6321001623AD /* CoreBluetooth.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreBluetooth.framework; path = System/Library/Frameworks/CoreBluetooth.framework; sourceTree = SDKROOT; };
@@ -84,6 +96,7 @@
 		BD8F1177C1CF42868E6C9991 /* Entypo.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Entypo.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Entypo.ttf"; sourceTree = "<group>"; };
 		CCB303FA7BFB41B09A27FAA2 /* Foundation.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Foundation.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Foundation.ttf"; sourceTree = "<group>"; };
 		D29623324D374A3888E38C4A /* rubicon-icon-font.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "rubicon-icon-font.ttf"; path = "../node_modules/native-base/Fonts/rubicon-icon-font.ttf"; sourceTree = "<group>"; };
+		D79D238921C0454A9A3EE4E9 /* libWatermelonDB.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libWatermelonDB.a; sourceTree = "<group>"; };
 		D877573166CE4D8F8579829B /* AntDesign.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = AntDesign.ttf; path = "../node_modules/react-native-vector-icons/Fonts/AntDesign.ttf"; sourceTree = "<group>"; };
 		D87FD957C337447EB7DF55C4 /* FontAwesome5_Brands.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome5_Brands.ttf; path = "../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Brands.ttf"; sourceTree = "<group>"; };
 		E38A05147C05473CBA1C9AC9 /* MaterialCommunityIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = MaterialCommunityIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/MaterialCommunityIcons.ttf"; sourceTree = "<group>"; };
@@ -107,6 +120,7 @@
 				ED297163215061F000B7C4FE /* JavaScriptCore.framework in Frameworks */,
 				BEDAA4C29F2A455594DDC00A /* libRNGestureHandler.a in Frameworks */,
 				298566B4182437FDC9416AAA /* libPods-Settled.a in Frameworks */,
+				A16C4B1F3E6B4FD89E0DDF63 /* libWatermelonDB.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -154,6 +168,7 @@
 			children = (
 				7ECFD547ABDD40A8941F8AC8 /* libRNGestureHandler.a */,
 				EB604BAD56CE40729982F1CB /* libRNGestureHandler-tvOS.a */,
+				D79D238921C0454A9A3EE4E9 /* libWatermelonDB.a */,
 			);
 			name = "Recovered References";
 			sourceTree = "<group>";
@@ -231,9 +246,18 @@
 			path = Pods;
 			sourceTree = "<group>";
 		};
+		6F401A2D24658B5000C02658 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				6F401A3124658B5000C02658 /* libWatermelonDB.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
+				3066E71CDF5942D99CE78C94 /* WatermelonDB.xcodeproj */,
 			);
 			name = Libraries;
 			sourceTree = "<group>";
@@ -241,6 +265,7 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
+				6F401A2B24658B2F00C02658 /* File.swift */,
 				13B07FAE1A68108700A75B9A /* Settled */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				00E356EF1AD99517003FC87E /* SettledTests */,
@@ -249,6 +274,7 @@
 				0476B6D92256026C006BDB17 /* Recovered References */,
 				6B80F6007C5408FEF5BD69DE /* Pods */,
 				2192E66F55494E87A163BD6C /* Resources */,
+				6F401A2A24658B2F00C02658 /* Settled-Bridging-Header.h */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -337,6 +363,7 @@
 				TargetAttributes = {
 					13B07F861A680F5B00A75B9A = {
 						DevelopmentTeam = DA8UDZW52H;
+						LastSwiftMigration = 1130;
 					};
 					2D02E47A1E0B4A5D006451C7 = {
 						CreatedOnToolsVersion = 8.2.1;
@@ -361,6 +388,12 @@
 			mainGroup = 83CBB9F61A601CBA00E9B192;
 			productRefGroup = 83CBBA001A601CBA00E9B192 /* Products */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = 6F401A2D24658B5000C02658 /* Products */;
+					ProjectRef = 3066E71CDF5942D99CE78C94 /* WatermelonDB.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				13B07F861A680F5B00A75B9A /* Settled */,
@@ -369,6 +402,16 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		6F401A3124658B5000C02658 /* libWatermelonDB.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libWatermelonDB.a;
+			remoteRef = 6F401A3024658B5000C02658 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
 		13B07F8E1A680F5B00A75B9A /* Resources */ = {
@@ -549,6 +592,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */,
+				6F401A2C24658B2F00C02658 /* File.swift in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -598,6 +642,7 @@
 			baseConfigurationReference = B47D75E5D1913E2479AB2B8D /* Pods-Settled.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = NO;
 				DEVELOPMENT_TEAM = DA8UDZW52H;
@@ -606,6 +651,7 @@
 					"$(SRCROOT)..",
 					ode_modules,
 					"eact-native-gesture-handlerios/**",
+					"$(SRCROOT)/../node_modules/@nozbe/watermelondb/native/ios/WatermelonDB/SupportingFiles/**",
 				);
 				"HEADER_SEARCH_PATHS[arch=*]" = (
 					"$(inherited)",
@@ -616,6 +662,10 @@
 				);
 				INFOPLIST_FILE = Settled/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/Settled\"",
+				);
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -623,6 +673,9 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = org.reactjs.native.example.pos1012;
 				PRODUCT_NAME = Settled;
+				SWIFT_OBJC_BRIDGING_HEADER = "Settled-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 2;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
@@ -633,6 +686,7 @@
 			baseConfigurationReference = 75E936EB1A3002F6A9AB4156 /* Pods-Settled.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = DA8UDZW52H;
 				HEADER_SEARCH_PATHS = (
@@ -640,6 +694,7 @@
 					"$(SRCROOT)..",
 					ode_modules,
 					"eact-native-gesture-handlerios/**",
+					"$(SRCROOT)/../node_modules/@nozbe/watermelondb/native/ios/WatermelonDB/SupportingFiles/**",
 				);
 				"HEADER_SEARCH_PATHS[arch=*]" = (
 					"$(inherited)",
@@ -650,6 +705,10 @@
 				);
 				INFOPLIST_FILE = Settled/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/Settled\"",
+				);
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -657,6 +716,8 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = org.reactjs.native.example.pos1012;
 				PRODUCT_NAME = Settled;
+				SWIFT_OBJC_BRIDGING_HEADER = "Settled-Bridging-Header.h";
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 2;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
@@ -678,6 +739,7 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)..\node_modules\neact-native-gesture-handlerios/**",
+					"$(SRCROOT)/../node_modules/@nozbe/watermelondb/native/ios/WatermelonDB/SupportingFiles/**",
 				);
 				INFOPLIST_FILE = "Settled-tvOS/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -714,6 +776,7 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)..\node_modules\neact-native-gesture-handlerios/**",
+					"$(SRCROOT)/../node_modules/@nozbe/watermelondb/native/ios/WatermelonDB/SupportingFiles/**",
 				);
 				INFOPLIST_FILE = "Settled-tvOS/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -749,6 +812,7 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)..\node_modules\neact-native-gesture-handlerios/**",
+					"$(SRCROOT)/../node_modules/@nozbe/watermelondb/native/ios/WatermelonDB/SupportingFiles/**",
 				);
 				INFOPLIST_FILE = "Settled-tvOSTests/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
@@ -784,6 +848,7 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)..\node_modules\neact-native-gesture-handlerios/**",
+					"$(SRCROOT)/../node_modules/@nozbe/watermelondb/native/ios/WatermelonDB/SupportingFiles/**",
 				);
 				INFOPLIST_FILE = "Settled-tvOSTests/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";

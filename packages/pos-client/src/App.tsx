@@ -11,6 +11,23 @@ import { Main } from './pages/Main/Main';
 import { NavigationContainer } from '@react-navigation/native';
 import { Root } from 'native-base';
 import decode from 'jwt-decode';
+import { Database } from '@nozbe/watermelondb'
+import SQLiteAdapter from '@nozbe/watermelondb/adapters/sqlite'
+import { models } from './models'
+import schema from './models/schema'
+// import Post from './model/Post' // ⬅️ You'll import your Models here
+
+// First, create the adapter to the underlying database:
+const adapter = new SQLiteAdapter({
+  schema,
+})
+
+// Then, make a Watermelon database from it!
+const database = new Database({
+  adapter,
+  modelClasses: models,
+  actionsEnabled: true,
+})
 
 export const App = () => {
   const [state, dispatch] = React.useReducer(
