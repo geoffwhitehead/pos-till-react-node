@@ -29,6 +29,24 @@ class ItemPrinter extends Model {
 
 class Category extends Model {
   static table = 'categories';
+
+  @field('name') name;
+
+  getCategory = () => {
+    return {
+      name: this.name,
+    };
+  };
+
+  updateCategory = async updatedCategory => {
+    await this.update(category => {
+      category.name = updatedCategory.name;
+    });
+  };
+
+  deleteCategory = async () => {
+    await this.markAsDeleted();
+  };
 }
 
 class Printer extends Model {
@@ -91,3 +109,18 @@ export const models = [
   Discount,
   Organization,
 ];
+
+export const Models = {
+  Item,
+  ItemPrinter,
+  Category,
+  Printer,
+  Modifier,
+  ModifierItem,
+  PriceGroup,
+  ItemPrice,
+  ModifierPrice,
+  PaymentType,
+  Discount,
+  Organization,
+};

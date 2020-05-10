@@ -8,6 +8,7 @@ import { realm } from '../../services/Realm';
 import uuidv4 from 'uuid/v4';
 import { BillPeriodContext } from '../../contexts/BillPeriodContext';
 import { PriceGroupContext } from '../../contexts/PriceGroupContext';
+import { populateMelon } from './populateMelon';
 
 // TODO: this needs to be moved to organizaiton => settings and queried from db
 // const DEF_PRICE_GROUP_ID = '5e90eae405a18b11edbf3214';
@@ -30,7 +31,9 @@ export const Main: React.FC<{ organizationId: string; userId: string }> = ({ org
         console.log('Populating failed', err);
       }
     };
+
     populateAsync();
+    populateMelon();
   }, []);
 
   useEffect(() => {

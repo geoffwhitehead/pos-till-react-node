@@ -1,8 +1,7 @@
 import { appSchema, tableSchema } from '@nozbe/watermelondb';
 
-
 export default appSchema({
-  version: 1,
+  version: 2,
   tables: [
     tableSchema({
       name: 'items',
@@ -81,10 +80,7 @@ export default appSchema({
     }),
     tableSchema({
       name: 'categories',
-      columns: [
-        { name: '_id', type: 'string', isIndexed: true },
-        { name: 'name', type: 'string' },
-      ],
+      columns: [{ name: 'name', type: 'string' }],
     }),
     tableSchema({
       name: 'discounts',

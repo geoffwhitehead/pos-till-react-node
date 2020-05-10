@@ -12,6 +12,7 @@ import {
   PaymentTypeSchema,
   BillProps,
   BillPaymentSchema,
+  CategoryProps,
 } from '../../services/schemas';
 import { CheckoutItemNavigator } from '../../navigators/CheckoutItemNavigator';
 import { Receipt } from './sub-components/Receipt/Receipt';
@@ -24,6 +25,10 @@ import { CompleteBill } from './sub-components/CompleteBill/CompleteBill';
 import { BillPeriodContext } from '../../contexts/BillPeriodContext';
 import dayjs from 'dayjs';
 import { paymentTypeNames } from '../../api/paymentType';
+import { Categories } from './Watermelon';
+import { useDatabase } from '@nozbe/watermelondb/hooks';
+import { Model } from '@nozbe/watermelondb';
+import { database } from '../../App';
 
 export enum Modes {
   Payments = 'payments',
@@ -31,6 +36,7 @@ export enum Modes {
   Items = 'items',
   Loading = 'loading',
   Complete = 'complete',
+  Watermelon = 'watermelon',
 }
 
 // TODO: move to org settings
@@ -97,16 +103,24 @@ export const Checkout: React.FC<CheckoutProps> = ({ navigation, route }) => {
     }
   };
 
-  useEffect(() => {
-    (!openBills || !paymentTypes || !discounts) && setMode(Modes.Loading);
-    return () => {};
-  }, [openBills, paymentTypes, discounts]);
+  // useEffect(() => {
+  //   (!openBills || !paymentTypes || !discounts) && setMode(Modes.Loading);
+  //   return () => {};
+  // }, [openBills, paymentTypes, discounts]);
+
+  // useEffect(() => {
+  //   !activeBill ? setMode(Modes.Bills) : setMode(Modes.Items);
+  //   return () => {};
+  // }, [activeBill]);
+
 
   useEffect(() => {
-    !activeBill ? setMode(Modes.Bills) : setMode(Modes.Items);
-    return () => {};
-  }, [activeBill]);
+    setMode(Modes.Watermelon);
+  }, [setMode]);
 
+  useEffect(() => {
+    setMode(Modes.Watermelon);
+  }, [setMode]);
   // TODO:  function duped in drawer->bills ... refactor
   const onSelectBill = (tab, bill) => {
     console.log('onSelectBill cout', tab, bill, billPeriod);
@@ -139,6 +153,8 @@ export const Checkout: React.FC<CheckoutProps> = ({ navigation, route }) => {
             onCompleteBill={completeBill}
           />
         );
+      case Modes.Watermelon:
+        return <Categories database={database} />;
       case Modes.Bills:
         return <SelectBill maxBills={maxBills} openBills={openBills} onSelectBill={onSelectBill} />;
       case Modes.Items:

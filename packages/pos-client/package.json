@@ -15,7 +15,8 @@
     "lint-check": "eslint .",
     "rename": "react-native-rename",
     "postinstall": "npx jetify",
-    "find:realm": "find ~/Library -type f -name 'default.realm'"
+    "find:realm": "find ~/Library -type f -name 'default.realm'",
+    "find:watermelon": "find ~/Library -type f -name 'watermelon.db'"
   },
   "dependencies": {
     "@nozbe/watermelondb": "^0.16.0",

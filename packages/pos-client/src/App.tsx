@@ -11,23 +11,23 @@ import { Main } from './pages/Main/Main';
 import { NavigationContainer } from '@react-navigation/native';
 import { Root } from 'native-base';
 import decode from 'jwt-decode';
-import { Database } from '@nozbe/watermelondb'
-import SQLiteAdapter from '@nozbe/watermelondb/adapters/sqlite'
-import { models } from './models'
-import schema from './models/schema'
+import { Database } from '@nozbe/watermelondb';
+import SQLiteAdapter from '@nozbe/watermelondb/adapters/sqlite';
+import { models } from './models';
+import schema from './models/schema';
 // import Post from './model/Post' // ⬅️ You'll import your Models here
-
+import DatabaseProvider from '@nozbe/watermelondb/DatabaseProvider';
 // First, create the adapter to the underlying database:
 const adapter = new SQLiteAdapter({
   schema,
-})
+});
 
 // Then, make a Watermelon database from it!
-const database = new Database({
+export const database = new Database({
   adapter,
   modelClasses: models,
   actionsEnabled: true,
-})
+});
 
 export const App = () => {
   const [state, dispatch] = React.useReducer(
@@ -216,24 +216,27 @@ export const App = () => {
   }
 
   return (
-    // native base wrapper
+    // {/* native base wrapper */}
+
     <Root>
       {/*  react-navigation wrapper */}
-      <NavigationContainer>
-        <AuthContext.Provider value={authContext}>
-          {!accessToken || !refreshToken || !organizationId || !userId ? (
-            // login etc
-            <AuthNavigator />
-          ) : (
-            // user is authenticated
-            <AuthContext.Provider value={authContext}>
-              <RealmProvider initialRealm={realm}>
-                <Main organizationId={organizationId} userId={userId} />
-              </RealmProvider>
-            </AuthContext.Provider>
-          )}
-        </AuthContext.Provider>
-      </NavigationContainer>
+      <DatabaseProvider database={database}>
+        <NavigationContainer>
+          <AuthContext.Provider value={authContext}>
+            {!accessToken || !refreshToken || !organizationId || !userId ? (
+              // login etc
+              <AuthNavigator />
+            ) : (
+              // user is authenticated
+              <AuthContext.Provider value={authContext}>
+                <RealmProvider initialRealm={realm}>
+                  <Main organizationId={organizationId} userId={userId} />
+                </RealmProvider>
+              </AuthContext.Provider>
+            )}
+          </AuthContext.Provider>
+        </NavigationContainer>
+      </DatabaseProvider>
     </Root>
   );
 };
