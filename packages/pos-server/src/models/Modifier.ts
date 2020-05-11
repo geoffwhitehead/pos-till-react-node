@@ -1,31 +1,12 @@
 import mongoose, { Schema } from 'mongoose';
-import { ItemPriceGroupProps } from './PriceGroup';
 import { tenantModel } from './utils/multiTenant';
-
-interface ModifierItemProps {
-    _id?: mongoose.Types.ObjectId;
-    name: string;
-    price: ItemPriceGroupProps[];
-}
+import { ModifierItemSubSchema, ModifierItemProps } from './ModifierItem';
 
 export interface ModifierProps {
     _id?: mongoose.Types.ObjectId;
     name: string;
-    mods: ModifierItemProps[];
+    items: ModifierItemProps[];
 }
-
-const ModSchema: Schema<ModifierItemProps> = new Schema({
-    name: String,
-    price: [{ groupId: { type: Schema.Types.ObjectId, ref: 'PriceGroup' }, amount: { type: 'Number' } }],
-});
-
-ModSchema.path('price').get(function(num) {
-    return (num / 100).toFixed(2);
-});
-
-ModSchema.path('price').set(function(num) {
-    return num * 100;
-});
 
 const ModifierSchema: Schema<ModifierProps> = new Schema(
     {
@@ -33,10 +14,7 @@ const ModifierSchema: Schema<ModifierProps> = new Schema(
             type: String,
             required: true,
         },
-        mods: {
-            type: Array,
-            items: [ModSchema],
-        },
+        items: [ModifierItemSubSchema],
     },
     { timestamps: true },
 );

@@ -1,9 +1,10 @@
 import faker from 'faker';
 import { random } from 'lodash';
-import { ItemPriceGroupProps, PriceGroupProps } from '../models/PriceGroup';
+import { PriceGroupProps } from '../models/PriceGroup';
 import { InjectedDependencies } from '.';
 import { PrinterProps } from '../models/Printer';
 import { objectId } from '../utils/objectId';
+import { ItemPriceProps } from '../models/ItemPrice';
 
 export interface MaintenanceService {
     seed: () => Promise<any>;
@@ -13,7 +14,7 @@ export interface MaintenanceService {
 const ITEMS_TO_SEED = 500;
 const PRICE_GROUPS = ['Main', 'Take Away']; // TODO: fix so generate price grouips handles varuious sizes
 
-const generatePriceGroups: (priceGroups: PriceGroupProps[]) => ItemPriceGroupProps[] = priceGroups => {
+const generatePriceGroups: (priceGroups: PriceGroupProps[]) => ItemPriceProps[] = priceGroups => {
     return priceGroups.map((group, i) => {
         return {
             groupId: group._id,
@@ -81,7 +82,7 @@ export const maintenanceService = ({
 
         const modifier = {
             name: 'Mains',
-            mods: [
+            items: [
                 {
                     name: 'Chicken',
                     price: generatePriceGroups(priceGroups),
@@ -141,11 +142,10 @@ export const maintenanceService = ({
 
         logger.info('Sucessfully seeded');
         return {
-            success: true
-        }
+            success: true,
+        };
     };
     return {
-        // seed,
         seed,
     };
 };

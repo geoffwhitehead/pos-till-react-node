@@ -1,12 +1,6 @@
 import mongoose, { Schema } from 'mongoose';
 import { tenantModel } from './utils/multiTenant';
 
-export interface ItemPriceGroupProps {
-    _id?: mongoose.Types.ObjectId;
-    groupId: mongoose.Types.ObjectId;
-    amount: number;
-}
-
 export interface PriceGroupProps {
     _id?: mongoose.Types.ObjectId;
     name: string;
