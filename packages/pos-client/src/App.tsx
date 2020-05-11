@@ -87,15 +87,12 @@ export const App = () => {
         console.error('Fetching tokens from local storage failed');
       }
 
-      console.log('accessToken', accessToken);
-      console.log('refreshToken', refreshToken);
       if (!accessToken || !refreshToken) {
         unsetAuth();
       }
 
       try {
         const decodedToken = decode(refreshToken);
-        console.log('decodedToken', decodedToken);
         if (decodedToken.exp < new Date().getTime() / 1000) {
           unsetAuth();
           return;
@@ -108,7 +105,6 @@ export const App = () => {
         return;
       }
 
-      console.log('settings headers');
       api.setHeader('authorization', accessToken);
       api.setHeader('x-refresh-token', refreshToken);
 
@@ -148,18 +144,13 @@ export const App = () => {
       signIn: async params => {
         console.log('signing in', params);
         // TODO: handle errors
-
         try {
           const response = await signIn(params);
 
-          console.log('response.data', response.data);
           if (response.data.success) {
             const accessToken = response.headers['authorization'];
             const refreshToken = response.headers['x-refresh-token'];
 
-            console.log('()()()()()');
-            console.log('accessToken', accessToken);
-            console.log('refreshToken', refreshToken);
             await setAuth({
               accessToken,
               refreshToken,
@@ -209,7 +200,6 @@ export const App = () => {
 
   const { isLoading, refreshToken, accessToken, userId, organizationId } = state;
 
-  console.log('stateaa', state);
   if (isLoading) {
     // We haven't finished checking for the token yet
     return <SplashScreen />;

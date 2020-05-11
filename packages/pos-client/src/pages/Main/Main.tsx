@@ -22,18 +22,22 @@ export const Main: React.FC<{ organizationId: string; userId: string }> = ({ org
   const [priceGroup, setPriceGroup] = useState(null);
 
   useEffect(() => {
-    const populateAsync = async () => {
-      // TODO: use the dataId property to validate whether we need to re populate.
-      try {
-        await populate({ organizationId, userId });
-        setPopulating(false);
-      } catch (err) {
-        console.log('Populating failed', err);
-      }
-    };
+    // const populateAsync = async () => {
+    //   // TODO: use the dataId property to validate whether we need to re populate.
+    //   try {
+    //     await populate({ organizationId, userId });
+    //     setPopulating(false);
+    //   } catch (err) {
+    //     console.log('Populating failed', err);
+    //   }
+    // };
 
-    populateAsync();
-    populateMelon();
+    const melonTest = async () => {
+      await populateMelon();
+      setPopulating(false);
+    };
+    melonTest();
+    // populateAsync();
   }, []);
 
   useEffect(() => {
@@ -58,17 +62,9 @@ export const Main: React.FC<{ organizationId: string; userId: string }> = ({ org
 
   useEffect(() => {
     if (priceGroups && !populating) {
-      console.log('----- priceGroups', priceGroups);
-      priceGroups.map(pg => console.log('pg', pg));
       setPriceGroup(priceGroups[0]); // TODO: use first price group - need to change this to use default flag
     }
   }, [priceGroups, populating]);
-
-  console.log('***********');
-  console.log('populating', populating);
-  console.log('billPeriod', billPeriod);
-  console.log('priceGroup', priceGroup);
-  console.log('***********');
 
   return populating || !billPeriod || !priceGroup ? (
     <Loading />

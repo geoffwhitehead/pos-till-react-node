@@ -19,7 +19,6 @@ export const Bills = ({ navigation }) => {
 
   // TODO: onSelectBill function duped in drawer->checkout ... refactor
   const onSelectBill = (tab, bill) => {
-    console.log('onSelectBill +++++ ', tab, bill);
     if (bill) {
       navigateToCheckout(bill);
     } else {

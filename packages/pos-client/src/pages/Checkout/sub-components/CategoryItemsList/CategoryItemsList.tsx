@@ -24,8 +24,6 @@ const CategoryItemsListInner: React.FC<CategoryItemsListProps> = ({ route, navig
   const goBack = () => navigation.goBack();
 
   const onPressItemFactory: (item: ItemProps) => () => void = item => () => {
-    console.log('item', item);
-    console.log('route.params', route.params);
     if (item.modifierId) {
       // const modifier = modifiers.filtered(`_id = "${item.modifierId._id}"`)[0];
       // navigation.navigate(routes.itemModifierList, {

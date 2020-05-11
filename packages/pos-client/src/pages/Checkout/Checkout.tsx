@@ -25,7 +25,7 @@ import { CompleteBill } from './sub-components/CompleteBill/CompleteBill';
 import { BillPeriodContext } from '../../contexts/BillPeriodContext';
 import dayjs from 'dayjs';
 import { paymentTypeNames } from '../../api/paymentType';
-import { Categories } from './Watermelon';
+import { Watermelon } from './Watermelon';
 import { useDatabase } from '@nozbe/watermelondb/hooks';
 import { Model } from '@nozbe/watermelondb';
 import { database } from '../../App';
@@ -55,7 +55,6 @@ export const Checkout: React.FC<CheckoutProps> = ({ navigation, route }) => {
   const openBills = useRealmQuery<BillProps>({ source: BillSchema.name, filter: `isClosed = false` });
   const discounts = useRealmQuery<DiscountProps>({ source: DiscountSchema.name });
   const paymentTypes = useRealmQuery<PaymentTypeProps>({ source: PaymentTypeSchema.name });
-  // console.log('initialBill', selectedBill);
   const [activeBill, setActiveBill] = useState<null | any>(route.params?.selectedBill); // TODO: type
   console.log('route.params', route.params);
   useEffect(() => {
@@ -113,7 +112,6 @@ export const Checkout: React.FC<CheckoutProps> = ({ navigation, route }) => {
   //   return () => {};
   // }, [activeBill]);
 
-
   useEffect(() => {
     setMode(Modes.Watermelon);
   }, [setMode]);
@@ -154,7 +152,7 @@ export const Checkout: React.FC<CheckoutProps> = ({ navigation, route }) => {
           />
         );
       case Modes.Watermelon:
-        return <Categories database={database} />;
+        return <Watermelon />;
       case Modes.Bills:
         return <SelectBill maxBills={maxBills} openBills={openBills} onSelectBill={onSelectBill} />;
       case Modes.Items:
