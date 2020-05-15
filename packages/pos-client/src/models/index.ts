@@ -1,4 +1,4 @@
-import { Model } from '@nozbe/watermelondb';
+import { Model, Q } from '@nozbe/watermelondb';
 import { relation, action, lazy, field } from '@nozbe/watermelondb/decorators';
 
 export const tNames = {
@@ -24,10 +24,12 @@ class Item extends Model {
   static table = tNames.items;
   static associations = {
     [tNames.item_printers]: { type: 'has_many', foreignKey: 'item_id' },
+    [tNames.modifiers]: {type: 'belongs_to', key: 'modifier_id'}
   };
 
   // @ts-ignore
-  @lazy printers = this.collections.get(tNames.printers).query(Q.on(tNames.item_printers, 'item_id', this.id));
+  @lazy 
+  printers = this.collections.get(tNames.printers).query(Q.on(tNames.item_printers, 'item_id', this.id));
 }
 
 class ItemPrinter extends Model {
@@ -36,16 +38,10 @@ class ItemPrinter extends Model {
     [tNames.items]: { type: 'belongs_to', key: 'item_id' },
     [tNames.printers]: { type: 'belongs_to', key: 'printer_id' },
   };
-  // @ts-ignore
-  @field('item_id') itemId;
-  // @ts-ignore
-  @field('printer_id') printerId;
 }
 
 class Category extends Model {
   static table = tNames.categories;
-
-  @field('name') name;
 
   getCategory = () => {
     return {
@@ -89,8 +85,8 @@ class PriceGroup extends Model {
 
 class ItemPrice extends Model {
   static table = tNames.item_prices;
-  @relation('price_groups', 'price_group_id') priceGroup;
-  @relation('items', 'item_id') item;
+  @relation(tNames.price_groups, 'price_group_id') priceGroup;
+  @relation(tNames.items, 'item_id') item;
 }
 class ModifierPrice extends Model {
   static table = tNames.modifier_prices;
@@ -103,7 +99,6 @@ class PaymentType extends Model {
 
 class ModifierItem extends Model {
   static table = tNames.modifier_items;
-  @field('modifier_id') modifier_id;
 
   @relation(tNames.modifiers, 'modifier_id') modifier;
 }

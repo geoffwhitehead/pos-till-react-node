@@ -3,7 +3,6 @@ import { appSchema, tableSchema } from '@nozbe/watermelondb';
 export default appSchema({
   version: 2,
   tables: [
-
     tableSchema({
       name: 'printers',
       columns: [
@@ -12,7 +11,7 @@ export default appSchema({
         { name: 'address', type: 'string' },
       ],
     }),
-    
+
     tableSchema({
       name: 'price_groups',
       columns: [{ name: 'name', type: 'string' }],
@@ -20,14 +19,6 @@ export default appSchema({
     tableSchema({
       name: 'categories',
       columns: [{ name: 'name', type: 'string' }],
-    }),
-    tableSchema({
-      name: 'item_prices',
-      columns: [
-        { name: 'price', type: 'number' },
-        { name: 'price_group_id', type: 'string' },
-        { name: 'item_id', type: 'string', isIndexed: true },
-      ],
     }),
     tableSchema({
       name: 'modifier_prices',
@@ -49,12 +40,7 @@ export default appSchema({
         // { name: 'modifier_prices_id', type: 'string' },
       ],
     }),
-    
-    tableSchema({
-      name: 'payment_types',
-      columns: [{ name: 'name', type: 'string' }],
-    }),
-    
+
     tableSchema({
       name: 'discounts',
       columns: [
@@ -63,23 +49,38 @@ export default appSchema({
         { name: 'isPercent', type: 'boolean' },
       ],
     }),
+
     tableSchema({
-      name: 'item_printers',
-      columns: [
-        { name: '_id', type: 'string' },
-        { name: 'item_id', type: 'string' },
-        { name: 'printer_id', type: 'string' },
-      ],
+      name: 'payment_types',
+      columns: [{ name: 'name', type: 'string' }],
     }),
+
     tableSchema({
       name: 'items',
       columns: [
         { name: 'name', type: 'string' },
         { name: 'category_id', type: 'string', isIndexed: true },
         { name: 'modifier_id', type: 'string', isOptional: true },
-        { name: 'item_printers_id', type: 'string' }, // pivot table many to many
+        // { name: 'item_printers_id', type: 'string' }, // pivot table many to many
       ],
     }),
+
+    tableSchema({
+      name: 'item_prices',
+      columns: [
+        { name: 'price', type: 'number' },
+        { name: 'price_group_id', type: 'string' },
+        { name: 'item_id', type: 'string', isIndexed: true },
+      ],
+    }),
+    tableSchema({
+      name: 'item_printers',
+      columns: [
+        { name: 'item_id', type: 'string', isIndexed: true },
+        { name: 'printer_id', type: 'string' },
+      ],
+    }),
+
     tableSchema({
       name: 'organizations',
       columns: [

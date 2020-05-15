@@ -1,5 +1,5 @@
 import { database } from '../../App';
-import { Models } from '../../models';
+import { Models, tNames } from '../../models';
 import {
   ItemProps,
   CategoryProps,
@@ -7,6 +7,7 @@ import {
   PrinterProps,
   ModifierProps,
   ModifierItemProps,
+  DiscountProps,
 } from '../../services/schemas';
 import { Model } from '@nozbe/watermelondb';
 import { getItems } from '../../api/item';
@@ -53,7 +54,8 @@ export const populateMelon = async () => {
   const categoriesToCreate = okResponse(responses[1]).map(({ _id, name }) =>
     categoriesCollection.prepareCreate(
       catchFn(category => {
-        category._raw = sanitizedRaw({ id: _id, name }, categoriesCollection.schema);
+        category._raw = sanitizedRaw({ id: _id }, categoriesCollection.schema);
+        Object.assign(category, { name });
       }),
     ),
   );
@@ -63,8 +65,8 @@ export const populateMelon = async () => {
   const priceGroupsToCreate = okResponse(responses[4]).map(({ _id, name }) =>
     priceGroupsCollection.prepareCreate(
       catchFn(priceGroup => {
-        priceGroup._raw = sanitizedRaw({ id: _id, name }, priceGroupsCollection.schema);
-        priceGroup.name = name;
+        priceGroup._raw = sanitizedRaw({ id: _id }, priceGroupsCollection.schema);
+        Object.assign(priceGroup, { name });
       }),
     ),
   );
@@ -74,63 +76,113 @@ export const populateMelon = async () => {
     printersCollection.prepareCreate(
       catchFn(printer => {
         printer._raw = sanitizedRaw({ id: _id }, printersCollection.schema);
-        printer.name = name;
-        printer.type = type;
-        printer.address = address;
+        Object.assign(printer, { name, type, address });
       }),
     ),
   );
 
   toCreate.push(...printersToCreate);
-  console.log('--------------- MARK');
+
+  const discountsToCreate = okResponse(responses[3]).map(({ _id, name, amount, isPercent }) => {
+    const discountsCollection = database.collections.get<DiscountProps & Model>(tNames.discounts);
+    return discountsCollection.prepareCreate(
+      catchFn(discount => {
+        discount._raw = sanitizedRaw({ id: _id }, discountsCollection.schema);
+        Object.assign(discount, { name, amount, isPercent });
+      }),
+    );
+  });
+
+  toCreate.push(...discountsToCreate);
+
+  okResponse(responses[0]).map(
+    ({ _id: itemId, name, categoryId, price: itemPrices, modifierId, linkedPrinters: linkedPrinterIds }) => {
+      const itemsCollection = database.collections.get<ItemProps & Model>(tNames.items);
+      const itemPricesCollection = database.collections.get(tNames.item_prices);
+      const itemPrintersCollection = database.collections.get(tNames.item_printers);
+
+      const itemPricesToCreate = itemPrices.map(itemPrice =>
+        itemPricesCollection.prepareCreate(
+          catchFn(_itemPrice => {
+            _itemPrice._raw = Object.assign(
+              _itemPrice._raw,
+              sanitizedRaw(
+                { id: itemPrice._id, price: itemPrice.amount, price_group_id: itemPrice.groupId, item_id: itemId },
+                itemPricesCollection.schema,
+              ),
+            );
+            Object.assign(_itemPrice, { price: itemPrice.amount, price_group_id: itemPrice.groupId, item_id: itemId });
+          }),
+        ),
+      );
+
+      const printerLinksToCreate = linkedPrinterIds.map(linkedPrinterId =>
+        itemPrintersCollection.prepareCreate(
+          catchFn(_itemPrinter => {
+            _itemPrinter._raw = Object.assign(
+              _itemPrinter.raw,
+              sanitizedRaw({ item_id: itemId, printer_id: linkedPrinterId }, itemPrintersCollection.schema),
+            );
+
+            Object.assign(_itemPrinter, { item_id: itemId, printer_id: linkedPrinterId });
+          }),
+        ),
+      );
+
+      const itemToCreate = itemsCollection.prepareCreate(
+        catchFn(item => {
+          item._raw = {
+            ...item._raw,
+            ...sanitizedRaw(
+              { id: itemId, name, category_id: categoryId, modifier_id: modifierId },
+              itemsCollection.schema,
+            ),
+          };
+          Object.assign(item, { name, category_id: categoryId, modifier_id: modifierId });
+        }),
+      );
+
+      toCreate.push(...itemPricesToCreate, ...printerLinksToCreate, itemToCreate);
+    },
+  );
+
+  console.log('toCreate', toCreate);
 
   okResponse(responses[2]).map(({ _id, name, items }) => {
-    const modifiersCollection = database.collections.get<ModifierProps & Model>('modifiers');
-    const modifierItemsCollection = database.collections.get<any>('modifier_items');
-    const modifierPriceCollection = database.collections.get<any>('modifier_prices');
+    const modifiersCollection = database.collections.get<ModifierProps & Model>(tNames.modifiers);
+    const modifierItemsCollection = database.collections.get<any>(tNames.modifier_items);
+    const modifierPriceCollection = database.collections.get<any>(tNames.modifier_prices);
 
     const modifier = modifiersCollection.prepareCreate(
       catchFn(modifier => {
-        modifier._raw = sanitizedRaw({ id: _id, name }, modifiersCollection.schema);
-        modifier.name = name;
+        modifier._raw = sanitizedRaw({ id: _id }, modifiersCollection.schema);
+        Object.assign(modifier, { name });
       }),
     );
 
     items.map(mItem => {
-      const itemToCreate = modifierItemsCollection.prepareCreate(
+      const modifierToCreate = modifierItemsCollection.prepareCreate(
         catchFn(newItem => {
-          newItem._raw = sanitizedRaw(
-            { id: mItem._id, name: mItem.name, modifier_id: _id },
-            modifierItemsCollection.schema,
-          );
-          newItem.name = mItem.name;
-          newItem.modifier_id = _id;
+          newItem._raw = sanitizedRaw({ id: mItem._id }, modifierItemsCollection.schema);
+          Object.assign(newItem, { name: mItem.name, modifier_id: _id });
         }),
       );
 
       const pricesToCreate = mItem.price.map(price =>
         modifierPriceCollection.prepareCreate(
           catchFn(newPrice => {
-            newPrice._raw = sanitizedRaw(
-              { id: price._id, price: price.amount, price_group_id: price.groupId, modifier_item_id: mItem._id },
-              modifierPriceCollection.schema,
-            );
-            newPrice.price = price.amount;
-            newPrice.price_group_id = price.groupId;
-            newPrice.modifier_item_id = mItem._id;
+            newPrice._raw = sanitizedRaw({ id: price._id }, modifierPriceCollection.schema);
+            Object.assign(newPrice, {
+              price: price.amount,
+              price_group_id: price.groupId,
+              modifier_item_id: mItem._id,
+            });
           }),
         ),
       );
-
-      toCreate.push(itemToCreate);
-      toCreate.push(...pricesToCreate);
+      toCreate.push(modifierToCreate, ...pricesToCreate);
     });
-
     toCreate.push(modifier);
-
-    // TODO: craete mod itesm
-
-    // TODO create mod prices
   });
 
   console.log('----- AFTER');
