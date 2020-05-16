@@ -19,6 +19,7 @@ import { getPrinters } from '../../api/printer';
 import { omit } from 'lodash';
 import { sanitizedRaw } from '@nozbe/watermelondb/RawRecord';
 import catchFn from './catchFn';
+import { getOrganization } from '../../api/organization';
 export const populateMelon = async () => {
   // return;
   try {
@@ -55,7 +56,7 @@ export const populateMelon = async () => {
   const categoriesToCreate = okResponse(responses[1]).map(({ _id, name }) =>
     categoriesCollection.prepareCreate(
       catchFn(category => {
-        category._raw = sanitizedRaw({ id: _id }, categoriesCollection.schema);
+        category._raw = { ...category._raw, ...sanitizedRaw({ id: _id, name }, categoriesCollection.schema) };
         Object.assign(category, { name });
       }),
     ),
@@ -66,7 +67,7 @@ export const populateMelon = async () => {
   const priceGroupsToCreate = okResponse(responses[4]).map(({ _id, name }) =>
     priceGroupsCollection.prepareCreate(
       catchFn(priceGroup => {
-        priceGroup._raw = sanitizedRaw({ id: _id }, priceGroupsCollection.schema);
+        priceGroup._raw = { ...priceGroup._raw, ...sanitizedRaw({ id: _id, name }, priceGroupsCollection.schema) };
         Object.assign(priceGroup, { name });
       }),
     ),
@@ -76,7 +77,10 @@ export const populateMelon = async () => {
   const printersToCreate = okResponse(responses[5]).map(({ _id, name, type, address }) =>
     printersCollection.prepareCreate(
       catchFn(printer => {
-        printer._raw = sanitizedRaw({ id: _id }, printersCollection.schema);
+        printer._raw = {
+          ...printer._raw,
+          ...sanitizedRaw({ id: _id, name, type, address }, printersCollection.schema),
+        };
         Object.assign(printer, { name, type, address });
       }),
     ),
@@ -88,7 +92,7 @@ export const populateMelon = async () => {
     const discountsCollection = database.collections.get<DiscountProps & Model>(tNames.discounts);
     return discountsCollection.prepareCreate(
       catchFn(discount => {
-        discount._raw = sanitizedRaw({ id: _id }, discountsCollection.schema);
+        discount._raw = {...discount._raw, ...sanitizedRaw({ id: _id }, discountsCollection.schema)};
         Object.assign(discount, { name, amount, isPercent });
       }),
     );

@@ -4,14 +4,13 @@ import { SidebarHeader } from '../../components/SidebarHeader/SidebarHeader';
 import { Loading } from '../Loading/Loading';
 import { useRealmQuery } from 'react-use-realm';
 import { ItemSchema } from '../../services/schemas';
+import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
+import withObservables from '@nozbe/with-observables';
 
-export const Items = ({ navigation }) => {
-  const items = useRealmQuery({
-    source: ItemSchema.name,
-    sort: ['categoryId.name', 'name'],
-  });
+export const WrappedItems = ({ navigation, items }) => {
   const openDrawer = () => navigation.openDrawer();
 
+  console.log('items', items);
   return !items ? (
     <Loading />
   ) : (
@@ -44,3 +43,12 @@ export const Items = ({ navigation }) => {
     </Container>
   );
 };
+
+export const Items = withDatabase(
+  withObservables([], ({ database }) => ({
+    items: database.collections
+      .get('items')
+      .query()
+      .observe(),
+  }))(WrappedItems),
+);

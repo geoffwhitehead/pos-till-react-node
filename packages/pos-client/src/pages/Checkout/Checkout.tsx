@@ -113,12 +113,9 @@ export const Checkout: React.FC<CheckoutProps> = ({ navigation, route }) => {
   // }, [activeBill]);
 
   useEffect(() => {
-    setMode(Modes.Watermelon);
+    setMode(Modes.Items);
   }, [setMode]);
 
-  useEffect(() => {
-    setMode(Modes.Watermelon);
-  }, [setMode]);
   // TODO:  function duped in drawer->bills ... refactor
   const onSelectBill = (tab, bill) => {
     console.log('onSelectBill cout', tab, bill, billPeriod);

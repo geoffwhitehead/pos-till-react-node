@@ -67,15 +67,7 @@ export const Items = withDatabase(
     items: database.collections
       .get('items')
       .query()
-      .observe(),
-    links: database.collections
-      .get('item_printers')
-      .query()
-      .observe(),
-    printers: database.collections
-      .get('printers')
-      .query()
-      .observe(),
+      .observe()
   }))(ItemList),
 );
 

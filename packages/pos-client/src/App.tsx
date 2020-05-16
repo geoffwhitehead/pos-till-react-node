@@ -22,7 +22,6 @@ const adapter = new SQLiteAdapter({
   schema,
 });
 
-// Then, make a Watermelon database from it!
 export const database = new Database({
   adapter,
   modelClasses: models,
@@ -116,7 +115,7 @@ export const App = () => {
   }, []);
 
   const unsetAuth = async () => {
-    await AsyncStorage.multiRemove(['accessToken', 'refreshToken']);
+    await AsyncStorage.multiRemove(['accessToken', 'refreshToken', 'organizationId', 'userId']);
     api.setHeader('authorization', '');
     api.setHeader('x-refresh-token', '');
     dispatch({ type: 'SIGN_OUT' });
@@ -135,6 +134,8 @@ export const App = () => {
     await AsyncStorage.multiSet([
       ['accessToken', accessToken],
       ['refreshToken', refreshToken],
+      ['userId', userId],
+      ['organizationId', organizationId]
     ]);
     dispatch({ type: 'SIGN_IN', accessToken, refreshToken, organizationId, userId });
   };

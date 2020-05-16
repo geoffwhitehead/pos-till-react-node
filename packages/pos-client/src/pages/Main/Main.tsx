@@ -9,15 +9,22 @@ import uuidv4 from 'uuid/v4';
 import { BillPeriodContext } from '../../contexts/BillPeriodContext';
 import { PriceGroupContext } from '../../contexts/PriceGroupContext';
 import { populateMelon } from './populateMelon';
+import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
+import withObservables from '@nozbe/with-observables';
 
 // TODO: this needs to be moved to organizaiton => settings and queried from db
 // const DEF_PRICE_GROUP_ID = '5e90eae405a18b11edbf3214';
 
-export const Main: React.FC<{ organizationId: string; userId: string }> = ({ organizationId, userId }) => {
+export const MainWrapped: React.FC<{ organizationId: string; userId: string; priceGroups: any }> = ({
+  organizationId,
+  userId,
+  priceGroups,
+}) => {
+  // TODO: type
   const billPeriods = useRealmQuery<BillPeriodProps>({ source: BillPeriodSchema.name, filter: 'closed = null' });
-  const priceGroups = useRealmQuery<PriceGroupProps>({ source: PriceGroupSchema.name });
-
-  const [populating, setPopulating] = useState(true);
+  // const priceGroups = useRealmQuery<PriceGroupProps>({ source: PriceGroupSchema.name });
+  console.log('priceGroups', priceGroups);
+  const [populating, setPopulating] = useState(false); // TODO debug: reset to true
   const [billPeriod, setBillPeriod] = useState(null);
   const [priceGroup, setPriceGroup] = useState(null);
 
@@ -76,3 +83,12 @@ export const Main: React.FC<{ organizationId: string; userId: string }> = ({ org
     </BillPeriodContext.Provider>
   );
 };
+
+export const Main = withDatabase(
+  withObservables([], ({ database }) => ({
+    priceGroups: database.collections
+      .get('price_groups')
+      .query()
+      .observe(),
+  }))(MainWrapped),
+);

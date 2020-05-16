@@ -1,5 +1,5 @@
 import { Model, Q } from '@nozbe/watermelondb';
-import { relation, action, lazy, field } from '@nozbe/watermelondb/decorators';
+import { relation, action, lazy, field, children } from '@nozbe/watermelondb/decorators';
 
 export const tNames = {
   modifiers: 'modifiers',
@@ -25,6 +25,7 @@ class Item extends Model {
   static associations = {
     [tNames.item_printers]: { type: 'has_many', foreignKey: 'item_id' },
     [tNames.modifiers]: { type: 'belongs_to', key: 'modifier_id' },
+    [tNames.categories]: { type: 'belongs_to', key: 'category_id' },
   };
 
   // @ts-ignore
@@ -45,21 +46,27 @@ class ItemPrinter extends Model {
 class Category extends Model {
   static table = tNames.categories;
 
-  getCategory = () => {
-    return {
-      name: this.name,
-    };
+  static associations = {
+    [tNames.items]: { type: 'has_many', foreignKey: 'category_id' },
   };
 
-  updateCategory = async updatedCategory => {
-    await this.update(category => {
-      category.name = updatedCategory.name;
-    });
-  };
+  @children(tNames.items) items;
 
-  deleteCategory = async () => {
-    await this.markAsDeleted();
-  };
+  // getCategory = () => {
+  //   return {
+  //     name: this.name,
+  //   };
+  // };
+
+  // updateCategory = async updatedCategory => {
+  //   await this.update(category => {
+  //     category.name = updatedCategory.name;
+  //   });
+  // };
+
+  // deleteCategory = async () => {
+  //   await this.markAsDeleted();
+  // };
 }
 
 class Printer extends Model {

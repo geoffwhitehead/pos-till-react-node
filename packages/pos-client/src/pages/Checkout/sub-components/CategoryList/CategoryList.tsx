@@ -20,18 +20,23 @@ import { realm } from '../../../../services/Realm';
 import uuidv4 from 'uuid/v4';
 import { PriceGroupContext } from '../../../../contexts/PriceGroupContext';
 import { View, Grid, Col, Footer, FooterTab } from 'native-base';
+import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
+import withObservables from '@nozbe/with-observables';
 
-export const CategoryList: React.FC = ({ navigation, route }) => {
+export const CategoriesWrapped: React.FC<any> = ({ navigation, route, categories }) => {
+  //TODO: type this
   const { activeBill } = route.params;
 
   const { priceGroup } = useContext(PriceGroupContext);
 
-  const categories = useRealmQuery<CategoryProps>({
-    source: CategorySchema.name,
-    sort: ['name'],
-  });
-  const items = useRealmQuery<ItemProps>({ source: ItemSchema.name });
-  const modifiers = useRealmQuery<ModifierProps>({ source: ModifierSchema.name });
+  console.log('priceGroup', priceGroup);
+  console.log('categories', categories);
+  // const categories = useRealmQuery<CategoryProps>({
+  //   source: CategorySchema.name,
+  //   sort: ['name'],
+  // });
+  // const items = useRealmQuery<ItemProps>({ source: ItemSchema.name });
+  // const modifiers = useRealmQuery<ModifierProps>({ source: ModifierSchema.name });
 
   const [searchValue, setSearchValue] = useState<string>('');
 
@@ -77,11 +82,11 @@ export const CategoryList: React.FC = ({ navigation, route }) => {
   );
 
   const onPressCategoryFactory: (category?: CategoryProps) => () => void = category => () => {
-    const filtered = category ? items.filtered(`categoryId._id = "${category._id}"`) : items;
+    // const filtered = category ? items.filtered(`categoryId._id = "${category._id}"`) : items;
     navigation.navigate(routes.categoryItemList, {
       category,
-      items: filtered,
-      modifiers,
+      // items: filtered,
+      // modifiers,
       createBillItem,
     });
   };
@@ -110,11 +115,11 @@ export const CategoryList: React.FC = ({ navigation, route }) => {
         </ListItem>
         {categories
           .filter(category => searchFilter(category, searchValue))
-          .map(cat => {
+          .map(category => {
             return (
-              <ListItem key={cat._id} icon onPress={onPressCategoryFactory(cat)}>
+              <ListItem key={category._id} icon onPress={onPressCategoryFactory(category)}>
                 <Left>
-                  <Text>{cat.name}</Text>
+                  <Text>{category.name}</Text>
                 </Left>
                 <Body>
                   <Icon name="ios-arrow-forward" />
@@ -127,3 +132,12 @@ export const CategoryList: React.FC = ({ navigation, route }) => {
     </Content>
   );
 };
+
+export const Categories = withDatabase(
+  withObservables([], ({ database }) => ({
+    categories: database.collections
+      .get('categories')
+      .query()
+      .observe(),
+  }))(CategoriesWrapped),
+);

@@ -6,16 +6,26 @@ import { routes } from '../../../../navigators/CheckoutItemNavigator';
 import { StyleSheet } from 'react-native';
 import Modal from 'react-native-modal';
 import { ItemModifierList } from './sub-components/ItemModList/ItemModList';
+import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
+import withObservables from '@nozbe/with-observables';
 
 interface CategoryItemsListProps {
   category: CategoryProps;
   items: ItemProps[];
   modifiers: ModifierProps[];
   createBillItem: (bill: BillProps) => void;
+  route: any;
+  navigation: any; // TODO: type this
 }
 
-const CategoryItemsListInner: React.FC<CategoryItemsListProps> = ({ route, navigation }) => {
-  const { category, items, createBillItem } = route.params;
+const WrappedCategoryItems: React.FC<CategoryItemsListProps> = ({
+  category,
+  items,
+  createBillItem,
+  route,
+  navigation,
+}) => {
+  // const { category, items, createBillItem } = route.params;
 
   const [searchValue, setSearchValue] = useState<string>('');
   const [modalOpen, setModalOpen] = useState<boolean>(false);
@@ -105,4 +115,20 @@ const styles = StyleSheet.create({
   },
 });
 
-export const CategoryItemsList = React.memo(CategoryItemsListInner);
+export const CategoryItems = withObservables<
+  { category: any }, // TODO: fix types
+  { category: any; items: any }
+>(['route'], ({ route }) => {
+  console.log('route', route);
+
+  const { category } = route.params;
+  console.log('*** category', category);
+  return {
+    category: category.observe(),
+    items: category.items.observe(),
+  };
+})(WrappedCategoryItems);
+
+// // export const withUnWrappedRouteParams = (WrappedComponent) => {
+
+// }
