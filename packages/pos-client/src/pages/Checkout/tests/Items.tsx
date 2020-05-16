@@ -5,7 +5,7 @@ import withObservables from '@nozbe/with-observables';
 import { sanitizedRaw } from '@nozbe/watermelondb/RawRecord';
 import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 
-export const ItemList: React.FC<any> = ({ items, database }) => {
+export const ItemList: React.FC<any> = ({ items, links, printers, database }) => {
   // const create = async params => {
   //   await database.action(async () => {
   //     const printersCollection = database.collections.get('printers');
@@ -22,6 +22,8 @@ export const ItemList: React.FC<any> = ({ items, database }) => {
       console.log('-------- a', a);
     });
   };
+  console.log('links', links);
+  console.log('printers', printers);
   return (
     <Content>
       <List>
@@ -64,6 +66,14 @@ export const Items = withDatabase(
   withObservables([], ({ database }) => ({
     items: database.collections
       .get('items')
+      .query()
+      .observe(),
+    links: database.collections
+      .get('item_printers')
+      .query()
+      .observe(),
+    printers: database.collections
+      .get('printers')
       .query()
       .observe(),
   }))(ItemList),

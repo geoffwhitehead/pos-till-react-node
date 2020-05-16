@@ -24,16 +24,18 @@ class Item extends Model {
   static table = tNames.items;
   static associations = {
     [tNames.item_printers]: { type: 'has_many', foreignKey: 'item_id' },
-    [tNames.modifiers]: {type: 'belongs_to', key: 'modifier_id'}
+    [tNames.modifiers]: { type: 'belongs_to', key: 'modifier_id' },
   };
 
   // @ts-ignore
-  @lazy 
-  printers = this.collections.get(tNames.printers).query(Q.on(tNames.item_printers, 'item_id', this.id));
+  @lazy printers = this.collections.get(tNames.printers).query(Q.on(tNames.item_printers, 'item_id', this.id));
 }
 
 class ItemPrinter extends Model {
   static table = tNames.item_printers;
+
+  @relation(tNames.items, 'item_id') item;
+  @relation(tNames.printers, 'printer_id') printer;
   static associations = {
     [tNames.items]: { type: 'belongs_to', key: 'item_id' },
     [tNames.printers]: { type: 'belongs_to', key: 'printer_id' },

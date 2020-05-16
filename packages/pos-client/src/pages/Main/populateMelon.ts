@@ -20,6 +20,7 @@ import { omit } from 'lodash';
 import { sanitizedRaw } from '@nozbe/watermelondb/RawRecord';
 import catchFn from './catchFn';
 export const populateMelon = async () => {
+  // return;
   try {
     await database.action(async () => {
       await database.unsafeResetDatabase();
@@ -72,7 +73,7 @@ export const populateMelon = async () => {
   );
   toCreate.push(...priceGroupsToCreate);
 
-  const printersToCreate = okResponse(responses[2]).map(({ _id, name, type, address }) =>
+  const printersToCreate = okResponse(responses[5]).map(({ _id, name, type, address }) =>
     printersCollection.prepareCreate(
       catchFn(printer => {
         printer._raw = sanitizedRaw({ id: _id }, printersCollection.schema);
@@ -104,13 +105,13 @@ export const populateMelon = async () => {
       const itemPricesToCreate = itemPrices.map(itemPrice =>
         itemPricesCollection.prepareCreate(
           catchFn(_itemPrice => {
-            _itemPrice._raw = Object.assign(
-              _itemPrice._raw,
-              sanitizedRaw(
+            _itemPrice._raw = {
+              ..._itemPrice._raw,
+              ...sanitizedRaw(
                 { id: itemPrice._id, price: itemPrice.amount, price_group_id: itemPrice.groupId, item_id: itemId },
                 itemPricesCollection.schema,
               ),
-            );
+            };
             Object.assign(_itemPrice, { price: itemPrice.amount, price_group_id: itemPrice.groupId, item_id: itemId });
           }),
         ),
@@ -119,11 +120,10 @@ export const populateMelon = async () => {
       const printerLinksToCreate = linkedPrinterIds.map(linkedPrinterId =>
         itemPrintersCollection.prepareCreate(
           catchFn(_itemPrinter => {
-            _itemPrinter._raw = Object.assign(
-              _itemPrinter.raw,
-              sanitizedRaw({ item_id: itemId, printer_id: linkedPrinterId }, itemPrintersCollection.schema),
-            );
-
+            _itemPrinter._raw = {
+              ..._itemPrinter._raw,
+              ...sanitizedRaw({ item_id: itemId, printer_id: linkedPrinterId }, itemPrintersCollection.schema),
+            };
             Object.assign(_itemPrinter, { item_id: itemId, printer_id: linkedPrinterId });
           }),
         ),

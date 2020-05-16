@@ -29,6 +29,8 @@ export const populate = async (params: { userId: string; organizationId: string 
     // fetch the organization first ao that any expired tokens can be updated
     const { data: organization, ok: organizationResponse } = await getOrganization(organizationId);
 
+
+    
     if (!organizationResponse) {
       throw new Error('Failed fetching organization');
     }
