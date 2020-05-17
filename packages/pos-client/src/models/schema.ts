@@ -25,27 +25,34 @@ export default appSchema({
       columns: [
         { name: 'price', type: 'number' },
         { name: 'price_group_id', type: 'string' },
-        { name: 'modifier_item_id', type: 'string', isIndexed: true },
+        { name: 'modifier_item_revision_id', type: 'string', isIndexed: true }, //*
+        { name: 'revision', type: 'number'} 
       ],
     }),
-    tableSchema({
+    tableSchema({ //*
       name: 'modifier_price_revisions',
       columns: [
         { name: 'price', type: 'number' },
         { name: 'price_group_id', type: 'string' },
-        { name: 'modifier_item_id', type: 'string', isIndexed: true },
+        { name: 'modifier_item_revision_id', type: 'string', isIndexed: true },
+        { name: 'revision', type: 'number'} 
       ],
     }),
     tableSchema({
       name: 'modifiers',
-      columns: [{ name: 'name', type: 'string' }],
+      columns: [{ name: 'name', type: 'string' }, { name: 'revision', type: 'string'}],
+    }),
+    tableSchema({
+      name: 'modifier_revisions',
+      columns: [{ name: 'name', type: 'string' },{ name: 'revision', type: 'string'} ],
+      
     }),
     tableSchema({
       name: 'modifier_items',
       columns: [
         { name: 'modifier_revision_id', type: 'string', isIndexed: true },
         { name: 'name', type: 'string' },
-        { name: 'version', type: 'string'}
+        { name: 'revision', type: 'string'}
         // { name: 'modifier_prices_id', type: 'string' },
       ],
     }),
@@ -54,7 +61,7 @@ export default appSchema({
       columns: [
         { name: 'modifier_revision_id', type: 'string', isIndexed: true }, //*
         { name: 'name', type: 'string' },
-        { name: 'version', type: 'string'}
+        { name: 'revision', type: 'string'}
         // { name: 'modifier_prices_id', type: 'string' },
       ],
     }),
@@ -64,9 +71,18 @@ export default appSchema({
         { name: 'name', type: 'string' },
         { name: 'amount', type: 'string' },
         { name: 'is_percent', type: 'boolean' },
+        { name: 'revision', type: 'string'}
       ],
     }),
-
+    tableSchema({
+      name: 'discount_revisions',
+      columns: [
+        { name: 'name', type: 'string' },
+        { name: 'amount', type: 'string' },
+        { name: 'is_percent', type: 'boolean' },
+        { name: 'revision', type: 'string'}
+      ],
+    }),
     tableSchema({
       name: 'payment_types',
       columns: [{ name: 'name', type: 'string' }],
@@ -77,19 +93,18 @@ export default appSchema({
       columns: [
         { name: 'name', type: 'string' },
         { name: 'category_id', type: 'string', isIndexed: true },
-        { name: 'modifier_id', type: 'string', isOptional: true },
-        // { name: 'item_printers_id', type: 'string' }, // pivot table many to many
+        { name: 'modifier_revision_id', type: 'string', isOptional: true },
+        { name: 'revision', type: 'string'}
       ],
     }),
 
     tableSchema({
-      name: 'items_history',
+      name: 'item_revisions',
       columns: [
         { name: 'name', type: 'string' },
-        { name: 'item_id', type: 'string' },
         { name: 'category_id', type: 'string', isIndexed: true },
-        { name: 'modifier_id', type: 'string', isOptional: true },
-        // { name: 'item_printers_id', type: 'string' }, // pivot table many to many
+        { name: 'modifier_revision_id', type: 'string', isOptional: true },
+        { name: 'revision', type: 'string'}
       ],
     }),
 // modifier_item_revision_id
@@ -102,7 +117,19 @@ export default appSchema({
       columns: [
         { name: 'price', type: 'number' },
         { name: 'price_group_id', type: 'string' },
-        { name: 'item_id', type: 'string', isIndexed: true },
+        { name: 'item_revision_id', type: 'string', isIndexed: true },
+        { name: 'revision', type: 'string'}
+
+      ],
+    }),
+    tableSchema({
+      name: 'item_price_revisions',
+      columns: [
+        { name: 'price', type: 'number' },
+        { name: 'price_group_id', type: 'string' },
+        { name: 'item_revision_id', type: 'string', isIndexed: true },
+        { name: 'revision', type: 'string'}
+
       ],
     }),
     tableSchema({

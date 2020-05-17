@@ -1,19 +1,34 @@
 import { Model, Q } from '@nozbe/watermelondb';
-import { relation, action, immutableRelation, nochange, lazy, field, children, readonly, date } from '@nozbe/watermelondb/decorators';
+import {
+  relation,
+  action,
+  immutableRelation,
+  nochange,
+  lazy,
+  field,
+  children,
+  readonly,
+  date,
+} from '@nozbe/watermelondb/decorators';
 
 export const tNames = {
   modifiers: 'modifiers',
+  modifier_revisions: 'modifier_revisions',
   price_groups: 'price_groups',
   item_prices: 'item_prices',
   modifier_prices: 'modifier_prices',
+  modifier_price_revisions: 'modifier_price_revisions',
   payment_types: 'payment_types',
   modifier_items: 'modifier_items',
+  modifier_item_revisions: 'modifier_item_revisions',
   discounts: 'discounts',
+  discount_revisions: 'discount_revisions',
   organizations: 'organizations',
   printers: 'printers',
   categories: 'categories',
   item_printers: 'item_printers',
   items: 'items',
+  item_revisions: 'item_revisions'
 };
 
 class Item extends Model {
@@ -105,6 +120,31 @@ class Modifier extends Model {
   };
 }
 
+class ModifierPrice extends Model {
+  static table = tNames.modifier_prices;
+
+  @field('price') price;
+  @field('price_group_id') priceGroupId;
+  @field('modifier_item_revision_id') modifierItemId;
+  @field('revision') revision;
+
+  @relation(tNames.price_groups, 'price_group_id') priceGroup;
+  @relation(tNames.modifier_item_revisions, 'modifier_item_revision_id') modifierItem;
+}
+
+class ModifierPriceRevision extends Model {
+  static table = tNames.modifier_price_revisions;
+
+  @field('price') price;
+  @field('price_group_id') priceGroupId;
+  @field('modifier_item_revision_id') modifierItemId;
+  @field('revision') revision;
+
+  @relation(tNames.price_groups, 'price_group_id') priceGroup;
+  @relation(tNames.modifier_item_revisions, 'modifier_item_revision_id') modifierItem;
+}
+
+
 class PriceGroup extends Model {
   static table = tNames.price_groups;
 
@@ -121,16 +161,7 @@ class ItemPrice extends Model {
   @relation(tNames.price_groups, 'price_group_id') priceGroup;
   @relation(tNames.items, 'item_id') item;
 }
-class ModifierPrice extends Model {
-  static table = tNames.modifier_prices;
 
-  @field('price') price;
-  @field('price_group_id') priceGroupId;
-  @field('modifier_item_id') modifierItemId;
-
-  @relation(tNames.price_groups, 'price_group_id') priceGroup;
-  @relation(tNames.modifier_items, 'modifier_item_id') modifierItem;
-}
 class PaymentType extends Model {
   static table = tNames.payment_types;
 
@@ -139,7 +170,6 @@ class PaymentType extends Model {
   static associations = {
     [n.billPayments]: { type: 'has_many', foreignKey: 'payment_type_id' },
   };
-
 }
 
 class ModifierItem extends Model {
@@ -163,11 +193,7 @@ class Organization extends Model {
   static table = tNames.organizations;
 }
 
-
-
-
 // BILLS
-
 
 const n = {
   billPayments: 'bill_payments',
@@ -211,12 +237,11 @@ class Bill extends Model {
     [n.billPayments]: { type: 'has_many', foreignKey: 'bill_id' },
     [n.billItems]: { type: 'has_many', foreignKey: 'bill_id' },
     [n.billDiscounts]: { type: 'has_many', foreignKey: 'bill_id' },
-  }
-
+  };
 }
 
 class BillDiscount extends Model {
-  static table = n.billDiscounts
+  static table = n.billDiscounts;
 
   @nochange @field('name') name;
   @nochange @field('bill_id') billId;
@@ -227,24 +252,24 @@ class BillDiscount extends Model {
   @readonly @date('updated_at') updatedAt;
 
   @immutableRelation(n.bills, 'bill_id') bill;
-  
+
   static associations = {
-    [n.bills]: { type: 'belongs_to', key: 'bill_id'}
-  }
+    [n.bills]: { type: 'belongs_to', key: 'bill_id' },
+  };
 }
 
 class BillPeriod extends Model {
-  static table = n.billPeriods
+  static table = n.billPeriods;
 
   @date('closed_at')
-  @readonly @date('created_at') createdAt;
+  @readonly
+  @date('created_at')
+  createdAt;
 
   static associations = {
-    [n.bills]: { type: 'has_many', foreignKey: 'bill_period_id'}
-  }
+    [n.bills]: { type: 'has_many', foreignKey: 'bill_period_id' },
+  };
 }
-
-
 
 export const models = [
   Item,
