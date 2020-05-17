@@ -56,7 +56,7 @@ export const populateMelon = async () => {
   const categoriesToCreate = okResponse(responses[1]).map(({ _id, name }) =>
     categoriesCollection.prepareCreate(
       catchFn(category => {
-        category._raw = { ...category._raw, ...sanitizedRaw({ id: _id, name }, categoriesCollection.schema) };
+        category._raw = sanitizedRaw({ id: _id }, categoriesCollection.schema);
         Object.assign(category, { name });
       }),
     ),
@@ -67,7 +67,7 @@ export const populateMelon = async () => {
   const priceGroupsToCreate = okResponse(responses[4]).map(({ _id, name }) =>
     priceGroupsCollection.prepareCreate(
       catchFn(priceGroup => {
-        priceGroup._raw = { ...priceGroup._raw, ...sanitizedRaw({ id: _id, name }, priceGroupsCollection.schema) };
+        priceGroup._raw = sanitizedRaw({ id: _id }, priceGroupsCollection.schema);
         Object.assign(priceGroup, { name });
       }),
     ),
@@ -77,10 +77,7 @@ export const populateMelon = async () => {
   const printersToCreate = okResponse(responses[5]).map(({ _id, name, type, address }) =>
     printersCollection.prepareCreate(
       catchFn(printer => {
-        printer._raw = {
-          ...printer._raw,
-          ...sanitizedRaw({ id: _id, name, type, address }, printersCollection.schema),
-        };
+        printer._raw = sanitizedRaw({ id: _id }, printersCollection.schema);
         Object.assign(printer, { name, type, address });
       }),
     ),
@@ -92,8 +89,8 @@ export const populateMelon = async () => {
     const discountsCollection = database.collections.get<DiscountProps & Model>(tNames.discounts);
     return discountsCollection.prepareCreate(
       catchFn(discount => {
-        discount._raw = {...discount._raw, ...sanitizedRaw({ id: _id }, discountsCollection.schema)};
-        Object.assign(discount, { name, amount, isPercent });
+        discount._raw = sanitizedRaw({ id: _id }, discountsCollection.schema);
+        Object.assign(discount, { name, amount, is_percent: isPercent });
       }),
     );
   });
@@ -109,14 +106,12 @@ export const populateMelon = async () => {
       const itemPricesToCreate = itemPrices.map(itemPrice =>
         itemPricesCollection.prepareCreate(
           catchFn(_itemPrice => {
-            _itemPrice._raw = {
-              ..._itemPrice._raw,
-              ...sanitizedRaw(
-                { id: itemPrice._id, price: itemPrice.amount, price_group_id: itemPrice.groupId, item_id: itemId },
-                itemPricesCollection.schema,
-              ),
-            };
-            Object.assign(_itemPrice, { price: itemPrice.amount, price_group_id: itemPrice.groupId, item_id: itemId });
+            (_itemPrice._raw = sanitizedRaw({ id: itemPrice._id }, itemPricesCollection.schema)),
+              Object.assign(_itemPrice, {
+                price: itemPrice.amount,
+                price_group_id: itemPrice.groupId,
+                item_id: itemId,
+              });
           }),
         ),
       );
@@ -124,10 +119,6 @@ export const populateMelon = async () => {
       const printerLinksToCreate = linkedPrinterIds.map(linkedPrinterId =>
         itemPrintersCollection.prepareCreate(
           catchFn(_itemPrinter => {
-            _itemPrinter._raw = {
-              ..._itemPrinter._raw,
-              ...sanitizedRaw({ item_id: itemId, printer_id: linkedPrinterId }, itemPrintersCollection.schema),
-            };
             Object.assign(_itemPrinter, { item_id: itemId, printer_id: linkedPrinterId });
           }),
         ),
@@ -135,14 +126,8 @@ export const populateMelon = async () => {
 
       const itemToCreate = itemsCollection.prepareCreate(
         catchFn(item => {
-          item._raw = {
-            ...item._raw,
-            ...sanitizedRaw(
-              { id: itemId, name, category_id: categoryId, modifier_id: modifierId },
-              itemsCollection.schema,
-            ),
-          };
-          Object.assign(item, { name, category_id: categoryId, modifier_id: modifierId });
+          (item._raw = sanitizedRaw({ id: itemId }, itemsCollection.schema)),
+            Object.assign(item, { name, category_id: categoryId, modifier_id: modifierId });
         }),
       );
 

@@ -44,7 +44,7 @@ export const WrappedItems = ({ navigation, items }) => {
   );
 };
 
-export const Items = withDatabase(
+export const Items = withDatabase<any, any>( // TODO: fix type
   withObservables([], ({ database }) => ({
     items: database.collections
       .get('items')
