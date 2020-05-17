@@ -26,7 +26,8 @@ export default appSchema({
         { name: 'price', type: 'number' },
         { name: 'price_group_id', type: 'string' },
         { name: 'modifier_item_revision_id', type: 'string', isIndexed: true }, //*
-        { name: 'revision', type: 'number'} 
+        { name: 'revision', type: 'number'},
+        { name: 'modifier_price_revision_id', type: 'string'} 
       ],
     }),
     tableSchema({ //*
