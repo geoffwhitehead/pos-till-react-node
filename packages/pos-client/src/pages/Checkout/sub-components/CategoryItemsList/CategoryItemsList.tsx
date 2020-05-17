@@ -129,6 +129,16 @@ export const CategoryItems = withObservables<
   };
 })(WrappedCategoryItems);
 
+
+export const AllItems = withDatabase(
+  withObservables([], ({ database }) => ({
+    items: database.collections
+      .get('items')
+      .query()
+      .observe()
+  }))(WrappedCategoryItems),
+);
+
 // // export const withUnWrappedRouteParams = (WrappedComponent) => {
 
 // }

@@ -83,12 +83,18 @@ export const CategoriesWrapped: React.FC<any> = ({ navigation, route, categories
 
   const onPressCategoryFactory: (category?: CategoryProps) => () => void = category => () => {
     // const filtered = category ? items.filtered(`categoryId._id = "${category._id}"`) : items;
-    navigation.navigate(routes.categoryItemList, {
-      category,
-      // items: filtered,
-      // modifiers,
-      createBillItem,
-    });
+    if (!category) {
+      navigation.navigate(routes.allItems, {
+        createBillItem,
+      });
+    } else {
+      navigation.navigate(routes.categoryItemList, {
+        category,
+        // items: filtered,
+        // modifiers,
+        createBillItem,
+      });
+    }
   };
 
   const onSearchHandler = (value: string) => setSearchValue(value);
