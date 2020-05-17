@@ -159,50 +159,56 @@ const localSchemas = [
       name:'bill_items',
       columns: [
         { name: 'bill_id', type: 'string', isIndexed: true },
-        { name: 'item_revision_id', type: 'string' },
-        { name: 'price_group_id', type: 'string' },
-        { name: 'modifier_revision_id', type: 'string' },
+        { name: 'name', type: 'string' },
+        { name: 'price', type: 'string' },
+        { name: 'price_group_name', type: 'string' },
+        { name: 'modifier_name', type: 'string' },
+        { name: 'modifier_id', type: 'string' },
+        { name: 'category_name', type: 'string' },
         { name: 'category_id', type: 'string' },
+        { name: 'created_at', type: 'number' },
+        { name: 'updated_at', type: 'number' },
       ]
     }),
     tableSchema({
       name:'bill_item_modifier_items',
       columns: [
         { name: 'bill_item_id', type: 'string', isIndexed: true },
-        { name: 'modifier_item_revision_id', type: 'string' },
+        { name: 'modifier_item_name', type: 'string' },
+        { name: 'modifier_item_price', type: 'string' },
       ]
     }),
 
 ]
 
 
-export interface BillItemProps {
-  _id: string;
-  itemId: string;
-  name: string;
-  price: number;
-  modifierId?: string;
-  mods: Realm.Collection<BillItemModifierProps>;
-  categoryId: string;
-  categoryName: string;
-  priceGroup: PriceGroupProps;
-}
+// export interface BillItemProps {
+//   _id: string;
+//   itemId: string;
+//   name: string;
+//   price: number;
+//   modifierId?: string;
+//   mods: Realm.Collection<BillItemModifierProps>;
+//   categoryId: string;
+//   categoryName: string;
+//   priceGroup: PriceGroupProps;
+// }
 
-export const BillItemSchema: Realm.ObjectSchema = {
-  name: 'BillItem',
-  primaryKey: '_id',
-  properties: {
-    _id: 'string',
-    itemId: 'string',
-    name: 'string',
-    price: 'float', // TODO: it might be better for all prices to be a PriceGroupItem. This is a large refactor though.
-    // modifierId: 'string?',
-    mods: { type: 'BillItemModifier[]', default: [] },
-    categoryId: 'string',
-    categoryName: 'string',
-    priceGroup: 'PriceGroup', // TODO: it might be better for all prices to be a PriceGroupItem. This is a large refactor though
-  },
-};
+// export const BillItemSchema: Realm.ObjectSchema = {
+//   name: 'BillItem',
+//   primaryKey: '_id',
+//   properties: {
+//     _id: 'string',
+//     itemId: 'string',
+//     name: 'string',
+//     price: 'float', // TODO: it might be better for all prices to be a PriceGroupItem. This is a large refactor though.
+//     // modifierId: 'string?',
+//     mods: { type: 'BillItemModifier[]', default: [] },
+//     categoryId: 'string',
+//     categoryName: 'string',
+//     priceGroup: 'PriceGroup', // TODO: it might be better for all prices to be a PriceGroupItem. This is a large refactor though
+//   },
+// };
 
 // export interface BillPeriodProps {
 //   _id: string;

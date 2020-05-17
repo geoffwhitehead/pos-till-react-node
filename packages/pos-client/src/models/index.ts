@@ -1,5 +1,15 @@
 import { Model, Q } from '@nozbe/watermelondb';
-import { relation, action, immutableRelation, nochange, lazy, field, children, readonly, date } from '@nozbe/watermelondb/decorators';
+import {
+  relation,
+  action,
+  immutableRelation,
+  nochange,
+  lazy,
+  field,
+  children,
+  readonly,
+  date,
+} from '@nozbe/watermelondb/decorators';
 
 export const tNames = {
   modifiers: 'modifiers',
@@ -139,7 +149,6 @@ class PaymentType extends Model {
   static associations = {
     [n.billPayments]: { type: 'has_many', foreignKey: 'payment_type_id' },
   };
-
 }
 
 class ModifierItem extends Model {
@@ -163,17 +172,16 @@ class Organization extends Model {
   static table = tNames.organizations;
 }
 
-
-
-
 // BILLS
-
 
 const n = {
   billPayments: 'bill_payments',
   bills: 'bills',
   billDiscounts: 'bill_discounts',
+  billPeriods: 'bill_periods',
+  billItems: 'bill_items',
 };
+
 class BillPayment extends Model {
   static table = n.billPayments;
 
@@ -211,12 +219,11 @@ class Bill extends Model {
     [n.billPayments]: { type: 'has_many', foreignKey: 'bill_id' },
     [n.billItems]: { type: 'has_many', foreignKey: 'bill_id' },
     [n.billDiscounts]: { type: 'has_many', foreignKey: 'bill_id' },
-  }
-
+  };
 }
 
 class BillDiscount extends Model {
-  static table = n.billDiscounts
+  static table = n.billDiscounts;
 
   @nochange @field('name') name;
   @nochange @field('bill_id') billId;
@@ -227,24 +234,45 @@ class BillDiscount extends Model {
   @readonly @date('updated_at') updatedAt;
 
   @immutableRelation(n.bills, 'bill_id') bill;
-  
+
   static associations = {
-    [n.bills]: { type: 'belongs_to', key: 'bill_id'}
-  }
+    [n.bills]: { type: 'belongs_to', key: 'bill_id' },
+  };
 }
 
 class BillPeriod extends Model {
-  static table = n.billPeriods
+  static table = n.billPeriods;
 
   @date('closed_at')
-  @readonly @date('created_at') createdAt;
+  @readonly
+  @date('created_at')
+  createdAt;
 
   static associations = {
-    [n.bills]: { type: 'has_many', foreignKey: 'bill_period_id'}
-  }
+    [n.bills]: { type: 'has_many', foreignKey: 'bill_period_id' },
+  };
 }
 
+class BillItem extends Model {
+  static table = n.billItems;
+  @nochange @field('bill_id') billId;
+  @nochange @field('name') name;
+  @nochange @field('price') price;
+  @nochange @field('price_group_name') priceGroupName;
+  @nochange @field('modifier_name') modifierName;
+  @nochange @field('modifier_id') modifierId;
+  @nochange @field('category_name') categoryName;
+  @nochange @field('category_id') categoryId;
 
+  @readonly @date('created_at') createdAt;
+  @readonly @date('updated_at') updatedAt;
+
+  @immutableRelation(n.bills, 'bill_id') bill;
+
+  static associations = {
+    [n.bills]: { type: 'belongs_to', key: 'bill_id' },
+  };
+}
 
 export const models = [
   Item,
@@ -259,6 +287,11 @@ export const models = [
   PaymentType,
   Discount,
   Organization,
+  Bill,
+  BillDiscount,
+  BillItem,
+  BillPayment,
+  BillPeriod,
 ];
 
 export const Models = {
@@ -274,4 +307,9 @@ export const Models = {
   PaymentType,
   Discount,
   Organization,
+  Bill,
+  BillDiscount,
+  BillItem,
+  BillPayment,
+  BillPeriod,
 };
