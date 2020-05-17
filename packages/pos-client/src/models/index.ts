@@ -24,6 +24,11 @@ export const tNames = {
   categories: 'categories',
   item_printers: 'item_printers',
   items: 'items',
+  billPayments: 'bill_payments',
+  bills: 'bills',
+  billDiscounts: 'bill_discounts',
+  billPeriods: 'bill_periods',
+  billItems: 'bill_items',
 };
 
 class Item extends Model {
@@ -147,7 +152,7 @@ class PaymentType extends Model {
   @nochange @field('name') name;
 
   static associations = {
-    [n.billPayments]: { type: 'has_many', foreignKey: 'payment_type_id' },
+    [tNames.billPayments]: { type: 'has_many', foreignKey: 'payment_type_id' },
   };
 }
 
@@ -174,16 +179,19 @@ class Organization extends Model {
 
 // BILLS
 
-const n = {
-  billPayments: 'bill_payments',
-  bills: 'bills',
-  billDiscounts: 'bill_discounts',
-  billPeriods: 'bill_periods',
-  billItems: 'bill_items',
-};
+class BillPeriod extends Model {
+  static table = tNames.billPeriods;
+
+  @readonly @date('created_at') createdAt;
+  @date('closed_at') closedAt;
+
+  static associations = {
+    [tNames.bills]: { type: 'has_many', foreignKey: 'bill_period_id' },
+  };
+}
 
 class BillPayment extends Model {
-  static table = n.billPayments;
+  static table = tNames.billPayments;
 
   @nochange @field('payment_type_id') paymentTypeId;
   @nochange @field('amount') amount;
@@ -193,16 +201,16 @@ class BillPayment extends Model {
   @readonly @date('updated_at') updatedAt;
 
   static associations = {
-    [n.bills]: { type: 'belongs_to', key: 'bill_id' },
+    [tNames.bills]: { type: 'belongs_to', key: 'bill_id' },
     [tNames.payment_types]: { type: 'belongs_to', key: 'payment_type_id' },
   };
 
   @immutableRelation(tNames.payment_types, 'payment_type_id') paymentType;
-  @immutableRelation(n.bills, 'bill_id') bill;
+  @immutableRelation(tNames.bills, 'bill_id') bill;
 }
 
 class Bill extends Model {
-  static table = n.bills;
+  static table = tNames.bills;
 
   @field('reference') reference;
   @field('is_closed') isClosed;
@@ -212,18 +220,18 @@ class Bill extends Model {
   @readonly @date('created_at') createdAt;
   @readonly @date('updated_at') updatedAt;
 
-  @immutableRelation(n.billPeriods, 'bill_period_id') billPeriod;
+  @immutableRelation(tNames.billPeriods, 'bill_period_id') billPeriod;
 
   static associations = {
-    [n.billPeriods]: { type: 'belongs_to', key: 'bill_period_id' },
-    [n.billPayments]: { type: 'has_many', foreignKey: 'bill_id' },
-    [n.billItems]: { type: 'has_many', foreignKey: 'bill_id' },
-    [n.billDiscounts]: { type: 'has_many', foreignKey: 'bill_id' },
+    [tNames.billPeriods]: { type: 'belongs_to', key: 'bill_period_id' },
+    [tNames.billPayments]: { type: 'has_many', foreignKey: 'bill_id' },
+    [tNames.billItems]: { type: 'has_many', foreignKey: 'bill_id' },
+    [tNames.billDiscounts]: { type: 'has_many', foreignKey: 'bill_id' },
   };
 }
 
 class BillDiscount extends Model {
-  static table = n.billDiscounts;
+  static table = tNames.billDiscounts;
 
   @nochange @field('name') name;
   @nochange @field('bill_id') billId;
@@ -233,28 +241,15 @@ class BillDiscount extends Model {
   @readonly @date('created_at') createdAt;
   @readonly @date('updated_at') updatedAt;
 
-  @immutableRelation(n.bills, 'bill_id') bill;
+  @immutableRelation(tNames.bills, 'bill_id') bill;
 
   static associations = {
-    [n.bills]: { type: 'belongs_to', key: 'bill_id' },
-  };
-}
-
-class BillPeriod extends Model {
-  static table = n.billPeriods;
-
-  @date('closed_at')
-  @readonly
-  @date('created_at')
-  createdAt;
-
-  static associations = {
-    [n.bills]: { type: 'has_many', foreignKey: 'bill_period_id' },
+    [tNames.bills]: { type: 'belongs_to', key: 'bill_id' },
   };
 }
 
 class BillItem extends Model {
-  static table = n.billItems;
+  static table = tNames.billItems;
   @nochange @field('bill_id') billId;
   @nochange @field('name') name;
   @nochange @field('price') price;
@@ -267,10 +262,10 @@ class BillItem extends Model {
   @readonly @date('created_at') createdAt;
   @readonly @date('updated_at') updatedAt;
 
-  @immutableRelation(n.bills, 'bill_id') bill;
+  @immutableRelation(tNames.bills, 'bill_id') bill;
 
   static associations = {
-    [n.bills]: { type: 'belongs_to', key: 'bill_id' },
+    [tNames.bills]: { type: 'belongs_to', key: 'bill_id' },
   };
 }
 

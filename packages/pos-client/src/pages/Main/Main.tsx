@@ -11,22 +11,32 @@ import { PriceGroupContext } from '../../contexts/PriceGroupContext';
 import { populateMelon } from './populateMelon';
 import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import withObservables from '@nozbe/with-observables';
+import { Q } from '@nozbe/watermelondb';
+import { tNames } from '../../models';
+import { database } from '../../App';
 
 // TODO: this needs to be moved to organizaiton => settings and queried from db
 // const DEF_PRICE_GROUP_ID = '5e90eae405a18b11edbf3214';
 
-export const MainWrapped: React.FC<{ organizationId: string; userId: string; priceGroups: any }> = ({
-  organizationId,
-  userId,
-  priceGroups,
-}) => {
+export const MainWrapped: React.FC<{
+  organizationId: string;
+  userId: string;
+  priceGroups: any;
+  currentBillPeriod: any;
+}> = ({ organizationId, userId, priceGroups, currentBillPeriod }) => {
   // TODO: type
-  const billPeriods = useRealmQuery<BillPeriodProps>({ source: BillPeriodSchema.name, filter: 'closed = null' });
+  // const billPeriods = useRealmQuery<BillPeriodProps>({ source: BillPeriodSchema.name, filter: 'closed = null' });
   // const priceGroups = useRealmQuery<PriceGroupProps>({ source: PriceGroupSchema.name });
   console.log('priceGroups', priceGroups);
+  console.log('currentBillPeriod', currentBillPeriod);
   const [populating, setPopulating] = useState(false); // TODO debug: reset to true
   const [billPeriod, setBillPeriod] = useState(null);
   const [priceGroup, setPriceGroup] = useState(null);
+
+  console.log('----state- billPeriod', billPeriod);
+  React.useEffect(() => {
+   
+  }, [setBillPeriod]);
 
   useEffect(() => {
     // const populateAsync = async () => {
@@ -52,20 +62,35 @@ export const MainWrapped: React.FC<{ organizationId: string; userId: string; pri
      * If refreshing data in populate - make sure to only run after population is complete
      */
 
-    if (billPeriods && !populating) {
-      switch (billPeriods.length) {
-        case 0:
-          return realm.write(() => {
-            const newBillPeriod = realm.create(BillPeriodSchema.name, { _id: uuidv4(), opened: new Date() });
-            setBillPeriod(newBillPeriod);
-          });
-        case 1:
-          return setBillPeriod(billPeriods[0]);
-        default:
-          console.error('Invalid state: Multiple open bill periods');
-      }
+    if (!populating) {
+      // switch (billPeriods.length) {
+      //   case 0:
+      //     return realm.write(() => {
+      //       const newBillPeriod = realm.create(BillPeriodSchema.name, { _id: uuidv4(), opened: new Date() });
+      //       setBillPeriod(newBillPeriod);
+      //     });
+      //   case 1:
+      //     return setBillPeriod(billPeriods[0]);
+      //   default:
+      //     console.error('Invalid state: Multiple open bill periods');
+      // }
+
+      const setCurrentPeriod = async () => {
+        console.log('***********');
+        const billPeriodCollection = database.collections.get(tNames.billPeriods);
+        const [currentPeriod] = await billPeriodCollection.query('closed_at', Q.eq(null)).fetch();
+        if (!currentPeriod) {
+          const newPeriod = await database.action(async () => await billPeriodCollection.create());
+          console.log('------------period', newPeriod);
+          setBillPeriod(newPeriod);
+        } else {
+          setBillPeriod(currentPeriod);
+        }
+      };
+  
+      setCurrentPeriod();
     }
-  }, [billPeriods, populating]);
+  }, [setBillPeriod, populating]);
 
   useEffect(() => {
     if (priceGroups && !populating) {

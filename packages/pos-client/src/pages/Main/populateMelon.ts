@@ -135,8 +135,6 @@ export const populateMelon = async () => {
     },
   );
 
-  console.log('toCreate', toCreate);
-
   okResponse(responses[2]).map(({ _id, name, items }) => {
     const modifiersCollection = database.collections.get<ModifierProps & Model>(tNames.modifiers);
     const modifierItemsCollection = database.collections.get<any>(tNames.modifier_items);
@@ -174,8 +172,19 @@ export const populateMelon = async () => {
     toCreate.push(modifier);
   });
 
+  console.log('BEFORE BILL PERIOD');
+  const billPeriodCollection = database.collections.get<any>(tNames.billPeriods);
+
+  console.log('billPeriodCollection', billPeriodCollection);
+  const period = billPeriodCollection.prepareCreate(newPeriod => {
+    console.log('newPeriod', newPeriod);
+  });
+  console.log('period', period);
+  // toCreate.push(period);
   console.log('----- AFTER');
   console.log('printersToCreate', printersToCreate);
+  console.log('toCreate', toCreate);
+
   //   console.log('*************** categoriesToCreate', JSON.stringify(categoriesToCreate, null, 4));
   //   console.log('*************** responses[1].data.data', JSON.stringify(responses[1].data.data, null, 4));
 

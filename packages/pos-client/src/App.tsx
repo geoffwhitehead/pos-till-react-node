@@ -11,9 +11,9 @@ import { Main } from './pages/Main/Main';
 import { NavigationContainer } from '@react-navigation/native';
 import { Root } from 'native-base';
 import decode from 'jwt-decode';
-import { Database } from '@nozbe/watermelondb';
+import { Database, Q } from '@nozbe/watermelondb';
 import SQLiteAdapter from '@nozbe/watermelondb/adapters/sqlite';
-import { models } from './models';
+import { models, tNames } from './models';
 import schema from './models/schema';
 // import Post from './model/Post' // ⬅️ You'll import your Models here
 import DatabaseProvider from '@nozbe/watermelondb/DatabaseProvider';
@@ -135,7 +135,7 @@ export const App = () => {
       ['accessToken', accessToken],
       ['refreshToken', refreshToken],
       ['userId', userId],
-      ['organizationId', organizationId]
+      ['organizationId', organizationId],
     ]);
     dispatch({ type: 'SIGN_IN', accessToken, refreshToken, organizationId, userId });
   };
