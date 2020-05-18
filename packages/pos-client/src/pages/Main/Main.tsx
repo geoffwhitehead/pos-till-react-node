@@ -23,20 +23,18 @@ export const MainWrapped: React.FC<{
   userId: string;
   priceGroups: any;
   currentBillPeriod: any;
-}> = ({ organizationId, userId, priceGroups, currentBillPeriod }) => {
+}> = ({ organizationId, userId, priceGroups, openPeriods }) => {
   // TODO: type
   // const billPeriods = useRealmQuery<BillPeriodProps>({ source: BillPeriodSchema.name, filter: 'closed = null' });
   // const priceGroups = useRealmQuery<PriceGroupProps>({ source: PriceGroupSchema.name });
   console.log('priceGroups', priceGroups);
-  console.log('currentBillPeriod', currentBillPeriod);
+  console.log('openPeriods', openPeriods);
   const [populating, setPopulating] = useState(false); // TODO debug: reset to true
   const [billPeriod, setBillPeriod] = useState(null);
   const [priceGroup, setPriceGroup] = useState(null);
 
-  console.log('----state- billPeriod', billPeriod);
-  React.useEffect(() => {
-   
-  }, [setBillPeriod]);
+  // console.log('----state- billPeriod', billPeriod);
+  React.useEffect(() => {}, [setBillPeriod]);
 
   useEffect(() => {
     // const populateAsync = async () => {
@@ -62,7 +60,7 @@ export const MainWrapped: React.FC<{
      * If refreshing data in populate - make sure to only run after population is complete
      */
 
-    if (!populating) {
+    if (!populating && openPeriods) {
       // switch (billPeriods.length) {
       //   case 0:
       //     return realm.write(() => {
@@ -76,21 +74,19 @@ export const MainWrapped: React.FC<{
       // }
 
       const setCurrentPeriod = async () => {
-        console.log('***********');
-        const billPeriodCollection = database.collections.get(tNames.billPeriods);
-        const [currentPeriod] = await billPeriodCollection.query('closed_at', Q.eq(null)).fetch();
-        if (!currentPeriod) {
+        if (openPeriods.length === 0) {
+          const billPeriodCollection = database.collections.get(tNames.billPeriods);
           const newPeriod = await database.action(async () => await billPeriodCollection.create());
           console.log('------------period', newPeriod);
           setBillPeriod(newPeriod);
         } else {
-          setBillPeriod(currentPeriod);
+          setBillPeriod(openPeriods[0]);
         }
       };
-  
+
       setCurrentPeriod();
     }
-  }, [setBillPeriod, populating]);
+  }, [setBillPeriod, populating, openPeriods]);
 
   useEffect(() => {
     if (priceGroups && !populating) {
@@ -114,6 +110,10 @@ export const Main = withDatabase(
     priceGroups: database.collections
       .get('price_groups')
       .query()
+      .observe(),
+      openPeriods: database.collections
+      .get('bill_periods')
+      .query(Q.where('closed_at', Q.eq(null)))
       .observe(),
   }))(MainWrapped),
 );

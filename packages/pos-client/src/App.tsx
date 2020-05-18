@@ -49,6 +49,7 @@ export const App = () => {
             refreshToken: action.refreshToken,
             organizationId: action.organizationId,
             userId: action.userId,
+            isLoading: false,
           };
         case 'SIGN_OUT':
           return {
@@ -58,6 +59,7 @@ export const App = () => {
             refreshToken: null,
             organizationId: null,
             userId: null,
+            isLoading: false,
           };
       }
     },
@@ -201,6 +203,7 @@ export const App = () => {
 
   const { isLoading, refreshToken, accessToken, userId, organizationId } = state;
 
+  console.log('iuyqweiuryiuwyeiuryiwuer');
   if (isLoading) {
     // We haven't finished checking for the token yet
     return <SplashScreen />;

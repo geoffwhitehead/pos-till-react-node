@@ -11,7 +11,8 @@
         "dev:api": "cd packages/pos-server && yarn dev",
         "dev:all": "concurrently \"yarn dev:app\" \"yarn dev:api\"",
         "bootstrap": "lerna bootstrap --ignore-prepublish",
-        "heroku-postbuild": "cd ./packages/pos-server/ && NODE_ENV=development yarn && yarn build"
+        "heroku-postbuild": "cd ./packages/pos-server/ && NODE_ENV=development yarn && yarn build",
+        "create:env": "cp ../copyenv ./packages/pos-server/.env"
     },
     "devDependencies": {
         "concurrently": "^5.2.0",
