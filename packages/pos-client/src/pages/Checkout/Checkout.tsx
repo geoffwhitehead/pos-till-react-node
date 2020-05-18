@@ -29,6 +29,7 @@ import { Watermelon } from './Watermelon';
 import { useDatabase } from '@nozbe/watermelondb/hooks';
 import { Model } from '@nozbe/watermelondb';
 import { database } from '../../App';
+import { CurrentBillContext } from '../../contexts/CurrentBillContext';
 
 export enum Modes {
   Payments = 'payments',
@@ -52,26 +53,35 @@ export const Checkout: React.FC<CheckoutProps> = ({ navigation, route }) => {
   const { billPeriod } = useContext(BillPeriodContext);
   // const selectedBill = route.params?.selectedBill;
 
-  const openBills = useRealmQuery<BillProps>({ source: BillSchema.name, filter: `isClosed = false` });
+  console.log('----route', route);
+  const { currentBill, setCurrentBill } = useContext(CurrentBillContext);
+
+  // const openBills = useRealmQuery<BillProps>({ source: BillSchema.name, filter: `isClosed = false` });
   const discounts = useRealmQuery<DiscountProps>({ source: DiscountSchema.name });
   const paymentTypes = useRealmQuery<PaymentTypeProps>({ source: PaymentTypeSchema.name });
-  const [activeBill, setActiveBill] = useState<null | any>(route.params?.selectedBill); // TODO: type
-  console.log('route.params', route.params);
-  useEffect(() => {
-    const selectedBill = route.params?.selectedBill;
-    selectedBill && setActiveBill(selectedBill);
+  // const [activeBill, setActiveBill] = useState<null | any>(route.params?.selectedBill); // TODO: type
+  // console.log('route.params', route.params);
+  // useEffect(() => {
+  //   const selectedBill = route.params?.selectedBill;
+  //   selectedBill && setActiveBill(selectedBill);
 
-    console.log('selectedBill', selectedBill);
-    // console.log('activeBill', activeBill);
-    // if (selectedBill != activeBill) {
-    // }
-  }, [route.params]);
+  //   console.log('selectedBill', selectedBill);
+  //   // console.log('activeBill', activeBill);
+  //   // if (selectedBill != activeBill) {
+  //   // }
+  // }, [route.params]);
 
   const [mode, setMode] = useState<Modes>(Modes.Items);
 
-  const clearBill = () => setActiveBill(null);
+  const clearBill = () => setCurrentBill(null);
   const openDrawer = () => navigation.openDrawer();
   const onCheckout = () => setMode(Modes.Payments);
+
+  useEffect(() => {
+    if (!currentBill) {
+      setMode(Modes.Bills);
+    }
+  }, [currentBill]);
 
   const completeBill = bill => {
     const billBalance = balance(bill);
@@ -112,23 +122,23 @@ export const Checkout: React.FC<CheckoutProps> = ({ navigation, route }) => {
   //   return () => {};
   // }, [activeBill]);
 
-  useEffect(() => {
-    setMode(Modes.Items);
-  }, [setMode]);
+  // useEffect(() => {
+  //   setMode(Modes.Items);
+  // }, [setMode]);
 
   // TODO:  function duped in drawer->bills ... refactor
-  const onSelectBill = (tab, bill) => {
-    console.log('onSelectBill cout', tab, bill, billPeriod);
-    if (bill) {
-      setActiveBill(bill);
-    } else {
-      realm.write(() => {
-        const bill = realm.create(BillSchema.name, { _id: uuidv4(), tab, billPeriod });
-        console.log('created bill', bill);
-        setActiveBill(bill);
-      });
-    }
-  };
+  // const onSelectBill = (tab, bill) => {
+  //   console.log('onSelectBill cout', tab, bill, billPeriod);
+  //   if (bill) {
+  //     setCurrentBill(bill);
+  //   } else {
+  //     realm.write(() => {
+  //       const bill = realm.create(BillSchema.name, { _id: uuidv4(), tab, billPeriod });
+  //       console.log('created bill', bill);
+  //       setCurrentBill(bill);
+  //     });
+  //   }
+  // };
 
   const closeBill = bill => {
     clearBill();
@@ -142,20 +152,20 @@ export const Checkout: React.FC<CheckoutProps> = ({ navigation, route }) => {
       case Modes.Payments:
         return (
           <Payment
-            activeBill={activeBill}
+            activeBill={currentBill}
             discounts={discounts}
             paymentTypes={paymentTypes}
             onCompleteBill={completeBill}
           />
         );
-      case Modes.Watermelon:
-        return <Watermelon />;
+      // case Modes.Watermelon:
+      //   return <Watermelon />;
       case Modes.Bills:
-        return <SelectBill maxBills={maxBills} openBills={openBills} onSelectBill={onSelectBill} />;
+        return <SelectBill billPeriod={billPeriod} />;
       case Modes.Items:
-        return <CheckoutItemNavigator activeBill={activeBill} />;
+        return <CheckoutItemNavigator activeBill={currentBill} />;
       case Modes.Complete:
-        return <CompleteBill activeBill={activeBill} onCloseBill={closeBill} />;
+        return <CompleteBill activeBill={currentBill} onCloseBill={closeBill} />;
     }
   };
 
@@ -164,16 +174,16 @@ export const Checkout: React.FC<CheckoutProps> = ({ navigation, route }) => {
       <SidebarHeader title="Checkout" onOpen={openDrawer} disableNav={mode === Modes.Complete} />
       <Grid>
         <Col>{renderMainPanel()}</Col>
-        <Col style={{ width: 350 }}>
-          {activeBill && (
+        {/* <Col style={{ width: 350 }}>
+          {currentBill && (
             <Receipt
-              activeBill={activeBill}
+              activeBill={currentBill}
               onStore={clearBill}
               onCheckout={onCheckout}
               complete={mode === Modes.Complete}
             />
           )}
-        </Col>
+        </Col> */}
       </Grid>
     </Container>
   );

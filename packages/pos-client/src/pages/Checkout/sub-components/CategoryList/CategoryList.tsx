@@ -29,10 +29,10 @@ export const CategoriesWrapped: React.FC<any> = ({ navigation, route, categories
 
   const { priceGroup } = useContext(PriceGroupContext);
 
-  console.log('priceGroup', priceGroup);
-  console.log('categories', categories);
-  console.log('categories[0].name', categories[0] && categories[0].name);
-  console.log('categories[0].id', categories[0] && categories[0].id);
+  // console.log('priceGroup', priceGroup);
+  // console.log('categories', categories);
+  // console.log('categories[0].name', categories[0] && categories[0].name);
+  // console.log('categories[0].id', categories[0] && categories[0].id);
   // const categories = useRealmQuery<CategoryProps>({
   //   source: CategorySchema.name,
   //   sort: ['name'],
@@ -122,7 +122,7 @@ export const CategoriesWrapped: React.FC<any> = ({ navigation, route, categories
           <Right />
         </ListItem>
         {categories
-          // .filter(category => searchFilter(category, searchValue))
+          .filter(category => searchFilter(category, searchValue))
           .map(category => {
             return (
               <ListItem key={category._id} icon onPress={onPressCategoryFactory(category)}>

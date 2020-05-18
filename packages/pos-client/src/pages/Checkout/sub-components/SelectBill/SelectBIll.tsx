@@ -1,7 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Text, Content, List, ListItem, Left, Body, Right, Button, Separator } from '../../../../core';
 import { formatNumber, balance, total } from '../../../../utils';
 import { BillProps } from '../../../../services/schemas';
+import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
+import withObservables from '@nozbe/with-observables';
+import { tNames } from '../../../../models';
+import { Q } from '@nozbe/watermelondb';
+import { CurrentBillContext } from '../../../../contexts/CurrentBillContext';
 
 interface SelectBillProps {
   openBills: any; // TODO: fix realm types
@@ -11,20 +16,39 @@ interface SelectBillProps {
 
 // TODO: fetch from org / state
 const symbol = '£';
+const maxBills = 40; // TODO: move to org settings
 
-export const SelectBill: React.FC<SelectBillProps> = ({ openBills, maxBills, onSelectBill }) => {
+export const WrappedSelectBill: React.FC<SelectBillProps> = ({ database, billPeriod, openBills }) => {
+  const { setCurrentBill } = useContext(CurrentBillContext);
+  const [showOpen, setShowOpen] = useState<boolean>(false);
+
+  console.log('*******');
+  console.log('billPeriod', billPeriod);
+  console.log('openBills', openBills);
+
   const bills = openBills.reduce((acc, bill) => {
-    acc[bill.tab - 1] = bill;
+    acc[bill.reference - 1] = bill;
     return [...acc];
   }, Array(maxBills).fill(null));
 
-  const [showOpen, setShowOpen] = useState<boolean>(false);
+  const onSelectBillFactory = (reference: number, bill: BillProps) => () => {
+    database.action(async () => {
+      // const billCollection = database.collections.get(tNames.bills);
 
-  type OnSelectBillFactory = (tab: number, bill: BillProps) => () => void;
-  const onSelectBillFactory: OnSelectBillFactory = (tab, bill) => () => onSelectBill(tab, bill);
+      // const bill = await billCollection.create(bill => {
+      //   bill.reference = ref;
+      //   bill.isClosed = false;
+      //   bill.billPeriodId = billPeriod.id;
+      // });
+
+      const bill = await billPeriod.createBill({ reference });
+      setCurrentBill(bill);
+    });
+  };
+
   const toggleOpenOnlyFilter = () => setShowOpen(!showOpen);
-
   const filterOpenOnly = bill => (showOpen ? bill : true);
+
   return (
     <Content>
       <List>
@@ -59,10 +83,11 @@ export const SelectBill: React.FC<SelectBillProps> = ({ openBills, maxBills, onS
                 <Text style={{ color }}>{`${tab}: ${bill ? 'Open' : 'Closed'}`}</Text>
               </Left>
               <Body>
-                <Text style={{ color: 'grey' }}>{bill ? formatNumber(balance(bill), symbol) : ''}</Text>
+                <Text>{bill ? 'BILL' : 'nope'}</Text>
+                {/* <Text style={{ color: 'grey' }}>{bill ? formatNumber(balance(bill), symbol) : ''}</Text> */}
               </Body>
               <Right>
-                <Text style={{ color: 'grey' }}>{bill ? formatNumber(total(bill), symbol) : ''}</Text>
+                {/* <Text style={{ color: 'grey' }}>{bill ? formatNumber(total(bill), symbol) : ''}</Text> */}
               </Right>
             </ListItem>
           );
@@ -71,3 +96,9 @@ export const SelectBill: React.FC<SelectBillProps> = ({ openBills, maxBills, onS
     </Content>
   );
 };
+
+export const SelectBill = withDatabase<any, any>( // TODO: fix type
+  withObservables(['billPeriod'], ({ billPeriod }) => ({
+    openBills: billPeriod.openBills,
+  }))(WrappedSelectBill),
+);

@@ -21,7 +21,7 @@ import { sanitizedRaw } from '@nozbe/watermelondb/RawRecord';
 import catchFn from './catchFn';
 import { getOrganization } from '../../api/organization';
 export const populateMelon = async () => {
-  // return;
+  return;
   try {
     await database.action(async () => {
       await database.unsafeResetDatabase();
@@ -100,8 +100,8 @@ export const populateMelon = async () => {
   okResponse(responses[0]).map(
     ({ _id: itemId, name, categoryId, price: itemPrices, modifierId, linkedPrinters: linkedPrinterIds }) => {
       const itemsCollection = database.collections.get<ItemProps & Model>(tNames.items);
-      const itemPricesCollection = database.collections.get(tNames.item_prices);
-      const itemPrintersCollection = database.collections.get(tNames.item_printers);
+      const itemPricesCollection = database.collections.get(tNames.itemPrices);
+      const itemPrintersCollection = database.collections.get(tNames.itemPrinters);
 
       const itemPricesToCreate = itemPrices.map(itemPrice =>
         itemPricesCollection.prepareCreate(
@@ -137,8 +137,8 @@ export const populateMelon = async () => {
 
   okResponse(responses[2]).map(({ _id, name, items }) => {
     const modifiersCollection = database.collections.get<ModifierProps & Model>(tNames.modifiers);
-    const modifierItemsCollection = database.collections.get<any>(tNames.modifier_items);
-    const modifierPriceCollection = database.collections.get<any>(tNames.modifier_prices);
+    const modifierItemsCollection = database.collections.get<any>(tNames.modifierItems);
+    const modifierPriceCollection = database.collections.get<any>(tNames.modifierPrices);
 
     const modifier = modifiersCollection.prepareCreate(
       catchFn(modifier => {

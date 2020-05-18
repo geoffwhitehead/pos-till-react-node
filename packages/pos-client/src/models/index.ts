@@ -13,22 +13,23 @@ import {
 
 export const tNames = {
   modifiers: 'modifiers',
-  price_groups: 'price_groups',
-  item_prices: 'item_prices',
-  modifier_prices: 'modifier_prices',
-  payment_types: 'payment_types',
-  modifier_items: 'modifier_items',
+  priceGroups: 'price_groups',
+  itemPrices: 'item_prices',
+  modifierPrices: 'modifier_prices',
+  paymentTypes: 'payment_types',
+  modifierItems: 'modifier_items',
   discounts: 'discounts',
   organizations: 'organizations',
   printers: 'printers',
   categories: 'categories',
-  item_printers: 'item_printers',
+  itemPrinters: 'item_printers',
   items: 'items',
   billPayments: 'bill_payments',
   bills: 'bills',
   billDiscounts: 'bill_discounts',
   billPeriods: 'bill_periods',
   billItems: 'bill_items',
+  billItemModifierItems: 'bill_item_modifier_items',
 };
 
 class Item extends Model {
@@ -42,17 +43,17 @@ class Item extends Model {
   @relation(tNames.modifiers, 'modifier_id') modifier;
 
   static associations = {
-    [tNames.item_printers]: { type: 'has_many', foreignKey: 'item_id' },
+    [tNames.itemPrinters]: { type: 'has_many', foreignKey: 'item_id' },
     [tNames.modifiers]: { type: 'belongs_to', key: 'modifier_id' },
     [tNames.categories]: { type: 'belongs_to', key: 'category_id' },
   };
 
   // @ts-ignore
-  @lazy printers = this.collections.get(tNames.printers).query(Q.on(tNames.item_printers, 'item_id', this.id));
+  @lazy printers = this.collections.get(tNames.printers).query(Q.on(tNames.itemPrinters, 'item_id', this.id));
 }
 
 class ItemPrinter extends Model {
-  static table = tNames.item_printers;
+  static table = tNames.itemPrinters;
 
   @field('item_id') itemId;
   @field('printerId') printerId;
@@ -102,11 +103,11 @@ class Printer extends Model {
   @field('address') address;
 
   static associations = {
-    [tNames.item_printers]: { type: 'has_many', foreignKey: 'printer_id' },
+    [tNames.itemPrinters]: { type: 'has_many', foreignKey: 'printer_id' },
   };
   // @ts-ignore
 
-  @lazy items = this.collections.get(tNames.items).query(Q.on(tNames.item_printers, 'printer_id', this.id));
+  @lazy items = this.collections.get(tNames.items).query(Q.on(tNames.itemPrinters, 'printer_id', this.id));
 }
 
 class Modifier extends Model {
@@ -115,39 +116,39 @@ class Modifier extends Model {
   @field('name') name;
 
   static associations = {
-    [tNames.modifier_items]: { type: 'belongs_to', foreignKey: 'modifier_id' },
+    [tNames.modifierItems]: { type: 'belongs_to', foreignKey: 'modifier_id' },
     [tNames.items]: { type: 'belongs_to', foreignKey: 'modifier_id' },
   };
 }
 
 class PriceGroup extends Model {
-  static table = tNames.price_groups;
+  static table = tNames.priceGroups;
 
   @field('name') name;
 }
 
 class ItemPrice extends Model {
-  static table = tNames.item_prices;
+  static table = tNames.itemPrices;
 
   @field('price') price;
   @field('price_group_id') priceGroupId;
   @field('item_id') itemId;
 
-  @relation(tNames.price_groups, 'price_group_id') priceGroup;
+  @relation(tNames.priceGroups, 'price_group_id') priceGroup;
   @relation(tNames.items, 'item_id') item;
 }
 class ModifierPrice extends Model {
-  static table = tNames.modifier_prices;
+  static table = tNames.modifierPrices;
 
   @field('price') price;
   @field('price_group_id') priceGroupId;
   @field('modifier_item_id') modifierItemId;
 
-  @relation(tNames.price_groups, 'price_group_id') priceGroup;
-  @relation(tNames.modifier_items, 'modifier_item_id') modifierItem;
+  @relation(tNames.priceGroups, 'price_group_id') priceGroup;
+  @relation(tNames.modifierItems, 'modifier_item_id') modifierItem;
 }
 class PaymentType extends Model {
-  static table = tNames.payment_types;
+  static table = tNames.paymentTypes;
 
   @nochange @field('name') name;
 
@@ -157,7 +158,7 @@ class PaymentType extends Model {
 }
 
 class ModifierItem extends Model {
-  static table = tNames.modifier_items;
+  static table = tNames.modifierItems;
 
   @field('name') name;
   @field('modifier_id') modifierId;
@@ -188,6 +189,18 @@ class BillPeriod extends Model {
   static associations = {
     [tNames.bills]: { type: 'has_many', foreignKey: 'bill_period_id' },
   };
+
+  @children(tNames.bills) bills;
+
+  @lazy openBills = this.bills.extend(Q.where('is_closed', Q.notEq(true)));
+
+  createBill = async (params: { reference: number }) => {
+    return this.collections.get(tNames.bills).create(bill => {
+      bill.reference = params.reference;
+      bill.isClosed = false;
+      bill.billPeriodId = this.id;
+    });
+  };
 }
 
 class BillPayment extends Model {
@@ -202,10 +215,10 @@ class BillPayment extends Model {
 
   static associations = {
     [tNames.bills]: { type: 'belongs_to', key: 'bill_id' },
-    [tNames.payment_types]: { type: 'belongs_to', key: 'payment_type_id' },
+    [tNames.paymentTypes]: { type: 'belongs_to', key: 'payment_type_id' },
   };
 
-  @immutableRelation(tNames.payment_types, 'payment_type_id') paymentType;
+  @immutableRelation(tNames.paymentTypes, 'payment_type_id') paymentType;
   @immutableRelation(tNames.bills, 'bill_id') bill;
 }
 
@@ -228,6 +241,10 @@ class Bill extends Model {
     [tNames.billItems]: { type: 'has_many', foreignKey: 'bill_id' },
     [tNames.billDiscounts]: { type: 'has_many', foreignKey: 'bill_id' },
   };
+
+  @children(tNames.billPayments) payments;
+  @children(tNames.discounts) discounts;
+  @children(tNames.billItems) billItems;
 }
 
 class BillDiscount extends Model {
@@ -263,9 +280,25 @@ class BillItem extends Model {
   @readonly @date('updated_at') updatedAt;
 
   @immutableRelation(tNames.bills, 'bill_id') bill;
+  @children(tNames.billItemModifierItems) modifierItems;
 
   static associations = {
     [tNames.bills]: { type: 'belongs_to', key: 'bill_id' },
+    [tNames.billItemModifierItems]: { type: 'has_many', foreignKey: 'bill_item_id' },
+  };
+}
+
+class BillItemModifierItem extends Model {
+  static table = tNames.billItemModifierItems;
+
+  @nochange @field('bill_item_id') billItemId;
+  @nochange @field('modifier_item_price') modifierItemPrice;
+  @nochange @field('modifier_item_name') modifierItemName;
+
+  @immutableRelation(tNames.billItems, 'bill_item_id') billItem;
+
+  static associations = {
+    [tNames.billItems]: { type: 'belongs_to', key: 'bill_item_id' },
   };
 }
 
@@ -287,6 +320,7 @@ export const models = [
   BillItem,
   BillPayment,
   BillPeriod,
+  BillItemModifierItem,
 ];
 
 export const Models = {
@@ -307,4 +341,5 @@ export const Models = {
   BillItem,
   BillPayment,
   BillPeriod,
+  BillItemModifierItem,
 };

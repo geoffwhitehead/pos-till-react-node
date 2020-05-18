@@ -14,6 +14,7 @@ import withObservables from '@nozbe/with-observables';
 import { Q } from '@nozbe/watermelondb';
 import { tNames } from '../../models';
 import { database } from '../../App';
+import { CurrentBillContext } from '../../contexts/CurrentBillContext';
 
 // TODO: this needs to be moved to organizaiton => settings and queried from db
 // const DEF_PRICE_GROUP_ID = '5e90eae405a18b11edbf3214';
@@ -25,15 +26,11 @@ export const MainWrapped: React.FC<{
   currentBillPeriod: any;
 }> = ({ organizationId, userId, priceGroups, openPeriods }) => {
   // TODO: type
-  // const billPeriods = useRealmQuery<BillPeriodProps>({ source: BillPeriodSchema.name, filter: 'closed = null' });
-  // const priceGroups = useRealmQuery<PriceGroupProps>({ source: PriceGroupSchema.name });
-  console.log('priceGroups', priceGroups);
-  console.log('openPeriods', openPeriods);
   const [populating, setPopulating] = useState(false); // TODO debug: reset to true
   const [billPeriod, setBillPeriod] = useState(null);
   const [priceGroup, setPriceGroup] = useState(null);
+  const [currentBill, setCurrentBill] = useState(null);
 
-  // console.log('----state- billPeriod', billPeriod);
   React.useEffect(() => {}, [setBillPeriod]);
 
   useEffect(() => {
@@ -99,7 +96,9 @@ export const MainWrapped: React.FC<{
   ) : (
     <BillPeriodContext.Provider value={{ billPeriod, setBillPeriod }}>
       <PriceGroupContext.Provider value={{ priceGroup, setPriceGroup }}>
-        <SidebarNavigator />
+        <CurrentBillContext.Provider value={{ currentBill, setCurrentBill }}>
+          <SidebarNavigator />
+        </CurrentBillContext.Provider>
       </PriceGroupContext.Provider>
     </BillPeriodContext.Provider>
   );
@@ -108,11 +107,11 @@ export const MainWrapped: React.FC<{
 export const Main = withDatabase(
   withObservables([], ({ database }) => ({
     priceGroups: database.collections
-      .get('price_groups')
+      .get(tNames.priceGroups)
       .query()
       .observe(),
-      openPeriods: database.collections
-      .get('bill_periods')
+    openPeriods: database.collections
+      .get(tNames.billPeriods)
       .query(Q.where('closed_at', Q.eq(null)))
       .observe(),
   }))(MainWrapped),
