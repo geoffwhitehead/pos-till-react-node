@@ -60,9 +60,17 @@ export default appSchema({
       columns: [
         { name: 'name', type: 'string' },
         { name: 'category_id', type: 'string', isIndexed: true },
-        { name: 'modifier_id', type: 'string', isOptional: true },
+        // { name: 'modifier_id', type: 'string', isOptional: true },
         // { name: 'item_printers_id', type: 'string' }, // pivot table many to many
       ],
+    }),
+
+    tableSchema({
+      name: 'item_modifiers',
+      columns: [
+        { name: 'item_id', type: 'string' },
+        { name: 'modifier_id', type: 'string' },
+      ]
     }),
 
     // modifier_item_revision_id
@@ -149,8 +157,8 @@ export default appSchema({
         { name: 'item_price', type: 'string' },
         { name: 'price_group_name', type: 'string' },
         { name: 'price_group_id', type: 'string' },
-        { name: 'modifier_name', type: 'string' },
-        { name: 'modifier_id', type: 'string' },
+        // { name: 'modifier_name', type: 'string' },
+        // { name: 'modifier_id', type: 'string' },
         { name: 'category_name', type: 'string' },
         { name: 'category_id', type: 'string' },
         { name: 'created_at', type: 'number' },
@@ -158,9 +166,18 @@ export default appSchema({
       ],
     }),
     tableSchema({
+      name: 'bill_item_modifiers',
+      columns: [
+        { name: 'bill_item_id', type: 'string', isIndexed: true },
+        { name: 'modifier_name', type: 'string' },
+        { name: 'modifier_id', type: 'string' },
+      ]
+    }),
+    tableSchema({
       name: 'bill_item_modifier_items',
       columns: [
         { name: 'bill_item_id', type: 'string', isIndexed: true },
+        { name: 'bill_item_modifier_id', type: 'string' },
         { name: 'modifier_item_id', type: 'string' },
         { name: 'modifier_item_name', type: 'string' },
         { name: 'modifier_item_price', type: 'string' },

@@ -98,20 +98,28 @@ export const populateMelon = async () => {
   toCreate.push(...discountsToCreate);
 
   okResponse(responses[0]).map(
-    ({ _id: itemId, name, categoryId, price: itemPrices, modifierId, linkedPrinters: linkedPrinterIds }) => {
+    ({ _id: itemId, name, categoryId, price: itemPrices, modifiers, linkedPrinters: linkedPrinterIds }) => {
       const itemsCollection = database.collections.get<ItemProps & Model>(tNames.items);
       const itemPricesCollection = database.collections.get(tNames.itemPrices);
       const itemPrintersCollection = database.collections.get(tNames.itemPrinters);
+      const itemModifiersCollection = database.collections.get(tNames.itemModifiers);
+
+      const itemModifiersToCreate = modifiers.map(modifierId => {
+        itemModifiersCollection.prepareCreate(catchFn(_itemModifier => {
+          _itemModifier.item_id = itemId;
+          _itemModifier.modifier_id = modifierId
+        }));
+      });
 
       const itemPricesToCreate = itemPrices.map(itemPrice =>
         itemPricesCollection.prepareCreate(
           catchFn(_itemPrice => {
-            (_itemPrice._raw = sanitizedRaw({ id: itemPrice._id }, itemPricesCollection.schema)),
-              Object.assign(_itemPrice, {
-                price: itemPrice.amount,
-                price_group_id: itemPrice.groupId,
-                item_id: itemId,
-              });
+            _itemPrice._raw = sanitizedRaw({ id: itemPrice._id }, itemPricesCollection.schema);
+            Object.assign(_itemPrice, {
+              price: itemPrice.amount,
+              price_group_id: itemPrice.groupId,
+              item_id: itemId,
+            });
           }),
         ),
       );
@@ -127,11 +135,11 @@ export const populateMelon = async () => {
       const itemToCreate = itemsCollection.prepareCreate(
         catchFn(item => {
           (item._raw = sanitizedRaw({ id: itemId }, itemsCollection.schema)),
-            Object.assign(item, { name, category_id: categoryId, modifier_id: modifierId });
+            Object.assign(item, { name, category_id: categoryId });
         }),
       );
 
-      toCreate.push(...itemPricesToCreate, ...printerLinksToCreate, itemToCreate);
+      toCreate.push(...itemModifiersToCreate, ...itemPricesToCreate, ...printerLinksToCreate, itemToCreate);
     },
   );
 
