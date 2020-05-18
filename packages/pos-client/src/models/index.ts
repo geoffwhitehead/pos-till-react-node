@@ -72,7 +72,7 @@ class Category extends Model {
 
   @children(tNames.items) items;
 
-  @field('name') name;
+  @nochange @field('name') name;
 
   static associations = {
     [tNames.items]: { type: 'has_many', foreignKey: 'category_id' },
@@ -169,9 +169,9 @@ class ModifierItem extends Model {
 class Discount extends Model {
   static table = tNames.discounts;
 
-  @field('name') name;
-  @field('amount') amount;
-  @field('is_percent') isPercent;
+  @nochange @field('name') name;
+  @nochange @field('amount') amount;
+  @nochange @field('is_percent') isPercent;
 }
 
 class Organization extends Model {
@@ -249,41 +249,65 @@ class Bill extends Model {
 
 class BillDiscount extends Model {
   static table = tNames.billDiscounts;
-
-  @nochange @field('name') name;
+  
   @nochange @field('bill_id') billId;
-  @nochange @field('amount') amount;
-  @nochange @field('is_percent') isPercent;
-
+  @nochange @field('discount_id') discountId;
   @readonly @date('created_at') createdAt;
   @readonly @date('updated_at') updatedAt;
 
   @immutableRelation(tNames.bills, 'bill_id') bill;
+  @immutableRelation(tNames.discounts, 'discount_id') discount;
 
   static associations = {
     [tNames.bills]: { type: 'belongs_to', key: 'bill_id' },
+    [tNames.discounts]: { type: 'belongs_to', key: 'discount_id' },
   };
 }
 
 class BillItem extends Model {
   static table = tNames.billItems;
   @nochange @field('bill_id') billId;
-  @nochange @field('name') name;
-  @nochange @field('price') price;
+  @nochange @field('item_id') itemId;
+  @nochange @field('item_name') name;
+  @nochange @field('item_price') price;
   @nochange @field('price_group_name') priceGroupName;
-  @nochange @field('modifier_name') modifierName;
+  @nochange @field('price_group_id') priceGroupId;
   @nochange @field('modifier_id') modifierId;
-  @nochange @field('category_name') categoryName;
+  @nochange @field('modifier_name') modifierName;
   @nochange @field('category_id') categoryId;
-
+  @nochange @field('category_name') categoryName;
   @readonly @date('created_at') createdAt;
   @readonly @date('updated_at') updatedAt;
 
   @immutableRelation(tNames.bills, 'bill_id') bill;
+  @immutableRelation(tNames.items, 'item_id') item;
+  @immutableRelation(tNames.priceGroups, 'price_group_id') priceGroup;
+  @immutableRelation(tNames.modifiers, 'modifier_id') modifier;
+  @immutableRelation(tNames.categories, 'category_id') category;
   @children(tNames.billItemModifierItems) modifierItems;
+
+  addPayment = async (p: { paymentTypeId: string; amount: number; isChange?: boolean }) => {
+    this.collections.get(tNames.billPayments).create(payment => {
+      payment.payment_type_id = p.paymentTypeId;
+      payment.bill_id = this.id;
+      payment.amount = p.amount;
+      payment.is_change = p.isChange || false;
+    });
+  };
+
+  addDiscount = async (p: { discountId: string; amount: number; isChange?: boolean }) => {
+    this.collections.get(tNames.billDiscounts).create(discount => {
+      discount.bill_id = this.id;
+      discount.discount_id = p.discountId;
+    });
+  };
 
   static associations = {
     [tNames.bills]: { type: 'belongs_to', key: 'bill_id' },
+    [tNames.items]: { type: 'belongs_to', key: 'item_id' },
+    [tNames.priceGroups]: { type: 'belongs_to', key: 'price_group_id' },
+    [tNames.modifiers]: { type: 'belongs_to', key: 'modifier_id' },
+    [tNames.categories]: { type: 'belongs_to', key: 'category_id' },
     [tNames.billItemModifierItems]: { type: 'has_many', foreignKey: 'bill_item_id' },
   };
 }
@@ -292,13 +316,16 @@ class BillItemModifierItem extends Model {
   static table = tNames.billItemModifierItems;
 
   @nochange @field('bill_item_id') billItemId;
+  @nochange @field('modifier_item_id') modifierItemId;
   @nochange @field('modifier_item_price') modifierItemPrice;
   @nochange @field('modifier_item_name') modifierItemName;
 
   @immutableRelation(tNames.billItems, 'bill_item_id') billItem;
+  @immutableRelation(tNames.modifierItems, 'modifier_item_id') modifierItem;
 
   static associations = {
     [tNames.billItems]: { type: 'belongs_to', key: 'bill_item_id' },
+    [tNames.modifierItems]: { type: 'belongs_to', key: 'modifier_item_id' },
   };
 }
 

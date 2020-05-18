@@ -127,11 +127,8 @@ export default appSchema({
     tableSchema({
       name: 'bill_discounts',
       columns: [
-        { name: 'name', type: 'string' },
         { name: 'bill_id', type: 'string', isIndexed: true },
         { name: 'discount_id', type: 'string' },
-        { name: 'amount', type: 'number' },
-        { name: 'is_percent', type: 'boolean' },
         { name: 'created_at', type: 'number' },
         { name: 'updated_at', type: 'number' },
       ],
@@ -147,9 +144,11 @@ export default appSchema({
       name: 'bill_items',
       columns: [
         { name: 'bill_id', type: 'string', isIndexed: true },
-        { name: 'name', type: 'string' },
-        { name: 'price', type: 'string' },
+        { name: 'item_id', type: 'string' },
+        { name: 'item_name', type: 'string' },
+        { name: 'item_price', type: 'string' },
         { name: 'price_group_name', type: 'string' },
+        { name: 'price_group_id', type: 'string' },
         { name: 'modifier_name', type: 'string' },
         { name: 'modifier_id', type: 'string' },
         { name: 'category_name', type: 'string' },
@@ -162,6 +161,7 @@ export default appSchema({
       name: 'bill_item_modifier_items',
       columns: [
         { name: 'bill_item_id', type: 'string', isIndexed: true },
+        { name: 'modifier_item_id', type: 'string' },
         { name: 'modifier_item_name', type: 'string' },
         { name: 'modifier_item_price', type: 'string' },
       ],
