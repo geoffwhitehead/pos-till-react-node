@@ -53,7 +53,6 @@ export const Checkout: React.FC<CheckoutProps> = ({ navigation, route }) => {
   const { billPeriod } = useContext(BillPeriodContext);
   // const selectedBill = route.params?.selectedBill;
 
-  console.log('----route', route);
   const { currentBill, setCurrentBill } = useContext(CurrentBillContext);
 
   // const openBills = useRealmQuery<BillProps>({ source: BillSchema.name, filter: `isClosed = false` });
@@ -77,9 +76,12 @@ export const Checkout: React.FC<CheckoutProps> = ({ navigation, route }) => {
   const openDrawer = () => navigation.openDrawer();
   const onCheckout = () => setMode(Modes.Payments);
 
+  console.log('currentBill', currentBill);
   useEffect(() => {
     if (!currentBill) {
       setMode(Modes.Bills);
+    } else {
+      setMode(Modes.Items);
     }
   }, [currentBill]);
 
