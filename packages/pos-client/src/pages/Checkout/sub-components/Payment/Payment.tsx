@@ -28,15 +28,18 @@ import { balance, formatNumber } from '../../../../utils';
 import { StyleSheet } from 'react-native';
 import { paymentTypeNames } from '../../../../api/paymentType';
 import { capitalize } from 'lodash';
+import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
+import withObservables from '@nozbe/with-observables';
+import { tNames } from '../../../../models';
 
 interface PaymentProps {
-  activeBill: BillProps; // fix
-  discounts: Realm.Collection<DiscountProps>;
-  paymentTypes: Realm.Collection<PaymentTypeProps>;
+  currentBill: BillProps; // fix
+  discounts: DiscountProps[];
+  paymentTypes: PaymentTypeProps[];
   onCompleteBill: (bill: BillProps) => void;
 }
 
-export const Payment: React.FC<PaymentProps> = ({ activeBill, discounts, paymentTypes, onCompleteBill }) => {
+export const WrappedPayments: React.FC<PaymentProps> = ({ currentBill, discounts, paymentTypes, onCompleteBill }) => {
   const [value, setValue] = useState<string>('');
   // TODO: this / payment types will need refactoring so were not having to use find
   const cashType = paymentTypes.find(pt => pt.name === paymentTypeNames.CASH);
@@ -44,38 +47,41 @@ export const Payment: React.FC<PaymentProps> = ({ activeBill, discounts, payment
   // TODO: refactor to grab currency from org
   const currencySymbol = '£';
 
-  const checkComplete = () => balance(activeBill) <= 0 && onCompleteBill(activeBill);
+  const checkComplete = () => balance(currentBill) <= 0 && onCompleteBill(currentBill);
 
   type OnValueChange = (value: string) => void;
   const onValueChange: OnValueChange = value => setValue(value);
 
   type AddPayment = (paymentType: PaymentTypeProps, amt: number) => () => void;
-  const addPayment: AddPayment = (paymentType, amt) => () => {
-    realm.write(() => {
-      const billPayment = realm.create(BillPaymentSchema.name, {
-        _id: uuidv4(),
-        paymentType: paymentType.name,
-        paymentTypeId: paymentType._id,
-        amount: amt || Math.max(balance(activeBill), 0),
-      });
-      activeBill.payments.push(billPayment);
-      setValue('');
-    });
+  const addPayment: AddPayment = (paymentType, amt) => async () => {
+    await currentBill.addPayment({ paymentTypeId: paymentType._id, amount: amt || Math.max(balance(currentBill), 0) });
+    // realm.write(() => {
+    //   const billPayment = realm.create(BillPaymentSchema.name, {
+    //     _id: uuidv4(),
+    //     paymentType: paymentType.name,
+    //     paymentTypeId: paymentType._id,
+    //     amount: amt || Math.max(balance(currentBill), 0),
+    //   });
+    //   currentBill.payments.push(billPayment);
+    // });
+    setValue('');
+
     checkComplete();
   };
 
-  type AddDiscount = (discount: DiscountProps) => () => void;
-  const addDiscount: AddDiscount = discount => () => {
-    realm.write(() => {
-      const billDiscount = realm.create(BillDiscountSchema.name, {
-        _id: uuidv4(),
-        discountId: discount._id,
-        name: discount.name,
-        amount: discount.amount,
-        isPercent: discount.isPercent,
-      });
-      activeBill.discounts.push(billDiscount);
-    });
+  const addDiscount = (discount: DiscountProps) => async () => {
+    // realm.write(() => {
+    //   const billDiscount = realm.create(BillDiscountSchema.name, {
+    //     _id: uuidv4(),
+    //     discountId: discount._id,
+    //     name: discount.name,
+    //     amount: discount.amount,
+    //     isPercent: discount.isPercent,
+    //   });
+    //   activeBill.discounts.push(billDiscount);
+    // });
+    await currentBill.addDiscount({ discountId: discount.id });
+
     checkComplete();
   };
 
@@ -136,6 +142,19 @@ export const Payment: React.FC<PaymentProps> = ({ activeBill, discounts, payment
     </Content>
   );
 };
+
+export const Payments = withDatabase<any, any>(
+  withObservables([], ({ database, currentBill }) => ({
+    discounts: database.collections
+      .get(tNames.discounts)
+      .query()
+      .observe(),
+    paymentTypes: database.collections
+      .get(tNames.paymentTypes)
+      .query()
+      .observe(),
+  }))(WrappedPayments),
+);
 
 const styles = StyleSheet.create({
   row: {
