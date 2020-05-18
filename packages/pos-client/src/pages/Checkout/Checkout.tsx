@@ -27,9 +27,10 @@ import dayjs from 'dayjs';
 import { paymentTypeNames } from '../../api/paymentType';
 import { Watermelon } from './Watermelon';
 import { useDatabase } from '@nozbe/watermelondb/hooks';
-import { Model } from '@nozbe/watermelondb';
+import { Model, Q } from '@nozbe/watermelondb';
 import { database } from '../../App';
 import { CurrentBillContext } from '../../contexts/CurrentBillContext';
+import { tNames } from '../../models';
 
 export enum Modes {
   Payments = 'payments',
@@ -89,7 +90,11 @@ export const Checkout: React.FC<CheckoutProps> = ({ navigation, route }) => {
     const billBalance = balance(bill);
 
     if (billBalance <= 0) {
-      const cashPayment = paymentTypes.find(payment => payment.name === paymentTypeNames.CASH);
+      const cashPayment = await database.collections
+        .get(tNames.paymentTypes)
+        .query(Q.where('name', Q.eq(paymentTypeNames.CASH)));
+
+      // paymentTypes.find(payment => payment.name === paymentTypeNames.CASH);
 
       // Over tenders of any payment type are given change in cash
 
@@ -98,7 +103,7 @@ export const Checkout: React.FC<CheckoutProps> = ({ navigation, route }) => {
 
       await currentBill.addPayment({ paymentTypeId: cashPayment.id, amount: billBalance, isChange: true });
 
-      await currentBill.close()
+      await currentBill.close();
       // realm.write(() => {
       //   const changeDuePayment = realm.create(BillPaymentSchema.name, {
       //     _id: uuidv4(),
@@ -155,12 +160,7 @@ export const Checkout: React.FC<CheckoutProps> = ({ navigation, route }) => {
       case Modes.Loading:
         return <Loading />;
       case Modes.Payments:
-        return (
-          <Payment
-            currentBill={currentBill}
-            onCompleteBill={completeBill}
-          />
-        );
+        return <Payment currentBill={currentBill} onCompleteBill={completeBill} />;
       // case Modes.Watermelon:
       //   return <Watermelon />;
       case Modes.Bills:
@@ -168,7 +168,7 @@ export const Checkout: React.FC<CheckoutProps> = ({ navigation, route }) => {
       case Modes.Items:
         return <CheckoutItemNavigator activeBill={currentBill} />;
       case Modes.Complete:
-        return <CompleteBill activeBill={currentBill} onCloseBill={clearBill} />;
+        return <CompleteBill currentBill={currentBill} onCloseBill={clearBill} />;
     }
   };
 

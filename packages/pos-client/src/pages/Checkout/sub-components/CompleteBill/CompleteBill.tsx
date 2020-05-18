@@ -10,35 +10,34 @@ import { receiptBill } from '../../../../services/printer/receiptBill';
 
 interface CompleteBillProps {
   activeBill: BillProps;
-  onCloseBill: (bill: any) => void;
+  onCloseBill: () => void;
 }
 
 // TODO : move this
 const currencySymbol = '£';
 
-export const CompleteBill: React.FC<CompleteBillProps> = ({ activeBill, onCloseBill }) => {
-  const onCloseFactory = (bill: any) => () => onCloseBill(bill);
-  const onPrint = async () => await print(receiptBill(activeBill), true);
+export const CompleteBill: React.FC<CompleteBillProps> = ({ currentBill, onCloseBill }) => {
+  const onPrint = async () => await print(receiptBill(currentBill), true);
   useFocusEffect(
     React.useCallback(() => {
       const onBackPress = () => {
-        onCloseBill(activeBill);
+        onCloseBill();
       };
 
       BackHandler.addEventListener('hardwareBackPress', onBackPress);
 
       return () => BackHandler.removeEventListener('hardwareBackPress', onBackPress);
-    }, [onCloseBill, activeBill]),
+    }, [onCloseBill]),
   );
 
-  const changePayment = activeBill.payments.find(payment => payment.isChange).amount;
+  const changePayment = currentBill.payments.find(payment => payment.isChange).amount;
   return (
     <View style={styles.container}>
       <Text style={styles.text}>{`Change due: ${formatNumber(Math.abs(changePayment), currencySymbol)}`}</Text>
       <Button style={styles.button} large onPress={onPrint}>
         <Text>Print Receipt</Text>
       </Button>
-      <Button style={styles.button} large bordered success onPress={onCloseFactory(activeBill)}>
+      <Button style={styles.button} large bordered success onPress={onCloseBill}>
         <Text>Close</Text>
       </Button>
     </View>
