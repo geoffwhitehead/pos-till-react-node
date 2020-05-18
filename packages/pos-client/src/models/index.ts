@@ -10,6 +10,7 @@ import {
   readonly,
   date,
 } from '@nozbe/watermelondb/decorators';
+import dayjs from 'dayjs';
 
 export const tNames = {
   modifiers: 'modifiers',
@@ -245,6 +246,28 @@ class Bill extends Model {
   @children(tNames.billPayments) payments;
   @children(tNames.discounts) discounts;
   @children(tNames.billItems) billItems;
+
+
+  @action addPayment = async (p: { paymentTypeId: string; amount: number; isChange?: boolean }) => {
+    this.collections.get(tNames.billPayments).create(payment => {
+      payment.payment_type_id = p.paymentTypeId;
+      payment.bill_id = this.id;
+      payment.amount = p.amount;
+      payment.is_change = p.isChange || false;
+    });
+  };
+
+  @action addDiscount = async (p: { discountId: string; amount: number; isChange?: boolean }) => {
+    this.collections.get(tNames.billDiscounts).create(discount => {
+      discount.bill_id = this.id;
+      discount.discount_id = p.discountId;
+    });
+  };
+
+  @action close = async () => {
+    this.is_closed = true;
+    this.closed_at = dayjs().unix()
+  }
 }
 
 class BillDiscount extends Model {
@@ -285,22 +308,6 @@ class BillItem extends Model {
   @immutableRelation(tNames.modifiers, 'modifier_id') modifier;
   @immutableRelation(tNames.categories, 'category_id') category;
   @children(tNames.billItemModifierItems) modifierItems;
-
-  addPayment = async (p: { paymentTypeId: string; amount: number; isChange?: boolean }) => {
-    this.collections.get(tNames.billPayments).create(payment => {
-      payment.payment_type_id = p.paymentTypeId;
-      payment.bill_id = this.id;
-      payment.amount = p.amount;
-      payment.is_change = p.isChange || false;
-    });
-  };
-
-  addDiscount = async (p: { discountId: string; amount: number; isChange?: boolean }) => {
-    this.collections.get(tNames.billDiscounts).create(discount => {
-      discount.bill_id = this.id;
-      discount.discount_id = p.discountId;
-    });
-  };
 
   static associations = {
     [tNames.bills]: { type: 'belongs_to', key: 'bill_id' },

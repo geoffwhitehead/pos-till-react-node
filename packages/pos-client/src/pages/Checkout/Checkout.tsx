@@ -85,7 +85,7 @@ export const Checkout: React.FC<CheckoutProps> = ({ navigation, route }) => {
     }
   }, [currentBill]);
 
-  const completeBill = bill => {
+  const completeBill = async bill => {
     const billBalance = balance(bill);
 
     if (billBalance <= 0) {
@@ -96,19 +96,22 @@ export const Checkout: React.FC<CheckoutProps> = ({ navigation, route }) => {
       // TODO: should all overtenders do this????
       // TODO: vouchers overtenders should issue new voucher not refund in cash?
 
-      realm.write(() => {
-        const changeDuePayment = realm.create(BillPaymentSchema.name, {
-          _id: uuidv4(),
-          paymentType: paymentTypeNames.CASH,
-          paymentTypeId: cashPayment._id,
-          amount: billBalance,
-          isChange: true,
-        });
-        // push a final negative payment which represents the change due in cash to balance the payments with the sale total
-        bill.payments.push(changeDuePayment);
-        bill.isClosed = true;
-        bill.closedAt = dayjs().toDate();
-      });
+      await currentBill.addPayment({ paymentTypeId: cashPayment.id, amount: billBalance, isChange: true });
+
+      await currentBill.close()
+      // realm.write(() => {
+      //   const changeDuePayment = realm.create(BillPaymentSchema.name, {
+      //     _id: uuidv4(),
+      //     paymentType: paymentTypeNames.CASH,
+      //     paymentTypeId: cashPayment._id,
+      //     amount: billBalance,
+      //     isChange: true,
+      //   });
+      //   // push a final negative payment which represents the change due in cash to balance the payments with the sale total
+      //   bill.payments.push(changeDuePayment);
+      //   bill.isClosed = true;
+      //   bill.closedAt = dayjs().toDate();
+      // });
 
       setMode(Modes.Complete);
     }
@@ -142,10 +145,10 @@ export const Checkout: React.FC<CheckoutProps> = ({ navigation, route }) => {
   //   }
   // };
 
-  const closeBill = bill => {
-    clearBill();
-    setMode(Modes.Bills);
-  };
+  // const closeBill = bill => {
+  //   clearBill();
+  //   setMode(Modes.Bills);
+  // };
 
   const renderMainPanel = () => {
     switch (mode) {
@@ -154,9 +157,7 @@ export const Checkout: React.FC<CheckoutProps> = ({ navigation, route }) => {
       case Modes.Payments:
         return (
           <Payment
-            activeBill={currentBill}
-            discounts={discounts}
-            paymentTypes={paymentTypes}
+            currentBill={currentBill}
             onCompleteBill={completeBill}
           />
         );
@@ -167,7 +168,7 @@ export const Checkout: React.FC<CheckoutProps> = ({ navigation, route }) => {
       case Modes.Items:
         return <CheckoutItemNavigator activeBill={currentBill} />;
       case Modes.Complete:
-        return <CompleteBill activeBill={currentBill} onCloseBill={closeBill} />;
+        return <CompleteBill activeBill={currentBill} onCloseBill={clearBill} />;
     }
   };
 

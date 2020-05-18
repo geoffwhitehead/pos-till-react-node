@@ -36,18 +36,18 @@ interface PaymentProps {
   currentBill: BillProps; // fix
   discounts: DiscountProps[];
   paymentTypes: PaymentTypeProps[];
-  onCompleteBill: (bill: BillProps) => void;
+  onCompleteBill: (bill: BillProps) => Promise<void>;
 }
 
 export const WrappedPayments: React.FC<PaymentProps> = ({ currentBill, discounts, paymentTypes, onCompleteBill }) => {
   const [value, setValue] = useState<string>('');
   // TODO: this / payment types will need refactoring so were not having to use find
   const cashType = paymentTypes.find(pt => pt.name === paymentTypeNames.CASH);
-  const denominations = [500, 1000, 2000, 3000, 5000];
+  const denominations = [500, 1000, 2000, 3000, 5000]; // TODO: grab from org settings or create new table, will vary based on currency
   // TODO: refactor to grab currency from org
   const currencySymbol = '£';
 
-  const checkComplete = () => balance(currentBill) <= 0 && onCompleteBill(currentBill);
+  const checkComplete = async () => balance(currentBill) <= 0 && await onCompleteBill(currentBill);
 
   type OnValueChange = (value: string) => void;
   const onValueChange: OnValueChange = value => setValue(value);
@@ -66,7 +66,7 @@ export const WrappedPayments: React.FC<PaymentProps> = ({ currentBill, discounts
     // });
     setValue('');
 
-    checkComplete();
+    await checkComplete();
   };
 
   const addDiscount = (discount: DiscountProps) => async () => {
@@ -82,7 +82,7 @@ export const WrappedPayments: React.FC<PaymentProps> = ({ currentBill, discounts
     // });
     await currentBill.addDiscount({ discountId: discount.id });
 
-    checkComplete();
+    await checkComplete();
   };
 
   return (
@@ -103,7 +103,7 @@ export const WrappedPayments: React.FC<PaymentProps> = ({ currentBill, discounts
               </ListItem>
               {discounts.map(discount => {
                 return (
-                  <ListItem key={discount._id} onPress={addDiscount(discount)}>
+                  <ListItem key={discount.id} onPress={addDiscount(discount)}>
                     <Left>
                       <Text>{discount.name}</Text>
                     </Left>
@@ -122,7 +122,7 @@ export const WrappedPayments: React.FC<PaymentProps> = ({ currentBill, discounts
           {paymentTypes.map(paymentType => {
             return (
               <Button
-                key={paymentType._id}
+                key={paymentType.id}
                 style={styles.paymentButtons}
                 onPress={addPayment(paymentType, parseFloat(value))}
               >
@@ -144,7 +144,7 @@ export const WrappedPayments: React.FC<PaymentProps> = ({ currentBill, discounts
 };
 
 export const Payments = withDatabase<any, any>(
-  withObservables([], ({ database, currentBill }) => ({
+  withObservables([], ({ database }) => ({
     discounts: database.collections
       .get(tNames.discounts)
       .query()
