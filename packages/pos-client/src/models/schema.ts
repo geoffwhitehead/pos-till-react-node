@@ -31,7 +31,11 @@ export default appSchema({
     }),
     tableSchema({
       name: 'modifiers',
-      columns: [{ name: 'name', type: 'string' }],
+      columns: [
+        { name: 'name', type: 'string' },
+        { name: 'minItems', type: 'string' },
+        { name: 'maxItems', type: 'string' },
+      ],
     }),
     tableSchema({
       name: 'modifier_items',
@@ -70,7 +74,7 @@ export default appSchema({
       columns: [
         { name: 'item_id', type: 'string' },
         { name: 'modifier_id', type: 'string' },
-      ]
+      ],
     }),
 
     // modifier_item_revision_id
@@ -171,7 +175,7 @@ export default appSchema({
         { name: 'bill_item_id', type: 'string', isIndexed: true },
         { name: 'modifier_name', type: 'string' },
         { name: 'modifier_id', type: 'string' },
-      ]
+      ],
     }),
     tableSchema({
       name: 'bill_item_modifier_items',

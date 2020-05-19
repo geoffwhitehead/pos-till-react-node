@@ -14,6 +14,14 @@ const ModifierSchema: Schema<ModifierProps> = new Schema(
             type: String,
             required: true,
         },
+        maxItems: {
+            type: Number,
+            default: 1
+        },
+        minItems: {
+            type: Number,
+            default: 1
+        },
         items: [ModifierItemSubSchema],
     },
     { timestamps: true },

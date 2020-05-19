@@ -144,7 +144,7 @@ export const populateMelon = async () => {
     },
   );
 
-  okResponse(responses[2]).map(({ _id, name, items }) => {
+  okResponse(responses[2]).map(({ _id, name, items, maxItems, minItems }) => {
     const modifiersCollection = database.collections.get<ModifierProps & Model>(tNames.modifiers);
     const modifierItemsCollection = database.collections.get<any>(tNames.modifierItems);
     const modifierPriceCollection = database.collections.get<any>(tNames.modifierPrices);
@@ -152,7 +152,7 @@ export const populateMelon = async () => {
     const modifier = modifiersCollection.prepareCreate(
       catchFn(modifier => {
         modifier._raw = sanitizedRaw({ id: _id }, modifiersCollection.schema);
-        Object.assign(modifier, { name });
+        Object.assign(modifier, { name, maxItems, minItems });
       }),
     );
 
