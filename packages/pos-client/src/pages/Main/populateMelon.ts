@@ -21,7 +21,7 @@ import { sanitizedRaw } from '@nozbe/watermelondb/RawRecord';
 import catchFn from './catchFn';
 import { getOrganization } from '../../api/organization';
 export const populateMelon = async () => {
-  return;
+  // return;
   try {
     await database.action(async () => {
       await database.unsafeResetDatabase();
@@ -90,7 +90,7 @@ export const populateMelon = async () => {
     return discountsCollection.prepareCreate(
       catchFn(discount => {
         discount._raw = sanitizedRaw({ id: _id }, discountsCollection.schema);
-        Object.assign(discount, { name, amount, is_percent: isPercent });
+        Object.assign(discount, { name, amount, isPercent });
       }),
     );
   });
@@ -105,10 +105,11 @@ export const populateMelon = async () => {
       const itemModifiersCollection = database.collections.get(tNames.itemModifiers);
 
       const itemModifiersToCreate = modifiers.map(modifierId => {
-        itemModifiersCollection.prepareCreate(catchFn(_itemModifier => {
-          _itemModifier.item_id = itemId;
-          _itemModifier.modifier_id = modifierId
-        }));
+        return itemModifiersCollection.prepareCreate(
+          catchFn(_itemModifier => {
+            Object.assign(_itemModifier, { itemId, modifierId });
+          }),
+        );
       });
 
       const itemPricesToCreate = itemPrices.map(itemPrice =>
@@ -117,25 +118,25 @@ export const populateMelon = async () => {
             _itemPrice._raw = sanitizedRaw({ id: itemPrice._id }, itemPricesCollection.schema);
             Object.assign(_itemPrice, {
               price: itemPrice.amount,
-              price_group_id: itemPrice.groupId,
-              item_id: itemId,
+              priceGroupId: itemPrice.groupId,
+              itemId,
             });
           }),
         ),
       );
 
-      const printerLinksToCreate = linkedPrinterIds.map(linkedPrinterId =>
-        itemPrintersCollection.prepareCreate(
+      const printerLinksToCreate = linkedPrinterIds.map(linkedPrinterId => {
+        return itemPrintersCollection.prepareCreate(
           catchFn(_itemPrinter => {
-            Object.assign(_itemPrinter, { item_id: itemId, printer_id: linkedPrinterId });
+            Object.assign(_itemPrinter, { itemId, printerId: linkedPrinterId });
           }),
-        ),
-      );
+        );
+      });
 
       const itemToCreate = itemsCollection.prepareCreate(
         catchFn(item => {
-          (item._raw = sanitizedRaw({ id: itemId }, itemsCollection.schema)),
-            Object.assign(item, { name, category_id: categoryId });
+          item._raw = sanitizedRaw({ id: itemId }, itemsCollection.schema);
+          Object.assign(item, { name, categoryId });
         }),
       );
 
@@ -159,7 +160,7 @@ export const populateMelon = async () => {
       const modifierToCreate = modifierItemsCollection.prepareCreate(
         catchFn(newItem => {
           newItem._raw = sanitizedRaw({ id: mItem._id }, modifierItemsCollection.schema);
-          Object.assign(newItem, { name: mItem.name, modifier_id: _id });
+          Object.assign(newItem, { name: mItem.name, modifierId: _id });
         }),
       );
 
@@ -169,8 +170,8 @@ export const populateMelon = async () => {
             newPrice._raw = sanitizedRaw({ id: price._id }, modifierPriceCollection.schema);
             Object.assign(newPrice, {
               price: price.amount,
-              price_group_id: price.groupId,
-              modifier_item_id: mItem._id,
+              priceGroupId: price.groupId,
+              modifierItemId: mItem._id,
             });
           }),
         ),
@@ -180,6 +181,7 @@ export const populateMelon = async () => {
     toCreate.push(modifier);
   });
 
+  console.log('toCreate', toCreate);
   try {
     await database.action(async () => {
       await database.batch(...toCreate);

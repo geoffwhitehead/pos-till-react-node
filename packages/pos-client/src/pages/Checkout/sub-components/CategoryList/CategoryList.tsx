@@ -25,7 +25,7 @@ import withObservables from '@nozbe/with-observables';
 
 export const CategoriesWrapped: React.FC<any> = ({ navigation, route, categories }) => {
   //TODO: type this
-  const { activeBill } = route.params;
+  // const { activeBill } = route.params;
 
   const { priceGroup } = useContext(PriceGroupContext);
 
@@ -42,59 +42,59 @@ export const CategoriesWrapped: React.FC<any> = ({ navigation, route, categories
 
   const [searchValue, setSearchValue] = useState<string>('');
 
-  const resolvePrice: (price: PriceGroupItemProps[], priceGroup: PriceGroupProps) => number = (price, priceGroup) =>
-    price.find(({ groupId }) => groupId._id === priceGroup._id).price;
+  // const resolvePrice: (price: PriceGroupItemProps[], priceGroup: PriceGroupProps) => number = (price, priceGroup) =>
+  //   price.find(({ groupId }) => groupId._id === priceGroup._id).price;
 
-  const createBillItem = useCallback(
-    (item, mods = []) => {
-      console.log('creating bill item');
-      const { _id: itemId, name, categoryId, modifierId, price } = item;
-      console.log('adding priceGroup', priceGroup);
+  // const createBillItem = useCallback(
+  //   (item, mods = []) => {
+  //     console.log('creating bill item');
+  //     const { _id: itemId, name, categoryId, modifierId, price } = item;
+  //     console.log('adding priceGroup', priceGroup);
 
-      const newModItems = mods.map(mod => {
-        const { _id: modId, name, price } = mod;
-        return {
-          _id: uuidv4(),
-          modId,
-          name,
-          price: resolvePrice(price, priceGroup),
-        };
-      });
+  //     const newModItems = mods.map(mod => {
+  //       const { _id: modId, name, price } = mod;
+  //       return {
+  //         _id: uuidv4(),
+  //         modId,
+  //         name,
+  //         price: resolvePrice(price, priceGroup),
+  //       };
+  //     });
 
-      realm.write(() => {
-        const modItems = newModItems.map(modItem => realm.create(BillItemModifierSchema.name, modItem));
+  //     realm.write(() => {
+  //       const modItems = newModItems.map(modItem => realm.create(BillItemModifierSchema.name, modItem));
 
-        const newBillItem = {
-          _id: uuidv4(),
-          itemId,
-          name,
-          price: resolvePrice(price, priceGroup),
-          modifierId: modifierId ? modifierId._id : null,
-          mods: modItems,
-          categoryId: categoryId._id,
-          categoryName: categoryId.name,
-          priceGroup,
-        };
+  //       const newBillItem = {
+  //         _id: uuidv4(),
+  //         itemId,
+  //         name,
+  //         price: resolvePrice(price, priceGroup),
+  //         modifierId: modifierId ? modifierId._id : null,
+  //         mods: modItems,
+  //         categoryId: categoryId._id,
+  //         categoryName: categoryId.name,
+  //         priceGroup,
+  //       };
 
-        realm.create(BillItemSchema.name, newBillItem);
-        activeBill.items = [...activeBill.items, newBillItem];
-      });
-    },
-    [activeBill, priceGroup],
-  );
+  //       realm.create(BillItemSchema.name, newBillItem);
+  //       activeBill.items = [...activeBill.items, newBillItem];
+  //     });
+  //   },
+  //   [activeBill, priceGroup],
+  // );
 
   const onPressCategoryFactory: (category?: CategoryProps) => () => void = category => () => {
     // const filtered = category ? items.filtered(`categoryId._id = "${category._id}"`) : items;
     if (!category) {
       navigation.navigate(routes.allItems, {
-        createBillItem,
+        // createBillItem,
       });
     } else {
       navigation.navigate(routes.categoryItemList, {
         category,
         // items: filtered,
         // modifiers,
-        createBillItem,
+        // createBillItem,
       });
     }
   };

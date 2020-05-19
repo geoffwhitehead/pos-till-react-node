@@ -9,7 +9,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { receiptBill } from '../../../../services/printer/receiptBill';
 
 interface CompleteBillProps {
-  activeBill: BillProps;
+  currentBill: BillProps;
   onCloseBill: () => void;
 }
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Text, Content, List, ListItem, Left, Icon, Body, Right } from '../../../../core';
 import { SearchHeader } from '../../../../components/SearchHeader/SearchHeader';
 import { CategoryProps, ItemProps, ModifierProps, BillProps, ModifierItemProps } from '../../../../services/schemas';
@@ -8,12 +8,15 @@ import Modal from 'react-native-modal';
 import { ItemModifierList } from './sub-components/ItemModList/ItemModList';
 import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import withObservables from '@nozbe/with-observables';
+import { PriceGroupContext } from '../../../../contexts/PriceGroupContext';
+import { CurrentBillContext } from '../../../../contexts/CurrentBillContext';
+import { CategoryItem } from './sub-components/CategoryItem';
 
 interface CategoryItemsListProps {
   category: CategoryProps;
   items: ItemProps[];
   modifiers: ModifierProps[];
-  createBillItem: (bill: BillProps) => void;
+  // createBillItem: (bill: BillProps) => void;
   route: any;
   navigation: any; // TODO: type this
 }
@@ -21,8 +24,8 @@ interface CategoryItemsListProps {
 const WrappedCategoryItems: React.FC<CategoryItemsListProps> = ({
   category,
   items,
-  createBillItem,
-  route,
+  // createBillItem,
+  // route,
   navigation,
 }) => {
   // const { category, items, createBillItem } = route.params;
@@ -30,28 +33,12 @@ const WrappedCategoryItems: React.FC<CategoryItemsListProps> = ({
   const [searchValue, setSearchValue] = useState<string>('');
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [selectedItem, setSelectedItem] = useState<ItemProps>();
+  const { priceGroup } = useContext(PriceGroupContext);
+  const { currentBill } = useContext(CurrentBillContext);
+
+  const [prices, setPrices] = useState([]);
 
   const goBack = () => navigation.goBack();
-
-  const onPressItemFactory: (item: ItemProps) => () => void = item => () => {
-    if (item.modifierId) {
-      // const modifier = modifiers.filtered(`_id = "${item.modifierId._id}"`)[0];
-      // navigation.navigate(routes.itemModifierList, {
-      //   item,
-      //   modifier,
-      //   createBillItem,
-      // });
-      setSelectedItem(item);
-      setModalOpen(true);
-    } else {
-      createBillItem(item);
-    }
-  };
-
-  const createItemWithModifiers = (mods: ModifierItemProps[]) => {
-    setModalOpen(false);
-    createBillItem(selectedItem, mods);
-  };
 
   const searchFilter = (item: ItemProps, searchValue: string) =>
     item.name.toLowerCase().includes(searchValue.toLowerCase());
@@ -60,6 +47,17 @@ const WrappedCategoryItems: React.FC<CategoryItemsListProps> = ({
   const onCancelHandler = () => {
     setModalOpen(false);
     setSelectedItem(null);
+  };
+
+  const onSelectItem = async (item, modifierCount) => {
+    console.log('item', item);
+    console.log('modifierCount', modifierCount);
+    if (modifierCount > 0) {
+      setSelectedItem(item);
+      setModalOpen(true);
+    } else {
+      await currentBill.addItem({ item, priceGroup });
+    }
   };
 
   return (
@@ -77,7 +75,13 @@ const WrappedCategoryItems: React.FC<CategoryItemsListProps> = ({
         backdropTransitionOutTiming={50}
       >
         {modalOpen && (
-          <ItemModifierList createBillItem={createItemWithModifiers} onCancel={onCancelHandler} item={selectedItem} />
+          <ItemModifierList
+            priceGroup={priceGroup}
+            currentBill={currentBill}
+            onClose={onCancelHandler}
+            item={selectedItem}
+            onPressItem={onSelectItem}
+          />
         )}
       </Modal>
 
@@ -92,28 +96,18 @@ const WrappedCategoryItems: React.FC<CategoryItemsListProps> = ({
         </ListItem>
         {items
           .filter(item => searchFilter(item, searchValue))
-          .map(item => {
-            const isActive = selectedItem && item._id === selectedItem._id;
-            const containsMods = item.modifierId;
-            return (
-              <ListItem style={isActive && styles.activeRow} icon key={item._id} onPress={onPressItemFactory(item)}>
-                <Left>
-                  <Text>{item.name}</Text>
-                </Left>
-                <Body>{containsMods ? <Icon name="ios-arrow-forward" /> : null}</Body>
-              </ListItem>
-            );
-          })}
+          .map(item => (
+            <CategoryItem
+              item={item}
+              priceGroup={priceGroup}
+              isActive={selectedItem === item}
+              onPressItem={onSelectItem}
+            />
+          ))}
       </List>
     </Content>
   );
 };
-
-const styles = StyleSheet.create({
-  activeRow: {
-    backgroundColor: '#cde1f9',
-  },
-});
 
 export const CategoryItems = withObservables<
   { category: any }, // TODO: fix types
@@ -129,13 +123,12 @@ export const CategoryItems = withObservables<
   };
 })(WrappedCategoryItems);
 
-
 export const AllItems = withDatabase(
   withObservables([], ({ database }) => ({
     items: database.collections
       .get('items')
       .query()
-      .observe()
+      .observe(),
   }))(WrappedCategoryItems),
 );
 
