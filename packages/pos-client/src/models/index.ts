@@ -49,14 +49,23 @@ class Item extends Model {
     [tNames.itemModifiers]: { type: 'has_many', foreignKey: 'item_id' },
     [tNames.modifiers]: { type: 'belongs_to', key: 'modifier_id' },
     [tNames.categories]: { type: 'belongs_to', key: 'category_id' },
+    [tNames.itemPrices]: { type: 'has_many', foreignKey: 'item_id' },
   };
 
-  price = async (priceGroupId: string) => {
-    return this.collections
-      .get(tNames.itemPrices)
-      .query(Q.and(Q.where('item_id', this.id), Q.where('price_group_id', priceGroupId)));
-  };
+  // price = async (priceGroupId: string) => {
+  //   return this.collections
+  //     .get(tNames.itemPrices)
+  //     .query(Q.and(Q.where('item_id', this.id), Q.where('price_group_id', priceGroupId)));
+  // };
 
+  @children(tNames.itemPrices) prices;
+
+  // price = async priceGroupId => {
+  //   return this.collections
+  //     .get(tNames.itemPrices)
+  //     .query(Q.and(Q.where('item_id', this.id), Q.where('price_group_id', priceGroupId)));
+  // };
+  // modifierItemPrices = async();
   // @ts-ignore
   @lazy printers = this.collections.get(tNames.printers).query(Q.on(tNames.itemPrinters, 'item_id', this.id));
   @lazy modifiers = this.collections.get(tNames.modifiers).query(Q.on(tNames.itemModifiers, 'item_id', this.id));
@@ -69,7 +78,7 @@ class ItemModifier extends Model {
   @field('modifier_id') modifierId;
 
   @relation(tNames.items, 'item_id') item;
-  @relation(tNames.printers, 'modifier_id') modifierId;
+  @relation(tNames.modifiers, 'modifier_id') modifier;
 
   static associations = {
     [tNames.items]: { type: 'belongs_to', key: 'item_id' },
@@ -81,7 +90,7 @@ class ItemPrinter extends Model {
   static table = tNames.itemPrinters;
 
   @field('item_id') itemId;
-  @field('printerId') printerId;
+  @field('printer_id') printerId;
 
   @relation(tNames.items, 'item_id') item;
   @relation(tNames.printers, 'printer_id') printer;
@@ -147,6 +156,8 @@ class Modifier extends Model {
   };
 
   @children(tNames.modifierItems) modifierItems;
+
+  // prices = async () => this.collections.get(tNames.modifierPrices).query(Q.)
 }
 
 class PriceGroup extends Model {
@@ -164,6 +175,11 @@ class ItemPrice extends Model {
 
   @relation(tNames.priceGroups, 'price_group_id') priceGroup;
   @relation(tNames.items, 'item_id') item;
+
+  static associations = {
+    [tNames.priceGroups]: { type: 'belongs_to', key: 'price_group_id' },
+    [tNames.items]: { type: 'belongs_to', key: 'item_id' },
+  };
 }
 class ModifierPrice extends Model {
   static table = tNames.modifierPrices;
@@ -193,11 +209,17 @@ class ModifierItem extends Model {
 
   @relation(tNames.modifiers, 'modifier_id') modifier;
 
-  price = async (priceGroupId: string) => {
-    return this.collections
-      .get(tNames.modifierPrices)
-      .query(Q.and(Q.where('modifier_item_id', this.id), Q.where('price_group_id', priceGroupId)));
+  @children(tNames.modifierPrices, 'modifier_item_id') prices;
+
+  static associations = {
+    [tNames.modifierPrices]: { type: 'has_many', foreignKey: 'modifier_item_id' },
+    [tNames.modifiers]: { type: 'belongs_to', key: 'modifier_id' },
   };
+  // price = () => {
+  //   return this.collections
+  //     .get(tNames.modifierPrices)
+  //     .query(Q.and(Q.where('modifier_item_id', this.id), Q.where('price_group_id', priceGroupId)));
+  // };
 }
 
 class Discount extends Model {
@@ -296,10 +318,10 @@ class Bill extends Model {
     });
   };
 
-  @action addItem = async (p: { item; priceGroup; modifierItems?: any[] }) => {
-    const { item, priceGroup, modifierItems = [] } = p;
+  @action addItem = async (p: { item; priceGroup }) => {
+    const { item, priceGroup } = p;
     let toCreate = [];
-    const price = await item.price(priceGroup.id).fetch();
+    const price = item.price[priceGroup.id];
     const category = await item.category.fetch();
     const billItem = this.collections.get(tNames.billItems).prepareCreate(billitem => {
       Object.assign(billitem, {
@@ -375,9 +397,9 @@ class BillItem extends Model {
 
     const billItemModifierItemsToCreate = await Promise.all(
       modifierItems.map(modifierItem => {
-        return this.collections.get(tNames.billItemModifierItems).prepareCreate(async item => {
-          const price = await modifierItem.price(priceGroup.id).fetch();
-          Object.assign(item, {
+        return this.collections.get(tNames.billItemModifierItems).prepareCreate(async _item => {
+          const price = modifierItem.prices[priceGroup.id];
+          Object.assign(_item, {
             bill_item_id: this.id,
             modifier_item_id: modifierItem.id,
             modifier_item_name: modifierItem.name,
