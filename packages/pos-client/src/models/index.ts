@@ -11,6 +11,7 @@ import {
   date,
 } from '@nozbe/watermelondb/decorators';
 import dayjs from 'dayjs';
+import { uniq } from 'lodash';
 
 export const tNames = {
   modifiers: 'modifiers',
@@ -48,6 +49,12 @@ class Item extends Model {
     [tNames.itemModifiers]: { type: 'has_many', foreignKey: 'item_id' },
     [tNames.modifiers]: { type: 'belongs_to', key: 'modifier_id' },
     [tNames.categories]: { type: 'belongs_to', key: 'category_id' },
+  };
+
+  price = async (priceGroupId: string) => {
+    return this.collections
+      .get(tNames.itemPrices)
+      .query(Q.and(Q.where('item_id', this.id), Q.where('price_group_id', priceGroupId)));
   };
 
   // @ts-ignore
@@ -185,6 +192,12 @@ class ModifierItem extends Model {
   @field('modifier_id') modifierId;
 
   @relation(tNames.modifiers, 'modifier_id') modifier;
+
+  price = async (priceGroupId: string) => {
+    return this.collections
+      .get(tNames.modifierPrices)
+      .query(Q.and(Q.where('modifier_item_id', this.id), Q.where('price_group_id', priceGroupId)));
+  };
 }
 
 class Discount extends Model {
@@ -283,7 +296,25 @@ class Bill extends Model {
     });
   };
 
-  // @action addItem = async(p: {itemId: string, })
+  @action addItem = async (p: { item; priceGroup; modifierItems?: any[] }) => {
+    const { item, priceGroup, modifierItems = [] } = p;
+    let toCreate = [];
+    const price = await item.price(priceGroup.id).fetch();
+    const category = await item.category.fetch();
+    const billItem = this.collections.get(tNames.billItems).prepareCreate(billitem => {
+      Object.assign(billitem, {
+        bill_id: this.id,
+        item_id: item.id,
+        item_name: item.name,
+        item_price: price.price,
+        price_group_name: priceGroup.name,
+        price_group_id: priceGroup.id,
+        category_name: category.name,
+        category_id: category.id,
+      });
+    });
+    toCreate.push(billItem);
+  };
 
   @action close = async () => {
     this.is_closed = true;
@@ -330,6 +361,34 @@ class BillItem extends Model {
   @immutableRelation(tNames.categories, 'category_id') category;
   @children(tNames.billItemModifierItems) modifierItems;
   @children(tNames.itemModifiers) modifiers;
+
+  @action addModifierChoices = async (modifier, modifierItems, priceGroup) => {
+    const toCreate = [];
+
+    const billItemModifierToCreate = this.collections.get(tNames.billItemModifiers).prepareCreate(billItemModifier => {
+      Object.assign(billItemModifier, {
+        bill_item_id: this.id,
+        modifier_id: modifier.id,
+        modifier_name: modifier.name,
+      });
+    });
+
+    const billItemModifierItemsToCreate = await Promise.all(
+      modifierItems.map(modifierItem => {
+        return this.collections.get(tNames.billItemModifierItems).prepareCreate(async item => {
+          const price = await modifierItem.price(priceGroup.id).fetch();
+          Object.assign(item, {
+            bill_item_id: this.id,
+            modifier_item_id: modifierItem.id,
+            modifier_item_name: modifierItem.name,
+            modifier_item_price: price,
+          });
+        });
+      }),
+    );
+
+    toCreate.push(billItemModifierToCreate, ...billItemModifierItemsToCreate);
+  };
 
   static associations = {
     [tNames.bills]: { type: 'belongs_to', key: 'bill_id' },

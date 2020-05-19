@@ -5,7 +5,7 @@ export interface ItemProps {
   name: string;
   categoryId: Realm.Collection<CategoryProps>;
   price: number;
-  modifierId?: Realm.Collection<ModifierProps>;
+  modifiers: Realm.Collection<ModifierProps>;
   linkedPrinters: Realm.Collection<PrinterProps>;
 }
 
@@ -200,13 +200,6 @@ export const AddressSchema: Realm.ObjectSchema = {
 //     // settings: {
 //     currency: '£',
 //     defaultPriceGroupId: '5e90eae405a18b11edbf3214',
-
-
-
-
-
-
-
 
 export interface BillPaymentProps {
   _id: string;
