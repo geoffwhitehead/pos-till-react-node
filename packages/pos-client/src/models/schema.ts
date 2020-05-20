@@ -33,8 +33,8 @@ export default appSchema({
       name: 'modifiers',
       columns: [
         { name: 'name', type: 'string' },
-        { name: 'minItems', type: 'string' },
-        { name: 'maxItems', type: 'string' },
+        { name: 'min_items', type: 'number' },
+        { name: 'max_items', type: 'number' },
       ],
     }),
     tableSchema({

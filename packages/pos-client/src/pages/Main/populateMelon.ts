@@ -149,6 +149,8 @@ export const populateMelon = async () => {
     const modifierItemsCollection = database.collections.get<any>(tNames.modifierItems);
     const modifierPriceCollection = database.collections.get<any>(tNames.modifierPrices);
 
+    console.log('maxItems', maxItems);
+    console.log('minItems', minItems);
     const modifier = modifiersCollection.prepareCreate(
       catchFn(modifier => {
         modifier._raw = sanitizedRaw({ id: _id }, modifiersCollection.schema);
