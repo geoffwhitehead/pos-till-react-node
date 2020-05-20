@@ -37,21 +37,18 @@ export const WrappedModifierList: React.FC<ModifierListProps> = ({
     ),
   );
 
-  console.log('selectedModifiers', selectedModifiers);
   const createItemWithModifiers = async () => {
     const create = async () => {
       const billItem = await currentBill.addItem({ item, priceGroup });
 
-      const newItems = await Promise.all(
-        Object.values(selectedModifiers).map(({ modifier, items }) => {
-          return billItem.addModifierChoices(modifier, items, priceGroup);
-        }),
+      await Promise.all(
+        Object.values(selectedModifiers).map(({ modifier, items }) =>
+          billItem.addModifierChoices(modifier, items, priceGroup),
+        ),
       );
-
-      console.log('newItems', newItems);
     };
 
-    await Promise.all(new Array(quantity).fill(create()));
+    await times(quantity, create);
 
     onClose();
   };
@@ -59,8 +56,6 @@ export const WrappedModifierList: React.FC<ModifierListProps> = ({
   const onPressModifierItem = (modifier, modifierItem) => {
     const m = selectedModifiers[modifier.id];
     const containsModifier = m.items.includes(modifierItem);
-    console.log('m', m);
-    console.log('containsModifier', containsModifier);
     if (containsModifier) {
       setSelectedModifiers({
         ...selectedModifiers,
@@ -77,7 +72,7 @@ export const WrappedModifierList: React.FC<ModifierListProps> = ({
         <Button light onPress={onClose}>
           <Text>Cancel</Text>
         </Button>
-        <Button info onPress={createItemWithModifiers}>
+        <Button onPress={createItemWithModifiers}>
           <Text>Save</Text>
         </Button>
       </View>
@@ -95,6 +90,7 @@ export const WrappedModifierList: React.FC<ModifierListProps> = ({
             const selectedItems = selectedModifiers[modifier.id].items;
             return (
               <ModifierGroup
+                key={modifier.id}
                 selectedModifierItems={selectedItems}
                 onPressModifierItem={onPressModifierItem}
                 modifier={modifier}

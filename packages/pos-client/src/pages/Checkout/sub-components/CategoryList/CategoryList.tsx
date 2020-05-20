@@ -125,7 +125,7 @@ export const CategoriesWrapped: React.FC<any> = ({ navigation, route, categories
           .filter(category => searchFilter(category, searchValue))
           .map(category => {
             return (
-              <ListItem key={category._id} icon onPress={onPressCategoryFactory(category)}>
+              <ListItem key={category.id} icon onPress={onPressCategoryFactory(category)}>
                 <Left>
                   <Text>{category.name}</Text>
                 </Left>

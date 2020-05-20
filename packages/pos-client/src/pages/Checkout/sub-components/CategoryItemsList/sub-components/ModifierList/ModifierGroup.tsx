@@ -20,19 +20,16 @@ const WrappedModifierGroup: React.FC<ModifierGroupProps> = ({
   onPressModifierItem,
   selectedModifierItems,
 }) => {
-  console.log('modifierItems', modifierItems);
-
   const _onPressModifierItem = modifierItem => {
-    console.log('modifierItem', modifierItem);
     onPressModifierItem(modifier, modifierItem);
   };
 
-  console.log('selectedModifierItems', selectedModifierItems);
   return (
     <View>
       <Text>{modifier.name}</Text>
       {modifierItems.map(item => (
         <ModifierItem
+          key={item.id}
           selected={selectedModifierItems.includes(item)}
           modifierItem={item}
           priceGroup={priceGroup}

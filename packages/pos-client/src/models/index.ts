@@ -419,21 +419,14 @@ class BillItem extends Model {
         modifierName: modifier.name,
       });
     });
-    console.log('billItemModifierToCreate', billItemModifierToCreate);
 
     const billItemModifierItemsToCreate = await Promise.all(
       await modifierItems.map(async modifierItem => {
-        console.log('modifierItem', modifierItem);
         const prices = await modifierItem.prices.fetch();
-        console.log('prices', prices);
         const mItem = this.collections.get(tNames.billItemModifierItems).prepareCreate(billItemModifierItem => {
-          console.log('billItemModifierItem', billItemModifierItem);
           billItemModifierItem.billItem.set(this);
-          console.log(1);
           billItemModifierItem.modifierItem.set(modifierItem);
-          console.log(2);
           billItemModifierItem.billItemModifier.set(billItemModifierToCreate);
-          console.log(3);
           Object.assign(billItemModifierItem, {
             modifierItemName: modifierItem.name,
             modifierItemPrice: resolvePrice(priceGroup, prices),
@@ -443,9 +436,7 @@ class BillItem extends Model {
         return mItem;
       }),
     );
-
     toCreate.push(billItemModifierToCreate, ...billItemModifierItemsToCreate);
-    console.log('toCreate', toCreate);
   };
 
   static associations = {
