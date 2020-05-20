@@ -13,6 +13,7 @@ import {
 import dayjs from 'dayjs';
 import { uniq } from 'lodash';
 import { resolvePrice } from '../helpers';
+import catchFn from '../pages/Main/catchFn';
 
 export const tNames = {
   modifiers: 'modifiers',
@@ -34,7 +35,7 @@ export const tNames = {
   billPeriods: 'bill_periods',
   billItems: 'bill_items',
   billItemModifiers: 'bill_item_modifiers',
-  billItemModifierItems: 'bill_modifier_items',
+  billItemModifierItems: 'bill_item_modifier_items',
 };
 
 class Item extends Model {
@@ -403,78 +404,97 @@ class BillItem extends Model {
   @immutableRelation(tNames.priceGroups, 'price_group_id') priceGroup;
   @immutableRelation(tNames.categories, 'category_id') category;
   // @immutableRelation(tNames.modifiers, 'modifier_id') modifier;
-  @children(tNames.billItemModifierItems) modifierItems;
-  @children(tNames.itemModifiers) modifiers;
+
+  @children(tNames.billItemModifierItems) billItemModifierItems;
+  @children(tNames.billItemModifiers) billItemModifiers;
+  // @children(tNames.itemModifiers) modifiers;
 
   @action addModifierChoices = async (modifier, modifierItems, priceGroup) => {
     const toCreate = [];
 
     const billItemModifierToCreate = this.collections.get(tNames.billItemModifiers).prepareCreate(billItemModifier => {
+      billItemModifier.modifier.set(modifier);
+      billItemModifier.billItem.set(this);
       Object.assign(billItemModifier, {
-        bill_item_id: this.id,
-        modifier_id: modifier.id,
-        modifier_name: modifier.name,
+        modifierName: modifier.name,
       });
     });
+    console.log('billItemModifierToCreate', billItemModifierToCreate);
 
     const billItemModifierItemsToCreate = await Promise.all(
-      modifierItems.map(modifierItem => {
-        return this.collections.get(tNames.billItemModifierItems).prepareCreate(async _item => {
-          const price = modifierItem.prices[priceGroup.id];
-          Object.assign(_item, {
-            bill_item_id: this.id,
-            modifier_item_id: modifierItem.id,
-            modifier_item_name: modifierItem.name,
-            modifier_item_price: price,
+      await modifierItems.map(async modifierItem => {
+        console.log('modifierItem', modifierItem);
+        const prices = await modifierItem.prices.fetch();
+        console.log('prices', prices);
+        const mItem = this.collections.get(tNames.billItemModifierItems).prepareCreate(billItemModifierItem => {
+          console.log('billItemModifierItem', billItemModifierItem);
+          billItemModifierItem.billItem.set(this);
+          console.log(1);
+          billItemModifierItem.modifierItem.set(modifierItem);
+          console.log(2);
+          billItemModifierItem.billItemModifier.set(billItemModifierToCreate);
+          console.log(3);
+          Object.assign(billItemModifierItem, {
+            modifierItemName: modifierItem.name,
+            modifierItemPrice: resolvePrice(priceGroup, prices),
+            // billItemModifierId: billItemModifierToCreate.id,
           });
         });
+        return mItem;
       }),
     );
 
     toCreate.push(billItemModifierToCreate, ...billItemModifierItemsToCreate);
+    console.log('toCreate', toCreate);
   };
 
   static associations = {
     [tNames.bills]: { type: 'belongs_to', key: 'bill_id' },
     [tNames.items]: { type: 'belongs_to', key: 'item_id' },
     [tNames.priceGroups]: { type: 'belongs_to', key: 'price_group_id' },
-    [tNames.modifiers]: { type: 'belongs_to', key: 'modifier_id' },
+    // [tNames.modifiers]: { type: 'has_many', key: 'modifier_id' },
     [tNames.categories]: { type: 'belongs_to', key: 'category_id' },
     [tNames.billItemModifierItems]: { type: 'has_many', foreignKey: 'bill_item_id' },
+    [tNames.billItemModifiers]: { type: 'has_many', foreignKey: 'bill_item_id' },
   };
 }
 
 class BillItemModifier extends Model {
   static table = tNames.billItemModifiers;
 
-  @nochange @field('bill_item_id') billItem;
+  @nochange @field('bill_item_id') billItemId;
   @nochange @field('modifier_name') modifierName;
   @nochange @field('modifier_id') modifierId;
 
   @immutableRelation(tNames.modifiers, 'modifier_id') modifier;
   @immutableRelation(tNames.billItems, 'bill_item_id') billItem;
 
+  @children(tNames.billItemModifierItems) billItemModifierItems;
+
   static associations = {
     [tNames.billItems]: { type: 'belongs_to', key: 'bill_item_id' },
     [tNames.modifiers]: { type: 'belongs_to', key: 'modifier_id' },
+    [tNames.billItemModifierItems]: { type: 'has_many', key: 'bill_item_modifier_id' },
   };
 }
 
 class BillItemModifierItem extends Model {
   static table = tNames.billItemModifierItems;
 
-  @nochange @field('bill_item_id') billItem;
-  @nochange @field('bill_item_modifier_id') modifier;
-  @nochange @field('modifier_item_id') modifierItem;
+  @nochange @field('bill_item_id') billItemId;
+  @nochange @field('bill_item_modifier_id') billItemModifierId;
+  @nochange @field('modifier_item_id') modifierItemId;
   @nochange @field('modifier_item_price') modifierItemPrice;
   @nochange @field('modifier_item_name') modifierItemName;
 
   @immutableRelation(tNames.billItems, 'bill_item_id') billItem;
   @immutableRelation(tNames.modifierItems, 'modifier_item_id') modifierItem;
+  @immutableRelation(tNames.billItemModifiers, 'bill_item_modifier_id') billItemModifier;
 
   static associations = {
     [tNames.billItems]: { type: 'belongs_to', key: 'bill_item_id' },
     [tNames.modifierItems]: { type: 'belongs_to', key: 'modifier_item_id' },
+    [tNames.billItemModifiers]: { type: 'belongs_to', key: 'bill_item_modifier_id' },
   };
 }
 

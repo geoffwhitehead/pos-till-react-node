@@ -181,6 +181,7 @@ export default appSchema({
       name: 'bill_item_modifier_items',
       columns: [
         { name: 'bill_item_id', type: 'string', isIndexed: true },
+        { name: 'bill_item_modifier_id', type: 'string' },
         { name: 'modifier_item_id', type: 'string' },
         { name: 'modifier_item_name', type: 'string' },
         { name: 'modifier_item_price', type: 'number' },

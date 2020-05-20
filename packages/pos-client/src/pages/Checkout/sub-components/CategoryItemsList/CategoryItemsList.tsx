@@ -46,8 +46,6 @@ const WrappedCategoryItems: React.FC<CategoryItemsListProps> = ({
   };
 
   const onSelectItem = async (item, modifierCount) => {
-    console.log('item', item);
-    console.log('modifierCount', modifierCount);
     if (modifierCount > 0) {
       setSelectedItem(item);
       setModalOpen(true);

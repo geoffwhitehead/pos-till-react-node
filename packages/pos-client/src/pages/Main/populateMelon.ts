@@ -21,7 +21,7 @@ import { sanitizedRaw } from '@nozbe/watermelondb/RawRecord';
 import catchFn from './catchFn';
 import { getOrganization } from '../../api/organization';
 export const populateMelon = async () => {
-  // return;
+  return;
   try {
     await database.action(async () => {
       await database.unsafeResetDatabase();
