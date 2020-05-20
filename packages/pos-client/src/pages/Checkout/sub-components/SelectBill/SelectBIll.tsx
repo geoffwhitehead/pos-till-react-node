@@ -11,39 +11,29 @@ import { CurrentBillContext } from '../../../../contexts/CurrentBillContext';
 interface SelectBillProps {
   openBills: any; // TODO: fix realm types
   maxBills: number;
-  onSelectBill: (index: number, bill: any) => void;
+  onSelectBill?: (bill: any) => void;
 }
 
 // TODO: fetch from org / state
 const symbol = '£';
 const maxBills = 40; // TODO: move to org settings
 
-export const WrappedSelectBill: React.FC<SelectBillProps> = ({ database, billPeriod, openBills }) => {
+export const WrappedSelectBill: React.FC<SelectBillProps> = ({ onSelectBill, database, billPeriod, openBills }) => {
   const { setCurrentBill } = useContext(CurrentBillContext);
   const [showOpen, setShowOpen] = useState<boolean>(false);
-
-  console.log('*******');
-  console.log('billPeriod', billPeriod);
-  console.log('openBills', openBills);
 
   const bills = openBills.reduce((acc, bill) => {
     acc[bill.reference - 1] = bill;
     return [...acc];
   }, Array(maxBills).fill(null));
 
-  const onSelectBillFactory = (reference: number, bill: BillProps) => () => {
-    database.action(async () => {
-      // const billCollection = database.collections.get(tNames.bills);
-
-      // const bill = await billCollection.create(bill => {
-      //   bill.reference = ref;
-      //   bill.isClosed = false;
-      //   bill.billPeriodId = billPeriod.id;
-      // });
-
-      const bill = await billPeriod.createBill({ reference });
-      setCurrentBill(bill);
+  const onSelectBillFactory = (reference: number, bill: BillProps) => async () => {
+    const bill = await database.action(async () => {
+      const newBill = await billPeriod.createBill({ reference });
+      return newBill;
     });
+    setCurrentBill(bill);
+    onSelectBill(bill);
   };
 
   const toggleOpenOnlyFilter = () => setShowOpen(!showOpen);
