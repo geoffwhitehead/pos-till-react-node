@@ -37,6 +37,11 @@ export const WrappedModifierList: React.FC<ModifierListProps> = ({
     ),
   );
 
+  const isSelectionValid = Object.keys(selectedModifiers).some(key => {
+    const { modifier, items } = selectedModifiers[key];
+    return !(items.length < modifier.minItems || items.length > modifier.maxItems);
+  });
+
   const createItemWithModifiers = async () => {
     const create = async () => {
       const billItem = await currentBill.addItem({ item, priceGroup });
@@ -72,7 +77,7 @@ export const WrappedModifierList: React.FC<ModifierListProps> = ({
         <Button light onPress={onClose}>
           <Text>Cancel</Text>
         </Button>
-        <Button onPress={createItemWithModifiers}>
+        <Button disabled={!isSelectionValid} onPress={createItemWithModifiers}>
           <Text>Save</Text>
         </Button>
       </View>
