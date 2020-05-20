@@ -3,6 +3,7 @@ import withObservables from '@nozbe/with-observables';
 import { ListItem, Left, Text, Icon, Body, Right } from '../../../../../core';
 import { StyleSheet } from 'react-native';
 import { PriceGroupSchema } from '../../../../../services/schemas';
+import { resolvePrice } from '../../../../../helpers';
 
 interface CategoryItemProps {
   // TODO: types
@@ -24,8 +25,6 @@ const WrappedCategoryItem: React.FC<CategoryItemProps> = ({
 }) => {
   const onPress = () => onPressItem(item, modifierCount);
 
-  console.log('prices', prices);
-  const priceRecord = prices.find(p => p.priceGroupId === priceGroup.id);
   return (
     <ListItem style={isActive && styles.activeRow} icon key={item._id} onPress={onPress}>
       <Left>
@@ -33,7 +32,7 @@ const WrappedCategoryItem: React.FC<CategoryItemProps> = ({
       </Left>
       <Body>{modifierCount > 0 ? <Icon name="ios-arrow-forward" /> : null}</Body>
       <Right>
-        <Text>{priceRecord && priceRecord.price}</Text>
+        <Text>{resolvePrice(priceGroup, prices)}</Text>
       </Right>
     </ListItem>
   );

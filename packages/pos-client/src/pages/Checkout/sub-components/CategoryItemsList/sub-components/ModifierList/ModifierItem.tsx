@@ -1,21 +1,26 @@
 import React from 'react';
 import withObservables from '@nozbe/with-observables';
 import { ListItem, Left, Body, Text, Right } from 'native-base';
+import { resolvePrice } from '../../../../../../helpers';
 
 interface ModifierItemProps {
   priceGroup: any;
   prices: any;
   modifierItem: any;
+  onPress: any;
+  selected: boolean;
 }
-const WrappedModifierItem: React.FC<ModifierItemProps> = ({ modifierItem, priceGroup, prices }) => {
-  const priceRecord = prices.find(p => p.priceGroupId === priceGroup.id);
+const WrappedModifierItem: React.FC<ModifierItemProps> = ({ selected, modifierItem, priceGroup, prices, onPress }) => {
+  const _onPress = () => onPress(modifierItem);
 
   return (
-    <ListItem>
+    <ListItem selected={selected} onPress={_onPress}>
       <Left>
         <Text>{modifierItem.name}</Text>
         <Body />
-        <Right><Text>{priceRecord && priceRecord.price}</Text></Right>
+        <Right>
+          <Text>{resolvePrice(priceGroup, prices)}</Text>
+        </Right>
       </Left>
     </ListItem>
   );

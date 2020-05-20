@@ -9,15 +9,35 @@ interface ModifierGroupProps {
   modifierItems: any;
   modifier: any;
   priceGroup: any;
+  onPressModifierItem: any;
+  selectedModifierItems: any[];
 }
 
-const WrappedModifierGroup: React.FC<ModifierGroupProps> = ({ modifier, priceGroup, modifierItems }) => {
+const WrappedModifierGroup: React.FC<ModifierGroupProps> = ({
+  modifier,
+  priceGroup,
+  modifierItems,
+  onPressModifierItem,
+  selectedModifierItems,
+}) => {
   console.log('modifierItems', modifierItems);
+
+  const _onPressModifierItem = modifierItem => {
+    console.log('modifierItem', modifierItem);
+    onPressModifierItem(modifier, modifierItem);
+  };
+
+  console.log('selectedModifierItems', selectedModifierItems);
   return (
     <View>
       <Text>{modifier.name}</Text>
       {modifierItems.map(item => (
-        <ModifierItem modifierItem={item} priceGroup={priceGroup} />
+        <ModifierItem
+          selected={selectedModifierItems.includes(item)}
+          modifierItem={item}
+          priceGroup={priceGroup}
+          onPress={_onPressModifierItem}
+        />
       ))}
     </View>
   );

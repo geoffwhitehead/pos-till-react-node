@@ -12,6 +12,7 @@ import {
 } from '@nozbe/watermelondb/decorators';
 import dayjs from 'dayjs';
 import { uniq } from 'lodash';
+import { resolvePrice } from '../helpers';
 
 export const tNames = {
   modifiers: 'modifiers',
@@ -148,6 +149,8 @@ class Modifier extends Model {
   static table = tNames.modifiers;
 
   @field('name') name;
+  @field('min_items') minItems;
+  @field('max_items') maxItems;
 
   static associations = {
     [tNames.itemModifiers]: { type: 'has_many', foreignKey: 'modifier_id' },
@@ -320,22 +323,41 @@ class Bill extends Model {
 
   @action addItem = async (p: { item; priceGroup }) => {
     const { item, priceGroup } = p;
-    let toCreate = [];
-    const price = item.price[priceGroup.id];
-    const category = await item.category.fetch();
-    const billItem = this.collections.get(tNames.billItems).prepareCreate(billitem => {
-      Object.assign(billitem, {
-        bill_id: this.id,
-        item_id: item.id,
-        item_name: item.name,
-        item_price: price.price,
-        price_group_name: priceGroup.name,
-        price_group_id: priceGroup.id,
-        category_name: category.name,
-        category_id: category.id,
-      });
-    });
-    toCreate.push(billItem);
+
+    // console.log('item', item);
+    const [category, prices] = await Promise.all([item.category.fetch(), item.prices.fetch()]);
+
+    const newItem = await this.database.action(() =>
+      this.collections.get(tNames.billItems).create(billItem => {
+        billItem.bill.set(this);
+        billItem.priceGroup.set(priceGroup);
+        billItem.category.set(category);
+        billItem.item.set(item);
+        Object.assign(billItem, {
+          itemName: item.name,
+          itemPrice: resolvePrice(priceGroup, prices),
+          priceGroupName: priceGroup.name,
+          categoryName: category.name,
+        });
+      }),
+    );
+
+    return newItem;
+
+    // const price = item.price[priceGroup.id];
+    // const billItem = this.collections.get(tNames.billItems).prepareCreate(billitem => {
+    // Object.assign(billItem, {
+    //   bill_id: this.id,
+    //   item_id: item.id,
+    //   item_name: item.name,
+    //   item_price: price.price,
+    //   price_group_name: priceGroup.name,
+    //   price_group_id: priceGroup.id,
+    //   category_name: category.name,
+    //   category_id: category.id,
+    // });
+    // });
+    // toCreate.push(billItem);
   };
 
   @action close = async () => {
@@ -365,8 +387,8 @@ class BillItem extends Model {
   static table = tNames.billItems;
   @nochange @field('bill_id') billId;
   @nochange @field('item_id') itemId;
-  @nochange @field('item_name') name;
-  @nochange @field('item_price') price;
+  @nochange @field('item_name') itemName;
+  @nochange @field('item_price') itemPrice;
   @nochange @field('price_group_name') priceGroupName;
   @nochange @field('price_group_id') priceGroupId;
   // @nochange @field('modifier_id') modifierId;
@@ -379,8 +401,8 @@ class BillItem extends Model {
   @immutableRelation(tNames.bills, 'bill_id') bill;
   @immutableRelation(tNames.items, 'item_id') item;
   @immutableRelation(tNames.priceGroups, 'price_group_id') priceGroup;
-  // @immutableRelation(tNames.modifiers, 'modifier_id') modifier;
   @immutableRelation(tNames.categories, 'category_id') category;
+  // @immutableRelation(tNames.modifiers, 'modifier_id') modifier;
   @children(tNames.billItemModifierItems) modifierItems;
   @children(tNames.itemModifiers) modifiers;
 

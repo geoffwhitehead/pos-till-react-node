@@ -2,10 +2,8 @@ import React, { useState, useContext } from 'react';
 import { Text, Content, List, ListItem, Left, Icon, Body, Right } from '../../../../core';
 import { SearchHeader } from '../../../../components/SearchHeader/SearchHeader';
 import { CategoryProps, ItemProps, ModifierProps, BillProps, ModifierItemProps } from '../../../../services/schemas';
-import { routes } from '../../../../navigators/CheckoutItemNavigator';
-import { StyleSheet } from 'react-native';
 import Modal from 'react-native-modal';
-import { ItemModifierList } from './sub-components/ItemModList/ItemModList';
+import { ModifierList } from './sub-components/ModifierList/ModifierList';
 import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import withObservables from '@nozbe/with-observables';
 import { PriceGroupContext } from '../../../../contexts/PriceGroupContext';
@@ -36,8 +34,6 @@ const WrappedCategoryItems: React.FC<CategoryItemsListProps> = ({
   const { priceGroup } = useContext(PriceGroupContext);
   const { currentBill } = useContext(CurrentBillContext);
 
-  const [prices, setPrices] = useState([]);
-
   const goBack = () => navigation.goBack();
 
   const searchFilter = (item: ItemProps, searchValue: string) =>
@@ -56,7 +52,8 @@ const WrappedCategoryItems: React.FC<CategoryItemsListProps> = ({
       setSelectedItem(item);
       setModalOpen(true);
     } else {
-      await currentBill.addItem({ item, priceGroup });
+      const newItem = await currentBill.addItem({ item, priceGroup });
+      console.log('newItem', newItem);
     }
   };
 
@@ -75,7 +72,7 @@ const WrappedCategoryItems: React.FC<CategoryItemsListProps> = ({
         backdropTransitionOutTiming={50}
       >
         {modalOpen && (
-          <ItemModifierList
+          <ModifierList
             priceGroup={priceGroup}
             currentBill={currentBill}
             onClose={onCancelHandler}
@@ -109,10 +106,7 @@ const WrappedCategoryItems: React.FC<CategoryItemsListProps> = ({
   );
 };
 
-export const CategoryItems = withObservables<
-  { category: any }, // TODO: fix types
-  { category: any; items: any }
->(['route'], ({ route }) => {
+export const CategoryItems = withObservables(['route'], ({ route }) => {
   console.log('route', route);
 
   const { category } = route.params;
