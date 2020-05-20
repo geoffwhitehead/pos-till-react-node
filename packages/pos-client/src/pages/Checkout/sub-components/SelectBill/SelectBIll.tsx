@@ -7,6 +7,8 @@ import withObservables from '@nozbe/with-observables';
 import { tNames } from '../../../../models';
 import { Q } from '@nozbe/watermelondb';
 import { CurrentBillContext } from '../../../../contexts/CurrentBillContext';
+import { BillRowEmpty } from './BillRowEmpty';
+import { BillRow } from './BillRow';
 
 interface SelectBillProps {
   openBills: any; // TODO: fix realm types
@@ -15,7 +17,6 @@ interface SelectBillProps {
 }
 
 // TODO: fetch from org / state
-const symbol = '£';
 const maxBills = 40; // TODO: move to org settings
 
 export const WrappedSelectBill: React.FC<SelectBillProps> = ({ onSelectBill, database, billPeriod, openBills }) => {
@@ -27,13 +28,9 @@ export const WrappedSelectBill: React.FC<SelectBillProps> = ({ onSelectBill, dat
     return [...acc];
   }, Array(maxBills).fill(null));
 
-  const onSelectBillFactory = (reference: number, bill: BillProps) => async () => {
-    const bill = await database.action(async () => {
-      const newBill = await billPeriod.createBill({ reference });
-      return newBill;
-    });
+  const _onSelectBill = (bill: BillProps) => {
     setCurrentBill(bill);
-    onSelectBill(bill);
+    onSelectBill && onSelectBill(bill);
   };
 
   const toggleOpenOnlyFilter = () => setShowOpen(!showOpen);
@@ -63,25 +60,15 @@ export const WrappedSelectBill: React.FC<SelectBillProps> = ({ onSelectBill, dat
             <Text>Total</Text>
           </Right>
         </ListItem>
-        {bills.filter(filterOpenOnly).map((bill, index) => {
-          const tab = index + 1;
-          const color = bill ? 'green' : 'red';
-
-          return (
-            <ListItem key={index} onPress={onSelectBillFactory(tab, bill)}>
-              <Left>
-                <Text style={{ color }}>{`${tab}: ${bill ? 'Open' : 'Closed'}`}</Text>
-              </Left>
-              <Body>
-                <Text>{bill ? 'BILL' : 'nope'}</Text>
-                {/* <Text style={{ color: 'grey' }}>{bill ? formatNumber(balance(bill), symbol) : ''}</Text> */}
-              </Body>
-              <Right>
-                {/* <Text style={{ color: 'grey' }}>{bill ? formatNumber(total(bill), symbol) : ''}</Text> */}
-              </Right>
-            </ListItem>
-          );
-        })}
+        {bills
+          .filter(filterOpenOnly)
+          .map((bill, index) =>
+            bill ? (
+              <BillRow key={bill.id} bill={bill} onSelectBill={_onSelectBill} />
+            ) : (
+              <BillRowEmpty key={index} reference={index + 1} billPeriod={billPeriod} onSelectBill={_onSelectBill} />
+            ),
+          )}
       </List>
     </Content>
   );
