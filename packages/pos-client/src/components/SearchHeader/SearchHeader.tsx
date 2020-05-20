@@ -3,14 +3,16 @@ import { Item, Icon, Input, Header, Right, Text, Button, ActionSheet } from '../
 import { useRealmQuery } from 'react-use-realm';
 import { PriceGroupProps, PriceGroupSchema } from '../../services/schemas';
 import { PriceGroupContext } from '../../contexts/PriceGroupContext';
+import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
+import withObservables from '@nozbe/with-observables';
+import { tNames } from '../../models';
 
 interface SearchHeaderProps {
   onChangeText: (value: string) => void;
   value: string;
 }
 
-export const SearchHeader: React.FC<SearchHeaderProps> = ({ onChangeText, value = '', buttonText, buttonOnPress }) => {
-  const priceGroups = useRealmQuery<PriceGroupProps>({ source: PriceGroupSchema.name });
+export const WrappedSearchHeader: React.FC<SearchHeaderProps> = ({ priceGroups, onChangeText, value = '', buttonText, buttonOnPress }) => {
   const { priceGroup, setPriceGroup } = useContext(PriceGroupContext);
 
   const onChangePriceGroup = () => {
@@ -41,3 +43,12 @@ export const SearchHeader: React.FC<SearchHeaderProps> = ({ onChangeText, value 
     </Header>
   );
 };
+
+export const SearchHeader = withDatabase(
+  withObservables([], ({ database }) => ({
+    priceGroups: database.collections
+      .get(tNames.priceGroups)
+      .query()
+      .observe(),
+  }))(WrappedSearchHeader),
+);
