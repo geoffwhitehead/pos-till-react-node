@@ -11,7 +11,7 @@ import { Collection } from 'realm';
 import { flatten } from 'lodash';
 
 // TODO fix tpyes
-export const total: (bill: BillProps) => number = bill => {
+export const total = (p: { items; discounts }): number => {
   const amt = bill.items.reduce((acc, item) => {
     const mods = item.mods.reduce((acc, mod) => acc + mod.price, 0);
     return acc + mods + item.price;
@@ -24,7 +24,7 @@ export const totalPayable: (bill: BillProps) => number = bill => {
 };
 
 // TODO fix tpyes
-export const balance: (bill: BillProps) => number = bill => {
+export const balance = (bill: BillProps): number => {
   return total(bill) - totalDiscount(bill) - totalPayments(bill);
 };
 
@@ -149,3 +149,62 @@ export const totalPayments: (bill: BillProps) => number = bill => {
 
 export const formatNumber: (value: number, symbol?: string) => string = (value, symbol = '') =>
   `${symbol}${(value / 100).toFixed(2)}`;
+
+// ****************
+// ****************
+// ****************
+// ****************
+// ****************
+
+export const _totalDiscount = (total, discounts) => {
+  return _discountBreakdown(total, discounts).reduce((acc, discount) => acc + discount.calculatedDiscount, 0);
+};
+
+export const _discountBreakdown = (total: number, discounts: any): DiscountBreakdownItemProps[] => {
+  let rollingTotal = total;
+  const arrDiscounts = discounts.map(d => {
+    const calculatedDiscount = d.isPercent ? Math.round(rollingTotal * (d.amount / 100)) : d.amount;
+    rollingTotal = rollingTotal - calculatedDiscount;
+    return {
+      ...d,
+      calculatedDiscount,
+    };
+  });
+  return arrDiscounts;
+};
+
+export const _total = async (items, discounts, payments): Promise<number> => {
+  const totalsArray: any = await Promise.all(
+    // TODO: fix type
+    items.map(async item => {
+      console.log('item', item);
+      const modifierItems = await item.billItemModifierItems.fetch();
+      console.log('-- modifierItems', modifierItems);
+      return modifierItems.reduce((out, mItem) => out + mItem.modifierItemPrice, item.itemPrice);
+    }),
+  );
+
+  console.log(' -- totalsArray', totalsArray);
+  const totals = totalsArray.reduce((out, total) => out + total, 0);
+
+  const totalDiscount = _totalDiscount(total, discounts);
+
+  const totalPayments = _totalPayments(payments);
+
+  console.log('totals', totals);
+  console.log('totalDiscount', totalDiscount);
+  console.log('totalPayments', totalPayments);
+
+  return totals - totalDiscount;
+  // const amt = bill.items.reduce((acc, item) => {
+  //   const mods = item.mods.reduce((acc, mod) => acc + mod.price, 0);
+  //   return acc + mods + item.price;
+  // }, 0);
+  // return amt;
+};
+
+export const _totalPayments = (payments: any): number => {
+  const amt = payments.reduce((acc, payment) => acc + payment.amount, 0);
+  console.log('amt', amt);
+  return amt;
+};

@@ -34,6 +34,7 @@
     "jwt-decode": "^2.2.0",
     "lodash": "^4.17.15",
     "native-base": "^2.13.8",
+    "observable-hooks": "^2.3.5",
     "prop-types": "^15.7.2",
     "react": "^16.12.0",
     "react-native": "0.61.5",
@@ -51,6 +52,7 @@
     "redux-persist": "^5.10.0",
     "redux-saga": "^1.0.2",
     "reduxsauce": "^1.0.1",
+    "rxjs": "^6.5.5",
     "yup": "^0.28.1"
   },
   "devDependencies": {

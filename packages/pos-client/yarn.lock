@@ -6426,6 +6426,11 @@ object.values@^1.1.0, object.values@^1.1.1:
     function-bind "^1.1.1"
     has "^1.0.3"
 
+observable-hooks@^2.3.5:
+  version "2.3.5"
+  resolved "https://registry.yarnpkg.com/observable-hooks/-/observable-hooks-2.3.5.tgz#83819ad1d8e536c9ef7792c74000ea226254655b"
+  integrity sha512-kiBU3WlsNY912l/WiYp7DcOV+u8tNpLRq4Pgh0DnwqHP6YgR36XkCBpXsMli7JDQ0VgYo4FRdlkZcMxWcsa99g==
+
 on-finished@~2.3.0:
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/on-finished/-/on-finished-2.3.0.tgz#20f1336481b083cd75337992a16971aa2d906947"
@@ -7614,7 +7619,7 @@ rxjs@^5.4.3:
   dependencies:
     symbol-observable "1.0.1"
 
-rxjs@^6.2.2, rxjs@^6.4.0, rxjs@^6.5.2:
+rxjs@^6.2.2, rxjs@^6.4.0, rxjs@^6.5.2, rxjs@^6.5.5:
   version "6.5.5"
   resolved "https://registry.yarnpkg.com/rxjs/-/rxjs-6.5.5.tgz#c5c884e3094c8cfee31bf27eb87e54ccfc87f9ec"
   integrity sha512-WfQI+1gohdf0Dai/Bbmk5L5ItH5tYqm3ki2c5GdWhKjalzjg93N3avFjVStyZZz+A2Em+ZxKH5bNghw9UeylGQ==

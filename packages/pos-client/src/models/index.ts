@@ -302,8 +302,8 @@ class Bill extends Model {
     [tNames.billDiscounts]: { type: 'has_many', foreignKey: 'bill_id' },
   };
 
-  @children(tNames.billPayments) payments;
-  @children(tNames.discounts) discounts;
+  @children(tNames.billPayments) billPayments;
+  @children(tNames.billDiscounts) billDiscounts;
   @children(tNames.billItems) billItems;
 
   @action addPayment = async (p: { paymentTypeId: string; amount: number; isChange?: boolean }) => {
@@ -437,6 +437,10 @@ class BillItem extends Model {
       }),
     );
     toCreate.push(billItemModifierToCreate, ...billItemModifierItemsToCreate);
+
+    await this.database.action(async () => {
+      await this.database.batch(...toCreate);
+    });
   };
 
   static associations = {
