@@ -69,7 +69,7 @@ export const WrappedSelectBill: React.FC<SelectBillProps> = ({ onSelectBill, ope
             bill ? (
               <BillRow key={bill.id} bill={bill} onSelectBill={_onSelectBill} />
             ) : (
-              <BillRowEmpty key={index} reference={index + 1} billPeriod={billPeriod} onSelectBill={_onSelectBill} />
+              <BillRowEmpty key={index} reference={index + 1} onSelectBill={_onSelectBill} />
             ),
           )}
       </List>

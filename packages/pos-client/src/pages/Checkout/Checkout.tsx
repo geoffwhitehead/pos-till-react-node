@@ -163,7 +163,7 @@ export const Checkout: React.FC<CheckoutProps> = ({ navigation }) => {
       // case Modes.Watermelon:
       //   return <Watermelon />;
       case Modes.Bills:
-        return <SelectBill database={database} billPeriod={billPeriod} />;
+        return <SelectBill billPeriod={billPeriod} />;
       case Modes.Items:
         return <CheckoutItemNavigator />;
       case Modes.Complete:
@@ -176,16 +176,16 @@ export const Checkout: React.FC<CheckoutProps> = ({ navigation }) => {
       <SidebarHeader title="Checkout" onOpen={openDrawer} disableNav={mode === Modes.Complete} />
       <Grid>
         <Col>{renderMainPanel()}</Col>
-        {/* <Col style={{ width: 350 }}>
+        <Col style={{ width: 350 }}>
           {currentBill && (
             <Receipt
-              activeBill={currentBill}
+            currentBill={currentBill}
               onStore={clearBill}
               onCheckout={onCheckout}
               complete={mode === Modes.Complete}
             />
           )}
-        </Col> */}
+        </Col>
       </Grid>
     </Container>
   );

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, Suspense } from 'react';
 import { ListItem, Left, Text, Body, Right } from 'native-base';
-import { formatNumber, balance, _total } from '../../../../utils';
+import { formatNumber, balance, _total, billSummary } from '../../../../utils';
 import withObservables from '@nozbe/with-observables';
 import { useObservableSuspense } from 'observable-hooks';
 import { from } from 'rxjs';
@@ -17,17 +17,11 @@ interface BillRowProps {
   discounts: any;
   items: any;
 }
-export const WrappedBillRow: React.FC<BillRowProps> = ({
-  bill,
-  onSelectBill,
-  items,
-  payments,
-  discounts,
-}) => {
+export const WrappedBillRow: React.FC<BillRowProps> = ({ bill, onSelectBill, items, payments, discounts }) => {
   const _onSelectBill = () => onSelectBill(bill);
   const [total, setTotal] = useState(null);
+  const [balance, setBalance] = useState(null);
   const database = useDatabase();
-
   // console.log('*************');
   // console.log('re render');
   // console.log('total', total);
@@ -41,12 +35,12 @@ export const WrappedBillRow: React.FC<BillRowProps> = ({
   // const itemsCount = items.length;
   // console.log('itemsCount', itemsCount);
   useEffect(() => {
-    console.log('use effect trigger');
-    const total = async () => {
-      const t = await _total(items, discounts, payments);
-      setTotal(t);
+    const summary = async () => {
+      const summary = await billSummary(items, discounts, payments);
+      setTotal(summary.totalPayable);
+      setBalance(summary.balance);
     };
-    total();
+    summary();
   }, [items]);
 
   const a = async () => {
@@ -71,12 +65,14 @@ export const WrappedBillRow: React.FC<BillRowProps> = ({
       <Left>
         <Text style={{ color: 'green' }}>{`${bill.reference}: Open`}</Text>
       </Left>
-      <Body>
+      {/* <Body>
         <Button onPress={a}>
           <Text>Add item</Text>
         </Button>
+      </Body> */}
+      <Body>
+        <Text style={{ color: 'grey' }}>{balance && formatNumber(balance, symbol)}</Text>
       </Body>
-      {/* <Body><Text style={{ color: 'grey' }}>{formatNumber(balance(bill), symbol)}</Text></Body> */}
       <Right>
         <Suspense fallback={<Text>...</Text>}>
           <Text style={{ color: 'grey' }}>{total && formatNumber(total, symbol)}</Text>
@@ -93,8 +89,14 @@ export const WrappedBillRow: React.FC<BillRowProps> = ({
 //   const total = useObservableSuspense(from(_total(items, discounts, payments)));
 //   return <Text style={{ color: 'grey' }}>{formatNumber(total, symbol)}</Text>;
 // };
+// const enhanceT = withObservables(['items'], ({ items }) => {
+//   console.log('------- items', items);
+//   return {
+//     modifierItems: items.map(async i => await i.billItemModifierItems.fetch()),
+//   };
+// });
 
-const enhance = withObservables(['bill, items, discounts'], ({ bill }) => ({
+const enhance = withObservables(['bill'], ({ bill }) => ({
   bill,
   payments: bill.billPayments,
   discounts: bill.billDiscounts,

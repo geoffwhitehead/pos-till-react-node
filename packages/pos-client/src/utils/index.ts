@@ -176,11 +176,12 @@ export const _discountBreakdown = (total: number, discounts: any): DiscountBreak
 export const _total = async (items, discounts, payments): Promise<number> => {
   const totalsArray: any = await Promise.all(
     // TODO: fix type
-    items.map(async item => {
-      // console.log('item', item);
-      const modifierItems = await item.billItemModifierItems.fetch();
-      // console.log('-- modifierItems', modifierItems);
-      return modifierItems.reduce((out, mItem) => out + mItem.modifierItemPrice, item.itemPrice);
+    items.map(item => {
+      return new Promise(async (res, rej) => {
+        const modifierItems = await item.billItemModifierItems.fetch();
+        const prices = modifierItems.reduce((out, mItem) => out + mItem.modifierItemPrice, item.itemPrice);
+        res(prices);
+      });
     }),
   );
 
@@ -207,4 +208,26 @@ export const _totalPayments = (payments: any): number => {
   const amt = payments.reduce((acc, payment) => acc + payment.amount, 0);
   console.log('amt', amt);
   return amt;
+};
+
+export const _balance = async (items, discounts, payments): Promise<number> => {
+  const totalPayable = await _total(items, discounts, payments);
+  const totalPayments = _totalPayments(payments);
+  return totalPayable - totalPayments;
+};
+
+// const fetchModifier
+
+export const billSummary = async (
+  items,
+  discounts,
+  payments,
+): Promise<{ totalPayable: number; totalPayments: number; balance: number }> => {
+  const totalPayable = await _total(items, discounts, payments);
+  const totalPayments = _totalPayments(payments);
+  return {
+    totalPayable,
+    totalPayments,
+    balance: totalPayable - totalPayments,
+  };
 };
