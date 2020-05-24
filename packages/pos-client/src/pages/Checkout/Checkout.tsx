@@ -19,7 +19,7 @@ import { Receipt } from './sub-components/Receipt/Receipt';
 import { SelectBill } from './sub-components/SelectBill/SelectBIll';
 import { realm } from '../../services/Realm';
 import uuidv4 from 'uuid';
-import { Payment } from './sub-components/Payment/Payment';
+import { Payments } from './sub-components/Payment/Payment';
 import { balance } from '../../utils';
 import { CompleteBill } from './sub-components/CompleteBill/CompleteBill';
 import { BillPeriodContext } from '../../contexts/BillPeriodContext';
@@ -46,19 +46,17 @@ const maxBills = 40;
 
 interface CheckoutProps {
   navigation: any; // TODO: fix
-  selectedBill: any; // TODO
-  route: any; //fix
 }
 
-export const Checkout: React.FC<CheckoutProps> = ({ navigation, route }) => {
-  const { billPeriod } = useContext(BillPeriodContext);
+export const Checkout: React.FC<CheckoutProps> = ({ navigation }) => {
   // const selectedBill = route.params?.selectedBill;
 
+  const { billPeriod } = useContext(BillPeriodContext);
   const { currentBill, setCurrentBill } = useContext(CurrentBillContext);
 
   // const openBills = useRealmQuery<BillProps>({ source: BillSchema.name, filter: `isClosed = false` });
-  const discounts = useRealmQuery<DiscountProps>({ source: DiscountSchema.name });
-  const paymentTypes = useRealmQuery<PaymentTypeProps>({ source: PaymentTypeSchema.name });
+  // const discounts = useRealmQuery<DiscountProps>({ source: DiscountSchema.name });
+  // const paymentTypes = useRealmQuery<PaymentTypeProps>({ source: PaymentTypeSchema.name });
   // const [activeBill, setActiveBill] = useState<null | any>(route.params?.selectedBill); // TODO: type
   // console.log('route.params', route.params);
   // useEffect(() => {
@@ -76,6 +74,7 @@ export const Checkout: React.FC<CheckoutProps> = ({ navigation, route }) => {
   const clearBill = () => setCurrentBill(null);
   const openDrawer = () => navigation.openDrawer();
   const onCheckout = () => setMode(Modes.Payments);
+  const database = useDatabase();
 
   console.log('currentBill', currentBill);
   useEffect(() => {
@@ -160,11 +159,11 @@ export const Checkout: React.FC<CheckoutProps> = ({ navigation, route }) => {
       case Modes.Loading:
         return <Loading />;
       case Modes.Payments:
-        return <Payment currentBill={currentBill} onCompleteBill={completeBill} />;
+        return <Payments currentBill={currentBill} onCompleteBill={completeBill} />;
       // case Modes.Watermelon:
       //   return <Watermelon />;
       case Modes.Bills:
-        return <SelectBill billPeriod={billPeriod} />;
+        return <SelectBill database={database} billPeriod={billPeriod} />;
       case Modes.Items:
         return <CheckoutItemNavigator />;
       case Modes.Complete:
@@ -190,4 +189,9 @@ export const Checkout: React.FC<CheckoutProps> = ({ navigation, route }) => {
       </Grid>
     </Container>
   );
+};
+
+export const CheckoutContainer = () => {
+  const { billPeriod } = useContext(BillPeriodContext);
+  const { currentBill } = useContext(CurrentBillContext);
 };

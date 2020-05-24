@@ -9,17 +9,19 @@ import { Q } from '@nozbe/watermelondb';
 import { CurrentBillContext } from '../../../../contexts/CurrentBillContext';
 import { BillRowEmpty } from './BillRowEmpty';
 import { BillRow } from './BillRow';
+import { useDatabase } from '@nozbe/watermelondb/hooks';
 
 interface SelectBillProps {
   openBills: any; // TODO: fix realm types
   maxBills: number;
+  billPeriod: any;
   onSelectBill?: (bill: any) => void;
 }
 
 // TODO: fetch from org / state
 const maxBills = 40; // TODO: move to org settings
 
-export const WrappedSelectBill: React.FC<SelectBillProps> = ({ onSelectBill, database, billPeriod, openBills }) => {
+export const WrappedSelectBill: React.FC<SelectBillProps> = ({ onSelectBill, openBills }) => {
   const { setCurrentBill } = useContext(CurrentBillContext);
   const [showOpen, setShowOpen] = useState<boolean>(false);
 
@@ -36,6 +38,7 @@ export const WrappedSelectBill: React.FC<SelectBillProps> = ({ onSelectBill, dat
   const toggleOpenOnlyFilter = () => setShowOpen(!showOpen);
   const filterOpenOnly = bill => (showOpen ? bill : true);
 
+  console.log('openBills', openBills);
   return (
     <Content>
       <List>
@@ -74,8 +77,31 @@ export const WrappedSelectBill: React.FC<SelectBillProps> = ({ onSelectBill, dat
   );
 };
 
-export const SelectBill = withDatabase<any, any>( // TODO: fix type
-  withObservables(['billPeriod'], ({ billPeriod }) => ({
-    openBills: billPeriod.openBills,
-  }))(WrappedSelectBill),
-);
+// const enhanceRelation = withObservables(['bp'], ({ bp }) => ({
+//   bp,
+//   openBills: bp.openBills.observe(),
+// }));
+
+const enhance = withObservables(['billPeriod'], ({ billPeriod }) => ({
+  billPeriod,
+  openBills: billPeriod.openBills,
+}));
+
+// const enhance = withObservables(['billPeriod'], ({ billPeriod, database }) => ({
+//   bp: database.collections.get(tNames.billPeriods).findAndObserve(billPeriod.id),
+// }));
+
+export const SelectBill = enhance(WrappedSelectBill);
+
+// export const enhanceBillPeriod = withDatabase(
+//   withObservables(['billPeriod'], ({ billPeriod }) => ({
+//     priceGroups: database.collections
+//       .get(tNames.priceGroups)
+//       .query()
+//       .observe(),
+//     openPeriods: database.collections
+//       .get(tNames.billPeriods)
+//       .query(Q.where('closed_at', Q.eq(null)))
+//       .observe(),
+//   }))(MainWrapped),
+// );

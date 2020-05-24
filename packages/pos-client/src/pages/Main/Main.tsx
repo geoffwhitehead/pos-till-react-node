@@ -24,6 +24,7 @@ export const MainWrapped: React.FC<{
   userId: string;
   priceGroups: any;
   currentBillPeriod: any;
+  openPeriods: any
 }> = ({ organizationId, userId, priceGroups, openPeriods }) => {
   // TODO: type
   const [populating, setPopulating] = useState(false); // TODO debug: reset to true

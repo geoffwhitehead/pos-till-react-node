@@ -177,23 +177,23 @@ export const _total = async (items, discounts, payments): Promise<number> => {
   const totalsArray: any = await Promise.all(
     // TODO: fix type
     items.map(async item => {
-      console.log('item', item);
+      // console.log('item', item);
       const modifierItems = await item.billItemModifierItems.fetch();
-      console.log('-- modifierItems', modifierItems);
+      // console.log('-- modifierItems', modifierItems);
       return modifierItems.reduce((out, mItem) => out + mItem.modifierItemPrice, item.itemPrice);
     }),
   );
 
-  console.log(' -- totalsArray', totalsArray);
+  // console.log(' -- totalsArray', totalsArray);
   const totals = totalsArray.reduce((out, total) => out + total, 0);
 
   const totalDiscount = _totalDiscount(total, discounts);
 
   const totalPayments = _totalPayments(payments);
 
-  console.log('totals', totals);
-  console.log('totalDiscount', totalDiscount);
-  console.log('totalPayments', totalPayments);
+  // console.log('totals', totals);
+  // console.log('totalDiscount', totalDiscount);
+  // console.log('totalPayments', totalPayments);
 
   return totals - totalDiscount;
   // const amt = bill.items.reduce((acc, item) => {
