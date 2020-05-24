@@ -76,7 +76,6 @@ export const Checkout: React.FC<CheckoutProps> = ({ navigation }) => {
   const onCheckout = () => setMode(Modes.Payments);
   const database = useDatabase();
 
-  console.log('currentBill', currentBill);
   useEffect(() => {
     if (!currentBill) {
       setMode(Modes.Bills);
@@ -171,6 +170,8 @@ export const Checkout: React.FC<CheckoutProps> = ({ navigation }) => {
     }
   };
 
+  console.log('currentBill', currentBill);
+
   return (
     <Container>
       <SidebarHeader title="Checkout" onOpen={openDrawer} disableNav={mode === Modes.Complete} />
@@ -179,7 +180,7 @@ export const Checkout: React.FC<CheckoutProps> = ({ navigation }) => {
         <Col style={{ width: 350 }}>
           {currentBill && (
             <Receipt
-            currentBill={currentBill}
+              bill={currentBill}
               onStore={clearBill}
               onCheckout={onCheckout}
               complete={mode === Modes.Complete}
@@ -189,9 +190,4 @@ export const Checkout: React.FC<CheckoutProps> = ({ navigation }) => {
       </Grid>
     </Container>
   );
-};
-
-export const CheckoutContainer = () => {
-  const { billPeriod } = useContext(BillPeriodContext);
-  const { currentBill } = useContext(CurrentBillContext);
 };

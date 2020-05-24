@@ -1,7 +1,16 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Text, Col, Grid, Row, Button } from '../../../../core';
 import { StyleSheet } from 'react-native';
-import { balance, total, totalDiscount, formatNumber } from '../../../../utils';
+import {
+  balance,
+  total,
+  totalDiscount,
+  formatNumber,
+  billSummary,
+  BillSummary,
+  totalPayable,
+  totalPayments,
+} from '../../../../utils';
 import { Fonts } from '../../../../theme';
 import { ReceiptItems } from './ReceiptItems';
 import dayjs from 'dayjs';
@@ -10,36 +19,54 @@ import { receiptBill } from '../../../../services/printer/receiptBill';
 
 import { Results } from 'realm';
 import { BillProps } from '../../../../services/schemas';
+import withObservables from '@nozbe/with-observables';
 
 // TODO: move into org and fetch from db or something
 const currencySymbol = '£';
 
 interface ReceiptProps {
-  activeBill: BillProps; // TODO
+  bill: BillProps; // TODO
+  payments: any, 
+  discounts: any,
+  items: any,
   onStore?: () => void;
   onCheckout?: () => void;
   complete: boolean;
 }
 
-export const Receipt: React.FC<ReceiptProps> = ({ activeBill, onStore, onCheckout, complete }) => {
+export const ReceiptInner: React.FC<ReceiptProps> = ({ bill, items, discounts, payments, onStore, onCheckout, complete }) => {
+  const [summary, setSummary] = useState<BillSummary>();
+
+  useEffect(() => {
+    const summary = async () => {
+      const summary = await billSummary(items, discounts, payments);
+      setSummary(summary);
+    };
+    summary();
+  }, [items]);
+
   const onPrint = () => {
-    const commands = receiptBill(activeBill);
+    const commands = receiptBill(bill);
     print(commands, false);
   };
 
-  return !activeBill ? (
-    <Text>Select bill</Text>
-  ) : (
+  if (!bill || !summary) {
+    return <Text>Loading ... </Text>;
+  }
+
+  const { totalDiscount, total, totalPayable, totalPayments, balance } = summary;
+
+  return (
     <Grid style={styles.grid}>
       <Row style={styles.r1}>
         <Col>
           <Button style={styles.buttons} light onPress={onStore}>
-            <Text>Bill / Table: {(activeBill && activeBill.tab) || '-'}</Text>
+            <Text>Bill / Table: {bill.reference || '-'}</Text>
           </Button>
         </Col>
         <Col>
           <Text style={styles.dateText}>
-            {dayjs(activeBill.timestamp)
+            {dayjs(bill.timestamp)
               .format('DD/MM/YYYY HH:mm')
               .toString()}
           </Text>
@@ -47,21 +74,19 @@ export const Receipt: React.FC<ReceiptProps> = ({ activeBill, onStore, onCheckou
       </Row>
 
       <Row>
-        <ReceiptItems readonly={complete} activeBill={activeBill} />
+        <ReceiptItems readonly={complete} bill={bill} items={items} discounts={summary.discountBreakdown} payments={payments}/>
       </Row>
       <Row style={styles.r3}>
-        {activeBill.discounts.length > 0 && (
-          <Text>{`Discount: ${formatNumber(totalDiscount(activeBill), currencySymbol)}`}</Text>
-        )}
+        {<Text>{`Discount: ${formatNumber(totalDiscount, currencySymbol)}`}</Text>}
 
-        <Text>{`Total: ${formatNumber(total(activeBill), currencySymbol)}`}</Text>
+        <Text>{`Total: ${formatNumber(total, currencySymbol)}`}</Text>
         {complete && (
           <Text>{`Change Due: ${formatNumber(
-            Math.abs(activeBill.payments.find(payment => payment.isChange).amount),
+            Math.abs(payments.find(payment => payment.isChange).amount),
             currencySymbol,
           )}`}</Text>
         )}
-        <Text style={Fonts.h3}>{`Balance: ${formatNumber(balance(activeBill), currencySymbol)}`}</Text>
+        <Text style={Fonts.h3}>{`Balance: ${formatNumber(balance, currencySymbol)}`}</Text>
       </Row>
       <Row style={styles.r4}>
         <Button style={styles.printButton} block small info onPress={onPrint}>
@@ -85,6 +110,15 @@ export const Receipt: React.FC<ReceiptProps> = ({ activeBill, onStore, onCheckou
     </Grid>
   );
 };
+
+const enhance = withObservables(['bill'], ({ bill }) => ({
+  bill,
+  payments: bill.billPayments,
+  discounts: bill.billDiscounts,
+  items: bill.billItems,
+}));
+
+export const Receipt = enhance(ReceiptInner);
 
 const styles = StyleSheet.create({
   grid: {

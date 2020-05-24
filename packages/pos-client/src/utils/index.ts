@@ -156,8 +156,16 @@ export const formatNumber: (value: number, symbol?: string) => string = (value, 
 // ****************
 // ****************
 
-export const _totalDiscount = (total, discounts) => {
-  return _discountBreakdown(total, discounts).reduce((acc, discount) => acc + discount.calculatedDiscount, 0);
+export const _totalDiscount = (
+  total,
+  discounts,
+): { total: number; breakdown: ReturnType<typeof _discountBreakdown> } => {
+  const breakdown = _discountBreakdown(total, discounts);
+
+  return {
+    total: breakdown.reduce((acc, discount) => acc + discount.calculatedDiscount, 0),
+    breakdown,
+  };
 };
 
 export const _discountBreakdown = (total: number, discounts: any): DiscountBreakdownItemProps[] => {
@@ -200,15 +208,24 @@ export const _totalPayments = (payments: any): number => {
 
 // const fetchModifier
 
-export type BillSummary = { total: number; totalPayable: number; totalPayments: number; balance: number };
+export type BillSummary = {
+  total: number;
+  totalDiscount: number;
+  discountBreakdown: ReturnType<typeof _discountBreakdown>;
+  totalPayable: number;
+  totalPayments: number;
+  balance: number;
+};
 export const billSummary = async (items, discounts, payments): Promise<BillSummary> => {
   const total = await _total(items);
   const totalPayments = _totalPayments(payments);
-  const totalDiscount = _totalDiscount(total, discounts);
+  const discountBreakdown = _totalDiscount(total, discounts);
   return {
     total,
-    totalPayable: total - totalDiscount,
+    totalDiscount: discountBreakdown.total,
+    discountBreakdown: discountBreakdown.breakdown,
+    totalPayable: total - discountBreakdown.total,
     totalPayments,
-    balance: total - totalDiscount - totalPayments,
+    balance: total - discountBreakdown.total - totalPayments,
   };
 };
