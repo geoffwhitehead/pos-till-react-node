@@ -1,6 +1,6 @@
 import React, { useState, useEffect, Suspense } from 'react';
 import { ListItem, Left, Text, Body, Right } from 'native-base';
-import { formatNumber, balance, _total, billSummary } from '../../../../utils';
+import { formatNumber, balance, _total, billSummary, BillSummary } from '../../../../utils';
 import withObservables from '@nozbe/with-observables';
 import { useObservableSuspense } from 'observable-hooks';
 import { from } from 'rxjs';
@@ -19,8 +19,12 @@ interface BillRowProps {
 }
 export const WrappedBillRow: React.FC<BillRowProps> = ({ bill, onSelectBill, items, payments, discounts }) => {
   const _onSelectBill = () => onSelectBill(bill);
-  const [total, setTotal] = useState(null);
-  const [balance, setBalance] = useState(null);
+  const [summary, setSummary] = useState<BillSummary>({
+    total: null,
+    balance: null,
+    totalPayable: null,
+    totalPayments: null,
+  });
   const database = useDatabase();
   // console.log('*************');
   // console.log('re render');
@@ -37,8 +41,7 @@ export const WrappedBillRow: React.FC<BillRowProps> = ({ bill, onSelectBill, ite
   useEffect(() => {
     const summary = async () => {
       const summary = await billSummary(items, discounts, payments);
-      setTotal(summary.totalPayable);
-      setBalance(summary.balance);
+      setSummary(summary);
     };
     summary();
   }, [items]);
@@ -60,6 +63,10 @@ export const WrappedBillRow: React.FC<BillRowProps> = ({ bill, onSelectBill, ite
   };
   // const l = from();
   // const t = useObservableSuspense(l);
+  const { total, balance } = summary;
+  console.log('balance', balance);
+  console.log('total', total);
+  console.log('formatNumber(balance, symbol)', formatNumber(balance, symbol));
   return (
     <ListItem onPress={_onSelectBill}>
       <Left>
@@ -71,12 +78,10 @@ export const WrappedBillRow: React.FC<BillRowProps> = ({ bill, onSelectBill, ite
         </Button>
       </Body> */}
       <Body>
-        <Text style={{ color: 'grey' }}>{balance && formatNumber(balance, symbol)}</Text>
+        <Text style={{ color: 'grey' }}>{summary ? formatNumber(balance, symbol) : '...'}</Text>
       </Body>
       <Right>
-        <Suspense fallback={<Text>...</Text>}>
-          <Text style={{ color: 'grey' }}>{total && formatNumber(total, symbol)}</Text>
-        </Suspense>
+        <Text style={{ color: 'grey' }}>{summary ? formatNumber(total, symbol) : '...'}</Text>
         {/* <Suspense fallback={<Text>...</Text>}>
           <Value items={items} discounts={discounts} payments={payments} />
         </Suspense> */}

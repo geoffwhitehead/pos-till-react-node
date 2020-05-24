@@ -21,7 +21,7 @@ interface SelectBillProps {
 // TODO: fetch from org / state
 const maxBills = 40; // TODO: move to org settings
 
-export const WrappedSelectBill: React.FC<SelectBillProps> = ({ onSelectBill, openBills }) => {
+export const WrappedSelectBill: React.FC<SelectBillProps> = ({ onSelectBill, openBills, billPeriod }) => {
   const { setCurrentBill } = useContext(CurrentBillContext);
   const [showOpen, setShowOpen] = useState<boolean>(false);
 
@@ -69,7 +69,7 @@ export const WrappedSelectBill: React.FC<SelectBillProps> = ({ onSelectBill, ope
             bill ? (
               <BillRow key={bill.id} bill={bill} onSelectBill={_onSelectBill} />
             ) : (
-              <BillRowEmpty key={index} reference={index + 1} onSelectBill={_onSelectBill} />
+              <BillRowEmpty billPeriod={billPeriod} key={index} reference={index + 1} onSelectBill={_onSelectBill} />
             ),
           )}
       </List>
