@@ -1,12 +1,13 @@
 import { Text, Content, List, ListItem, Left, Right, Icon, Separator } from '../../../../core';
 import { realm } from '../../../../services/Realm';
 import { discountBreakdown, formatNumber } from '../../../../utils';
-import React, { useState, useEffect, Fragment } from 'react';
+import React, { useState, useEffect, Fragment, useRef } from 'react';
 import { BillProps, BillItemProps } from '../../../../services/schemas';
 import { capitalize, groupBy } from 'lodash';
 import { Payments } from '../Payment/Payment';
 import { Discounts } from '../../tests/Discounts';
 import { View } from 'react-native';
+import withObservables from '@nozbe/with-observables';
 
 // TODO: move into org and fetch from db or something
 const currencySymbol = '£';
@@ -40,9 +41,13 @@ interface ReceiptItemsProps {
 }
 
 export const ReceiptItems: React.FC<ReceiptItemsProps> = ({ bill, readonly, items, discounts, payments }) => {
+  const refContentList = useRef();
+
+  useEffect(() => refContentList.current._root.scrollToEnd(), [items]);
+
   return (
-    <Content>
-      <List>
+    <Content ref={refContentList}>
+      <List style={{ paddingBottom: 60 }}>
         <ItemsBreakdown items={items} readonly={readonly} />
         <DiscountsBreakdown discounts={discounts} readonly={readonly} />
         <PaymentsBreakdown payments={payments} readonly={readonly} />
@@ -67,32 +72,38 @@ const ItemsBreakdown: React.FC<{ items: any; readonly: boolean }> = ({ items, re
           <ListItem itemHeader first>
             <Text>{capitalize(itemGroup[0].priceGroupName)}</Text>
           </ListItem>,
-          ...itemGroup.map(item => {
-            return (
-              <ListItem noIndent key={item.id}>
-                <Left>
-                  {!readonly && <Icon name="ios-close" onPress={voidItem(item)} />}
-                  <Content>
-                      <Text>{`${capitalize(item.itemName)}`}</Text>
-                      {/* {item.mods.map(m => (
-                        <Text key={`${m._id}name`}>{`- ${m.name}`}</Text>
-                      ))} */}
-                    </Content>
-                </Left>
-                <Right>
-                  <Text>{`${formatNumber(item.itemPrice, currencySymbol)}`}</Text>
-                  {/* {item.mods.map(m => (
-                      <Text key={`${m._id}price`}>{formatNumber(m.price, currencySymbol)}</Text>
-                    ))} */}
-                </Right>
-              </ListItem>
-            );
-          }),
+          ...itemGroup.map(item => <ItemBreakdown item={item} readonly={readonly} />),
         ];
       })}
     </>
   );
 };
+
+const ItemBreakdownInner = ({ item, modifierItems, readonly }) => {
+  return (
+    <ListItem noIndent key={item.id}>
+      <Left>
+        {!readonly && <Icon name="ios-close" onPress={voidItem(item)} />}
+        <Content>
+          <Text>{`${capitalize(item.itemName)}`}</Text>
+          {modifierItems.map(m => (
+            <Text key={`${m.id}-name`}>{`- ${m.modifierItemName}`}</Text>
+          ))}
+        </Content>
+      </Left>
+      <Right>
+        <Text>{`${formatNumber(item.itemPrice, currencySymbol)}`}</Text>
+        {modifierItems.map(m => (
+          <Text key={`${m.id}-price`}>{formatNumber(m.modifierItemPrice, currencySymbol)}</Text>
+        ))}
+      </Right>
+    </ListItem>
+  );
+};
+
+const ItemBreakdown = withObservables(['item'], ({ item }) => ({
+  modifierItems: item.billItemModifierItems,
+}))(ItemBreakdownInner);
 
 const DiscountsBreakdown: React.FC<{ discounts: any; readonly: boolean }> = ({ discounts, readonly }) => {
   if (!discounts || !discounts.length) {
