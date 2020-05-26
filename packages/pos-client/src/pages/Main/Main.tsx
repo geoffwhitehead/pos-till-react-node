@@ -24,7 +24,7 @@ export const MainWrapped: React.FC<{
   userId: string;
   priceGroups: any;
   currentBillPeriod: any;
-  openPeriods: any
+  openPeriods: any;
 }> = ({ organizationId, userId, priceGroups, openPeriods }) => {
   // TODO: type
   const [populating, setPopulating] = useState(false); // TODO debug: reset to true
@@ -91,6 +91,13 @@ export const MainWrapped: React.FC<{
       setPriceGroup(priceGroups[0]); // TODO: use first price group - need to change this to use default flag
     }
   }, [priceGroups, populating]);
+
+  console.log('******');
+  console.log('populating', populating);
+  console.log('billPeriod', billPeriod);
+  console.log('priceGroup', priceGroup);
+  console.log('priceGroups', priceGroups)
+  console.log('******');
 
   return populating || !billPeriod || !priceGroup ? (
     <Loading />

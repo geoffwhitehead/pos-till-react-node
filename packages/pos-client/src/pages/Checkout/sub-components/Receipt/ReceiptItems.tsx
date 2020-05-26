@@ -1,4 +1,4 @@
-import { Text, Content, List, ListItem, Left, Right, Icon, Separator } from '../../../../core';
+import { Text, Content, List, ListItem, Left, Right, Icon, Separator, ActionSheet } from '../../../../core';
 import { realm } from '../../../../services/Realm';
 import { discountBreakdown, formatNumber } from '../../../../utils';
 import React, { useState, useEffect, Fragment, useRef } from 'react';
@@ -8,6 +8,8 @@ import { Payments } from '../Payment/Payment';
 import { Discounts } from '../../tests/Discounts';
 import { View } from 'react-native';
 import withObservables from '@nozbe/with-observables';
+import { SwipeListView } from 'react-native-swipe-list-view';
+import { database } from '../../../../App';
 
 // TODO: move into org and fetch from db or something
 const currencySymbol = '£';
@@ -45,17 +47,50 @@ export const ReceiptItems: React.FC<ReceiptItemsProps> = ({ bill, readonly, item
 
   useEffect(() => refContentList.current._root.scrollToEnd(), [items]);
 
+  const [selected, setSelected] = useState(null);
+
+  // PROGRESS: continue implementing remove on payents and discounts . unlike item - add a void function that doesnt soft delete
+  const remove = async item => {
+    console.log('item', item);
+    await database.action(() => item.void());
+  };
+
+  const onRemove = item => {
+    const options = ['Remove', 'Cancel'];
+    ActionSheet.show(
+      {
+        options,
+        cancelButtonIndex: options.length - 1,
+        title: 'Select option',
+      },
+      i => {
+        remove(item);
+      },
+    );
+  };
+
+  const common = {
+    readonly: readonly,
+    selected,
+    onSelect: onRemove,
+  };
+
   return (
     <Content ref={refContentList}>
       <List style={{ paddingBottom: 60 }}>
-        <ItemsBreakdown items={items} readonly={readonly} />
-        <DiscountsBreakdown discounts={discounts} readonly={readonly} />
-        <PaymentsBreakdown payments={payments} readonly={readonly} />
+        <ItemsBreakdown {...common} items={items} />
+        <DiscountsBreakdown {...common} discounts={discounts} />
+        <PaymentsBreakdown {...common} payments={payments} />
       </List>
     </Content>
   );
 };
-const ItemsBreakdown: React.FC<{ items: any; readonly: boolean }> = ({ items, readonly }) => {
+const ItemsBreakdown: React.FC<{ items: any; readonly: boolean; selected: boolean; onSelect: (item) => void }> = ({
+  items,
+  readonly,
+  selected,
+  onSelect,
+}) => {
   if (!items) {
     return null;
   }
@@ -72,16 +107,18 @@ const ItemsBreakdown: React.FC<{ items: any; readonly: boolean }> = ({ items, re
           <ListItem itemHeader first>
             <Text>{capitalize(itemGroup[0].priceGroupName)}</Text>
           </ListItem>,
-          ...itemGroup.map(item => <ItemBreakdown item={item} readonly={readonly} />),
+          ...itemGroup.map(item => (
+            <ItemBreakdown item={item} readonly={readonly} selected={selected} onSelect={onSelect} />
+          )),
         ];
       })}
     </>
   );
 };
 
-const ItemBreakdownInner = ({ item, modifierItems, readonly }) => {
+const ItemBreakdownInner = ({ item, modifierItems, readonly, selected, onSelect }) => {
   return (
-    <ListItem noIndent key={item.id}>
+    <ListItem noIndent key={item.id} selected={selected === item} onPress={() => onSelect(item)}>
       <Left>
         {!readonly && <Icon name="ios-close" onPress={voidItem(item)} />}
         <Content>

@@ -304,7 +304,9 @@ class Bill extends Model {
 
   @children(tNames.billPayments) billPayments;
   @children(tNames.billDiscounts) billDiscounts;
-  @children(tNames.billItems) billItems;
+  @children(tNames.billItems) _billItems;
+  @lazy billItems = this._billItems.extend(Q.where('is_voided', false));
+  @lazy billItemVoids = this._billItems.extend(Q.where('is_voided', true));
 
   @action addPayment = async (p: { paymentTypeId: string; amount: number; isChange?: boolean }) => {
     this.collections.get(tNames.billPayments).create(payment => {
@@ -398,6 +400,7 @@ class BillItem extends Model {
   @nochange @field('category_name') categoryName;
   @readonly @date('created_at') createdAt;
   @readonly @date('updated_at') updatedAt;
+  @field('is_voided') isVoided;
 
   @immutableRelation(tNames.bills, 'bill_id') bill;
   @immutableRelation(tNames.items, 'item_id') item;
@@ -405,9 +408,21 @@ class BillItem extends Model {
   @immutableRelation(tNames.categories, 'category_id') category;
   // @immutableRelation(tNames.modifiers, 'modifier_id') modifier;
 
-  @children(tNames.billItemModifierItems) billItemModifierItems;
+  @children(tNames.billItemModifierItems) _billItemModifierItems;
+  @lazy billItemModifierItems = this._billItemModifierItems.extend(Q.where('is_voided', false));
+  @lazy billItemModifierItemVoids = this._billItemModifierItems.extend(Q.where('is_voided', true));
   @children(tNames.billItemModifiers) billItemModifiers;
   // @children(tNames.itemModifiers) modifiers;
+
+  @action void = async () => {
+    const modifierItemsToVoid = await this.billItemModifierItems.fetch();
+
+    modifierItemsToVoid.map(modifierItem => this.subAction(modifierItem.void));
+
+    await this.update(billItem => {
+      billItem.isVoided = true;
+    });
+  };
 
   @action addModifierChoices = async (modifier, modifierItems, priceGroup) => {
     const toCreate = [];
@@ -430,6 +445,7 @@ class BillItem extends Model {
           Object.assign(billItemModifierItem, {
             modifierItemName: modifierItem.name,
             modifierItemPrice: resolvePrice(priceGroup, prices),
+            isVoided: false,
             // billItemModifierId: billItemModifierToCreate.id,
           });
         });
@@ -464,7 +480,9 @@ class BillItemModifier extends Model {
   @immutableRelation(tNames.modifiers, 'modifier_id') modifier;
   @immutableRelation(tNames.billItems, 'bill_item_id') billItem;
 
-  @children(tNames.billItemModifierItems) billItemModifierItems;
+  @children(tNames.billItemModifierItems) _billItemModifierItems;
+  @lazy billItemModifierItems = this._billItemModifierItems.extend(Q.where('is_voided', false));
+  @lazy billItemModifierItemVoids = this._billItemModifierItems.extend(Q.where('is_voided', true));
 
   static associations = {
     [tNames.billItems]: { type: 'belongs_to', key: 'bill_item_id' },
@@ -481,6 +499,7 @@ class BillItemModifierItem extends Model {
   @nochange @field('modifier_item_id') modifierItemId;
   @nochange @field('modifier_item_price') modifierItemPrice;
   @nochange @field('modifier_item_name') modifierItemName;
+  @field('is_voided') isVoided;
 
   @immutableRelation(tNames.billItems, 'bill_item_id') billItem;
   @immutableRelation(tNames.modifierItems, 'modifier_item_id') modifierItem;
@@ -491,6 +510,11 @@ class BillItemModifierItem extends Model {
     [tNames.modifierItems]: { type: 'belongs_to', key: 'modifier_item_id' },
     [tNames.billItemModifiers]: { type: 'belongs_to', key: 'bill_item_modifier_id' },
   };
+
+  @action void = async () =>
+    await this.update(modifierItem => {
+      modifierItem.isVoided = true;
+    });
 }
 
 export const models = [

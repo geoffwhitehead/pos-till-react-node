@@ -7091,6 +7091,11 @@ react-native-screens@^2.0.0-beta.2:
   version "1.2.0"
   resolved "https://github.com/geoffwhitehead/react-native-star-prnt.git#5eeb7fc46fa412a602b537c03ce312e2796e6c07"
 
+react-native-swipe-list-view@^3.1.0:
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/react-native-swipe-list-view/-/react-native-swipe-list-view-3.1.0.tgz#4c59a8b6358d203f406d199463e2347283ac08d1"
+  integrity sha512-JVRAN3w3fOjNnpfLSWi++X+4pB2SK4+5gFhAU5NFHcsLinPBLZT8MMpfQAtAa3nFdFrbtdogDMre5mHOScLycg==
+
 react-native-vector-icons@^6.6.0:
   version "6.6.0"
   resolved "https://registry.yarnpkg.com/react-native-vector-icons/-/react-native-vector-icons-6.6.0.tgz#66cf004918eb05d90778d64bd42077c1800d481b"

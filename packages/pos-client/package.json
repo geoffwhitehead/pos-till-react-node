@@ -16,7 +16,8 @@
     "rename": "react-native-rename",
     "postinstall": "npx jetify",
     "find:realm": "find ~/Library -type f -name 'default.realm'",
-    "find:watermelon": "find ~/Library -type f -name 'watermelon.db'"
+    "find:watermelon": "find ~/Library -type f -name 'watermelon.db'",
+    "reset:cache": "watchman watch-del-all && react-native start --reset-cache"
   },
   "dependencies": {
     "@nozbe/watermelondb": "^0.16.0",
@@ -44,6 +45,7 @@
     "react-native-safe-area-context": "^0.7.2",
     "react-native-screens": "^2.0.0-beta.2",
     "react-native-star-prnt": "https://github.com/geoffwhitehead/react-native-star-prnt.git",
+    "react-native-swipe-list-view": "^3.1.0",
     "react-native-vector-icons": "^6.6.0",
     "react-redux": "^6.0.1",
     "react-use-realm": "^0.2.0",

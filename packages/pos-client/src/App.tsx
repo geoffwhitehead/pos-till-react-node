@@ -209,6 +209,13 @@ export const App = () => {
     return <SplashScreen />;
   }
 
+  // console.log('******');
+  // console.log('accessToken', accessToken);
+  // console.log('refreshToken', refreshToken);
+  // console.log('organizationId', organizationId);
+  // console.log('userId', userId);
+  // console.log('******');
+
   return (
     // {/* native base wrapper */}
 
