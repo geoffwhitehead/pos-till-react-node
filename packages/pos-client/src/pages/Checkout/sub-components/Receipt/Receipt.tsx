@@ -66,7 +66,7 @@ export const ReceiptInner: React.FC<ReceiptProps> = ({ bill, items, discounts, p
         </Col>
         <Col>
           <Text style={styles.dateText}>
-            {dayjs(bill.timestamp)
+            {dayjs(bill.createdAt)
               .format('DD/MM/YYYY HH:mm')
               .toString()}
           </Text>
