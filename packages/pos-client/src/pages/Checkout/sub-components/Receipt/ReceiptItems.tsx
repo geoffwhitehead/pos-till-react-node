@@ -37,12 +37,11 @@ interface ReceiptItemsProps {
   bill: BillProps;
   readonly: boolean;
   payments: any;
-  discounts: any;
   discountsBreakdown: any;
   items: any;
 }
 
-export const ReceiptItems: React.FC<ReceiptItemsProps> = ({ bill, readonly, items, discounts, payments }) => {
+export const ReceiptItems: React.FC<ReceiptItemsProps> = ({ bill, readonly, items, discountsBreakdown, payments }) => {
   const refContentList = useRef();
 
   useEffect(() => refContentList.current._root.scrollToEnd(), [items]);
@@ -79,7 +78,7 @@ export const ReceiptItems: React.FC<ReceiptItemsProps> = ({ bill, readonly, item
     <Content ref={refContentList}>
       <List style={{ paddingBottom: 60 }}>
         <ItemsBreakdown {...common} items={items} />
-        <DiscountsBreakdown {...common} discounts={discounts} />
+        <DiscountsBreakdown {...common} discounts={discountsBreakdown} />
         <PaymentsBreakdown {...common} payments={payments} />
       </List>
     </Content>
@@ -118,9 +117,8 @@ const ItemsBreakdown: React.FC<{ items: any; readonly: boolean; selected: boolea
 
 const ItemBreakdownInner = ({ item, modifierItems, readonly, selected, onSelect }) => {
   return (
-    <ListItem noIndent key={item.id} selected={selected === item} onPress={() => onSelect(item)}>
+    <ListItem noIndent key={item.id} selected={selected === item} onPress={() => !readonly && onSelect(item)}>
       <Left>
-        {!readonly && <Icon name="ios-close" onPress={voidItem(item)} />}
         <Content>
           <Text>{`${capitalize(item.itemName)}`}</Text>
           {modifierItems.map(m => (
@@ -142,7 +140,12 @@ const ItemBreakdown = withObservables(['item'], ({ item }) => ({
   modifierItems: item.billItemModifierItems,
 }))(ItemBreakdownInner);
 
-const DiscountsBreakdown: React.FC<{ discounts: any; readonly: boolean }> = ({ discounts, readonly }) => {
+const DiscountsBreakdown: React.FC<{ discounts: any; readonly: boolean; selected: any; onSelect: (item) => void }> = ({
+  discounts,
+  readonly,
+  selected,
+  onSelect,
+}) => {
   if (!discounts || !discounts.length) {
     return null;
   }
@@ -153,16 +156,13 @@ const DiscountsBreakdown: React.FC<{ discounts: any; readonly: boolean }> = ({ d
       </Separator>
       {discounts.map(discount => {
         return (
-          <ListItem key={discount.id}>
+          <ListItem key={discount.id} selected={selected} onPress={() => !readonly && onSelect(discount)}>
             <Left>
-              {!readonly && <Icon name="ios-close" onPress={voidDiscount(discount)} />}
-              <Content>
-                {discount.isPercent ? (
-                  <Text>{`Discount: ${discount.name} ${discount.amount}%`}</Text>
-                ) : (
-                  <Text>{`Discount: ${discount.name} ${formatNumber(discount.amount, currencySymbol)}`}</Text>
-                )}
-              </Content>
+              {discount.isPercent ? (
+                <Text>{`Discount: ${discount.name} ${discount.amount}%`}</Text>
+              ) : (
+                <Text>{`Discount: ${discount.name} ${formatNumber(discount.amount, currencySymbol)}`}</Text>
+              )}
             </Left>
             <Right>
               <Text>{`${formatNumber(discount.calculatedDiscount, currencySymbol)}`}</Text>
@@ -174,7 +174,12 @@ const DiscountsBreakdown: React.FC<{ discounts: any; readonly: boolean }> = ({ d
   );
 };
 
-const PaymentsBreakdown: React.FC<{ payments: any; readonly: boolean }> = ({ payments, readonly }) => {
+const PaymentsBreakdown: React.FC<{
+  payments: any;
+  readonly: boolean;
+  selected: boolean;
+  onSelect: (payment) => void;
+}> = ({ payments, readonly, selected, onSelect }) => {
   if (!payments || !payments.length) {
     return null;
   }
@@ -189,12 +194,9 @@ const PaymentsBreakdown: React.FC<{ payments: any; readonly: boolean }> = ({ pay
         .map(payment => {
           return (
             <>
-              <ListItem key={payment._id}>
+              <ListItem key={payment._id} selected={selected} onPress={() => onSelect(!readonly && payment)}>
                 <Left>
-                  {!readonly && <Icon name="ios-close" onPress={voidPayment(payment)} />}
-                  <Content>
-                    <Text>{`Payment: ${capitalize(payment.paymentType)}`}</Text>
-                  </Content>
+                  <Text>{`Payment: ${capitalize(payment.paymentType)}`}</Text>
                 </Left>
                 <Right>
                   <Text>{`${formatNumber(payment.amount, currencySymbol)}`}</Text>

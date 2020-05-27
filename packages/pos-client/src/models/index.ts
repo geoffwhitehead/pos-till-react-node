@@ -280,6 +280,9 @@ class BillPayment extends Model {
 
   @immutableRelation(tNames.paymentTypes, 'payment_type_id') paymentType;
   @immutableRelation(tNames.bills, 'bill_id') bill;
+
+  @action close = async () => await this.destroyPermanently()
+
 }
 
 class Bill extends Model {
@@ -346,27 +349,9 @@ class Bill extends Model {
     );
 
     return newItem;
-
-    // const price = item.price[priceGroup.id];
-    // const billItem = this.collections.get(tNames.billItems).prepareCreate(billitem => {
-    // Object.assign(billItem, {
-    //   bill_id: this.id,
-    //   item_id: item.id,
-    //   item_name: item.name,
-    //   item_price: price.price,
-    //   price_group_name: priceGroup.name,
-    //   price_group_id: priceGroup.id,
-    //   category_name: category.name,
-    //   category_id: category.id,
-    // });
-    // });
-    // toCreate.push(billItem);
   };
 
-  @action close = async () => {
-    this.is_closed = true;
-    this.closed_at = dayjs().unix();
-  };
+  @action close = async () => await this.destroyPermanently()
 }
 
 class BillDiscount extends Model {
@@ -384,6 +369,11 @@ class BillDiscount extends Model {
     [tNames.bills]: { type: 'belongs_to', key: 'bill_id' },
     [tNames.discounts]: { type: 'belongs_to', key: 'discount_id' },
   };
+
+  @action void = async () =>
+  await this.update(modifierItem => {
+    modifierItem.isVoided = true;
+  });
 }
 
 class BillItem extends Model {
