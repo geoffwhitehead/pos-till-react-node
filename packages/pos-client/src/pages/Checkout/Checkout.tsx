@@ -19,7 +19,7 @@ import { Receipt } from './sub-components/Receipt/Receipt';
 import { SelectBill } from './sub-components/SelectBill/SelectBIll';
 import { realm } from '../../services/Realm';
 import uuidv4 from 'uuid';
-import { Payments } from './sub-components/Payment/Payment';
+import { Payments } from './sub-components/Payments/Payments';
 import { balance } from '../../utils';
 import { CompleteBill } from './sub-components/CompleteBill/CompleteBill';
 import { BillPeriodContext } from '../../contexts/BillPeriodContext';
@@ -158,7 +158,7 @@ export const Checkout: React.FC<CheckoutProps> = ({ navigation }) => {
       case Modes.Loading:
         return <Loading />;
       case Modes.Payments:
-        return <Payments currentBill={currentBill} onCompleteBill={completeBill} />;
+        return <Payments bill={currentBill} onCompleteBill={completeBill} />;
       // case Modes.Watermelon:
       //   return <Watermelon />;
       case Modes.Bills:

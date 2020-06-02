@@ -281,8 +281,7 @@ class BillPayment extends Model {
   @immutableRelation(tNames.paymentTypes, 'payment_type_id') paymentType;
   @immutableRelation(tNames.bills, 'bill_id') bill;
 
-  @action close = async () => await this.destroyPermanently()
-
+  @action close = async () => await this.destroyPermanently();
 }
 
 class Bill extends Model {
@@ -320,10 +319,10 @@ class Bill extends Model {
     });
   };
 
-  @action addDiscount = async (p: { discountId: string; amount: number; isChange?: boolean }) => {
-    this.collections.get(tNames.billDiscounts).create(discount => {
-      discount.bill_id = this.id;
-      discount.discount_id = p.discountId;
+  @action addDiscount = async (p: { discountId: string }) => {
+    await this.collections.get(tNames.billDiscounts).create(discount => {
+      discount.billId = this.id;
+      discount.discountId = p.discountId;
     });
   };
 
@@ -351,7 +350,7 @@ class Bill extends Model {
     return newItem;
   };
 
-  @action close = async () => await this.destroyPermanently()
+  @action close = async () => await this.destroyPermanently();
 }
 
 class BillDiscount extends Model {
@@ -370,10 +369,7 @@ class BillDiscount extends Model {
     [tNames.discounts]: { type: 'belongs_to', key: 'discount_id' },
   };
 
-  @action void = async () =>
-  await this.update(modifierItem => {
-    modifierItem.isVoided = true;
-  });
+  @action void = async () => await this.destroyPermanently();
 }
 
 class BillItem extends Model {
@@ -407,7 +403,7 @@ class BillItem extends Model {
   @action void = async () => {
     const modifierItemsToVoid = await this.billItemModifierItems.fetch();
 
-    modifierItemsToVoid.map(modifierItem => this.subAction(modifierItem.void));
+    await modifierItemsToVoid.map(async modifierItem => await this.subAction(modifierItem.void));
 
     await this.update(billItem => {
       billItem.isVoided = true;

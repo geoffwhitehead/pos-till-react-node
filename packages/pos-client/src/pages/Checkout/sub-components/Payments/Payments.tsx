@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Text,
   Content,
@@ -21,10 +21,13 @@ import {
   PaymentTypeProps,
   BillDiscountSchema,
   BillProps,
+  BillDiscountProps,
+  BillPaymentProps,
+  BillItemProps,
 } from '../../../../services/schemas';
 import { realm } from '../../../../services/Realm';
 import uuidv4 from 'uuid';
-import { balance, formatNumber } from '../../../../utils';
+import { balance, formatNumber, billSummary } from '../../../../utils';
 import { StyleSheet } from 'react-native';
 import { paymentTypeNames } from '../../../../api/paymentType';
 import { capitalize } from 'lodash';
@@ -33,13 +36,28 @@ import withObservables from '@nozbe/with-observables';
 import { tNames } from '../../../../models';
 
 interface PaymentProps {
-  currentBill: BillProps; // fix
+  bill: BillProps; // fix
   discounts: DiscountProps[];
   paymentTypes: PaymentTypeProps[];
   onCompleteBill: (bill: BillProps) => Promise<void>;
+  billDiscounts: BillDiscountProps[];
+  billPayments: BillPaymentProps[];
+  billItems: BillItemProps[];
 }
 
-export const WrappedPayments: React.FC<PaymentProps> = ({ currentBill, discounts, paymentTypes, onCompleteBill }) => {
+const PaymentsInner: React.FC<PaymentProps> = ({
+  billDiscounts,
+  billPayments,
+  billItems,
+  bill,
+  discounts,
+  paymentTypes,
+  onCompleteBill,
+  database
+}) => {
+  console.log('paymentTypes', paymentTypes);
+  console.log('discounts', discounts);
+  console.log('billDiscounts', billDiscounts)
   const [value, setValue] = useState<string>('');
   // TODO: this / payment types will need refactoring so were not having to use find
   const cashType = paymentTypes.find(pt => pt.name === paymentTypeNames.CASH);
@@ -47,42 +65,34 @@ export const WrappedPayments: React.FC<PaymentProps> = ({ currentBill, discounts
   // TODO: refactor to grab currency from org
   const currencySymbol = '£';
 
-  const checkComplete = async () => balance(currentBill) <= 0 && await onCompleteBill(currentBill);
+  const [summary, setSummary] = useState(null);
+
+  // const checkComplete = async () => balance(currentBill) <= 0 && (await onCompleteBill(currentBill));
 
   type OnValueChange = (value: string) => void;
   const onValueChange: OnValueChange = value => setValue(value);
 
   type AddPayment = (paymentType: PaymentTypeProps, amt: number) => () => void;
-  const addPayment: AddPayment = (paymentType, amt) => async () => {
-    await currentBill.addPayment({ paymentTypeId: paymentType._id, amount: amt || Math.max(balance(currentBill), 0) });
-    // realm.write(() => {
-    //   const billPayment = realm.create(BillPaymentSchema.name, {
-    //     _id: uuidv4(),
-    //     paymentType: paymentType.name,
-    //     paymentTypeId: paymentType._id,
-    //     amount: amt || Math.max(balance(currentBill), 0),
-    //   });
-    //   currentBill.payments.push(billPayment);
-    // });
-    setValue('');
 
-    await checkComplete();
+  useEffect(() => {
+    const summary = async () => {
+      const summary = await billSummary(billItems, billDiscounts, billPayments);
+      setSummary(summary);
+    };
+    summary();
+  }, [billPayments, billItems, billDiscounts]);
+
+  useEffect(() => {
+    summary && summary.balance <= 0 && onCompleteBill(bill);
+  }, [summary]);
+
+  const addPayment: AddPayment = (paymentType, amt) => async () => {
+    await database.action(() => bill.addPayment({ paymentTypeId: paymentType.id, amount: amt || Math.max(summary.balance, 0) }));
+    setValue('');
   };
 
   const addDiscount = (discount: DiscountProps) => async () => {
-    // realm.write(() => {
-    //   const billDiscount = realm.create(BillDiscountSchema.name, {
-    //     _id: uuidv4(),
-    //     discountId: discount._id,
-    //     name: discount.name,
-    //     amount: discount.amount,
-    //     isPercent: discount.isPercent,
-    //   });
-    //   activeBill.discounts.push(billDiscount);
-    // });
-    await currentBill.addDiscount({ discountId: discount.id });
-
-    await checkComplete();
+    await database.action(() => bill.addDiscount({ discountId: discount.id }));
   };
 
   return (
@@ -143,18 +153,25 @@ export const WrappedPayments: React.FC<PaymentProps> = ({ currentBill, discounts
   );
 };
 
-export const Payments = withDatabase<any, any>(
-  withObservables([], ({ database }) => ({
-    discounts: database.collections
-      .get(tNames.discounts)
-      .query()
-      .observe(),
-    paymentTypes: database.collections
-      .get(tNames.paymentTypes)
-      .query()
-      .observe(),
-  }))(WrappedPayments),
-);
+const enhance = component =>
+  withDatabase<any, any>(
+    withObservables(['bill'], ({ database, bill }) => ({
+      discounts: database.collections
+        .get(tNames.discounts)
+        .query()
+        .observe(),
+      paymentTypes: database.collections
+        .get(tNames.paymentTypes)
+        .query()
+        .observe(),
+      bill,
+      billPayments: bill.billPayments,
+      billDiscounts: bill.billDiscounts,
+      billItems: bill.billItems,
+    }))(component),
+  );
+
+export const Payments = enhance(PaymentsInner);
 
 const styles = StyleSheet.create({
   row: {

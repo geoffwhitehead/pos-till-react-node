@@ -2,7 +2,7 @@ import { Text, Content, List, ListItem, Left, Right, Icon, Separator, ActionShee
 import { realm } from '../../../../services/Realm';
 import { discountBreakdown, formatNumber } from '../../../../utils';
 import React, { useState, useEffect, Fragment, useRef } from 'react';
-import { BillProps, BillItemProps } from '../../../../services/schemas';
+import { BillProps, BillItemProps, DiscountProps } from '../../../../services/schemas';
 import { capitalize, groupBy } from 'lodash';
 import { Payments } from '../Payment/Payment';
 import { Discounts } from '../../tests/Discounts';
@@ -36,15 +36,25 @@ const voidDiscount = discount => () => {
 interface ReceiptItemsProps {
   bill: BillProps;
   readonly: boolean;
-  payments: any;
-  discountsBreakdown: any;
-  items: any;
+  billPayments: any;
+  discountBreakdown: any;
+  billItems: any;
+  discounts: DiscountProps[];
+  billDiscounts;
 }
 
-export const ReceiptItems: React.FC<ReceiptItemsProps> = ({ bill, readonly, items, discountsBreakdown, payments }) => {
+export const ReceiptItems: React.FC<ReceiptItemsProps> = ({
+  bill,
+  discounts,
+  readonly,
+  billItems,
+  discountBreakdown,
+  billPayments,
+  billDiscounts,
+}) => {
   const refContentList = useRef();
 
-  useEffect(() => refContentList.current._root.scrollToEnd(), [items]);
+  useEffect(() => refContentList.current._root.scrollToEnd(), [billItems]);
 
   const [selected, setSelected] = useState(null);
 
@@ -68,6 +78,11 @@ export const ReceiptItems: React.FC<ReceiptItemsProps> = ({ bill, readonly, item
     );
   };
 
+  const resolveBillDiscountId = fn => billDiscountId => {
+    const billDiscount = billDiscounts.find(({ id }) => id === billDiscountId);
+    billDiscount && fn(billDiscount);
+  };
+
   const common = {
     readonly: readonly,
     selected,
@@ -77,9 +92,13 @@ export const ReceiptItems: React.FC<ReceiptItemsProps> = ({ bill, readonly, item
   return (
     <Content ref={refContentList}>
       <List style={{ paddingBottom: 60 }}>
-        <ItemsBreakdown {...common} items={items} />
-        <DiscountsBreakdown {...common} discounts={discountsBreakdown} />
-        <PaymentsBreakdown {...common} payments={payments} />
+        <ItemsBreakdown {...common} items={billItems} />
+        <DiscountsBreakdown
+          {...common}
+          onSelect={resolveBillDiscountId(onRemove)}
+          discountBreakdown={discountBreakdown}
+        />
+        <PaymentsBreakdown {...common} payments={billPayments} />
       </List>
     </Content>
   );
@@ -140,32 +159,50 @@ const ItemBreakdown = withObservables(['item'], ({ item }) => ({
   modifierItems: item.billItemModifierItems,
 }))(ItemBreakdownInner);
 
-const DiscountsBreakdown: React.FC<{ discounts: any; readonly: boolean; selected: any; onSelect: (item) => void }> = ({
-  discounts,
-  readonly,
-  selected,
-  onSelect,
-}) => {
-  if (!discounts || !discounts.length) {
+const DiscountsBreakdown: React.FC<{
+  discountBreakdown: any;
+  readonly: boolean;
+  selected: any;
+  onSelect: (item) => void;
+}> = ({ discountBreakdown, readonly, selected, onSelect }) => {
+  if (!discountBreakdown || !discountBreakdown.length) {
     return null;
   }
+
+  console.log('discountBreakdown', discountBreakdown);
+  // const lookupDiscount = billDiscount => {
+  //   return discounts.find(d => d.id === billDiscount.discountId);
+  // };
+
+  // const lookupCalculatedDiscount = billDiscount => {
+  //   return discountBreakdown.find(breakdown => breakdown.billDiscountId === billDiscount.id).calculatedDiscount
+  // };
+
+  const discountText = discount =>
+    discount.isPercent
+      ? `Discount: ${discount.name} ${discount.amount}%`
+      : `Discount: ${discount.name} ${formatNumber(discount.amount, currencySymbol)}`;
+
   return (
     <>
       <Separator bordered>
         <Text>Discounts</Text>
       </Separator>
-      {discounts.map(discount => {
+      {discountBreakdown.map(breakdown => {
+        // const discount = lookupDiscount(billDiscount);
+        // const calculatedDiscount = lookupCalculatedDiscount(billDiscount);
+
         return (
-          <ListItem key={discount.id} selected={selected} onPress={() => !readonly && onSelect(discount)}>
+          <ListItem
+            key={breakdown.billDiscountId}
+            selected={selected}
+            onPress={() => !readonly && onSelect(breakdown.billDiscountId)}
+          >
             <Left>
-              {discount.isPercent ? (
-                <Text>{`Discount: ${discount.name} ${discount.amount}%`}</Text>
-              ) : (
-                <Text>{`Discount: ${discount.name} ${formatNumber(discount.amount, currencySymbol)}`}</Text>
-              )}
+              <Text>{discountText(breakdown)}</Text>
             </Left>
             <Right>
-              <Text>{`${formatNumber(discount.calculatedDiscount, currencySymbol)}`}</Text>
+              <Text>{`${formatNumber(breakdown.calculatedDiscount, currencySymbol)}`}</Text>
             </Right>
           </ListItem>
         );

@@ -158,9 +158,10 @@ export const formatNumber: (value: number, symbol?: string) => string = (value, 
 
 export const _totalDiscount = (
   total,
+  billDiscounts,
   discounts,
 ): { total: number; breakdown: ReturnType<typeof _discountBreakdown> } => {
-  const breakdown = _discountBreakdown(total, discounts);
+  const breakdown = _discountBreakdown(total, billDiscounts, discounts);
 
   return {
     total: breakdown.reduce((acc, discount) => acc + discount.calculatedDiscount, 0),
@@ -168,13 +169,21 @@ export const _totalDiscount = (
   };
 };
 
-export const _discountBreakdown = (total: number, discounts: any): DiscountBreakdownItemProps[] => {
+export const _discountBreakdown = (total: number, billDiscounts: any, discounts): DiscountBreakdownItemProps[] => {
   let rollingTotal = total;
-  const arrDiscounts = discounts.map(d => {
-    const calculatedDiscount = d.isPercent ? Math.round(rollingTotal * (d.amount / 100)) : d.amount;
+
+  const lookupDiscount = billDiscount => discounts.find(discount => discount.id === billDiscount.discountId);
+
+  const arrDiscounts = billDiscounts.map(billDiscount => {
+    const { isPercent, amount, name, id } = lookupDiscount(billDiscount);
+    const calculatedDiscount = isPercent ? Math.round(rollingTotal * (amount / 100)) : amount;
     rollingTotal = rollingTotal - calculatedDiscount;
     return {
-      ...d,
+      billDiscountId: billDiscount.id,
+      discountId: id,
+      isPercent,
+      amount,
+      name,
       calculatedDiscount,
     };
   });
@@ -216,10 +225,10 @@ export type BillSummary = {
   totalPayments: number;
   balance: number;
 };
-export const billSummary = async (items, discounts, payments): Promise<BillSummary> => {
-  const total = await _total(items);
-  const totalPayments = _totalPayments(payments);
-  const discountBreakdown = _totalDiscount(total, discounts);
+export const billSummary = async (billItems, billDiscounts, billPayments, discounts): Promise<BillSummary> => {
+  const total = await _total(billItems);
+  const totalPayments = _totalPayments(billPayments);
+  const discountBreakdown = _totalDiscount(total, billDiscounts, discounts);
   return {
     total,
     totalDiscount: discountBreakdown.total,

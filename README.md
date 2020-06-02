@@ -2,6 +2,8 @@
 
 ## Todo
 
+FIX TYPESCRIPT TYPES EVERYWHERE
+
 **Current**
 
 -   App performance isnt great with realm. With around 1000 items in the db the UI is very unresponsive taking seconds to respond to user input.

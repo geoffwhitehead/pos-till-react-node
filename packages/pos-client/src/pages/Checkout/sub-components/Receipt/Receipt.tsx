@@ -18,32 +18,45 @@ import { print } from '../../../../services/printer/printer';
 import { receiptBill } from '../../../../services/printer/receiptBill';
 
 import { Results } from 'realm';
-import { BillProps } from '../../../../services/schemas';
+import { BillProps, DiscountProps } from '../../../../services/schemas';
 import withObservables from '@nozbe/with-observables';
+import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
+import { AnonymousSubject } from 'rxjs/internal/Subject';
+import { tNames } from '../../../../models';
 
 // TODO: move into org and fetch from db or something
 const currencySymbol = '£';
 
 interface ReceiptProps {
   bill: BillProps; // TODO
-  payments: any, 
-  discounts: any,
-  items: any,
+  billPayments: any;
+  billDiscounts: any;
+  billItems: any;
+  discounts: DiscountProps[];
   onStore?: () => void;
   onCheckout?: () => void;
   complete: boolean;
 }
 
-export const ReceiptInner: React.FC<ReceiptProps> = ({ bill, items, discounts, payments, onStore, onCheckout, complete }) => {
+export const ReceiptInner: React.FC<ReceiptProps> = ({
+  bill,
+  billItems,
+  billDiscounts,
+  billPayments,
+  onStore,
+  onCheckout,
+  complete,
+  discounts,
+}) => {
   const [summary, setSummary] = useState<BillSummary>();
 
   useEffect(() => {
     const summary = async () => {
-      const summary = await billSummary(items, discounts, payments);
+      const summary = await billSummary(billItems, billDiscounts, billPayments, discounts);
       setSummary(summary);
     };
     summary();
-  }, [items]);
+  }, [billItems, billDiscounts, billPayments]);
 
   const onPrint = () => {
     const commands = receiptBill(bill);
@@ -56,6 +69,7 @@ export const ReceiptInner: React.FC<ReceiptProps> = ({ bill, items, discounts, p
 
   const { totalDiscount, total, totalPayable, totalPayments, balance } = summary;
 
+  console.log('summary', summary);
   return (
     <Grid style={styles.grid}>
       <Row style={styles.r1}>
@@ -74,7 +88,15 @@ export const ReceiptInner: React.FC<ReceiptProps> = ({ bill, items, discounts, p
       </Row>
 
       <Row>
-        <ReceiptItems readonly={complete} bill={bill} items={items} discounts={summary.discountBreakdown} payments={payments}/>
+        <ReceiptItems
+          readonly={complete}
+          bill={bill}
+          billItems={billItems}
+          discountBreakdown={summary.discountBreakdown}
+          billPayments={billPayments}
+          billDiscounts={billDiscounts}
+          discounts={discounts}
+        />
       </Row>
       <Row style={styles.r3}>
         {<Text>{`Discount: ${formatNumber(totalDiscount, currencySymbol)}`}</Text>}
@@ -82,7 +104,7 @@ export const ReceiptInner: React.FC<ReceiptProps> = ({ bill, items, discounts, p
         <Text>{`Total: ${formatNumber(total, currencySymbol)}`}</Text>
         {complete && (
           <Text>{`Change Due: ${formatNumber(
-            Math.abs(payments.find(payment => payment.isChange).amount),
+            Math.abs(billPayments.find(payment => payment.isChange).amount),
             currencySymbol,
           )}`}</Text>
         )}
@@ -111,12 +133,19 @@ export const ReceiptInner: React.FC<ReceiptProps> = ({ bill, items, discounts, p
   );
 };
 
-const enhance = withObservables(['bill'], ({ bill }) => ({
-  bill,
-  payments: bill.billPayments,
-  discounts: bill.billDiscounts,
-  items: bill.billItems,
-}));
+const enhance = component =>
+  withDatabase<any, any>( // TODO: fix
+    withObservables(['bill'], ({ bill, database }) => ({
+      bill,
+      billPayments: bill.billPayments,
+      billDiscounts: bill.billDiscounts,
+      billItems: bill.billItems,
+      discounts: database.collections
+        .get(tNames.discounts)
+        .query()
+        .fetch(),
+    }))(component),
+  );
 
 export const Receipt = enhance(ReceiptInner);
 
