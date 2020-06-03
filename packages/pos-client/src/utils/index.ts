@@ -6,6 +6,7 @@ import {
   BillPaymentProps,
   DiscountProps,
   CategoryProps,
+  BillItemModifierProps,
 } from '../services/schemas';
 import { Collection } from 'realm';
 import { flatten } from 'lodash';
@@ -171,7 +172,7 @@ export const _totalDiscount = (
 
 export const _discountBreakdown = (total: number, billDiscounts: any, discounts): DiscountBreakdownItemProps[] => {
   let rollingTotal = total;
-console.log('discounts', discounts)
+  console.log('discounts', discounts);
   const lookupDiscount = billDiscount => discounts.find(discount => discount.id === billDiscount.discountId);
 
   const arrDiscounts = billDiscounts.map(billDiscount => {
@@ -190,17 +191,44 @@ console.log('discounts', discounts)
   return arrDiscounts;
 };
 
-const _modifiersTotal = async item => {
-  const modifierItems = await item.billItemModifierItems.fetch();
-  const prices = modifierItems.reduce((out, mItem) => out + mItem.modifierItemPrice, item.itemPrice);
-  return prices;
+// const x_modifiersTotal = async item => {
+//   const modifierItems = await item.billItemModifierItems.fetch();
+//   const prices = modifierItems.reduce((out, mItem) => out + mItem.modifierItemPrice, item.itemPrice);
+//   return prices;
+// };
+
+// const _modifiersTotal = async item => {
+//   const modifierItems = await item.billItemModifierItems.fetch();
+//   const prices = modifierItems.reduce((out, mItem) => out + mItem.modifierItemPrice, item.itemPrice);
+//   return prices;
+// };
+
+export const itemsBreakdown = async (
+  items: any[],
+): Promise<{ item: BillItemProps; mods: BillItemModifierProps[], total: number }[]> => {
+  // TODO: fix type
+  const itemsWithModifiers: any = await Promise.all(
+    items.map(async item => {
+      const mods = await item.billItemModifierItems.fetch();
+      return {
+        item,
+        mods,
+        total: mods.reduce((out, mod) => out + mod.modifierItemPrice, item.itemPrice)
+      };
+    }),
+  );
+  // const total = itemsWithModifiers.reduce((out, total) => out + total, 0);
+  return itemsWithModifiers;
 };
 
-export const _total = async (items: any[]): Promise<number> => {
+export const _total = async (items: any[]): Promise<{total: number, itemsBreakdown: any}> => {
   // TODO: fix type
-  const arrPrices: any = await Promise.all(items.map(_modifiersTotal));
-  const total = arrPrices.reduce((out, total) => out + total, 0);
-  return total;
+  const breakdown = await itemsBreakdown(items)
+  // const arrPrices: any = await Promise.all(items.map(_modifiersTotal));
+  const total = breakdown.reduce((out, item) => out + item.total, 0);
+
+  // const total = arrPrices.reduce((out, total) => out + total, 0);
+  return {total, itemsBreakdown:breakdown};
 };
 
 export const _totalPayments = (payments: any): number => {
@@ -224,13 +252,15 @@ export type BillSummary = {
   totalPayable: number;
   totalPayments: number;
   balance: number;
+  itemsBreakdown: ReturnType<typeof itemsBreakdown>
 };
 export const billSummary = async (billItems, billDiscounts, billPayments, discounts): Promise<BillSummary> => {
-  const total = await _total(billItems);
+  const {total, itemsBreakdown} = await _total(billItems);
   const totalPayments = _totalPayments(billPayments);
   const discountBreakdown = _totalDiscount(total, billDiscounts, discounts);
   return {
     total,
+    itemsBreakdown,
     totalDiscount: discountBreakdown.total,
     discountBreakdown: discountBreakdown.breakdown,
     totalPayable: total - discountBreakdown.total,

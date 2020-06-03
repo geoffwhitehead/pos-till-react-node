@@ -31,7 +31,19 @@ export const addHeader = (c: any[], header: string): void => {
   c.push(divider);
 };
 
+export async function portDiscovery() {
+  try {
+    let printers = await StarPRNT.portDiscovery('All');
+    console.log(printers);
+  } catch (e) {
+    console.error(e);
+  }
+}
+
 export async function print(commands: any[], openDrawer: boolean = false) {
+  // const x = await portDiscovery();
+
+  // console.log('x', x);
   commands.push({ appendCutPaper: StarPRNT.CutPaperAction.PartialCutWithFeed });
   openDrawer && commands.push({ openCashDrawer: 1 });
   try {

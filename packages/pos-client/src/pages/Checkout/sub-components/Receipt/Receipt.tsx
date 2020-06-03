@@ -15,7 +15,7 @@ import { Fonts } from '../../../../theme';
 import { ReceiptItems } from './ReceiptItems';
 import dayjs from 'dayjs';
 import { print } from '../../../../services/printer/printer';
-import { receiptBill } from '../../../../services/printer/receiptBill';
+import { receiptBill, _receiptBill } from '../../../../services/printer/receiptBill';
 
 import { Results } from 'realm';
 import { BillProps, DiscountProps } from '../../../../services/schemas';
@@ -37,6 +37,7 @@ interface ReceiptProps {
   onCheckout?: () => void;
   complete: boolean;
   paymentTypes: any;
+  priceGroups: any;
 }
 
 export const ReceiptInner: React.FC<ReceiptProps> = ({
@@ -49,6 +50,7 @@ export const ReceiptInner: React.FC<ReceiptProps> = ({
   complete,
   discounts,
   paymentTypes,
+  priceGroups,
 }) => {
   const [summary, setSummary] = useState<BillSummary>();
 
@@ -60,8 +62,8 @@ export const ReceiptInner: React.FC<ReceiptProps> = ({
     summary();
   }, [billItems, billDiscounts, billPayments]);
 
-  const onPrint = () => {
-    const commands = receiptBill(bill);
+  const onPrint = async () => {
+    const commands = await _receiptBill(billItems, billDiscounts, billPayments, discounts, priceGroups, paymentTypes);
     print(commands, false);
   };
 
@@ -149,6 +151,10 @@ const enhance = component =>
         .fetch(),
       paymentTypes: database.collections
         .get(tNames.paymentTypes)
+        .query()
+        .fetch(),
+      priceGroups: database.collections
+        .get(tNames.priceGroups)
         .query()
         .fetch(),
     }))(component),

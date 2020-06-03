@@ -1,5 +1,5 @@
 import { BillProps } from '../schemas';
-import { formatNumber, total, discountBreakdown, totalPayable, balance } from '../../utils';
+import { formatNumber, total, discountBreakdown, totalPayable, balance, billSummary, BillSummary } from '../../utils';
 import { alignCenter, alignLeftRight, addHeader, divider, alignRight } from './printer';
 import { receiptTempate } from './template';
 import { capitalize, groupBy } from 'lodash';
@@ -17,27 +17,52 @@ const org = {
   vat: '123 345 567',
 };
 
-export const receiptBill = (bill: BillProps) => {
+export const receiptBill = async (
+  billItems: any,
+  billDiscounts: any,
+  billPayments: any,
+  discounts: any,
+  priceGroups: any,
+  paymentTypes: any,
+) => {
+  const summary = await billSummary(billItems, billDiscounts, billPayments, discounts);
+
+  console.log('summary.itemsBreakdown', summary.itemsBreakdown);
+  console.log('priceGroups', priceGroups);
   let c = [];
 
   addHeader(c, 'Items');
 
-  const itemGroups = groupBy(bill.items, item => item.priceGroup._id);
+  const lookupPriceGroup = id => priceGroups.find(pG => pG.id === id);
+  const lookupPaymentType = id => paymentTypes.find(pT => pT.id === id);
 
-  Object.values(itemGroups).map(group => {
-    c.push({ appendBitmapText: alignCenter(group[0].priceGroup.name) });
-    group.map(item => {
-      c.push({ appendBitmapText: alignLeftRight(capitalize(item.name), formatNumber(item.price, symbol)) });
-      item.mods.map(mod => {
-        c.push({ appendBitmapText: alignLeftRight(capitalize(modPrefix + mod.name), formatNumber(mod.price, symbol)) });
+  const itemGroups: Record<string, BillSummary['itemsBreakdown']> = groupBy(
+    summary.itemsBreakdown,
+    record => record.item.priceGroupId,
+  );
+
+  console.log('itemGroups', itemGroups);
+  Object.values(itemGroups).map((group, i) => {
+    const pG = lookupPriceGroup(Object.keys(itemGroups)[i]);
+    c.push({ appendBitmapText: alignCenter(pG.name) });
+    group.map(({ item, mods, total }) => {
+      c.push({ appendBitmapText: alignLeftRight(capitalize(item.itemName), formatNumber(item.itemPrice, symbol)) });
+      mods.map(mod => {
+        c.push({
+          appendBitmapText: alignLeftRight(
+            `${modPrefix} ${capitalize(mod.modifierItemName)}`,
+            formatNumber(mod.modifierItemPrice, symbol),
+          ),
+        });
       });
     });
   });
 
-  c.push({ appendBitmapText: alignRight(`Total: ${formatNumber(total(bill), symbol)}`) });
+  c.push({ appendBitmapText: alignRight(`Total: ${formatNumber(summary.total, symbol)}`) });
 
-  bill.discounts.length > 0 && addHeader(c, 'Discounts');
-  discountBreakdown(bill).map(discount => {
+  billDiscounts.length > 0 && addHeader(c, 'Discounts');
+
+  summary.discountBreakdown.map(discount => {
     c.push({
       appendBitmapText: alignLeftRight(
         capitalize(discount.name),
@@ -46,20 +71,20 @@ export const receiptBill = (bill: BillProps) => {
     });
   });
 
-  bill.payments.length > 0 && addHeader(c, 'Payments');
-  bill.payments
+  billPayments.length > 0 && addHeader(c, 'Payments');
+  billPayments
     .filter(p => !p.isChange)
     .map(payment => {
+      const pT = lookupPaymentType(payment.paymentTypeId);
       c.push({
-        appendBitmapText: alignLeftRight(capitalize(payment.paymentType), formatNumber(payment.amount, symbol)),
+        appendBitmapText: alignLeftRight(capitalize(pT.name), formatNumber(payment.amount, symbol)),
       });
     });
 
   addHeader(c, 'Totals');
-  c.push({ appendBitmapText: alignLeftRight('Subtotal: ', formatNumber(totalPayable(bill), symbol)) });
-  const bal = balance(bill);
-  c.push({ appendBitmapText: alignLeftRight('Amount Due: ', formatNumber(Math.max(0, bal), symbol)) });
-  const changePayment = bill.payments.find(p => p.isChange);
+  c.push({ appendBitmapText: alignLeftRight('Subtotal: ', formatNumber(summary.totalPayable, symbol)) });
+  c.push({ appendBitmapText: alignLeftRight('Amount Due: ', formatNumber(Math.max(0, summary.balance), symbol)) });
+  const changePayment = billPayments.find(p => p.isChange);
   if (changePayment) {
     c.push({ appendBitmapText: alignLeftRight('Change Due: ', formatNumber(Math.abs(changePayment.amount), symbol)) });
   }
