@@ -171,7 +171,7 @@ export const _totalDiscount = (
 
 export const _discountBreakdown = (total: number, billDiscounts: any, discounts): DiscountBreakdownItemProps[] => {
   let rollingTotal = total;
-
+console.log('discounts', discounts)
   const lookupDiscount = billDiscount => discounts.find(discount => discount.id === billDiscount.discountId);
 
   const arrDiscounts = billDiscounts.map(billDiscount => {

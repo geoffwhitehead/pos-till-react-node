@@ -40,7 +40,8 @@ interface ReceiptItemsProps {
   discountBreakdown: any;
   billItems: any;
   discounts: DiscountProps[];
-  billDiscounts;
+  billDiscounts: any;
+  paymentTypes: any
 }
 
 export const ReceiptItems: React.FC<ReceiptItemsProps> = ({
@@ -51,6 +52,7 @@ export const ReceiptItems: React.FC<ReceiptItemsProps> = ({
   discountBreakdown,
   billPayments,
   billDiscounts,
+  paymentTypes,
 }) => {
   const refContentList = useRef();
 
@@ -98,7 +100,7 @@ export const ReceiptItems: React.FC<ReceiptItemsProps> = ({
           onSelect={resolveBillDiscountId(onRemove)}
           discountBreakdown={discountBreakdown}
         />
-        <PaymentsBreakdown {...common} payments={billPayments} />
+        <PaymentsBreakdown {...common} payments={billPayments} paymentTypes={paymentTypes}/>
       </List>
     </Content>
   );
@@ -169,15 +171,6 @@ const DiscountsBreakdown: React.FC<{
     return null;
   }
 
-  console.log('discountBreakdown', discountBreakdown);
-  // const lookupDiscount = billDiscount => {
-  //   return discounts.find(d => d.id === billDiscount.discountId);
-  // };
-
-  // const lookupCalculatedDiscount = billDiscount => {
-  //   return discountBreakdown.find(breakdown => breakdown.billDiscountId === billDiscount.id).calculatedDiscount
-  // };
-
   const discountText = discount =>
     discount.isPercent
       ? `Discount: ${discount.name} ${discount.amount}%`
@@ -189,9 +182,6 @@ const DiscountsBreakdown: React.FC<{
         <Text>Discounts</Text>
       </Separator>
       {discountBreakdown.map(breakdown => {
-        // const discount = lookupDiscount(billDiscount);
-        // const calculatedDiscount = lookupCalculatedDiscount(billDiscount);
-
         return (
           <ListItem
             key={breakdown.billDiscountId}
@@ -213,14 +203,18 @@ const DiscountsBreakdown: React.FC<{
 
 const PaymentsBreakdown: React.FC<{
   payments: any;
+  paymentTypes: any
   readonly: boolean;
   selected: boolean;
   onSelect: (payment) => void;
-}> = ({ payments, readonly, selected, onSelect }) => {
+}> = ({ payments, readonly, selected, onSelect, paymentTypes }) => {
+  console.log('payments', payments);
   if (!payments || !payments.length) {
     return null;
   }
 
+  const lookupPaymentType = paymentTypeId => paymentTypes.find(({id}) => id === paymentTypeId)
+  
   return (
     <>
       <Separator bordered>
@@ -229,11 +223,12 @@ const PaymentsBreakdown: React.FC<{
       {payments
         .filter(payment => !payment.isChange)
         .map(payment => {
+          const paymentType = lookupPaymentType(payment.paymentTypeId)
           return (
             <>
               <ListItem key={payment._id} selected={selected} onPress={() => onSelect(!readonly && payment)}>
                 <Left>
-                  <Text>{`Payment: ${capitalize(payment.paymentType)}`}</Text>
+                  <Text>{`Payment: ${capitalize(paymentType.name)}`}</Text>
                 </Left>
                 <Right>
                   <Text>{`${formatNumber(payment.amount, currencySymbol)}`}</Text>

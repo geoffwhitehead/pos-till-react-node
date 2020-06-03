@@ -7,24 +7,28 @@ import { from } from 'rxjs';
 import { Button } from '../../../../core';
 import { useDatabase } from '@nozbe/watermelondb/hooks';
 import { tNames } from '../../../../models';
+import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 
 const symbol = '£'; // TODO: move to org settings
 
 interface BillRowProps {
   bill: any;
   onSelectBill: (bill: any) => void;
-  payments: any;
+  billPayments: any;
+  billDiscounts: any;
+  billItems: any;
   discounts: any;
-  items: any;
 }
-export const WrappedBillRow: React.FC<BillRowProps> = ({ bill, onSelectBill, items, payments, discounts }) => {
+export const WrappedBillRow: React.FC<BillRowProps> = ({
+  bill,
+  onSelectBill,
+  billItems,
+  billPayments,
+  billDiscounts,
+  discounts,
+}) => {
   const _onSelectBill = () => onSelectBill(bill);
-  const [summary, setSummary] = useState<BillSummary>({
-    total: null,
-    balance: null,
-    totalPayable: null,
-    totalPayments: null,
-  });
+  const [summary, setSummary] = useState<BillSummary>();
   const database = useDatabase();
   // console.log('*************');
   // console.log('re render');
@@ -40,11 +44,11 @@ export const WrappedBillRow: React.FC<BillRowProps> = ({ bill, onSelectBill, ite
   // console.log('itemsCount', itemsCount);
   useEffect(() => {
     const summary = async () => {
-      const summary = await billSummary(items, discounts, payments);
+      const summary = await billSummary(billItems, billDiscounts, billPayments, discounts);
       setSummary(summary);
     };
     summary();
-  }, [items]);
+  }, [billItems]);
 
   const a = async () => {
     const allItems = await database.collections
@@ -63,10 +67,6 @@ export const WrappedBillRow: React.FC<BillRowProps> = ({ bill, onSelectBill, ite
   };
   // const l = from();
   // const t = useObservableSuspense(l);
-  const { total, balance } = summary;
-  console.log('balance', balance);
-  console.log('total', total);
-  console.log('formatNumber(balance, symbol)', formatNumber(balance, symbol));
   return (
     <ListItem onPress={_onSelectBill}>
       <Left>
@@ -78,13 +78,10 @@ export const WrappedBillRow: React.FC<BillRowProps> = ({ bill, onSelectBill, ite
         </Button>
       </Body> */}
       <Body>
-        <Text style={{ color: 'grey' }}>{summary ? formatNumber(balance, symbol) : '...'}</Text>
+        <Text style={{ color: 'grey' }}>{summary ? formatNumber(summary.balance, symbol) : '...'}</Text>
       </Body>
       <Right>
-        <Text style={{ color: 'grey' }}>{summary ? formatNumber(total, symbol) : '...'}</Text>
-        {/* <Suspense fallback={<Text>...</Text>}>
-          <Value items={items} discounts={discounts} payments={payments} />
-        </Suspense> */}
+        <Text style={{ color: 'grey' }}>{summary ? formatNumber(summary.total, symbol) : '...'}</Text>
       </Right>
     </ListItem>
   );
@@ -101,12 +98,19 @@ export const WrappedBillRow: React.FC<BillRowProps> = ({ bill, onSelectBill, ite
 //   };
 // });
 
-const enhance = withObservables(['bill'], ({ bill }) => ({
-  bill,
-  payments: bill.billPayments,
-  discounts: bill.billDiscounts,
-  items: bill.billItems,
-}));
+const enhance = component =>
+  withDatabase<any>( // TODO: fix
+    withObservables(['bill'], ({ database, bill }) => ({
+      bill,
+      billPayments: bill.billPayments,
+      billDiscounts: bill.billDiscounts,
+      billItems: bill.billItems,
+      discounts: database.collections
+        .get(tNames.discounts)
+        .query()
+        .fetch(),
+    }))(component),
+  );
 
 // const enhance = withObservables(['bill'], ({ bill, database }) => ({
 //   b: database.collections.get(tNames.bills).findAndObserve(bill.id),

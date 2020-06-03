@@ -307,22 +307,27 @@ class Bill extends Model {
   @children(tNames.billPayments) billPayments;
   @children(tNames.billDiscounts) billDiscounts;
   @children(tNames.billItems) _billItems;
+
   @lazy billItems = this._billItems.extend(Q.where('is_voided', false));
   @lazy billItemVoids = this._billItems.extend(Q.where('is_voided', true));
 
-  @action addPayment = async (p: { paymentTypeId: string; amount: number; isChange?: boolean }) => {
-    this.collections.get(tNames.billPayments).create(payment => {
-      payment.payment_type_id = p.paymentTypeId;
-      payment.bill_id = this.id;
-      payment.amount = p.amount;
-      payment.is_change = p.isChange || false;
+  @action addPayment = async (p: { paymentType: string; amount: number; isChange?: boolean }) => {
+    const { paymentType, amount, isChange } = p;
+    await this.collections.get(tNames.billPayments).create(payment => {
+      payment.paymentType.set(paymentType);
+      payment.bill.set(this);
+      Object.assign(payment, {
+        amount,
+        isChange: isChange || false,
+      });
     });
   };
 
-  @action addDiscount = async (p: { discountId: string }) => {
+  @action addDiscount = async (p: { discount }) => {
+    console.log('discount', p.discount);
     await this.collections.get(tNames.billDiscounts).create(discount => {
-      discount.billId = this.id;
-      discount.discountId = p.discountId;
+      discount.bill.set(this);
+      discount.discount.set(p.discount);
     });
   };
 
@@ -350,7 +355,10 @@ class Bill extends Model {
     return newItem;
   };
 
-  @action close = async () => await this.destroyPermanently();
+  @action close = async () =>
+    await this.update(bill => {
+      bill.isClosed = true;
+    });
 }
 
 class BillDiscount extends Model {

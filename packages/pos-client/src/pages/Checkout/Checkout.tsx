@@ -71,7 +71,10 @@ export const Checkout: React.FC<CheckoutProps> = ({ navigation }) => {
 
   const [mode, setMode] = useState<Modes>(Modes.Items);
 
-  const clearBill = () => setCurrentBill(null);
+  const clearBill = () => {
+    setCurrentBill(null);
+    setMode(Modes.Bills)
+  }
   const openDrawer = () => navigation.openDrawer();
   const onCheckout = () => setMode(Modes.Payments);
   const database = useDatabase();
@@ -84,74 +87,9 @@ export const Checkout: React.FC<CheckoutProps> = ({ navigation }) => {
     }
   }, [currentBill]);
 
-  const completeBill = async bill => {
-    const billBalance = balance(bill);
-
-    if (billBalance <= 0) {
-      const cashPayment = await database.collections
-        .get(tNames.paymentTypes)
-        .query(Q.where('name', Q.eq(paymentTypeNames.CASH)));
-
-      // paymentTypes.find(payment => payment.name === paymentTypeNames.CASH);
-
-      // Over tenders of any payment type are given change in cash
-
-      // TODO: should all overtenders do this????
-      // TODO: vouchers overtenders should issue new voucher not refund in cash?
-
-      await currentBill.addPayment({ paymentTypeId: cashPayment.id, amount: billBalance, isChange: true });
-
-      await currentBill.close();
-      // realm.write(() => {
-      //   const changeDuePayment = realm.create(BillPaymentSchema.name, {
-      //     _id: uuidv4(),
-      //     paymentType: paymentTypeNames.CASH,
-      //     paymentTypeId: cashPayment._id,
-      //     amount: billBalance,
-      //     isChange: true,
-      //   });
-      //   // push a final negative payment which represents the change due in cash to balance the payments with the sale total
-      //   bill.payments.push(changeDuePayment);
-      //   bill.isClosed = true;
-      //   bill.closedAt = dayjs().toDate();
-      // });
-
-      setMode(Modes.Complete);
-    }
+  const completeBill = async () => {
+    setMode(Modes.Complete);
   };
-
-  // useEffect(() => {
-  //   (!openBills || !paymentTypes || !discounts) && setMode(Modes.Loading);
-  //   return () => {};
-  // }, [openBills, paymentTypes, discounts]);
-
-  // useEffect(() => {
-  //   !activeBill ? setMode(Modes.Bills) : setMode(Modes.Items);
-  //   return () => {};
-  // }, [activeBill]);
-
-  // useEffect(() => {
-  //   setMode(Modes.Items);
-  // }, [setMode]);
-
-  // TODO:  function duped in drawer->bills ... refactor
-  // const onSelectBill = (tab, bill) => {
-  //   console.log('onSelectBill cout', tab, bill, billPeriod);
-  //   if (bill) {
-  //     setCurrentBill(bill);
-  //   } else {
-  //     realm.write(() => {
-  //       const bill = realm.create(BillSchema.name, { _id: uuidv4(), tab, billPeriod });
-  //       console.log('created bill', bill);
-  //       setCurrentBill(bill);
-  //     });
-  //   }
-  // };
-
-  // const closeBill = bill => {
-  //   clearBill();
-  //   setMode(Modes.Bills);
-  // };
 
   const renderMainPanel = () => {
     switch (mode) {
@@ -159,14 +97,12 @@ export const Checkout: React.FC<CheckoutProps> = ({ navigation }) => {
         return <Loading />;
       case Modes.Payments:
         return <Payments bill={currentBill} onCompleteBill={completeBill} />;
-      // case Modes.Watermelon:
-      //   return <Watermelon />;
       case Modes.Bills:
         return <SelectBill billPeriod={billPeriod} />;
       case Modes.Items:
         return <CheckoutItemNavigator />;
       case Modes.Complete:
-        return <CompleteBill currentBill={currentBill} onCloseBill={clearBill} />;
+        return <CompleteBill bill={currentBill} onCloseBill={clearBill} />;
     }
   };
 

@@ -9,19 +9,20 @@ export enum paymentTypeNames {
 export const getPaymentTypes = () => {
   return new Promise((resolve, reject) => {
     resolve({
+      ok: true,
       data: {
         success: true,
         data: [
           {
-            _id: uuidv4(),
+            _id: '123aksciukn2i3knkcnw',
             name: paymentTypeNames.CASH,
           },
           {
-            _id: uuidv4(),
+            _id: '1jk32kjhsfn23fkjhn4',
             name: paymentTypeNames.CARD,
           },
           {
-            _id: uuidv4(),
+            _id: 'akjnsdfuwknerk32nj3c',
             name: paymentTypeNames.VOUCHER,
           },
         ],

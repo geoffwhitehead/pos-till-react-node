@@ -16,6 +16,7 @@ import { getModifiers } from '../../api/modifier';
 import { getDiscounts } from '../../api/discount';
 import { getPriceGroups } from '../../api/priceGroup';
 import { getPrinters } from '../../api/printer';
+import { getPaymentTypes } from '../../api/paymentType';
 import { omit } from 'lodash';
 import { sanitizedRaw } from '@nozbe/watermelondb/RawRecord';
 import catchFn from './catchFn';
@@ -37,6 +38,7 @@ export const populateMelon = async () => {
     getDiscounts(),
     getPriceGroups(),
     getPrinters(),
+    getPaymentTypes(),
   ]);
 
   let toCreate = [];
@@ -48,11 +50,23 @@ export const populateMelon = async () => {
       throw new Error('Failed: Response: ' + response.data?.success + 'Problem: ' + response.problem);
     }
   };
-  const categoriesCollection = database.collections.get<CategoryProps & Model>('categories');
-  const priceGroupsCollection = database.collections.get<PriceGroupProps & Model>('price_groups');
-  const printersCollection = database.collections.get<PrinterProps & Model>('printers');
+  const categoriesCollection = database.collections.get<CategoryProps & Model>(tNames.categories);
+  const priceGroupsCollection = database.collections.get<PriceGroupProps & Model>(tNames.priceGroups);
+  const printersCollection = database.collections.get<PrinterProps & Model>(tNames.printers);
+  const paymentTypesCollection = database.collections.get(tNames.paymentTypes);
 
   console.log('--------------- START');
+
+  const paymentTypesToCreate = okResponse(responses[6]).map(({ _id, name }) =>
+    paymentTypesCollection.prepareCreate(
+      catchFn(paymentType => {
+        paymentType._raw = sanitizedRaw({ id: _id }, categoriesCollection.schema);
+        Object.assign(paymentType, { name });
+      }),
+    ),
+  );
+  toCreate.push(...paymentTypesToCreate);
+
   const categoriesToCreate = okResponse(responses[1]).map(({ _id, name }) =>
     categoriesCollection.prepareCreate(
       catchFn(category => {

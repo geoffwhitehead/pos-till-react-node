@@ -7,17 +7,21 @@ import { Fonts } from '../../../../theme';
 import { print } from '../../../../services/printer/printer';
 import { useFocusEffect } from '@react-navigation/native';
 import { receiptBill } from '../../../../services/printer/receiptBill';
+import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
+import withObservables from '@nozbe/with-observables';
+import { tNames } from '../../../../models';
 
 interface CompleteBillProps {
-  currentBill: BillProps;
+  bill: BillProps;
   onCloseBill: () => void;
+  billPayments: any;
 }
 
 // TODO : move this
 const currencySymbol = '£';
 
-export const CompleteBill: React.FC<CompleteBillProps> = ({ currentBill, onCloseBill }) => {
-  const onPrint = async () => await print(receiptBill(currentBill), true);
+const CompleteBillInner: React.FC<CompleteBillProps> = ({ bill, onCloseBill, billPayments }) => {
+  const onPrint = async () => await print(receiptBill(bill), true);
   useFocusEffect(
     React.useCallback(() => {
       const onBackPress = () => {
@@ -30,7 +34,12 @@ export const CompleteBill: React.FC<CompleteBillProps> = ({ currentBill, onClose
     }, [onCloseBill]),
   );
 
-  const changePayment = currentBill.payments.find(payment => payment.isChange).amount;
+  const changePayment = billPayments.find(billPayment => billPayment.isChange).amount;
+
+  console.log('**********');
+  console.log('billPayments', billPayments);
+  console.log('bill', bill);
+  console.log('**********');
   return (
     <View style={styles.container}>
       <Text style={styles.text}>{`Change due: ${formatNumber(Math.abs(changePayment), currencySymbol)}`}</Text>
@@ -43,6 +52,26 @@ export const CompleteBill: React.FC<CompleteBillProps> = ({ currentBill, onClose
     </View>
   );
 };
+
+const enhance = component =>
+  withDatabase<any, any>( // TODO: fix
+    withObservables(['bill'], ({ bill, database }) => ({
+      bill,
+      billPayments: bill.billPayments,
+      // billDiscounts: bill.billDiscounts,
+      // billItems: bill.billItems,
+      // discounts: database.collections
+      //   .get(tNames.discounts)
+      //   .query()
+      //   .fetch(),
+      // paymentTypes: database.collections
+      //   .get(tNames.paymentTypes)
+      //   .query()
+      //   .fetch(),
+    }))(component),
+  );
+
+export const CompleteBill = enhance(CompleteBillInner);
 
 const styles = StyleSheet.create({
   container: { flex: 1, alignItems: 'center', flexDirection: 'column', justifyContent: 'center' },

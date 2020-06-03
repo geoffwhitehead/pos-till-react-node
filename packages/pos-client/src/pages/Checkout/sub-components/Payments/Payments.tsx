@@ -39,7 +39,7 @@ interface PaymentProps {
   bill: BillProps; // fix
   discounts: DiscountProps[];
   paymentTypes: PaymentTypeProps[];
-  onCompleteBill: (bill: BillProps) => Promise<void>;
+  onCompleteBill: () => Promise<void>;
   billDiscounts: BillDiscountProps[];
   billPayments: BillPaymentProps[];
   billItems: BillItemProps[];
@@ -53,11 +53,11 @@ const PaymentsInner: React.FC<PaymentProps> = ({
   discounts,
   paymentTypes,
   onCompleteBill,
-  database
+  database,
 }) => {
   console.log('paymentTypes', paymentTypes);
   console.log('discounts', discounts);
-  console.log('billDiscounts', billDiscounts)
+  console.log('billDiscounts', billDiscounts);
   const [value, setValue] = useState<string>('');
   // TODO: this / payment types will need refactoring so were not having to use find
   const cashType = paymentTypes.find(pt => pt.name === paymentTypeNames.CASH);
@@ -76,23 +76,34 @@ const PaymentsInner: React.FC<PaymentProps> = ({
 
   useEffect(() => {
     const summary = async () => {
-      const summary = await billSummary(billItems, billDiscounts, billPayments);
+      const summary = await billSummary(billItems, billDiscounts, billPayments, discounts);
       setSummary(summary);
     };
     summary();
   }, [billPayments, billItems, billDiscounts]);
 
   useEffect(() => {
-    summary && summary.balance <= 0 && onCompleteBill(bill);
-  }, [summary]);
+    const finalize = async () => {
+      await database.action(async () => {
+        await bill.addPayment({ paymentType: cashType, amount: summary.balance, isChange: true });
+      });
+      await database.action(async () => {
+        await bill.close();
+      });
+      onCompleteBill();
+    };
+    summary && summary.balance <= 0 && finalize();
+  }, [summary, bill]);
 
   const addPayment: AddPayment = (paymentType, amt) => async () => {
-    await database.action(() => bill.addPayment({ paymentTypeId: paymentType.id, amount: amt || Math.max(summary.balance, 0) }));
+    console.log('paymentType', paymentType);
+    console.log('amt', amt);
+    await database.action(() => bill.addPayment({ paymentType, amount: amt || Math.max(summary.balance, 0) }));
     setValue('');
   };
 
   const addDiscount = (discount: DiscountProps) => async () => {
-    await database.action(() => bill.addDiscount({ discountId: discount.id }));
+    await database.action(() => bill.addDiscount({ discount }));
   };
 
   return (

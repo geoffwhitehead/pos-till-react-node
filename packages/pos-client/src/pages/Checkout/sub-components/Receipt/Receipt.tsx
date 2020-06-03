@@ -36,6 +36,7 @@ interface ReceiptProps {
   onStore?: () => void;
   onCheckout?: () => void;
   complete: boolean;
+  paymentTypes: any;
 }
 
 export const ReceiptInner: React.FC<ReceiptProps> = ({
@@ -47,6 +48,7 @@ export const ReceiptInner: React.FC<ReceiptProps> = ({
   onCheckout,
   complete,
   discounts,
+  paymentTypes,
 }) => {
   const [summary, setSummary] = useState<BillSummary>();
 
@@ -96,6 +98,7 @@ export const ReceiptInner: React.FC<ReceiptProps> = ({
           billPayments={billPayments}
           billDiscounts={billDiscounts}
           discounts={discounts}
+          paymentTypes={paymentTypes}
         />
       </Row>
       <Row style={styles.r3}>
@@ -142,6 +145,10 @@ const enhance = component =>
       billItems: bill.billItems,
       discounts: database.collections
         .get(tNames.discounts)
+        .query()
+        .fetch(),
+      paymentTypes: database.collections
+        .get(tNames.paymentTypes)
         .query()
         .fetch(),
     }))(component),
