@@ -14,7 +14,6 @@ interface CategoryItemsListProps {
   category: CategoryProps;
   items: ItemProps[];
   modifiers: ModifierProps[];
-  // createBillItem: (bill: BillProps) => void;
   route: any;
   navigation: any; // TODO: type this
 }
@@ -22,12 +21,8 @@ interface CategoryItemsListProps {
 const WrappedCategoryItems: React.FC<CategoryItemsListProps> = ({
   category,
   items,
-  // createBillItem,
-  // route,
   navigation,
 }) => {
-  // const { category, items, createBillItem } = route.params;
-
   const [searchValue, setSearchValue] = useState<string>('');
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [selectedItem, setSelectedItem] = useState<ItemProps>();
@@ -124,7 +119,3 @@ export const AllItems = withDatabase(
       .observe(),
   }))(WrappedCategoryItems),
 );
-
-// // export const withUnWrappedRouteParams = (WrappedComponent) => {
-
-// }
