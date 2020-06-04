@@ -23,5 +23,6 @@ export {
   Col,
   Row,
   Toast,
-  ActionSheet
+  ActionSheet,
+  Segment
 } from 'native-base';

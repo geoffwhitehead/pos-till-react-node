@@ -29,6 +29,7 @@ const TransactionListRowInner: React.FC<{ bill: any; onSelectBill: (bill) => voi
   if (!(billItems || billModifierItems || billDiscounts || billPayments)) {
     return <Text>Loading...</Text>;
   }
+
   const summary = transactionSummary(billItems, billModifierItems, billDiscounts, billPayments, paymentTypes);
   return (
     <ListItem noIndent style={isSelected && styles.selected} key={bill.id} onPress={() => onSelectBill(bill)}>
