@@ -9,7 +9,7 @@ import {
   BillItemModifierProps,
 } from '../services/schemas';
 import { Collection } from 'realm';
-import { flatten, uniq } from 'lodash';
+import { flatten, uniq, groupBy } from 'lodash';
 
 // TODO fix tpyes
 export const total = (p: { items; discounts }): number => {
@@ -282,10 +282,19 @@ export const transactionSummary = (
   const modifierTotal = billItemModifierItems.reduce((out, modifierItem) => out + modifierItem.modifierItemPrice, 0);
   const itemTotal = billItems.reduce((out, billItem) => out + billItem.itemPrice, 0);
   const billDiscountsTotal = billDiscounts.reduce((out, billDiscount) => out + billDiscount.closingAmount, 0);
-  const lookupPaymentType = id => paymentTypes.find(pT => pT.id === id).name
-  const paymentMethods = uniq(billPayments.map(bP => bP.paymentTypeId)).map(lookupPaymentType)
+  const lookupPaymentType = id => paymentTypes.find(pT => pT.id === id).name;
+  const paymentMethods = uniq(billPayments.map(bP => bP.paymentTypeId)).map(lookupPaymentType);
   return {
     total: modifierTotal + itemTotal - billDiscountsTotal,
-    paymentMethods
+    paymentMethods,
   };
+};
+
+export const periodSummary = (periodPayments, paymentTypes) => {
+  const groupedPayments = groupBy(periodPayments, p => p.paymentTypeId);
+  const paymentTotals = paymentTypes.map(pT => ({
+    name: pT.name,
+    total: groupedPayments[pT.id] ? groupedPayments[pT.id].reduce((out, payment) => out + payment.amount, 0) : 0,
+  }));
+  return { paymentTotals };
 };

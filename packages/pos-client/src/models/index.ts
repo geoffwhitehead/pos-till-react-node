@@ -261,7 +261,8 @@ class BillPeriod extends Model {
    */
 
   @lazy _periodItems = this.collections.get(tNames.billItems).query(Q.on(tNames.bills, 'bill_period_id', this.id));
-  @lazy periodItems = this._periodItems.extend(Q.where('isVoided', Q.notEq(true)));
+  @lazy periodItems = this._periodItems.extend(Q.where('is_voided', Q.notEq(true)));
+  @lazy periodItemVoids = this._periodItems.extend(Q.where('is_voided', Q.eq(true)));
   @lazy periodDiscounts = this.collections
     .get(tNames.billDiscounts)
     .query(Q.on(tNames.bills, 'bill_period_id', this.id));
@@ -321,11 +322,13 @@ class Bill extends Model {
   @children(tNames.billDiscounts) billDiscounts;
   @children(tNames.billItems) _billItems;
 
-  @lazy billItems = this._billItems.extend(Q.where('is_voided', false));
+  @lazy billItems = this._billItems.extend(Q.where('is_voided', Q.notEq(true)));
   @lazy billItemVoids = this._billItems.extend(Q.where('is_voided', true));
-  @lazy billModifierItems = this.collections
+  @lazy _billModifierItems = this.collections
     .get(tNames.billItemModifierItems)
     .query(Q.on(tNames.billItems, 'bill_id', this.id));
+  @lazy billModifierItems = this._billModifierItems.extend(Q.where('is_voided', Q.notEq(true)));
+  @lazy billModifierItemVoids = this._billModifierItems.extend(Q.where('is_voided', true));
 
   @action addPayment = async (p: { paymentType: string; amount: number; isChange?: boolean }) => {
     const { paymentType, amount, isChange } = p;
@@ -429,7 +432,7 @@ class BillItem extends Model {
   // @immutableRelation(tNames.modifiers, 'modifier_id') modifier;
 
   @children(tNames.billItemModifierItems) _billItemModifierItems;
-  @lazy billItemModifierItems = this._billItemModifierItems.extend(Q.where('is_voided', false));
+  @lazy billItemModifierItems = this._billItemModifierItems.extend(Q.where('is_voided', Q.notEq(true)));
   @lazy billItemModifierItemVoids = this._billItemModifierItems.extend(Q.where('is_voided', true));
   @children(tNames.billItemModifiers) billItemModifiers;
   // @children(tNames.itemModifiers) modifiers;
@@ -501,7 +504,7 @@ class BillItemModifier extends Model {
   @immutableRelation(tNames.billItems, 'bill_item_id') billItem;
 
   @children(tNames.billItemModifierItems) _billItemModifierItems;
-  @lazy billItemModifierItems = this._billItemModifierItems.extend(Q.where('is_voided', false));
+  @lazy billItemModifierItems = this._billItemModifierItems.extend(Q.where('is_voided', Q.notEq(true)));
   @lazy billItemModifierItemVoids = this._billItemModifierItems.extend(Q.where('is_voided', true));
 
   static associations = {
