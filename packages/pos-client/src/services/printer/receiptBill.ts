@@ -27,8 +27,6 @@ export const receiptBill = async (
 ) => {
   const summary = await billSummary(billItems, billDiscounts, billPayments, discounts);
 
-  console.log('summary.itemsBreakdown', summary.itemsBreakdown);
-  console.log('priceGroups', priceGroups);
   let c = [];
 
   addHeader(c, 'Items');
@@ -41,7 +39,6 @@ export const receiptBill = async (
     record => record.item.priceGroupId,
   );
 
-  console.log('itemGroups', itemGroups);
   Object.values(itemGroups).map((group, i) => {
     const pG = lookupPriceGroup(Object.keys(itemGroups)[i]);
     c.push({ appendBitmapText: alignCenter(pG.name) });
@@ -82,11 +79,12 @@ export const receiptBill = async (
     });
 
   addHeader(c, 'Totals');
-  c.push({ appendBitmapText: alignLeftRight('Subtotal: ', formatNumber(summary.totalPayable, symbol)) });
-  c.push({ appendBitmapText: alignLeftRight('Amount Due: ', formatNumber(Math.max(0, summary.balance), symbol)) });
+  c.push({ appendBitmapText: alignLeftRight('Net total: ', formatNumber(summary.totalPayable, symbol)) });
+  c.push({ appendBitmapText: alignLeftRight('Paid: ', formatNumber(summary.totalPayments, symbol)) });
+  c.push({ appendBitmapText: alignLeftRight('Balance: ', formatNumber(Math.max(0, summary.balance), symbol)) });
   const changePayment = billPayments.find(p => p.isChange);
   if (changePayment) {
-    c.push({ appendBitmapText: alignLeftRight('Change Due: ', formatNumber(Math.abs(changePayment.amount), symbol)) });
+    c.push({ appendBitmapText: alignLeftRight('Change: ', formatNumber(Math.abs(changePayment.amount), symbol)) });
   }
   c.push(divider);
 

@@ -15,13 +15,30 @@ interface CompleteBillProps {
   bill: BillProps;
   onCloseBill: () => void;
   billPayments: any;
+  billItems: any;
+  billDiscounts: any;
+  discounts: any;
+  priceGroups: any;
+  paymentTypes: any;
 }
 
 // TODO : move this
 const currencySymbol = '£';
 
-const CompleteBillInner: React.FC<CompleteBillProps> = ({ bill, onCloseBill, billPayments }) => {
-  const onPrint = async () => await print(receiptBill(bill), true);
+const CompleteBillInner: React.FC<CompleteBillProps> = ({
+  bill,
+  onCloseBill,
+  billPayments,
+  billItems,
+  billDiscounts,
+  discounts,
+  priceGroups,
+  paymentTypes,
+}) => {
+  const onPrint = async () => {
+    const commands = await receiptBill(billItems, billDiscounts, billPayments, discounts, priceGroups, paymentTypes);
+    await print(commands, true);
+  };
   useFocusEffect(
     React.useCallback(() => {
       const onBackPress = () => {
@@ -36,10 +53,6 @@ const CompleteBillInner: React.FC<CompleteBillProps> = ({ bill, onCloseBill, bil
 
   const changePayment = billPayments.find(billPayment => billPayment.isChange).amount;
 
-  console.log('**********');
-  console.log('billPayments', billPayments);
-  console.log('bill', bill);
-  console.log('**********');
   return (
     <View style={styles.container}>
       <Text style={styles.text}>{`Change due: ${formatNumber(Math.abs(changePayment), currencySymbol)}`}</Text>
@@ -58,16 +71,20 @@ const enhance = component =>
     withObservables(['bill'], ({ bill, database }) => ({
       bill,
       billPayments: bill.billPayments,
-      // billDiscounts: bill.billDiscounts,
-      // billItems: bill.billItems,
-      // discounts: database.collections
-      //   .get(tNames.discounts)
-      //   .query()
-      //   .fetch(),
-      // paymentTypes: database.collections
-      //   .get(tNames.paymentTypes)
-      //   .query()
-      //   .fetch(),
+      billDiscounts: bill.billDiscounts,
+      billItems: bill.billItems,
+      discounts: database.collections
+        .get(tNames.discounts)
+        .query()
+        .fetch(),
+      paymentTypes: database.collections
+        .get(tNames.paymentTypes)
+        .query()
+        .fetch(),
+      priceGroups: database.collections
+        .get(tNames.priceGroups)
+        .query()
+        .fetch(),
     }))(component),
   );
 

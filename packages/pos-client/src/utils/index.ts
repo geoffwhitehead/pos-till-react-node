@@ -9,7 +9,7 @@ import {
   BillItemModifierProps,
 } from '../services/schemas';
 import { Collection } from 'realm';
-import { flatten } from 'lodash';
+import { flatten, uniq } from 'lodash';
 
 // TODO fix tpyes
 export const total = (p: { items; discounts }): number => {
@@ -172,7 +172,6 @@ export const _totalDiscount = (
 
 export const _discountBreakdown = (total: number, billDiscounts: any, discounts): DiscountBreakdownItemProps[] => {
   let rollingTotal = total;
-  console.log('discounts', discounts);
   const lookupDiscount = billDiscount => discounts.find(discount => discount.id === billDiscount.discountId);
 
   const arrDiscounts = billDiscounts.map(billDiscount => {
@@ -205,7 +204,7 @@ export const _discountBreakdown = (total: number, billDiscounts: any, discounts)
 
 export const itemsBreakdown = async (
   items: any[],
-): Promise<{ item: BillItemProps; mods: BillItemModifierProps[], total: number }[]> => {
+): Promise<{ item: BillItemProps; mods: BillItemModifierProps[]; total: number }[]> => {
   // TODO: fix type
   const itemsWithModifiers: any = await Promise.all(
     items.map(async item => {
@@ -213,7 +212,7 @@ export const itemsBreakdown = async (
       return {
         item,
         mods,
-        total: mods.reduce((out, mod) => out + mod.modifierItemPrice, item.itemPrice)
+        total: mods.reduce((out, mod) => out + mod.modifierItemPrice, item.itemPrice),
       };
     }),
   );
@@ -221,19 +220,18 @@ export const itemsBreakdown = async (
   return itemsWithModifiers;
 };
 
-export const _total = async (items: any[]): Promise<{total: number, itemsBreakdown: any}> => {
+export const _total = async (items: any[]): Promise<{ total: number; itemsBreakdown: any }> => {
   // TODO: fix type
-  const breakdown = await itemsBreakdown(items)
+  const breakdown = await itemsBreakdown(items);
   // const arrPrices: any = await Promise.all(items.map(_modifiersTotal));
   const total = breakdown.reduce((out, item) => out + item.total, 0);
 
   // const total = arrPrices.reduce((out, total) => out + total, 0);
-  return {total, itemsBreakdown:breakdown};
+  return { total, itemsBreakdown: breakdown };
 };
 
 export const _totalPayments = (payments: any): number => {
   const amt = payments.reduce((acc, payment) => acc + payment.amount, 0);
-  console.log('amt', amt);
   return amt;
 };
 
@@ -252,10 +250,10 @@ export type BillSummary = {
   totalPayable: number;
   totalPayments: number;
   balance: number;
-  itemsBreakdown: ReturnType<typeof itemsBreakdown>
+  itemsBreakdown: ReturnType<typeof itemsBreakdown>;
 };
 export const billSummary = async (billItems, billDiscounts, billPayments, discounts): Promise<BillSummary> => {
-  const {total, itemsBreakdown} = await _total(billItems);
+  const { total, itemsBreakdown } = await _total(billItems);
   const totalPayments = _totalPayments(billPayments);
   const discountBreakdown = _totalDiscount(total, billDiscounts, discounts);
   return {
@@ -266,5 +264,28 @@ export const billSummary = async (billItems, billDiscounts, billPayments, discou
     totalPayable: total - discountBreakdown.total,
     totalPayments,
     balance: total - discountBreakdown.total - totalPayments,
+  };
+};
+
+type TransactionSummary = {
+  total: number;
+  paymentMethods: string[];
+};
+
+export const transactionSummary = (
+  billItems,
+  billItemModifierItems,
+  billDiscounts,
+  billPayments,
+  paymentTypes,
+): TransactionSummary => {
+  const modifierTotal = billItemModifierItems.reduce((out, modifierItem) => out + modifierItem.modifierItemPrice, 0);
+  const itemTotal = billItems.reduce((out, billItem) => out + billItem.itemPrice, 0);
+  const billDiscountsTotal = billDiscounts.reduce((out, billDiscount) => out + billDiscount.closingAmount, 0);
+  const lookupPaymentType = id => paymentTypes.find(pT => pT.id === id).name
+  const paymentMethods = uniq(billPayments.map(bP => bP.paymentTypeId)).map(lookupPaymentType)
+  return {
+    total: modifierTotal + itemTotal - billDiscountsTotal,
+    paymentMethods
   };
 };

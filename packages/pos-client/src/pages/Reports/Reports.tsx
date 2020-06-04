@@ -22,15 +22,18 @@ import { ReportsList } from './sub-components/ReportsList/ReportsList';
 import { ReportReceipt } from './sub-components/ReportReceipt/ReportReceipt';
 import { print } from '../../services/printer/printer';
 import uuidv4 from 'uuid';
+import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
+import withObservables from '@nozbe/with-observables';
 
 const ORG_PASSCODE = '1234'; // TODO: move to an org setting and hash
 
-export const Reports = ({ navigation }) => {
+export const ReportsInner = ({ navigation }) => {
   const openDrawer = () => navigation.openDrawer();
   const billPeriods = useRealmQuery<BillPeriodProps>({
     source: BillPeriodSchema.name,
     sort: [['opened', true]],
   });
+
   const categories = useRealmQuery<CategoryProps>({ source: CategorySchema.name });
   const discounts = useRealmQuery<DiscountProps>({ source: DiscountSchema.name });
   const paymentTypes = useRealmQuery<PaymentTypeProps>({ source: PaymentTypeSchema.name });
@@ -78,7 +81,6 @@ export const Reports = ({ navigation }) => {
         title: 'Close current billing period and print report?',
       },
       index => {
-        console.log('index', index);
         index === 0 && closePeriod(billPeriod);
       },
     );
@@ -112,3 +114,9 @@ export const Reports = ({ navigation }) => {
     </Container>
   );
 };
+
+// const enhance = withDatabase(withObservables([], ({billPeriod}) => ({
+
+// })))
+
+export const Reports = ReportsInner;

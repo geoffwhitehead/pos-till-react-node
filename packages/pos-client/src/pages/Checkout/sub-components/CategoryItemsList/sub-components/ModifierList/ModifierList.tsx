@@ -45,8 +45,6 @@ export const WrappedModifierList: React.FC<ModifierListProps> = ({
   const createItemWithModifiers = async () => {
     const create = async () => {
       const billItem = await currentBill.addItem({ item, priceGroup });
-      console.log('billItem', billItem);
-      console.log('selectedModifiers', selectedModifiers);
       await Promise.all(
         Object.values(selectedModifiers).map(async ({ modifier, items }) => {
           await billItem.addModifierChoices(modifier, items, priceGroup);

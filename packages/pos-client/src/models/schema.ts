@@ -2,7 +2,7 @@ import { appSchema, tableSchema } from '@nozbe/watermelondb';
 import { PriceGroupProps } from '../services/schemas';
 
 export default appSchema({
-  version: 4,
+  version: 6,
   tables: [
     tableSchema({
       name: 'printers',
@@ -144,6 +144,7 @@ export default appSchema({
         { name: 'discount_id', type: 'string' },
         { name: 'created_at', type: 'number' },
         { name: 'updated_at', type: 'number' },
+        { name: 'closing_amount', type: 'number' },
       ],
     }),
     tableSchema({

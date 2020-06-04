@@ -37,8 +37,6 @@ export const WrappedSelectBill: React.FC<SelectBillProps> = ({ onSelectBill, ope
 
   const toggleOpenOnlyFilter = () => setShowOpen(!showOpen);
   const filterOpenOnly = bill => (showOpen ? bill : true);
-
-  console.log('openBills', openBills);
   return (
     <Content>
       <List>
@@ -82,10 +80,17 @@ export const WrappedSelectBill: React.FC<SelectBillProps> = ({ onSelectBill, ope
 //   openBills: bp.openBills.observe(),
 // }));
 
-const enhance = withObservables(['billPeriod'], ({ billPeriod }) => ({
-  billPeriod,
-  openBills: billPeriod.openBills,
-}));
+const enhance = c =>
+  withDatabase<any>(
+    withObservables(['billPeriod'], ({ billPeriod, database }) => ({
+      billPeriod,
+      openBills: billPeriod.openBills,
+      // itemss: database.collections
+      //   .get(tNames.billItems)
+      //   .query(Q.on(tNames.bills, 'bill_period_id', billPeriod.id))
+      //   .fetch(),
+    }))(c),
+  );
 
 // const enhance = withObservables(['billPeriod'], ({ billPeriod, database }) => ({
 //   bp: database.collections.get(tNames.billPeriods).findAndObserve(billPeriod.id),

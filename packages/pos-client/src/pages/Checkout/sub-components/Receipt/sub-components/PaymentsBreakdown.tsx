@@ -13,7 +13,6 @@ const PaymentsBreakdown: React.FC<{
   selected: boolean;
   onSelect: (payment) => void;
 }> = ({ payments, readonly, selected, onSelect, paymentTypes }) => {
-  console.log('payments', payments);
   if (!payments || !payments.length) {
     return null;
   }

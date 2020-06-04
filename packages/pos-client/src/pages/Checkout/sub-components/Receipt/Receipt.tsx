@@ -15,7 +15,7 @@ import { Fonts } from '../../../../theme';
 import { ReceiptItems } from './ReceiptItems';
 import dayjs from 'dayjs';
 import { print } from '../../../../services/printer/printer';
-import { receiptBill, _receiptBill } from '../../../../services/printer/receiptBill';
+import { receiptBill } from '../../../../services/printer/receiptBill';
 
 import { Results } from 'realm';
 import { BillProps, DiscountProps } from '../../../../services/schemas';
@@ -63,7 +63,7 @@ export const ReceiptInner: React.FC<ReceiptProps> = ({
   }, [billItems, billDiscounts, billPayments]);
 
   const onPrint = async () => {
-    const commands = await _receiptBill(billItems, billDiscounts, billPayments, discounts, priceGroups, paymentTypes);
+    const commands = await receiptBill(billItems, billDiscounts, billPayments, discounts, priceGroups, paymentTypes);
     print(commands, false);
   };
 
@@ -73,7 +73,6 @@ export const ReceiptInner: React.FC<ReceiptProps> = ({
 
   const { totalDiscount, total, totalPayable, totalPayments, balance } = summary;
 
-  console.log('summary', summary);
   return (
     <Grid style={styles.grid}>
       <Row style={styles.r1}>
@@ -106,7 +105,7 @@ export const ReceiptInner: React.FC<ReceiptProps> = ({
       <Row style={styles.r3}>
         {<Text>{`Discount: ${formatNumber(totalDiscount, currencySymbol)}`}</Text>}
 
-        <Text>{`Total: ${formatNumber(total, currencySymbol)}`}</Text>
+        <Text>{`Total: ${formatNumber(totalPayable, currencySymbol)}`}</Text>
         {complete && (
           <Text>{`Change Due: ${formatNumber(
             Math.abs(billPayments.find(payment => payment.isChange).amount),

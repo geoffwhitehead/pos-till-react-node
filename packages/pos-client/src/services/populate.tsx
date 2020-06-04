@@ -35,11 +35,6 @@ export const populate = async (params: { userId: string; organizationId: string 
       throw new Error('Failed fetching organization');
     }
 
-    // const at = await AsyncStorage.getItem('accessToken');
-    // const rt = await AsyncStorage.getItem('refreshToken');
-
-    // console.log('!!!!!!!! at', at);
-    // console.log('!!!!!!! rt', rt);
     const responses = await Promise.all([
       getItems(),
       getCategories(),
@@ -52,7 +47,6 @@ export const populate = async (params: { userId: string; organizationId: string 
     const paymentTypes = await getPaymentTypes();
     const [items, categories, modifiers, discounts, priceGroups, printers] = responses;
 
-    console.log('priceGroups', priceGroups);
     // TODO: remove after dev
     realm.write(() => {
       realm.deleteAll();
@@ -129,7 +123,6 @@ export const populate = async (params: { userId: string; organizationId: string 
       phone,
     };
 
-    console.log('printers', printers);
 
     realm.write(() => {
       realm.create(AddressSchema.name, orgAddress);

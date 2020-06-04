@@ -253,6 +253,19 @@ class BillPeriod extends Model {
   @children(tNames.bills) bills;
 
   @lazy openBills = this.bills.extend(Q.where('is_closed', Q.notEq(true)));
+  @lazy closedBills = this.bills.extend(Q.where('is_closed', Q.eq(true)));
+
+  /**
+   * if you use following queries on an open period it will include any items / discounts etc that
+   * currently pending in a sale.
+   */
+
+  @lazy _periodItems = this.collections.get(tNames.billItems).query(Q.on(tNames.bills, 'bill_period_id', this.id));
+  @lazy periodItems = this._periodItems.extend(Q.where('isVoided', Q.notEq(true)));
+  @lazy periodDiscounts = this.collections
+    .get(tNames.billDiscounts)
+    .query(Q.on(tNames.bills, 'bill_period_id', this.id));
+  @lazy periodPayments = this.collections.get(tNames.billPayments).query(Q.on(tNames.bills, 'bill_period_id', this.id));
 
   createBill = async (params: { reference: number }) => {
     return this.collections.get(tNames.bills).create(bill => {
@@ -310,6 +323,9 @@ class Bill extends Model {
 
   @lazy billItems = this._billItems.extend(Q.where('is_voided', false));
   @lazy billItemVoids = this._billItems.extend(Q.where('is_voided', true));
+  @lazy billModifierItems = this.collections
+    .get(tNames.billItemModifierItems)
+    .query(Q.on(tNames.billItems, 'bill_id', this.id));
 
   @action addPayment = async (p: { paymentType: string; amount: number; isChange?: boolean }) => {
     const { paymentType, amount, isChange } = p;
@@ -324,7 +340,6 @@ class Bill extends Model {
   };
 
   @action addDiscount = async (p: { discount }) => {
-    console.log('discount', p.discount);
     await this.collections.get(tNames.billDiscounts).create(discount => {
       discount.bill.set(this);
       discount.discount.set(p.discount);
@@ -333,8 +348,6 @@ class Bill extends Model {
 
   @action addItem = async (p: { item; priceGroup }) => {
     const { item, priceGroup } = p;
-
-    // console.log('item', item);
     const [category, prices] = await Promise.all([item.category.fetch(), item.prices.fetch()]);
 
     const newItem = await this.database.action(() =>
@@ -358,6 +371,7 @@ class Bill extends Model {
   @action close = async () =>
     await this.update(bill => {
       bill.isClosed = true;
+      bill.closedAt = dayjs();
     });
 }
 
@@ -368,6 +382,7 @@ class BillDiscount extends Model {
   @nochange @field('discount_id') discountId;
   @readonly @date('created_at') createdAt;
   @readonly @date('updated_at') updatedAt;
+  @field('closing_amount') closingAmount;
 
   @immutableRelation(tNames.bills, 'bill_id') bill;
   @immutableRelation(tNames.discounts, 'discount_id') discount;
@@ -378,6 +393,17 @@ class BillDiscount extends Model {
   };
 
   @action void = async () => await this.destroyPermanently();
+
+  /**
+   * for reporting purposes: on close record the final discount amount.
+   * If this isn't done its quite a lot of work to recalcuate discounts
+   * when working large amounts of bills in reports
+   */
+
+  @action finalize = async (amt: number) =>
+    await this.update(billDiscount => {
+      billDiscount.closingAmount = amt;
+    });
 }
 
 class BillItem extends Model {

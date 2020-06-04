@@ -41,40 +41,20 @@ export enum Modes {
   Watermelon = 'watermelon',
 }
 
-// TODO: move to org settings
-const maxBills = 40;
-
 interface CheckoutProps {
   navigation: any; // TODO: fix
 }
 
 export const Checkout: React.FC<CheckoutProps> = ({ navigation }) => {
-  // const selectedBill = route.params?.selectedBill;
-
   const { billPeriod } = useContext(BillPeriodContext);
   const { currentBill, setCurrentBill } = useContext(CurrentBillContext);
-
-  // const openBills = useRealmQuery<BillProps>({ source: BillSchema.name, filter: `isClosed = false` });
-  // const discounts = useRealmQuery<DiscountProps>({ source: DiscountSchema.name });
-  // const paymentTypes = useRealmQuery<PaymentTypeProps>({ source: PaymentTypeSchema.name });
-  // const [activeBill, setActiveBill] = useState<null | any>(route.params?.selectedBill); // TODO: type
-  // console.log('route.params', route.params);
-  // useEffect(() => {
-  //   const selectedBill = route.params?.selectedBill;
-  //   selectedBill && setActiveBill(selectedBill);
-
-  //   console.log('selectedBill', selectedBill);
-  //   // console.log('activeBill', activeBill);
-  //   // if (selectedBill != activeBill) {
-  //   // }
-  // }, [route.params]);
 
   const [mode, setMode] = useState<Modes>(Modes.Items);
 
   const clearBill = () => {
     setCurrentBill(null);
-    setMode(Modes.Bills)
-  }
+    setMode(Modes.Bills);
+  };
   const openDrawer = () => navigation.openDrawer();
   const onCheckout = () => setMode(Modes.Payments);
   const database = useDatabase();
@@ -105,8 +85,6 @@ export const Checkout: React.FC<CheckoutProps> = ({ navigation }) => {
         return <CompleteBill bill={currentBill} onCloseBill={clearBill} />;
     }
   };
-
-  console.log('currentBill', currentBill);
 
   return (
     <Container>

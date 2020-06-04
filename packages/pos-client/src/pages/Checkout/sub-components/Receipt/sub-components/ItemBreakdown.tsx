@@ -8,8 +8,6 @@ import withObservables from '@nozbe/with-observables';
 const currencySymbol = '£';
 
 const ItemBreakdownInner = ({ item, modifierItems, readonly, selected, onSelect }) => {
-  console.log('item', item);
-  console.log('modifierItems', modifierItems);
   return (
     <ListItem noIndent key={item.id} selected={selected === item} onPress={() => !readonly && onSelect(item)}>
       <Left>

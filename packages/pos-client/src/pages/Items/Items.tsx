@@ -10,7 +10,6 @@ import withObservables from '@nozbe/with-observables';
 export const WrappedItems = ({ navigation, items }) => {
   const openDrawer = () => navigation.openDrawer();
 
-  console.log('items', items);
   return !items ? (
     <Loading />
   ) : (

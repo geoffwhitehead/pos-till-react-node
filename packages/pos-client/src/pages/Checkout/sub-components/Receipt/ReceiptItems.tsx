@@ -35,7 +35,6 @@ export const ReceiptItems: React.FC<ReceiptItemsProps> = ({
 
   // PROGRESS: continue implementing remove on payents and discounts . unlike item - add a void function that doesnt soft delete
   const remove = async item => {
-    console.log('item', item);
     await database.action(() => item.void());
   };
 

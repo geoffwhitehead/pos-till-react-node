@@ -15,6 +15,7 @@ import { Q } from '@nozbe/watermelondb';
 import { tNames } from '../../models';
 import { database } from '../../App';
 import { CurrentBillContext } from '../../contexts/CurrentBillContext';
+import dayjs from 'dayjs';
 
 // TODO: this needs to be moved to organizaiton => settings and queried from db
 // const DEF_PRICE_GROUP_ID = '5e90eae405a18b11edbf3214';
@@ -75,7 +76,6 @@ export const MainWrapped: React.FC<{
         if (openPeriods.length === 0) {
           const billPeriodCollection = database.collections.get(tNames.billPeriods);
           const newPeriod = await database.action(async () => await billPeriodCollection.create());
-          console.log('------------period', newPeriod);
           setBillPeriod(newPeriod);
         } else {
           setBillPeriod(openPeriods[0]);
@@ -92,13 +92,10 @@ export const MainWrapped: React.FC<{
     }
   }, [priceGroups, populating]);
 
-  console.log('******');
-  console.log('populating', populating);
-  console.log('billPeriod', billPeriod);
-  console.log('priceGroup', priceGroup);
-  console.log('priceGroups', priceGroups)
-  console.log('******');
+  const d = dayjs().unix();
 
+  console.log('DATE', d);
+  console.log('d', dayjs.unix(d));
   return populating || !billPeriod || !priceGroup ? (
     <Loading />
   ) : (

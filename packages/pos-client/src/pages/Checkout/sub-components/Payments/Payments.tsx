@@ -55,9 +55,6 @@ const PaymentsInner: React.FC<PaymentProps> = ({
   onCompleteBill,
   database,
 }) => {
-  console.log('paymentTypes', paymentTypes);
-  console.log('discounts', discounts);
-  console.log('billDiscounts', billDiscounts);
   const [value, setValue] = useState<string>('');
   // TODO: this / payment types will need refactoring so were not having to use find
   const cashType = paymentTypes.find(pt => pt.name === paymentTypeNames.CASH);
@@ -69,10 +66,7 @@ const PaymentsInner: React.FC<PaymentProps> = ({
 
   // const checkComplete = async () => balance(currentBill) <= 0 && (await onCompleteBill(currentBill));
 
-  type OnValueChange = (value: string) => void;
-  const onValueChange: OnValueChange = value => setValue(value);
-
-  type AddPayment = (paymentType: PaymentTypeProps, amt: number) => () => void;
+  const onValueChange = (value: string) => setValue(value);
 
   useEffect(() => {
     const summary = async () => {
@@ -86,18 +80,20 @@ const PaymentsInner: React.FC<PaymentProps> = ({
     const finalize = async () => {
       await database.action(async () => {
         await bill.addPayment({ paymentType: cashType, amount: summary.balance, isChange: true });
-      });
-      await database.action(async () => {
         await bill.close();
+        await Promise.all(
+          billDiscounts.map(async billDiscount => {
+            const amt = summary.discountBreakdown.find(d => d.billDiscountId === billDiscount.id).calculatedDiscount;
+            await billDiscount.finalize(amt);
+          }),
+        );
       });
       onCompleteBill();
     };
     summary && summary.balance <= 0 && finalize();
   }, [summary, bill]);
 
-  const addPayment: AddPayment = (paymentType, amt) => async () => {
-    console.log('paymentType', paymentType);
-    console.log('amt', amt);
+  const addPayment = (paymentType: PaymentTypeProps, amt: number) => async () => {
     await database.action(() => bill.addPayment({ paymentType, amount: amt || Math.max(summary.balance, 0) }));
     setValue('');
   };

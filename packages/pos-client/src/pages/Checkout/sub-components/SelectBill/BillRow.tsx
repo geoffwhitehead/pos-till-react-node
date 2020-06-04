@@ -30,18 +30,6 @@ export const WrappedBillRow: React.FC<BillRowProps> = ({
   const _onSelectBill = () => onSelectBill(bill);
   const [summary, setSummary] = useState<BillSummary>();
   const database = useDatabase();
-  // console.log('*************');
-  // console.log('re render');
-  // console.log('total', total);
-
-  // console.log('*************');
-
-  // console.log('payments', payments);
-  // console.log('discounts', discounts);
-  // console.log('items', items);
-  // const x = await _total(items, discounts, payments);
-  // const itemsCount = items.length;
-  // console.log('itemsCount', itemsCount);
   useEffect(() => {
     const summary = async () => {
       const summary = await billSummary(billItems, billDiscounts, billPayments, discounts);
@@ -59,14 +47,8 @@ export const WrappedBillRow: React.FC<BillRowProps> = ({
       .get(tNames.priceGroups)
       .query()
       .fetch();
-    // console.log('items', allItems);
-    // console.log('items[0]', allItems[0]);
-    // console.log('priceGroups', priceGroups);
     await bill.addItem({ item: allItems[0], priceGroup: priceGroups[0] });
-    // console.log('DONE');
   };
-  // const l = from();
-  // const t = useObservableSuspense(l);
   return (
     <ListItem onPress={_onSelectBill}>
       <Left>
@@ -86,17 +68,6 @@ export const WrappedBillRow: React.FC<BillRowProps> = ({
     </ListItem>
   );
 };
-
-// const Value = ({ items, discounts, payments }) => {
-//   const total = useObservableSuspense(from(_total(items, discounts, payments)));
-//   return <Text style={{ color: 'grey' }}>{formatNumber(total, symbol)}</Text>;
-// };
-// const enhanceT = withObservables(['items'], ({ items }) => {
-//   console.log('------- items', items);
-//   return {
-//     modifierItems: items.map(async i => await i.billItemModifierItems.fetch()),
-//   };
-// });
 
 const enhance = component =>
   withDatabase<any>( // TODO: fix

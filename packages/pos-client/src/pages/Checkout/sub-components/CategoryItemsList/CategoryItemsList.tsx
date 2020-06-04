@@ -46,7 +46,6 @@ const WrappedCategoryItems: React.FC<CategoryItemsListProps> = ({
       setModalOpen(true);
     } else {
       const newItem = await currentBill.addItem({ item, priceGroup });
-      console.log('newItem', newItem);
     }
   };
 
@@ -101,10 +100,8 @@ const WrappedCategoryItems: React.FC<CategoryItemsListProps> = ({
 };
 
 export const CategoryItems = withObservables(['route'], ({ route }) => {
-  console.log('route', route);
 
   const { category } = route.params;
-  console.log('*** category', category);
   return {
     category: category.observe(),
     items: category.items.observe(),

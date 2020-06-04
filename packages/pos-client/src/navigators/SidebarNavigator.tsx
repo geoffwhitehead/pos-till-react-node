@@ -22,7 +22,7 @@ export const SidebarNavigator: React.FC<SidebarNavigatorProps> = () => {
 
   return (
     <Drawer.Navigator initialRouteName="Checkout">
-      <Drawer.Screen name={routes.checkout} component={Checkout} />
+      <Drawer.Screen name={routes.checkout} component={Checkout} initial/>
       <Drawer.Screen name={routes.items} component={Items} />
       <Drawer.Screen name={routes.reports} component={Reports} />
       <Drawer.Screen name={routes.bills} component={Bills} />

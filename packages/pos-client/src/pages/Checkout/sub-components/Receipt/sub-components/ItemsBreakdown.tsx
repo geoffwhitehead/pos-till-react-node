@@ -16,7 +16,6 @@ export const ItemsBreakdown: React.FC<{
 
   const billItemGroups = groupBy(items, item => item.priceGroupId);
 
-  console.log('billItemGroups', billItemGroups);
   return (
     <>
       <Separator bordered>

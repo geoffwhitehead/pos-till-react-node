@@ -5,33 +5,41 @@ import { Receipt } from '../Checkout/sub-components/Receipt/Receipt';
 import { useRealmQuery } from 'react-use-realm';
 import { BillProps, BillSchema } from '../../services/schemas';
 import { BillPeriodContext } from '../../contexts/BillPeriodContext';
-import { TransactionsList } from './sub-components/TransactionsList/TransactionsList';
+import { TransactionList } from './sub-components/TransactionList';
+import { PanResponder } from 'react-native';
+import withObservables from '@nozbe/with-observables';
+import { withBillPeriod } from '../../hocs/withBillPeriod';
 
 interface TransactionsProps {
   navigation: any; // TODO
+  closedBills: any
 }
 
-export const Transactions: React.FC<TransactionsProps> = ({ navigation }) => {
-  const { billPeriod, setBillPeriod } = useContext(BillPeriodContext);
-  const closedBills = useRealmQuery<BillProps>({
-    source: BillSchema.name,
-    filter: `isClosed = true AND billPeriod._id = $0`,
-    sort: [['closedAt', true]],
-    variables: [billPeriod._id],
-  });
+export const TransactionsInner: React.FC<TransactionsProps> = ({ navigation, closedBills }) => {
+
   const [selectedBill, setSelectedBill] = useState<BillProps | null>(null);
-  const openDrawer = () => navigation.openDrawer();
   const selectBillHandler = (bill: BillProps) => setSelectedBill(bill);
 
+  console.log('closedBills', closedBills);
   return (
     <Container>
-      <SidebarHeader title="Transactions" onOpen={openDrawer} />
+      <SidebarHeader title="Transactions" onOpen={() => navigation.openDrawer()} />
       <Grid>
         <Col>
-          <TransactionsList bills={closedBills} selectedBill={selectedBill} onSelectBill={selectBillHandler} />
+          <TransactionList bills={closedBills} selectedBill={selectedBill} onSelectBill={selectBillHandler} />
         </Col>
-        <Col style={{ width: 350 }}>{selectedBill && <Receipt activeBill={selectedBill} complete={true} />}</Col>
+        <Col style={{ width: 350 }}>{selectedBill && <Receipt bill={selectedBill} complete={true} />}</Col>
       </Grid>
     </Container>
   );
 };
+
+const enhance = c =>
+  withBillPeriod(
+    withObservables(['billPeriod'], ({ billPeriod }) => ({
+      billPeriod,
+      closedBills: billPeriod.closedBills,
+    }))(c),
+  );
+
+export const Transactions = enhance(TransactionsInner);
