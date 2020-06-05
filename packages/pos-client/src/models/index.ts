@@ -461,13 +461,18 @@ class BillItem extends Model {
     const billItemModifierItemsToCreate = await Promise.all(
       await modifierItems.map(async modifierItem => {
         const prices = await modifierItem.prices.fetch();
+        const modifier = await modifierItem.modifier.fetch();
         const mItem = this.collections.get(tNames.billItemModifierItems).prepareCreate(billItemModifierItem => {
           billItemModifierItem.billItem.set(this);
           billItemModifierItem.modifierItem.set(modifierItem);
           billItemModifierItem.billItemModifier.set(billItemModifierToCreate);
+          billItemModifierItem.priceGroup.set(priceGroup)
+          billItemModifierItem.modifier.set(modifier)
           Object.assign(billItemModifierItem, {
+            modifierName: modifier.name,
             modifierItemName: modifierItem.name,
             modifierItemPrice: resolvePrice(priceGroup, prices),
+            priceGroupName: priceGroup.name,
             isVoided: false,
             // billItemModifierId: billItemModifierToCreate.id,
           });
@@ -519,19 +524,26 @@ class BillItemModifierItem extends Model {
 
   @nochange @field('bill_item_id') billItemId;
   @nochange @field('bill_item_modifier_id') billItemModifierId;
+  @nochange @field('modifier_id') modifierId;
+  @nochange @field('modifier_name') modifierName;
   @nochange @field('modifier_item_id') modifierItemId;
   @nochange @field('modifier_item_price') modifierItemPrice;
   @nochange @field('modifier_item_name') modifierItemName;
+  @nochange @field('price_group_name') priceGroupName;
+  @nochange @field('price_group_id') priceGroupId;
   @field('is_voided') isVoided;
 
   @immutableRelation(tNames.billItems, 'bill_item_id') billItem;
   @immutableRelation(tNames.modifierItems, 'modifier_item_id') modifierItem;
   @immutableRelation(tNames.billItemModifiers, 'bill_item_modifier_id') billItemModifier;
+  @immutableRelation(tNames.priceGroups, 'price_group_id') priceGroup;
+  @immutableRelation(tNames.modifiers, 'modifier_id') modifier;
 
   static associations = {
     [tNames.billItems]: { type: 'belongs_to', key: 'bill_item_id' },
     [tNames.modifierItems]: { type: 'belongs_to', key: 'modifier_item_id' },
     [tNames.billItemModifiers]: { type: 'belongs_to', key: 'bill_item_modifier_id' },
+    [tNames.modifiers]: { type: 'belongs_to', key: 'modifier_id' },
   };
 
   @action void = async () =>

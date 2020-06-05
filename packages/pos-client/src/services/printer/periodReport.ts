@@ -12,13 +12,20 @@ import {
   discountBreakdownTotals,
   billItemsCategoryTotals,
   formatNumber,
+  paymentSummary,
+  finalizedDiscountSummary,
+  categorySummary,
+  modifierSummary,
+  priceGroupSummmary,
 } from '../../utils';
 import { Collection } from 'realm';
 import { addHeader, alignLeftRight, divider, starDivider, alignCenter, RECEIPT_WIDTH, newLine } from './printer';
 import { receiptTempate } from './template';
 import { capitalize } from 'lodash';
 import dayjs from 'dayjs';
-import { flatten } from 'lodash';
+import { flatten, groupBy, sumBy } from 'lodash';
+import { tNames } from '../../models';
+
 const symbol = '£'; // TODO: move
 
 // TODO: fetch from db
@@ -45,16 +52,47 @@ const printGroupCommands: (
       },
     ];
   }, []);
-  
-export const periodReport = async billPeriod => {
+
+export const periodReport = async (billPeriod, database) => {
   let c = [];
 
-  const [periodItems, periodItemVoids, periodDiscounts, periodPayments, bills] = await Promise.all([
+  const [
+    periodItems,
+    periodItemVoids,
+    periodDiscounts,
+    periodPayments,
+    bills,
+    categories,
+    billItemModifiers,
+    paymentTypes,
+    discounts,
+    priceGroups,
+  ] = await Promise.all([
     billPeriod.periodItems.fetch(),
     billPeriod.periodItemVoids.fetch(),
     billPeriod.periodDiscounts.fetch(),
     billPeriod.periodPayments.fetch(),
     billPeriod.bills.fetch(),
+    database.collections
+      .get(tNames.categories)
+      .query()
+      .fetch(),
+    database.collections
+      .get(tNames.billItemModifiers)
+      .query()
+      .fetch(),
+    database.collections
+      .get(tNames.paymentTypes)
+      .query()
+      .fetch(),
+    database.collections
+      .get(tNames.discounts)
+      .query()
+      .fetch(),
+    database.collections
+      .get(tNames.priceGroups)
+      .query()
+      .fetch(),
   ]);
 
   const [billModifierItems, billModifierItemVoids] = await Promise.all([
@@ -66,6 +104,10 @@ export const periodReport = async billPeriod => {
   console.log('billModifierItemVoids', billModifierItemVoids);
   // const billModifierItemVoids = await Promise.all(bills.map(b => b.billModifierItemVoids));
 
+  const categoryTotals = categorySummary(periodItems);
+  const modifierTotals = modifierSummary(billModifierItems);
+
+  console.log('modifierTotals', modifierTotals);
   c.push(starDivider);
   c.push({ appendBitmapText: alignCenter('PERIOD REPORT') });
 
@@ -81,13 +123,113 @@ export const periodReport = async billPeriod => {
   });
   c.push(starDivider);
 
-
-  addHeader(c, 'Sales');
+  addHeader(c, 'Bills');
   c.push({ appendBitmapText: alignLeftRight('Total: ', bills.length.toString()) });
 
   addHeader(c, 'Category Totals');
-  c.push(...printGroupCommands(categoryTotals, id => resolveName(id, categories), symbol));
-  
+  c.push(
+    ...categoryTotals.breakdown.map(categoryTotal => {
+      return {
+        appendBitmapText: alignLeftRight(
+          capitalize(categories.find(c => c.id === categoryTotal.categoryId).name),
+          `${categoryTotal.count} / ${formatNumber(categoryTotal.total, symbol)}`,
+        ),
+      };
+    }),
+  );
+  c.push({
+    appendBitmapText: alignLeftRight(
+      'Total: ',
+      `${categoryTotals.count} / ${formatNumber(categoryTotals.total, symbol)}`,
+    ),
+  });
+
+  addHeader(c, 'Modifier Totals');
+  console.log('modifierTotals', modifierTotals);
+  // const groupedByModifier = groupBy(modifierTotals.breakdown, 'modifierItemName')
+  modifierTotals.breakdown.map(modifierGroup => {
+    c.push({
+      appendBitmapText: alignCenter(modifierGroup.modifierName),
+    });
+    c.push(
+      ...modifierGroup.breakdown.map(modifierItemGroup => {
+        return {
+          appendBitmapText: alignLeftRight(
+            capitalize(modifierItemGroup.modifierItemName),
+            `${modifierItemGroup.count} / ${formatNumber(modifierItemGroup.total, symbol)}`,
+          ),
+        };
+      }),
+    );
+  });
+  c.push({
+    appendBitmapText: alignLeftRight(
+      'Total: ',
+      `${modifierTotals.count} / ${formatNumber(modifierTotals.total, symbol)}`,
+    ),
+  });
+
+  addHeader(c, 'Discount Totals');
+  const discountTotals = finalizedDiscountSummary(periodDiscounts, discounts);
+  c.push(
+    ...discountTotals.breakdown.map(discountTotal => ({
+      appendBitmapText: alignLeftRight(
+        capitalize(discountTotal.name),
+        `${discountTotal.count} / ${formatNumber(discountTotal.total, symbol)}`,
+      ),
+    })),
+  );
+  c.push({
+    appendBitmapText: alignLeftRight(
+      'Total: ',
+      `${discountTotals.count} / ${formatNumber(discountTotals.total, symbol)}`,
+    ),
+  });
+  c.push(divider);
+
+  addHeader(c, 'Payment Totals');
+  const paymentTotals = paymentSummary(periodPayments, paymentTypes);
+  c.push(
+    ...paymentTotals.breakdown.map(paymentTotal => ({
+      appendBitmapText: alignLeftRight(
+        capitalize(paymentTotal.name),
+        `${paymentTotal.count} / ${formatNumber(paymentTotal.total, symbol)}`,
+      ),
+    })),
+  );
+  c.push({
+    appendBitmapText: alignLeftRight(
+      'Total: ',
+      `${paymentTotals.count} / ${formatNumber(paymentTotals.total, symbol)}`,
+    ),
+  });
+
+  addHeader(c, 'Voids / Corrections');
+  const voidTotal = sumBy(periodItemVoids, 'itemPrice') + sumBy(billModifierItemVoids, 'modifierItemPrice');
+  // dont include modifier items in the count as these are cancelled as part od the item.
+  const voidCount = periodItemVoids.length;
+  c.push({
+    appendBitmapText: alignLeftRight('Total: ', `${voidCount} / ${formatNumber(voidTotal, symbol)}`),
+  });
+
+  addHeader(c, 'Totals');
+
+  const priceGroupTotals = priceGroupSummmary(periodItems, billModifierItems, priceGroups);
+
+  c.push(
+    ...priceGroupTotals.map(priceGroupTotal => {
+      return {
+        appendBitmapText: alignLeftRight(
+          priceGroupTotal.name,
+          `${priceGroupTotal.count} / ${formatNumber(priceGroupTotal.total, symbol)}`,
+        ),
+      };
+    }),
+  );
+  const billItemsTotal = sumBy(periodItems, 'itemPrice');
+  const billModifierItemsTotal = sumBy(billModifierItems, 'modifierItemPrice');
+  const salesTotal = billItemsTotal + billModifierItemsTotal - discountTotals.total;
+  c.push({ appendBitmapText: alignLeftRight('Sales Total: ', formatNumber(salesTotal, symbol)) });
 
   return receiptTempate(c, org);
 };
@@ -160,17 +302,17 @@ export const _periodReport = (
 
   // addHeader(c, 'Category Totals');
   // c.push(...printGroupCommands(categoryTotals, id => resolveName(id, categories), symbol));
-  addHeader(c, 'Payment Totals');
-  c.push(...printGroupCommands(paymentTotals, id => resolveName(id, paymentTypes), symbol));
-  console.log('c', c);
+  // addHeader(c, 'Payment Totals');
+  // c.push(...printGroupCommands(paymentTotals, id => resolveName(id, paymentTypes), symbol));
+  // console.log('c', c);
 
-  addHeader(c, 'Discount Totals');
-  c.push(...printGroupCommands(discountTotals, id => resolveName(id, discounts), symbol));
-  c.push(divider);
-  c.push({ appendBitmapText: alignLeftRight('Gross Sales Total: ', formatNumber(grossSalesTotal, symbol)) });
-  c.push({ appendBitmapText: alignLeftRight('Discount Total: ', formatNumber(discountTotal, symbol)) });
-  c.push({ appendBitmapText: alignLeftRight('Net Sales Total: ', formatNumber(netSalesTotal, symbol)) });
-  c.push({ appendBitmapText: alignLeftRight('Grand Total: ', formatNumber(sumObject(paymentTotals), symbol)) });
+  // addHeader(c, 'Discount Totals');
+  // c.push(...printGroupCommands(discountTotals, id => resolveName(id, discounts), symbol));
+  // c.push(divider);
+  // c.push({ appendBitmapText: alignLeftRight('Gross Sales Total: ', formatNumber(grossSalesTotal, symbol)) });
+  // c.push({ appendBitmapText: alignLeftRight('Discount Total: ', formatNumber(discountTotal, symbol)) });
+  // c.push({ appendBitmapText: alignLeftRight('Net Sales Total: ', formatNumber(netSalesTotal, symbol)) });
+  // c.push({ appendBitmapText: alignLeftRight('Grand Total: ', formatNumber(sumObject(paymentTotals), symbol)) });
 
   // return receiptTempate(c, org);
 };

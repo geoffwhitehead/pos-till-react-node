@@ -30,13 +30,13 @@ import { tNames } from '../../models';
 import { Q, tableName } from '@nozbe/watermelondb';
 import dayjs from 'dayjs';
 import { View } from 'react-native';
-import { periodSummary, formatNumber } from '../../utils';
+import { formatNumber, paymentSummary } from '../../utils';
 import { capitalize } from 'lodash';
 
 const ORG_PASSCODE = '1234'; // TODO: move to an org setting and hash
 const symbol = '£'; // TODO move
 
-export const ReportsInner = ({ navigation, billPeriod, periodPayments, openBills, paymentTypes }) => {
+export const ReportsInner = ({ database, navigation, billPeriod, categories, periodPayments, openBills, paymentTypes }) => {
   const openDrawer = () => navigation.openDrawer();
   // const billPeriods = useRealmQuery<BillPeriodProps>({
   //   source: BillPeriodSchema.name,
@@ -56,7 +56,7 @@ export const ReportsInner = ({ navigation, billPeriod, periodPayments, openBills
   // const onPrint = useCallback(() => {
   const onPrint = async (billPeriod: BillPeriodProps) => {
     // const bills = await billPeriod.bills.fetch();
-    const commands = await periodReport(billPeriod);
+    const commands = await periodReport(billPeriod, database);
     console.log('commands', commands);
     print(commands);
   };
@@ -102,7 +102,7 @@ export const ReportsInner = ({ navigation, billPeriod, periodPayments, openBills
 
   // }, [paymentTypes, periodItems, periodDiscounts,periodPayments ])
 
-  const { paymentTotals } = periodSummary(periodPayments, paymentTypes);
+  const {breakdown: paymentTotals} = paymentSummary(periodPayments, paymentTypes);
   return (
     <Container>
       <SidebarHeader title="Reports" onOpen={openDrawer} />

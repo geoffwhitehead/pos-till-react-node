@@ -4,7 +4,7 @@ import { Toast } from '../../core';
 export const RECEIPT_WIDTH = 39; // TODO: move to settings - printer width
 const port = 'TCP:192.168.1.78';
 
-export const alignLeftRight = (left: string, right: string, rightWidth = 12) => {
+export const alignLeftRight = (left: string, right: string = "", rightWidth = 12) => {
   const leftWidth = RECEIPT_WIDTH - rightWidth;
   const lines = Math.ceil(left.length / leftWidth);
   const spaces = RECEIPT_WIDTH * lines - right.length - left.length;

@@ -2,7 +2,7 @@ import { appSchema, tableSchema } from '@nozbe/watermelondb';
 import { PriceGroupProps } from '../services/schemas';
 
 export default appSchema({
-  version: 6,
+  version: 8,
   tables: [
     tableSchema({
       name: 'printers',
@@ -185,9 +185,13 @@ export default appSchema({
       columns: [
         { name: 'bill_item_id', type: 'string', isIndexed: true },
         { name: 'bill_item_modifier_id', type: 'string' },
+        { name: 'modifier_id', type: 'string' },
+        { name: 'modifier_name', type: 'string' },
         { name: 'modifier_item_id', type: 'string' },
         { name: 'modifier_item_name', type: 'string' },
         { name: 'modifier_item_price', type: 'number' },
+        { name: 'price_group_name', type: 'string' },
+        { name: 'price_group_id', type: 'string' },
         { name: 'is_voided', type: 'boolean' },
       ],
     }),
