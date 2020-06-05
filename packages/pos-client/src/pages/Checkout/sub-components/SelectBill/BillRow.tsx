@@ -29,7 +29,7 @@ export const WrappedBillRow: React.FC<BillRowProps> = ({
 }) => {
   const _onSelectBill = () => onSelectBill(bill);
   const [summary, setSummary] = useState<BillSummary>();
-  const database = useDatabase();
+
   useEffect(() => {
     const summary = async () => {
       const summary = await billSummary(billItems, billDiscounts, billPayments, discounts);
@@ -38,27 +38,11 @@ export const WrappedBillRow: React.FC<BillRowProps> = ({
     summary();
   }, [billItems]);
 
-  const a = async () => {
-    const allItems = await database.collections
-      .get(tNames.items)
-      .query()
-      .fetch();
-    const priceGroups = await database.collections
-      .get(tNames.priceGroups)
-      .query()
-      .fetch();
-    await bill.addItem({ item: allItems[0], priceGroup: priceGroups[0] });
-  };
   return (
     <ListItem onPress={_onSelectBill}>
       <Left>
         <Text style={{ color: 'green' }}>{`${bill.reference}: Open`}</Text>
       </Left>
-      {/* <Body>
-        <Button onPress={a}>
-          <Text>Add item</Text>
-        </Button>
-      </Body> */}
       <Body>
         <Text style={{ color: 'grey' }}>{summary ? formatNumber(summary.balance, symbol) : '...'}</Text>
       </Body>
@@ -79,7 +63,6 @@ const enhance = component =>
       discounts: database.collections
         .get(tNames.discounts)
         .query()
-        .fetch(),
     }))(component),
   );
 

@@ -146,16 +146,13 @@ const enhance = component =>
       billItems: bill.billItems,
       discounts: database.collections
         .get(tNames.discounts)
-        .query()
-        .fetch(),
+        .query(),
       paymentTypes: database.collections
         .get(tNames.paymentTypes)
-        .query()
-        .fetch(),
+        .query(),
       priceGroups: database.collections
         .get(tNames.priceGroups)
-        .query()
-        .fetch(),
+        .query(),
     }))(component),
   );
 

@@ -20,8 +20,7 @@ export const TransactionListInner: React.FC<TransactionListProps> = ({
   selectedBill,
   paymentTypes,
 }) => {
-  const sorterClosedAtDescending = (bill1, bill2) =>
-    dayjs(bill1.closedAt).isBefore(bill2.closedAt) ? 1 : dayjs(bill1.closedAt).isAfter(bill2.closedAt) ? -1 : 0;
+  const sorterClosedAtDescending = (bill1, bill2) => bill2.closedAt - bill1.closedAt;
 
   return (
     <Content>
@@ -60,7 +59,6 @@ const enhance = c =>
       paymentTypes: database.collections
         .get(tNames.paymentTypes)
         .query()
-        .fetch(),
     }))(c),
   );
 export const TransactionList = enhance(TransactionListInner);

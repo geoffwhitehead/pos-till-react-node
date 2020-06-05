@@ -73,18 +73,9 @@ const enhance = component =>
       billPayments: bill.billPayments,
       billDiscounts: bill.billDiscounts,
       billItems: bill.billItems,
-      discounts: database.collections
-        .get(tNames.discounts)
-        .query()
-        .fetch(),
-      paymentTypes: database.collections
-        .get(tNames.paymentTypes)
-        .query()
-        .fetch(),
-      priceGroups: database.collections
-        .get(tNames.priceGroups)
-        .query()
-        .fetch(),
+      discounts: database.collections.get(tNames.discounts).query(),
+      paymentTypes: database.collections.get(tNames.paymentTypes).query(),
+      priceGroups: database.collections.get(tNames.priceGroups).query(),
     }))(component),
   );
 

@@ -268,13 +268,19 @@ class BillPeriod extends Model {
     .query(Q.on(tNames.bills, 'bill_period_id', this.id));
   @lazy periodPayments = this.collections.get(tNames.billPayments).query(Q.on(tNames.bills, 'bill_period_id', this.id));
 
-  createBill = async (params: { reference: number }) => {
+  @action createBill = async (params: { reference: number }) => {
     return this.collections.get(tNames.bills).create(bill => {
       bill.reference = params.reference;
       bill.isClosed = false;
       bill.billPeriodId = this.id;
     });
   };
+
+  @action closePeriod = async () => {
+    this.update(billPeriod => {
+      billPeriod.closedAt = dayjs()
+    })
+  }
 }
 
 class BillPayment extends Model {

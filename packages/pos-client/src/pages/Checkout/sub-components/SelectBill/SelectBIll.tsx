@@ -1,18 +1,14 @@
 import React, { useState, useContext } from 'react';
 import { Text, Content, List, ListItem, Left, Body, Right, Button, Separator } from '../../../../core';
-import { formatNumber, balance, total } from '../../../../utils';
 import { BillProps } from '../../../../services/schemas';
 import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import withObservables from '@nozbe/with-observables';
-import { tNames } from '../../../../models';
-import { Q } from '@nozbe/watermelondb';
 import { CurrentBillContext } from '../../../../contexts/CurrentBillContext';
 import { BillRowEmpty } from './BillRowEmpty';
 import { BillRow } from './BillRow';
-import { useDatabase } from '@nozbe/watermelondb/hooks';
 
 interface SelectBillProps {
-  openBills: any; // TODO: fix realm types
+  openBills: any; // TODO: fix types
   maxBills: number;
   billPeriod: any;
   onSelectBill?: (bill: any) => void;
@@ -75,38 +71,12 @@ export const WrappedSelectBill: React.FC<SelectBillProps> = ({ onSelectBill, ope
   );
 };
 
-// const enhanceRelation = withObservables(['bp'], ({ bp }) => ({
-//   bp,
-//   openBills: bp.openBills.observe(),
-// }));
-
 const enhance = c =>
   withDatabase<any>(
     withObservables(['billPeriod'], ({ billPeriod, database }) => ({
       billPeriod,
       openBills: billPeriod.openBills,
-      // itemss: database.collections
-      //   .get(tNames.billItems)
-      //   .query(Q.on(tNames.bills, 'bill_period_id', billPeriod.id))
-      //   .fetch(),
     }))(c),
   );
 
-// const enhance = withObservables(['billPeriod'], ({ billPeriod, database }) => ({
-//   bp: database.collections.get(tNames.billPeriods).findAndObserve(billPeriod.id),
-// }));
-
 export const SelectBill = enhance(WrappedSelectBill);
-
-// export const enhanceBillPeriod = withDatabase(
-//   withObservables(['billPeriod'], ({ billPeriod }) => ({
-//     priceGroups: database.collections
-//       .get(tNames.priceGroups)
-//       .query()
-//       .observe(),
-//     openPeriods: database.collections
-//       .get(tNames.billPeriods)
-//       .query(Q.where('closed_at', Q.eq(null)))
-//       .observe(),
-//   }))(MainWrapped),
-// );
