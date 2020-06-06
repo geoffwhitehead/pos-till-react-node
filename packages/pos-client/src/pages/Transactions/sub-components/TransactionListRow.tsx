@@ -8,7 +8,18 @@ import { capitalize } from 'lodash';
 
 const symbol = '£'; // TODO move
 
-const TransactionListRowInner: React.FC<{ bill: any; onSelectBill: (bill) => void; isSelected: boolean }> = ({
+interface TransactionListRowInnerProps {
+  bill: any;
+  onSelectBill: (bill) => void;
+  isSelected: boolean;
+  billItems: any;
+  billModifierItems: any;
+  billDiscounts: any;
+  billPayments: any;
+  paymentTypes: any;
+}
+
+const TransactionListRowInner: React.FC<TransactionListRowInnerProps> = ({
   isSelected,
   onSelectBill,
   bill,
@@ -18,14 +29,7 @@ const TransactionListRowInner: React.FC<{ bill: any; onSelectBill: (bill) => voi
   billPayments,
   paymentTypes,
 }) => {
-  //   console.log('billModifierItems', billModifierItems);
-  //   console.log('billItems', billItems);
-  //   console.log('bill', bill);
-  //   console.log('billDiscounts', billDiscounts);
-  //   console.log('billPayments', billPayments);
-  //   console.log('paymentTypes', paymentTypes);
 
-  console.log('bill.closedAt', bill.closedAt);
   if (!(billItems || billModifierItems || billDiscounts || billPayments)) {
     return <Text>Loading...</Text>;
   }
@@ -51,7 +55,7 @@ const TransactionListRowInner: React.FC<{ bill: any; onSelectBill: (bill) => voi
   );
 };
 
-const enhance = withObservables(['bill'], ({ bill }) => ({
+const enhance = withObservables<any, any>(['bill'], ({ bill }) => ({
   billItems: bill.billItems,
   billDiscounts: bill.billDiscounts,
   billPayments: bill.billPayments,

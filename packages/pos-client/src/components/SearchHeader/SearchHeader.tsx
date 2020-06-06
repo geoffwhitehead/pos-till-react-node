@@ -1,18 +1,17 @@
 import React, { useContext } from 'react';
 import { Item, Icon, Input, Header, Right, Text, Button, ActionSheet } from '../../core';
-import { useRealmQuery } from 'react-use-realm';
-import { PriceGroupProps, PriceGroupSchema } from '../../services/schemas';
 import { PriceGroupContext } from '../../contexts/PriceGroupContext';
 import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import withObservables from '@nozbe/with-observables';
-import { tNames } from '../../models';
+import { tableNames } from '../../models';
 
 interface SearchHeaderProps {
   onChangeText: (value: string) => void;
   value: string;
+  priceGroups: any[];
 }
 
-export const WrappedSearchHeader: React.FC<SearchHeaderProps> = ({ priceGroups, onChangeText, value = '', buttonText, buttonOnPress }) => {
+export const WrappedSearchHeader: React.FC<SearchHeaderProps> = ({ priceGroups, onChangeText, value = '' }) => {
   const { priceGroup, setPriceGroup } = useContext(PriceGroupContext);
 
   const onChangePriceGroup = () => {
@@ -45,9 +44,9 @@ export const WrappedSearchHeader: React.FC<SearchHeaderProps> = ({ priceGroups, 
 };
 
 export const SearchHeader = withDatabase(
-  withObservables([], ({ database }) => ({
+  withObservables<any, any>([], ({ database }) => ({
     priceGroups: database.collections
-      .get(tNames.priceGroups)
+      .get(tableNames.priceGroups)
       .query()
       .observe(),
   }))(WrappedSearchHeader),

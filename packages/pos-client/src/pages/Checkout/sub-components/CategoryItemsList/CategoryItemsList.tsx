@@ -1,7 +1,6 @@
 import React, { useState, useContext } from 'react';
 import { Text, Content, List, ListItem, Left, Icon, Body, Right } from '../../../../core';
 import { SearchHeader } from '../../../../components/SearchHeader/SearchHeader';
-import { CategoryProps, ItemProps, ModifierProps, BillProps, ModifierItemProps } from '../../../../services/schemas';
 import Modal from 'react-native-modal';
 import { ModifierList } from './sub-components/ModifierList/ModifierList';
 import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
@@ -11,9 +10,9 @@ import { CurrentBillContext } from '../../../../contexts/CurrentBillContext';
 import { CategoryItem } from './sub-components/CategoryItem';
 
 interface CategoryItemsListProps {
-  category: CategoryProps;
-  items: ItemProps[];
-  modifiers: ModifierProps[];
+  category: any;
+  items: any[];
+  modifiers: any[];
   route: any;
   navigation: any; // TODO: type this
 }
@@ -25,13 +24,13 @@ const WrappedCategoryItems: React.FC<CategoryItemsListProps> = ({
 }) => {
   const [searchValue, setSearchValue] = useState<string>('');
   const [modalOpen, setModalOpen] = useState<boolean>(false);
-  const [selectedItem, setSelectedItem] = useState<ItemProps>();
+  const [selectedItem, setSelectedItem] = useState<any>();
   const { priceGroup } = useContext(PriceGroupContext);
   const { currentBill } = useContext(CurrentBillContext);
 
   const goBack = () => navigation.goBack();
 
-  const searchFilter = (item: ItemProps, searchValue: string) =>
+  const searchFilter = (item: any, searchValue: string) =>
     item.name.toLowerCase().includes(searchValue.toLowerCase());
 
   const onSearchHandler = (value: string) => setSearchValue(value);
@@ -99,7 +98,7 @@ const WrappedCategoryItems: React.FC<CategoryItemsListProps> = ({
   );
 };
 
-export const CategoryItems = withObservables(['route'], ({ route }) => {
+export const CategoryItems = withObservables<any, any>(['route'], ({ route }) => {
 
   const { category } = route.params;
   return {
@@ -109,7 +108,7 @@ export const CategoryItems = withObservables(['route'], ({ route }) => {
 })(WrappedCategoryItems);
 
 export const AllItems = withDatabase(
-  withObservables([], ({ database }) => ({
+  withObservables<any, any>([], ({ database }) => ({
     items: database.collections
       .get('items')
       .query()

@@ -15,34 +15,24 @@ import {
   Right,
   Label,
 } from '../../../../core';
-import {
-  DiscountProps,
-  BillPaymentSchema,
-  PaymentTypeProps,
-  BillDiscountSchema,
-  BillProps,
-  BillDiscountProps,
-  BillPaymentProps,
-  BillItemProps,
-} from '../../../../services/schemas';
-import { realm } from '../../../../services/Realm';
-import uuidv4 from 'uuid';
-import { balance, formatNumber, billSummary } from '../../../../utils';
+import { formatNumber, billSummary } from '../../../../utils';
 import { StyleSheet } from 'react-native';
 import { paymentTypeNames } from '../../../../api/paymentType';
 import { capitalize } from 'lodash';
 import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import withObservables from '@nozbe/with-observables';
-import { tNames } from '../../../../models';
+import { tableNames } from '../../../../models';
+import { Database } from '@nozbe/watermelondb';
 
 interface PaymentProps {
-  bill: BillProps; // fix
-  discounts: DiscountProps[];
-  paymentTypes: PaymentTypeProps[];
+  bill: any; // fix
+  discounts: any[];
+  paymentTypes: any[];
   onCompleteBill: () => Promise<void>;
-  billDiscounts: BillDiscountProps[];
-  billPayments: BillPaymentProps[];
-  billItems: BillItemProps[];
+  billDiscounts: any[];
+  billPayments: any[];
+  billItems: any[];
+  database: Database
 }
 
 const PaymentsInner: React.FC<PaymentProps> = ({
@@ -53,7 +43,7 @@ const PaymentsInner: React.FC<PaymentProps> = ({
   discounts,
   paymentTypes,
   onCompleteBill,
-  database,
+  database
 }) => {
   const [value, setValue] = useState<string>('');
   // TODO: this / payment types will need refactoring so were not having to use find
@@ -93,12 +83,12 @@ const PaymentsInner: React.FC<PaymentProps> = ({
     summary && summary.balance <= 0 && finalize();
   }, [summary, bill]);
 
-  const addPayment = (paymentType: PaymentTypeProps, amt: number) => async () => {
+  const addPayment = (paymentType: any, amt: number) => async () => {
     await database.action(() => bill.addPayment({ paymentType, amount: amt || Math.max(summary.balance, 0) }));
     setValue('');
   };
 
-  const addDiscount = (discount: DiscountProps) => async () => {
+  const addDiscount = (discount: any) => async () => {
     await database.action(() => bill.addDiscount({ discount }));
   };
 
@@ -161,14 +151,14 @@ const PaymentsInner: React.FC<PaymentProps> = ({
 };
 
 const enhance = component =>
-  withDatabase<any, any>(
-    withObservables(['bill'], ({ database, bill }) => ({
+  withDatabase<any>(
+    withObservables<any, any>(['bill'], ({ database, bill }) => ({
       discounts: database.collections
-        .get(tNames.discounts)
+        .get(tableNames.discounts)
         .query()
         .observe(),
       paymentTypes: database.collections
-        .get(tNames.paymentTypes)
+        .get(tableNames.paymentTypes)
         .query()
         .observe(),
       bill,

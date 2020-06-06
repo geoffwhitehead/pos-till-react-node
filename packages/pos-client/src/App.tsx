@@ -5,15 +5,13 @@ import { AuthContext } from './contexts/AuthContext';
 import { api } from './api';
 import { signUp, signIn } from './api/auth';
 import { AuthNavigator } from './navigators';
-import { realm } from './services/Realm';
-import { RealmProvider } from 'react-use-realm';
 import { Main } from './pages/Main/Main';
 import { NavigationContainer } from '@react-navigation/native';
 import { Root } from 'native-base';
 import decode from 'jwt-decode';
 import { Database, Q } from '@nozbe/watermelondb';
 import SQLiteAdapter from '@nozbe/watermelondb/adapters/sqlite';
-import { models, tNames } from './models';
+import { models, tableNames } from './models';
 import schema from './models/schema';
 // import Post from './model/Post' // ⬅️ You'll import your Models here
 import DatabaseProvider from '@nozbe/watermelondb/DatabaseProvider';
@@ -230,9 +228,7 @@ export const App = () => {
             ) : (
               // user is authenticated
               <AuthContext.Provider value={authContext}>
-                <RealmProvider initialRealm={realm}>
                   <Main organizationId={organizationId} userId={userId} />
-                </RealmProvider>
               </AuthContext.Provider>
             )}
           </AuthContext.Provider>

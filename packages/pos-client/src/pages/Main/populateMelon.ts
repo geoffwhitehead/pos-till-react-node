@@ -1,14 +1,5 @@
 import { database } from '../../App';
-import { Models, tNames } from '../../models';
-import {
-  ItemProps,
-  CategoryProps,
-  PriceGroupProps,
-  PrinterProps,
-  ModifierProps,
-  ModifierItemProps,
-  DiscountProps,
-} from '../../services/schemas';
+import { Models, tableNames } from '../../models';
 import { Model } from '@nozbe/watermelondb';
 import { getItems } from '../../api/item';
 import { getCategories } from '../../api/category';
@@ -17,7 +8,6 @@ import { getDiscounts } from '../../api/discount';
 import { getPriceGroups } from '../../api/priceGroup';
 import { getPrinters } from '../../api/printer';
 import { getPaymentTypes } from '../../api/paymentType';
-import { omit } from 'lodash';
 import { sanitizedRaw } from '@nozbe/watermelondb/RawRecord';
 import catchFn from './catchFn';
 import { getOrganization } from '../../api/organization';
@@ -50,10 +40,10 @@ export const populateMelon = async () => {
       throw new Error('Failed: Response: ' + response.data?.success + 'Problem: ' + response.problem);
     }
   };
-  const categoriesCollection = database.collections.get<CategoryProps & Model>(tNames.categories);
-  const priceGroupsCollection = database.collections.get<PriceGroupProps & Model>(tNames.priceGroups);
-  const printersCollection = database.collections.get<PrinterProps & Model>(tNames.printers);
-  const paymentTypesCollection = database.collections.get(tNames.paymentTypes);
+  const categoriesCollection = database.collections.get<any & Model>(tableNames.categories);
+  const priceGroupsCollection = database.collections.get<any & Model>(tableNames.priceGroups);
+  const printersCollection = database.collections.get<any & Model>(tableNames.printers);
+  const paymentTypesCollection = database.collections.get(tableNames.paymentTypes);
 
   console.log('--------------- START');
 
@@ -100,7 +90,7 @@ export const populateMelon = async () => {
   toCreate.push(...printersToCreate);
 
   const discountsToCreate = okResponse(responses[3]).map(({ _id, name, amount, isPercent }) => {
-    const discountsCollection = database.collections.get<DiscountProps & Model>(tNames.discounts);
+    const discountsCollection = database.collections.get<any & Model>(tableNames.discounts);
     return discountsCollection.prepareCreate(
       catchFn(discount => {
         discount._raw = sanitizedRaw({ id: _id }, discountsCollection.schema);
@@ -113,10 +103,10 @@ export const populateMelon = async () => {
 
   okResponse(responses[0]).map(
     ({ _id: itemId, name, categoryId, price: itemPrices, modifiers, linkedPrinters: linkedPrinterIds }) => {
-      const itemsCollection = database.collections.get<ItemProps & Model>(tNames.items);
-      const itemPricesCollection = database.collections.get(tNames.itemPrices);
-      const itemPrintersCollection = database.collections.get(tNames.itemPrinters);
-      const itemModifiersCollection = database.collections.get(tNames.itemModifiers);
+      const itemsCollection = database.collections.get<any & Model>(tableNames.items);
+      const itemPricesCollection = database.collections.get(tableNames.itemPrices);
+      const itemPrintersCollection = database.collections.get(tableNames.itemPrinters);
+      const itemModifiersCollection = database.collections.get(tableNames.itemModifiers);
 
       const itemModifiersToCreate = modifiers.map(modifierId => {
         return itemModifiersCollection.prepareCreate(
@@ -159,9 +149,9 @@ export const populateMelon = async () => {
   );
 
   okResponse(responses[2]).map(({ _id, name, items, maxItems, minItems }) => {
-    const modifiersCollection = database.collections.get<ModifierProps & Model>(tNames.modifiers);
-    const modifierItemsCollection = database.collections.get<any>(tNames.modifierItems);
-    const modifierPriceCollection = database.collections.get<any>(tNames.modifierPrices);
+    const modifiersCollection = database.collections.get<any & Model>(tableNames.modifiers);
+    const modifierItemsCollection = database.collections.get<any>(tableNames.modifierItems);
+    const modifierPriceCollection = database.collections.get<any>(tableNames.modifierPrices);
 
     console.log('maxItems', maxItems);
     console.log('minItems', minItems);

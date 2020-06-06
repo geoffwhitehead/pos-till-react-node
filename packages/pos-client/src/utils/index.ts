@@ -1,13 +1,3 @@
-import {
-  BillDiscountProps,
-  BillItemProps,
-  BillProps,
-  PaymentTypeProps,
-  BillPaymentProps,
-  DiscountProps,
-  CategoryProps,
-  BillItemModifierProps,
-} from '../services/schemas';
 import { flatten, uniq, groupBy, sumBy } from 'lodash';
 
 export const formatNumber: (value: number, symbol?: string) => string = (value, symbol = '') =>
@@ -48,7 +38,7 @@ export const _discountBreakdown = (total: number, billDiscounts: any, discounts)
 
 export const itemsBreakdown = async (
   items: any[],
-): Promise<{ item: BillItemProps; mods: BillItemModifierProps[]; total: number }[]> => {
+): Promise<{ item: any; mods: any[]; total: number }[]> => {
   // TODO: fix type
   const itemsWithModifiers: any = await Promise.all(
     items.map(async item => {

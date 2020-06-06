@@ -1,7 +1,6 @@
-import React, { useEffect } from 'react';
-import { Text, Content, Icon, Button } from '../../../../core';
-import { BillProps } from '../../../../services/schemas';
-import { balance, formatNumber } from '../../../../utils';
+import React from 'react';
+import { Text,  Button } from '../../../../core';
+import { formatNumber } from '../../../../utils';
 import { StyleSheet, View, BackHandler } from 'react-native';
 import { Fonts } from '../../../../theme';
 import { print } from '../../../../services/printer/printer';
@@ -9,10 +8,10 @@ import { useFocusEffect } from '@react-navigation/native';
 import { receiptBill } from '../../../../services/printer/receiptBill';
 import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import withObservables from '@nozbe/with-observables';
-import { tNames } from '../../../../models';
+import { tableNames } from '../../../../models';
 
 interface CompleteBillProps {
-  bill: BillProps;
+  bill: any;
   onCloseBill: () => void;
   billPayments: any;
   billItems: any;
@@ -68,14 +67,14 @@ const CompleteBillInner: React.FC<CompleteBillProps> = ({
 
 const enhance = component =>
   withDatabase<any, any>( // TODO: fix
-    withObservables(['bill'], ({ bill, database }) => ({
+    withObservables<any, any>(['bill'], ({ bill, database }) => ({
       bill,
       billPayments: bill.billPayments,
       billDiscounts: bill.billDiscounts,
       billItems: bill.billItems,
-      discounts: database.collections.get(tNames.discounts).query(),
-      paymentTypes: database.collections.get(tNames.paymentTypes).query(),
-      priceGroups: database.collections.get(tNames.priceGroups).query(),
+      discounts: database.collections.get(tableNames.discounts).query(),
+      paymentTypes: database.collections.get(tableNames.paymentTypes).query(),
+      priceGroups: database.collections.get(tableNames.priceGroups).query(),
     }))(component),
   );
 

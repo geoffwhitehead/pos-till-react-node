@@ -21,17 +21,16 @@ import { periodReport } from '../../services/printer/periodReport';
 import { print } from '../../services/printer/printer';
 import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import withObservables from '@nozbe/with-observables';
-import { tNames } from '../../models';
+import { tableNames } from '../../models';
 import dayjs from 'dayjs';
 import { View } from 'react-native';
-import { BillPeriodProps } from '../../services/schemas';
 
 // const ORG_PASSCODE = '1234'; // TODO: move to an org setting and hash
 // const symbol = '£'; // TODO move
 
 export const ReportsInner = ({ database, navigation, billPeriods }) => {
   const openDrawer = () => navigation.openDrawer();
-  const onPrint = async (billPeriod: BillPeriodProps) => {
+  const onPrint = async (billPeriod: any) => {
     const commands = await periodReport(billPeriod, database);
     print(commands);
   };
@@ -41,7 +40,7 @@ export const ReportsInner = ({ database, navigation, billPeriods }) => {
     onPrint(billPeriod);
   };
 
-  const confirmClosePeriod = async (billPeriod: BillPeriodProps) => {
+  const confirmClosePeriod = async (billPeriod: any) => {
     const openBills = await billPeriod.openBills.fetch();
     if (openBills.length > 0) {
       Toast.show({
@@ -136,9 +135,9 @@ export const ReportsInner = ({ database, navigation, billPeriods }) => {
 
 const enhance = c =>
   withDatabase<any>(
-    withObservables([], ({ database }) => ({
-      paymentTypes: database.collections.get(tNames.paymentTypes).query(),
-      billPeriods: database.collections.get(tNames.billPeriods).query(),
+    withObservables<any, any>([], ({ database }) => ({
+      paymentTypes: database.collections.get(tableNames.paymentTypes).query(),
+      billPeriods: database.collections.get(tableNames.billPeriods).query(),
     }))(c),
   );
 

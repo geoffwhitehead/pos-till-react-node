@@ -1,20 +1,14 @@
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import { StyleSheet } from 'react-native';
-import { ItemProps, ModifierItemProps } from '../../../../../../services/schemas';
 import { Content, Text, List, ListItem, Left, Icon, Body, Right, Button } from '../../../../../../core';
-import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import withObservables from '@nozbe/with-observables';
-import { tNames } from '../../../../../../models';
-import { PriceGroupContext } from '../../../../../../contexts/PriceGroupContext';
-import { CurrentBillContext } from '../../../../../../contexts/CurrentBillContext';
 import { ModifierGroup } from './ModifierGroup';
-import { Formik } from 'formik';
 import { keyBy, times } from 'lodash';
-import { View, Input } from 'native-base';
+import { View } from 'native-base';
 import { NumberPicker } from '../../../../../../components/NumberPicker/NumberPicker';
 
 interface ModifierListProps {
-  item?: ItemProps;
+  item?: any;
   currentBill: any;
   priceGroup: any;
   onClose: () => void;
@@ -109,7 +103,7 @@ export const WrappedModifierList: React.FC<ModifierListProps> = ({
   );
 };
 
-export const ModifierList = withObservables(['item'], ({ item }) => ({
+export const ModifierList = withObservables<any, any>(['item'], ({ item }) => ({
   modifiers: item.modifiers,
 }))(WrappedModifierList);
 

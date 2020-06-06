@@ -2,15 +2,14 @@ import React from 'react';
 import dayjs from 'dayjs';
 import withObservables from '@nozbe/with-observables';
 import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
-import { BillProps } from '../../../services/schemas';
 import { Content, ListItem, Left, List, Text, Body, Right } from '../../../core';
 import { TransactionListRow } from './TransactionListRow';
-import { tNames } from '../../../models';
+import { tableNames } from '../../../models';
 
 interface TransactionListProps {
-  bills: BillProps[];
+  bills: any[];
   onSelectBill: (bill: any) => void;
-  selectedBill?: BillProps;
+  selectedBill?: any;
   paymentTypes: any;
 }
 
@@ -37,7 +36,6 @@ export const TransactionListInner: React.FC<TransactionListProps> = ({
           </Right>
         </ListItem>
         {bills.sort(sorterClosedAtDescending).map(bill => {
-          console.log('bill', bill);
           const isSelected = selectedBill && bill.id === selectedBill.id;
           return (
             <TransactionListRow
@@ -55,9 +53,9 @@ export const TransactionListInner: React.FC<TransactionListProps> = ({
 
 const enhance = c =>
   withDatabase(
-    withObservables([], ({ database }) => ({
+    withObservables<any, any>([], ({ database }) => ({
       paymentTypes: database.collections
-        .get(tNames.paymentTypes)
+        .get(tableNames.paymentTypes)
         .query()
     }))(c),
   );

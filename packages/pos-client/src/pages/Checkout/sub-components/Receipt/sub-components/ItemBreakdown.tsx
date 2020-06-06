@@ -28,6 +28,6 @@ const ItemBreakdownInner = ({ item, modifierItems, readonly, selected, onSelect 
   );
 };
 
-export const ItemBreakdown = withObservables(['item'], ({ item }) => ({
+export const ItemBreakdown = withObservables<any, any>(['item'], ({ item }) => ({
   modifierItems: item.billItemModifierItems,
 }))(ItemBreakdownInner);

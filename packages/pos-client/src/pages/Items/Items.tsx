@@ -2,8 +2,6 @@ import React from 'react';
 import { Text, Content, List, Separator, ListItem, Container } from '../../core';
 import { SidebarHeader } from '../../components/SidebarHeader/SidebarHeader';
 import { Loading } from '../Loading/Loading';
-import { useRealmQuery } from 'react-use-realm';
-import { ItemSchema } from '../../services/schemas';
 import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import withObservables from '@nozbe/with-observables';
 
@@ -44,7 +42,7 @@ export const WrappedItems = ({ navigation, items }) => {
 };
 
 export const Items = withDatabase<any, any>( // TODO: fix type
-  withObservables([], ({ database }) => ({
+  withObservables<any, any>([], ({ database }) => ({
     items: database.collections
       .get('items')
       .query()

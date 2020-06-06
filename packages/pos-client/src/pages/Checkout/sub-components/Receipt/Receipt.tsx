@@ -2,37 +2,28 @@ import React, { useState, useEffect } from 'react';
 import { Text, Col, Grid, Row, Button } from '../../../../core';
 import { StyleSheet } from 'react-native';
 import {
-  balance,
-  total,
-  totalDiscount,
   formatNumber,
   billSummary,
   BillSummary,
-  totalPayable,
-  totalPayments,
 } from '../../../../utils';
 import { Fonts } from '../../../../theme';
 import { ReceiptItems } from './ReceiptItems';
 import dayjs from 'dayjs';
 import { print } from '../../../../services/printer/printer';
 import { receiptBill } from '../../../../services/printer/receiptBill';
-
-import { Results } from 'realm';
-import { BillProps, DiscountProps } from '../../../../services/schemas';
 import withObservables from '@nozbe/with-observables';
 import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
-import { AnonymousSubject } from 'rxjs/internal/Subject';
-import { tNames } from '../../../../models';
+import { tableNames } from '../../../../models';
 
 // TODO: move into org and fetch from db or something
 const currencySymbol = '£';
 
 interface ReceiptProps {
-  bill: BillProps; // TODO
-  billPayments: any;
-  billDiscounts: any;
-  billItems: any;
-  discounts: DiscountProps[];
+  bill: any; // TODO
+  billPayments: any[];
+  billDiscounts: any[];
+  billItems: any[];
+  discounts: any[];
   onStore?: () => void;
   onCheckout?: () => void;
   complete: boolean;
@@ -139,19 +130,19 @@ export const ReceiptInner: React.FC<ReceiptProps> = ({
 
 const enhance = component =>
   withDatabase<any, any>( // TODO: fix
-    withObservables(['bill'], ({ bill, database }) => ({
+    withObservables<any, any>(['bill'], ({ bill, database }) => ({
       bill,
       billPayments: bill.billPayments,
       billDiscounts: bill.billDiscounts,
       billItems: bill.billItems,
       discounts: database.collections
-        .get(tNames.discounts)
+        .get(tableNames.discounts)
         .query(),
       paymentTypes: database.collections
-        .get(tNames.paymentTypes)
+        .get(tableNames.paymentTypes)
         .query(),
       priceGroups: database.collections
-        .get(tNames.priceGroups)
+        .get(tableNames.priceGroups)
         .query(),
     }))(component),
   );

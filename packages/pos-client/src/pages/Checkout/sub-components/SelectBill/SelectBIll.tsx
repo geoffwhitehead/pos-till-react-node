@@ -1,6 +1,5 @@
 import React, { useState, useContext } from 'react';
-import { Text, Content, List, ListItem, Left, Body, Right, Button, Separator } from '../../../../core';
-import { BillProps } from '../../../../services/schemas';
+import { Text, Content, List, ListItem, Left, Body, Right, Button } from '../../../../core';
 import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import withObservables from '@nozbe/with-observables';
 import { CurrentBillContext } from '../../../../contexts/CurrentBillContext';
@@ -26,7 +25,7 @@ export const WrappedSelectBill: React.FC<SelectBillProps> = ({ onSelectBill, ope
     return [...acc];
   }, Array(maxBills).fill(null));
 
-  const _onSelectBill = (bill: BillProps) => {
+  const _onSelectBill = (bill: any) => {
     setCurrentBill(bill);
     onSelectBill && onSelectBill(bill);
   };
@@ -73,7 +72,7 @@ export const WrappedSelectBill: React.FC<SelectBillProps> = ({ onSelectBill, ope
 
 const enhance = c =>
   withDatabase<any>(
-    withObservables(['billPeriod'], ({ billPeriod, database }) => ({
+    withObservables<any, any>(['billPeriod'], ({ billPeriod, database }) => ({
       billPeriod,
       openBills: billPeriod.openBills,
     }))(c),

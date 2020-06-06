@@ -11,7 +11,7 @@ import { receiptTempate } from './template';
 import { capitalize } from 'lodash';
 import dayjs from 'dayjs';
 import { flatten, groupBy, sumBy } from 'lodash';
-import { tNames } from '../../models';
+import { tableNames } from '../../models';
 
 const symbol = '£'; // TODO: move
 
@@ -60,19 +60,19 @@ export const periodReport = async (billPeriod, database) => {
     billPeriod.periodPayments.fetch(),
     billPeriod.bills.fetch(),
     database.collections
-      .get(tNames.categories)
+      .get(tableNames.categories)
       .query()
       .fetch(),
     database.collections
-      .get(tNames.paymentTypes)
+      .get(tableNames.paymentTypes)
       .query()
       .fetch(),
     database.collections
-      .get(tNames.discounts)
+      .get(tableNames.discounts)
       .query()
       .fetch(),
     database.collections
-      .get(tNames.priceGroups)
+      .get(tableNames.priceGroups)
       .query()
       .fetch(),
   ]);

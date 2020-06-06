@@ -1,36 +1,15 @@
-import React, { useState, useEffect, useContext, createContext } from 'react';
-import { Platform } from 'react-native';
+import React, { useState, useEffect, useContext } from 'react';
 import { Container, Grid, Col, Text } from '../../core';
 import { SidebarHeader } from '../../components/SidebarHeader/SidebarHeader';
 import { Loading } from '../Loading/Loading';
-import { useRealmQuery } from 'react-use-realm';
-import {
-  BillSchema,
-  DiscountProps,
-  DiscountSchema,
-  PaymentTypeProps,
-  PaymentTypeSchema,
-  BillProps,
-  BillPaymentSchema,
-  CategoryProps,
-} from '../../services/schemas';
 import { CheckoutItemNavigator } from '../../navigators/CheckoutItemNavigator';
 import { Receipt } from './sub-components/Receipt/Receipt';
 import { SelectBill } from './sub-components/SelectBill/SelectBIll';
-import { realm } from '../../services/Realm';
-import uuidv4 from 'uuid';
 import { Payments } from './sub-components/Payments/Payments';
-import { balance } from '../../utils';
 import { CompleteBill } from './sub-components/CompleteBill/CompleteBill';
 import { BillPeriodContext } from '../../contexts/BillPeriodContext';
-import dayjs from 'dayjs';
-import { paymentTypeNames } from '../../api/paymentType';
-import { Watermelon } from './Watermelon';
 import { useDatabase } from '@nozbe/watermelondb/hooks';
-import { Model, Q } from '@nozbe/watermelondb';
-import { database } from '../../App';
 import { CurrentBillContext } from '../../contexts/CurrentBillContext';
-import { tNames } from '../../models';
 
 export enum Modes {
   Payments = 'payments',
@@ -57,7 +36,6 @@ export const Checkout: React.FC<CheckoutProps> = ({ navigation }) => {
   };
   const openDrawer = () => navigation.openDrawer();
   const onCheckout = () => setMode(Modes.Payments);
-  const database = useDatabase();
 
   useEffect(() => {
     if (!currentBill) {
