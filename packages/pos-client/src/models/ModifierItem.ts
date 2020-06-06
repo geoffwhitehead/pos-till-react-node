@@ -1,8 +1,8 @@
-import { Model } from '@nozbe/watermelondb';
+import { Model, tableSchema } from '@nozbe/watermelondb';
 import { tableNames } from '.';
 import { field, relation, children } from '@nozbe/watermelondb/decorators';
 
-export class ModifierItem extends Model {
+export class ModifierItemModel extends Model {
   static table = tableNames.modifierItems;
 
   @field('name') name;
@@ -17,3 +17,11 @@ export class ModifierItem extends Model {
     [tableNames.modifiers]: { type: 'belongs_to', key: 'modifier_id' },
   };
 }
+
+export const modifierItemSchema = tableSchema({
+  name: 'modifier_items',
+  columns: [
+    { name: 'modifier_id', type: 'string', isIndexed: true },
+    { name: 'name', type: 'string' },
+  ],
+});

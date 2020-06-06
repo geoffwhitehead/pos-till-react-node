@@ -9,22 +9,8 @@ import { Main } from './pages/Main/Main';
 import { NavigationContainer } from '@react-navigation/native';
 import { Root } from 'native-base';
 import decode from 'jwt-decode';
-import { Database, Q } from '@nozbe/watermelondb';
-import SQLiteAdapter from '@nozbe/watermelondb/adapters/sqlite';
-import { models, tableNames } from './models';
-import schema from './models/schema';
-// import Post from './model/Post' // ⬅️ You'll import your Models here
 import DatabaseProvider from '@nozbe/watermelondb/DatabaseProvider';
-// First, create the adapter to the underlying database:
-const adapter = new SQLiteAdapter({
-  schema,
-});
-
-export const database = new Database({
-  adapter,
-  modelClasses: models,
-  actionsEnabled: true,
-});
+import { database } from './database';
 
 export const App = () => {
   const [state, dispatch] = React.useReducer(
@@ -201,18 +187,10 @@ export const App = () => {
 
   const { isLoading, refreshToken, accessToken, userId, organizationId } = state;
 
-  console.log('iuyqweiuryiuwyeiuryiwuer');
   if (isLoading) {
     // We haven't finished checking for the token yet
     return <SplashScreen />;
   }
-
-  // console.log('******');
-  // console.log('accessToken', accessToken);
-  // console.log('refreshToken', refreshToken);
-  // console.log('organizationId', organizationId);
-  // console.log('userId', userId);
-  // console.log('******');
 
   return (
     // {/* native base wrapper */}
@@ -228,7 +206,7 @@ export const App = () => {
             ) : (
               // user is authenticated
               <AuthContext.Provider value={authContext}>
-                  <Main organizationId={organizationId} userId={userId} />
+                <Main organizationId={organizationId} userId={userId} />
               </AuthContext.Provider>
             )}
           </AuthContext.Provider>

@@ -1,8 +1,8 @@
-import { Model, Q } from '@nozbe/watermelondb';
+import { Model, Q, tableSchema } from '@nozbe/watermelondb';
 import { tableNames } from '.';
 import { field, relation, children, lazy } from '@nozbe/watermelondb/decorators';
 
-export class Item extends Model {
+export class ItemModel extends Model {
   static table = tableNames.items;
 
   @field('name') name;
@@ -21,5 +21,15 @@ export class Item extends Model {
   @children(tableNames.itemPrices) prices;
 
   @lazy printers = this.collections.get(tableNames.printers).query(Q.on(tableNames.itemPrinters, 'item_id', this.id));
-  @lazy modifiers = this.collections.get(tableNames.modifiers).query(Q.on(tableNames.itemModifiers, 'item_id', this.id));
+  @lazy modifiers = this.collections
+    .get(tableNames.modifiers)
+    .query(Q.on(tableNames.itemModifiers, 'item_id', this.id));
 }
+
+export const itemSchema = tableSchema({
+  name: 'items',
+  columns: [
+    { name: 'name', type: 'string' },
+    { name: 'category_id', type: 'string', isIndexed: true },
+  ],
+});

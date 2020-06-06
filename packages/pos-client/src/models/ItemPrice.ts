@@ -1,8 +1,8 @@
-import { Model } from '@nozbe/watermelondb';
+import { Model, tableSchema } from '@nozbe/watermelondb';
 import { tableNames } from '.';
 import { field, relation } from '@nozbe/watermelondb/decorators';
 
-export class ItemPrice extends Model {
+export class ItemPriceModel extends Model {
   static table = tableNames.itemPrices;
 
   @field('price') price;
@@ -17,3 +17,12 @@ export class ItemPrice extends Model {
     [tableNames.items]: { type: 'belongs_to', key: 'item_id' },
   };
 }
+
+export const itemPriceSchema = tableSchema({
+  name: 'item_prices',
+  columns: [
+    { name: 'price', type: 'number' },
+    { name: 'price_group_id', type: 'string' },
+    { name: 'item_id', type: 'string', isIndexed: true },
+  ],
+});

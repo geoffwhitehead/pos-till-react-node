@@ -1,4 +1,3 @@
-import uuidv4 from 'uuid/v4';
 
 export enum paymentTypeNames {
   CASH = 'cash',

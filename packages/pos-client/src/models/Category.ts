@@ -1,8 +1,8 @@
-import { Model } from '@nozbe/watermelondb';
+import { Model, tableSchema } from '@nozbe/watermelondb';
 import { tableNames } from '.';
 import { children, nochange, field } from '@nozbe/watermelondb/decorators';
 
-export class Category extends Model {
+export class CategoryModel extends Model {
   static table = tableNames.categories;
 
   @children(tableNames.items) items;
@@ -13,3 +13,8 @@ export class Category extends Model {
     [tableNames.items]: { type: 'has_many', foreignKey: 'category_id' },
   };
 }
+
+export const categorySchema = tableSchema({
+  name: 'categories',
+  columns: [{ name: 'name', type: 'string' }],
+});

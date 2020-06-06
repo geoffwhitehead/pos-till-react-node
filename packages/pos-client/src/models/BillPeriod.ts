@@ -1,9 +1,17 @@
-import { Model, Q } from '@nozbe/watermelondb';
+import { Model, Q, tableSchema } from '@nozbe/watermelondb';
 import { tableNames } from '.';
 import { readonly, date, children, lazy, action } from '@nozbe/watermelondb/decorators';
 import dayjs from 'dayjs';
 
-export class BillPeriod extends Model {
+export const billPeriodSchema = tableSchema({
+  name: 'bill_periods',
+  columns: [
+    { name: 'created_at', type: 'number' },
+    { name: 'closed_at', type: 'number', isOptional: true },
+  ],
+});
+
+export class BillPeriodModel extends Model {
   static table = tableNames.billPeriods;
 
   @readonly @date('created_at') createdAt;
@@ -23,13 +31,17 @@ export class BillPeriod extends Model {
    * currently pending in a sale.
    */
 
-  @lazy _periodItems = this.collections.get(tableNames.billItems).query(Q.on(tableNames.bills, 'bill_period_id', this.id));
+  @lazy _periodItems = this.collections
+    .get(tableNames.billItems)
+    .query(Q.on(tableNames.bills, 'bill_period_id', this.id));
   @lazy periodItems = this._periodItems.extend(Q.where('is_voided', Q.notEq(true)));
   @lazy periodItemVoids = this._periodItems.extend(Q.where('is_voided', Q.eq(true)));
   @lazy periodDiscounts = this.collections
     .get(tableNames.billDiscounts)
     .query(Q.on(tableNames.bills, 'bill_period_id', this.id));
-  @lazy periodPayments = this.collections.get(tableNames.billPayments).query(Q.on(tableNames.bills, 'bill_period_id', this.id));
+  @lazy periodPayments = this.collections
+    .get(tableNames.billPayments)
+    .query(Q.on(tableNames.bills, 'bill_period_id', this.id));
 
   @action createBill = async (params: { reference: number }) => {
     return this.collections.get(tableNames.bills).create(bill => {

@@ -1,4 +1,4 @@
-import { Model, Q } from '@nozbe/watermelondb';
+import { Model, Q, tableSchema } from '@nozbe/watermelondb';
 import { tableNames } from '.';
 import {
   field,
@@ -13,7 +13,20 @@ import {
 import { resolvePrice } from '../helpers';
 import dayjs from 'dayjs';
 
-export class Bill extends Model {
+export const billSchema = tableSchema({
+    name: 'bills',
+    columns: [
+      { name: 'reference', type: 'number' },
+      { name: 'is_closed', type: 'boolean' },
+      { name: 'bill_period_id', type: 'string', isIndexed: true },
+      { name: 'closed_at', type: 'number', isOptional: true },
+      { name: 'created_at', type: 'number' },
+      { name: 'updated_at', type: 'number' },
+    ],
+  });
+
+  
+export class BillModel extends Model {
   static table = tableNames.bills;
 
   @field('reference') reference;

@@ -1,8 +1,19 @@
-import { Model } from '@nozbe/watermelondb';
+import { Model, tableSchema } from '@nozbe/watermelondb';
 import { tableNames } from '.';
 import { nochange, field, readonly, date, immutableRelation, action } from '@nozbe/watermelondb/decorators';
 
-export class BillDiscount extends Model {
+export const billDiscountSchema = tableSchema({
+    name: 'bill_discounts',
+    columns: [
+      { name: 'bill_id', type: 'string', isIndexed: true },
+      { name: 'discount_id', type: 'string' },
+      { name: 'created_at', type: 'number' },
+      { name: 'updated_at', type: 'number' },
+      { name: 'closing_amount', type: 'number' },
+    ],
+  });
+  
+export class BillDiscountModel extends Model {
   static table = tableNames.billDiscounts;
 
   @nochange @field('bill_id') billId;

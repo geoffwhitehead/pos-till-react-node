@@ -1,8 +1,8 @@
-import { Model } from '@nozbe/watermelondb';
+import { Model, tableSchema } from '@nozbe/watermelondb';
 import { tableNames } from '.';
 import { field, children } from '@nozbe/watermelondb/decorators';
 
-export class Modifier extends Model {
+export class ModifierModel extends Model {
   static table = tableNames.modifiers;
 
   @field('name') name;
@@ -17,3 +17,12 @@ export class Modifier extends Model {
 
   @children(tableNames.modifierItems) modifierItems;
 }
+
+export const modifierSchema = tableSchema({
+  name: 'modifiers',
+  columns: [
+    { name: 'name', type: 'string' },
+    { name: 'min_items', type: 'number' },
+    { name: 'max_items', type: 'number' },
+  ],
+});

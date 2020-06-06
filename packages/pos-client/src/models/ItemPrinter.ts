@@ -1,8 +1,8 @@
-import { Model } from '@nozbe/watermelondb';
+import { Model, tableSchema } from '@nozbe/watermelondb';
 import { tableNames } from '.';
 import { field, relation } from '@nozbe/watermelondb/decorators';
 
-export class ItemPrinter extends Model {
+export class ItemPrinterModel extends Model {
   static table = tableNames.itemPrinters;
 
   @field('item_id') itemId;
@@ -16,3 +16,11 @@ export class ItemPrinter extends Model {
     [tableNames.printers]: { type: 'belongs_to', key: 'printer_id' },
   };
 }
+
+export const itemPrinterSchema = tableSchema({
+  name: 'item_printers',
+  columns: [
+    { name: 'item_id', type: 'string', isIndexed: true },
+    { name: 'printer_id', type: 'string' },
+  ],
+});
