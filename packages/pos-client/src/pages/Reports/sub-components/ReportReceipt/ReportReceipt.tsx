@@ -14,19 +14,9 @@ import {
 import { StyleSheet } from 'react-native';
 import {
   formatNumber,
-  billItemsCategoryTotals,
-  totalBillsPaymentBreakdown,
-  discountBreakdownTotals,
 } from '../../../../utils';
 import { capitalize } from 'lodash';
 import { Collection } from 'realm';
-import {
-  CategoryProps,
-  DiscountProps,
-  PaymentTypeProps,
-  BillPeriodProps,
-  BillProps,
-} from '../../../../services/schemas';
 
 // TODO: move into org and fetch from db or something
 const currencySymbol = '£';
@@ -36,11 +26,11 @@ const sumObject: (obj: Record<string, number>) => number = obj =>
 
 interface ReportReceiptProps {
   onPressPrint: () => void;
-  categories: Collection<CategoryProps>;
-  discounts: Collection<DiscountProps>;
-  paymentTypes: Collection<PaymentTypeProps>;
-  billPeriod: BillPeriodProps;
-  bills: Collection<BillProps>;
+  categories: any;
+  discounts: any;
+  paymentTypes: any;
+  billPeriod: any;
+  bills: any;
 }
 
 export const ReportReceipt: React.FC<ReportReceiptProps> = ({
@@ -51,18 +41,17 @@ export const ReportReceipt: React.FC<ReportReceiptProps> = ({
   discounts,
   paymentTypes,
 }) => {
-  const categoryTotals = billItemsCategoryTotals(bills, categories);
-  const paymentTotals = totalBillsPaymentBreakdown(bills, paymentTypes);
-  const discountTotals = discountBreakdownTotals(bills, discounts);
+  // const categoryTotals = billItemsCategoryTotals(bills, categories);
+  // const paymentTotals = totalBillsPaymentBreakdown(bills, paymentTypes);
+  // const discountTotals = discountBreakdownTotals(bills, discounts);
 
-  // TODO: REACT CANT DIF REALM OBJECTS
   // const categoryTotals = useMemo(() => billItemsCategoryTotals(bills, categories), [bills, categories]);
   // const paymentTotals = useMemo(() => totalBillsPaymentBreakdown(bills, paymentTypes), [bills, paymentTypes]);
   // const discountTotals = useMemo(() => discountBreakdownTotals(bills, discounts), [bills, discounts]);
 
-  const grossSalesTotal = sumObject(categoryTotals);
-  const discountTotal = sumObject(discountTotals);
-  const netSalesTotal = grossSalesTotal - discountTotal;
+  // const grossSalesTotal = sumObject(categoryTotals);
+  // const discountTotal = sumObject(discountTotals);
+  // const netSalesTotal = grossSalesTotal - discountTotal;
 
   const resolveName: (id: string, collection: Collection<{ _id: string; name: string }>) => string = (id, collection) =>
     collection.find(({ _id }) => _id === id).name;
@@ -105,15 +94,15 @@ export const ReportReceipt: React.FC<ReportReceiptProps> = ({
               <Separator bordered>
                 <Text>Category Totals</Text>
               </Separator>
-              {mapGroup(categoryTotals, id => resolveName(id, categories), currencySymbol)}
+              {/* {mapGroup(categoryTotals, id => resolveName(id, categories), currencySymbol)} */}
               <Separator bordered>
                 <Text>Payment Totals</Text>
               </Separator>
-              {mapGroup(paymentTotals, id => resolveName(id, paymentTypes), currencySymbol)}
+              {/* {mapGroup(paymentTotals, id => resolveName(id, paymentTypes), currencySymbol)} */}
               <Separator bordered>
                 <Text>Discount Totals</Text>
               </Separator>
-              {mapGroup(discountTotals, id => resolveName(id, discounts), currencySymbol)}
+              {/* {mapGroup(discountTotals, id => resolveName(id, discounts), currencySymbol)} */}
               <Separator bordered>
                 <Text>Totals</Text>
               </Separator>
@@ -123,7 +112,7 @@ export const ReportReceipt: React.FC<ReportReceiptProps> = ({
                   <Text>Gross Sales Total: </Text>
                 </Left>
                 <Right>
-                  <Text>{formatNumber(grossSalesTotal, currencySymbol)}</Text>
+                  {/* <Text>{formatNumber(grossSalesTotal, currencySymbol)}</Text> */}
                 </Right>
               </ListItem>
               <ListItem>
@@ -131,7 +120,7 @@ export const ReportReceipt: React.FC<ReportReceiptProps> = ({
                   <Text>Discount Total: </Text>
                 </Left>
                 <Right>
-                  <Text>{formatNumber(discountTotal, currencySymbol)}</Text>
+                  {/* <Text>{formatNumber(discountTotal, currencySymbol)}</Text> */}
                 </Right>
               </ListItem>
               <ListItem>
@@ -139,7 +128,7 @@ export const ReportReceipt: React.FC<ReportReceiptProps> = ({
                   <Text>Net Sales Total: </Text>
                 </Left>
                 <Right>
-                  <Text>{formatNumber(netSalesTotal, currencySymbol)}</Text>
+                  {/* <Text>{formatNumber(netSalesTotal, currencySymbol)}</Text> */}
                 </Right>
               </ListItem>
               <ListItem>
@@ -147,7 +136,7 @@ export const ReportReceipt: React.FC<ReportReceiptProps> = ({
                   <Text>Grand Total: </Text>
                 </Left>
                 <Right>
-                  <Text>{formatNumber(sumObject(paymentTotals), currencySymbol)}</Text>
+                  {/* <Text>{formatNumber(sumObject(paymentTotals), currencySymbol)}</Text> */}
                 </Right>
               </ListItem>
             </List>

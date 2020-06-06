@@ -1,5 +1,4 @@
 import { Model, tableSchema } from '@nozbe/watermelondb';
-import { tableNames } from '.';
 import { action, nochange, field, immutableRelation } from '@nozbe/watermelondb/decorators';
 
 export const billItemModifierItemSchema = tableSchema({
@@ -19,7 +18,7 @@ export const billItemModifierItemSchema = tableSchema({
 });
 
 export class BillItemModifierItemModel extends Model {
-  static table = tableNames.billItemModifierItems;
+  static table = 'bill_item_modifier_items';
 
   @nochange @field('bill_item_id') billItemId;
   @nochange @field('bill_item_modifier_id') billItemModifierId;
@@ -32,17 +31,17 @@ export class BillItemModifierItemModel extends Model {
   @nochange @field('price_group_id') priceGroupId;
   @field('is_voided') isVoided;
 
-  @immutableRelation(tableNames.billItems, 'bill_item_id') billItem;
-  @immutableRelation(tableNames.modifierItems, 'modifier_item_id') modifierItem;
-  @immutableRelation(tableNames.billItemModifiers, 'bill_item_modifier_id') billItemModifier;
-  @immutableRelation(tableNames.priceGroups, 'price_group_id') priceGroup;
-  @immutableRelation(tableNames.modifiers, 'modifier_id') modifier;
+  @immutableRelation('bill_items', 'bill_item_id') billItem;
+  @immutableRelation('modifier_items', 'modifier_item_id') modifierItem;
+  @immutableRelation('bill_item_modifiers', 'bill_item_modifier_id') billItemModifier;
+  @immutableRelation('price_groups', 'price_group_id') priceGroup;
+  @immutableRelation('modifiers', 'modifier_id') modifier;
 
   static associations = {
-    [tableNames.billItems]: { type: 'belongs_to', key: 'bill_item_id' },
-    [tableNames.modifierItems]: { type: 'belongs_to', key: 'modifier_item_id' },
-    [tableNames.billItemModifiers]: { type: 'belongs_to', key: 'bill_item_modifier_id' },
-    [tableNames.modifiers]: { type: 'belongs_to', key: 'modifier_id' },
+    bill_items: { type: 'belongs_to', key: 'bill_item_id' },
+    modifier_items: { type: 'belongs_to', key: 'modifier_item_id' },
+    bill_item_modifiers: { type: 'belongs_to', key: 'bill_item_modifier_id' },
+    modifiers: { type: 'belongs_to', key: 'modifier_id' },
   };
 
   @action void = async () =>

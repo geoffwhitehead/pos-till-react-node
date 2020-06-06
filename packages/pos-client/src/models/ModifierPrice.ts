@@ -1,16 +1,15 @@
 import { Model, tableSchema } from '@nozbe/watermelondb';
-import { tableNames } from '.';
 import { field, relation } from '@nozbe/watermelondb/decorators';
 
 export class ModifierPriceModel extends Model {
-  static table = tableNames.modifierPrices;
+  static table = 'modifier_prices';
 
   @field('price') price;
   @field('price_group_id') priceGroupId;
   @field('modifier_item_id') modifierItemId;
 
-  @relation(tableNames.priceGroups, 'price_group_id') priceGroup;
-  @relation(tableNames.modifierItems, 'modifier_item_id') modifierItem;
+  @relation('price_groups', 'price_group_id') priceGroup;
+  @relation('modifier_items', 'modifier_item_id') modifierItem;
 }
 
 export const modifierPriceSchema = tableSchema({

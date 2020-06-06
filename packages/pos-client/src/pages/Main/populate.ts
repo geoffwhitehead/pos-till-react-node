@@ -1,6 +1,5 @@
-import { database } from '../../App';
-import { Models, tableNames } from '../../models';
-import { Model } from '@nozbe/watermelondb';
+import { tableNames } from '../../models';
+import { Model, Database } from '@nozbe/watermelondb';
 import { getItems } from '../../api/item';
 import { getCategories } from '../../api/category';
 import { getModifiers } from '../../api/modifier';
@@ -10,8 +9,9 @@ import { getPrinters } from '../../api/printer';
 import { getPaymentTypes } from '../../api/paymentType';
 import { sanitizedRaw } from '@nozbe/watermelondb/RawRecord';
 import catchFn from './catchFn';
-import { getOrganization } from '../../api/organization';
-export const populateMelon = async () => {
+// import { getOrganization } from '../../api/organization';
+
+export const populate = async (database: Database) => {
   return;
   try {
     await database.action(async () => {

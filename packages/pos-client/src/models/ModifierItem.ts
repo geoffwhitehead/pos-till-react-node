@@ -1,20 +1,19 @@
 import { Model, tableSchema } from '@nozbe/watermelondb';
-import { tableNames } from '.';
 import { field, relation, children } from '@nozbe/watermelondb/decorators';
 
 export class ModifierItemModel extends Model {
-  static table = tableNames.modifierItems;
+  static table = 'modifier_items';
 
   @field('name') name;
   @field('modifier_id') modifierId;
 
-  @relation(tableNames.modifiers, 'modifier_id') modifier;
+  @relation('modifiers', 'modifier_id') modifier;
 
-  @children(tableNames.modifierPrices, 'modifier_item_id') prices;
+  @children('modifier_prices') prices;
 
   static associations = {
-    [tableNames.modifierPrices]: { type: 'has_many', foreignKey: 'modifier_item_id' },
-    [tableNames.modifiers]: { type: 'belongs_to', key: 'modifier_id' },
+    modifier_prices: { type: 'has_many', foreignKey: 'modifier_item_id' },
+    modifiers: { type: 'belongs_to', key: 'modifier_id' },
   };
 }
 

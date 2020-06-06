@@ -11,6 +11,7 @@ import { Root } from 'native-base';
 import decode from 'jwt-decode';
 import DatabaseProvider from '@nozbe/watermelondb/DatabaseProvider';
 import { database } from './database';
+import { models } from './models';
 
 export const App = () => {
   const [state, dispatch] = React.useReducer(
@@ -192,6 +193,7 @@ export const App = () => {
     return <SplashScreen />;
   }
 
+  console.log('models', models);
   return (
     // {/* native base wrapper */}
 

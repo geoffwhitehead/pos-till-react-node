@@ -1,5 +1,4 @@
-import { BillProps } from '../schemas';
-import { formatNumber, total, discountBreakdown, totalPayable, balance, billSummary, BillSummary } from '../../utils';
+import { formatNumber, billSummary, BillSummary } from '../../utils';
 import { alignCenter, alignLeftRight, addHeader, divider, alignRight } from './printer';
 import { receiptTempate } from './template';
 import { capitalize, groupBy } from 'lodash';

@@ -1,6 +1,5 @@
 import { Model, tableSchema } from '@nozbe/watermelondb';
-import { field } from '@nozbe/watermelondb/decorators';
-import { tableNames } from '.';
+import { field, lazy } from '@nozbe/watermelondb/decorators';
 
 export class PrinterModel extends Model {
   static table = 'printers';
@@ -10,10 +9,10 @@ export class PrinterModel extends Model {
   @field('address') address;
 
   static associations = {
-    [tableNames.itemPrinters]: { type: 'has_many', foreignKey: 'printer_id' },
+    item_printers: { type: 'has_many', foreignKey: 'printer_id' },
   };
   // @ts-ignore
-  @lazy items = this.collections.get(tableNames.items).query(Q.on(tableNames.itemPrinters, 'printer_id', this.id));
+  @lazy items = this.collections.get('items').query(Q.on('item_printers', 'printer_id', this.id));
 }
 
 export const printerSchema = tableSchema({

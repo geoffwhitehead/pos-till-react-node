@@ -1,6 +1,5 @@
 import React from 'react';
 import { ListItem, Left, Text, Body, Right } from '../../../../core';
-import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import { useDatabase } from '@nozbe/watermelondb/hooks';
 
 interface BillRowEmptyProps {

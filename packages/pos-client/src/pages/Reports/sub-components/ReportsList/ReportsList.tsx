@@ -1,13 +1,11 @@
 import React from 'react';
-import { List, ListItem, Text, Left, Body, Right, Button, Content, Icon, Toast } from '../../../../core';
+import { List, ListItem, Text, Left, Body, Right, Button, Content, Icon } from '../../../../core';
 import dayjs from 'dayjs';
-import { BillPeriodProps } from '../../../../services/schemas';
-import { Collection } from 'realm';
 
 interface ReportsListProps {
-  billPeriods: Collection<BillPeriodProps>;
-  selectedReport: BillPeriodProps | null;
-  onSelectReport: (report: BillPeriodProps) => void;
+  billPeriods: any;
+  selectedReport: any | null;
+  onSelectReport: (report: any) => void;
   onPressClosePeriod: (billPeriod) => void;
 }
 

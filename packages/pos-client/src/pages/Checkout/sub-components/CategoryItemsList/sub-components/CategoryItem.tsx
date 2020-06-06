@@ -2,7 +2,6 @@ import React from 'react';
 import withObservables from '@nozbe/with-observables';
 import { ListItem, Left, Text, Icon, Body, Right } from '../../../../../core';
 import { StyleSheet } from 'react-native';
-import { PriceGroupSchema } from '../../../../../services/schemas';
 import { resolvePrice } from '../../../../../helpers';
 
 interface CategoryItemProps {

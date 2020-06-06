@@ -3,14 +3,12 @@ import { SidebarNavigator } from '../../navigators';
 import { Loading } from '../Loading/Loading';
 import { BillPeriodContext } from '../../contexts/BillPeriodContext';
 import { PriceGroupContext } from '../../contexts/PriceGroupContext';
-import { populateMelon } from './populateMelon';
+import { populate } from './populate';
 import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import withObservables from '@nozbe/with-observables';
 import { Q } from '@nozbe/watermelondb';
 import { tableNames } from '../../models';
-import { database } from '../../App';
 import { CurrentBillContext } from '../../contexts/CurrentBillContext';
-import dayjs from 'dayjs';
 
 export const MainWrapped: React.FC<{
   organizationId: string;
@@ -18,7 +16,8 @@ export const MainWrapped: React.FC<{
   priceGroups: any;
   currentBillPeriod: any;
   openPeriods: any;
-}> = ({ organizationId, userId, priceGroups, openPeriods }) => {
+  database;
+}> = ({ organizationId, userId, priceGroups, openPeriods, database }) => {
   // TODO: type
   const [populating, setPopulating] = useState(false); // TODO debug: reset to true
   const [billPeriod, setBillPeriod] = useState(null);
@@ -31,7 +30,8 @@ export const MainWrapped: React.FC<{
     const populateAsync = async () => {
       // TODO: SYNC.
       try {
-        await populateMelon();
+        console.log('database', database);
+        await populate(database);
         setPopulating(false);
       } catch (err) {
         console.log('Populating failed', err);
@@ -49,6 +49,7 @@ export const MainWrapped: React.FC<{
     if (!populating && openPeriods) {
       const setCurrentPeriod = async () => {
         if (openPeriods.length === 0) {
+          console.log('tableNames', tableNames);
           const billPeriodCollection = database.collections.get(tableNames.billPeriods);
           const newPeriod = await database.action(async () => await billPeriodCollection.create());
           setBillPeriod(newPeriod);
@@ -56,7 +57,6 @@ export const MainWrapped: React.FC<{
           setBillPeriod(openPeriods[0]);
         }
       };
-
       setCurrentPeriod();
     }
   }, [setBillPeriod, populating, openPeriods]);
@@ -67,8 +67,10 @@ export const MainWrapped: React.FC<{
     }
   }, [priceGroups, populating]);
 
-  const d = dayjs().unix();
-
+  console.log('populating', populating);
+  console.log('priceGroup', priceGroup);
+  console.log('billPeriod', billPeriod);
+  console.log('priceGroups', priceGroups);
   return populating || !billPeriod || !priceGroup ? (
     <Loading />
   ) : (

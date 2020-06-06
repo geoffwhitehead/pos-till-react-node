@@ -19,11 +19,34 @@ import { paymentTypeSchema, PaymentTypeModel } from './PaymentType';
 import { printerSchema, PrinterModel } from './Printer';
 import { priceGroupSchema, PriceGroupModel } from './PriceGroup';
 
+// export const tableNames = {
+//   modifiers: 'modifiers',
+//   itemModifiers: 'item_modifiers',
+//   priceGroups: 'price_groups',
+//   itemPrices: 'item_prices',
+//   modifierPrices: 'modifier_prices',
+//   paymentTypes: 'payment_types',
+//   modifierItems: 'modifier_items',
+//   discounts: 'discounts',
+//   organizations: 'organizations',
+//   printers: 'printers',
+//   categories: 'categories',
+//   itemPrinters: 'item_printers',
+//   items: 'items',
+//   billPayments: 'bill_payments',
+//   bills: 'bills',
+//   billDiscounts: 'bill_discounts',
+//   billPeriods: 'bill_periods',
+//   billItems: 'bill_items',
+//   billItemModifiers: 'bill_item_modifiers',
+//   billItemModifierItems: 'bill_item_modifier_items',
+// };
+
 export const tableNames = {
   modifiers: modifierSchema.name,
   itemModifiers: itemModifierSchema.name,
   priceGroups: priceGroupSchema.name,
-  itemPrices: itemSchema.name,
+  itemPrices: itemPriceSchema.name,
   modifierPrices: modifierPriceSchema.name,
   paymentTypes: paymentTypeSchema.name,
   modifierItems: modifierItemSchema.name,
@@ -86,7 +109,7 @@ export const models = {
   BillPeriodModel,
   BillItemModifierItemModel,
   BillItemModifierModel,
-}
+};
 
 // PROP EXPRTS
 // export {

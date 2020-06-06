@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { Container, Grid, Col, Text } from '../../core';
+import { Container, Grid, Col } from '../../core';
 import { SidebarHeader } from '../../components/SidebarHeader/SidebarHeader';
 import { Loading } from '../Loading/Loading';
 import { CheckoutItemNavigator } from '../../navigators/CheckoutItemNavigator';
@@ -8,7 +8,6 @@ import { SelectBill } from './sub-components/SelectBill/SelectBIll';
 import { Payments } from './sub-components/Payments/Payments';
 import { CompleteBill } from './sub-components/CompleteBill/CompleteBill';
 import { BillPeriodContext } from '../../contexts/BillPeriodContext';
-import { useDatabase } from '@nozbe/watermelondb/hooks';
 import { CurrentBillContext } from '../../contexts/CurrentBillContext';
 
 export enum Modes {

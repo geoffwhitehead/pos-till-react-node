@@ -1,5 +1,4 @@
 import { Model, Q, tableSchema } from '@nozbe/watermelondb';
-import { tableNames } from '.';
 import {
   field,
   nochange,
@@ -14,20 +13,19 @@ import { resolvePrice } from '../helpers';
 import dayjs from 'dayjs';
 
 export const billSchema = tableSchema({
-    name: 'bills',
-    columns: [
-      { name: 'reference', type: 'number' },
-      { name: 'is_closed', type: 'boolean' },
-      { name: 'bill_period_id', type: 'string', isIndexed: true },
-      { name: 'closed_at', type: 'number', isOptional: true },
-      { name: 'created_at', type: 'number' },
-      { name: 'updated_at', type: 'number' },
-    ],
-  });
+  name: 'bills',
+  columns: [
+    { name: 'reference', type: 'number' },
+    { name: 'is_closed', type: 'boolean' },
+    { name: 'bill_period_id', type: 'string', isIndexed: true },
+    { name: 'closed_at', type: 'number', isOptional: true },
+    { name: 'created_at', type: 'number' },
+    { name: 'updated_at', type: 'number' },
+  ],
+});
 
-  
 export class BillModel extends Model {
-  static table = tableNames.bills;
+  static table = 'bills';
 
   @field('reference') reference;
   @field('is_closed') isClosed;
@@ -37,30 +35,30 @@ export class BillModel extends Model {
   @readonly @date('created_at') createdAt;
   @readonly @date('updated_at') updatedAt;
 
-  @immutableRelation(tableNames.billPeriods, 'bill_period_id') billPeriod;
+  @immutableRelation('bill_periods', 'bill_period_id') billPeriod;
 
   static associations = {
-    [tableNames.billPeriods]: { type: 'belongs_to', key: 'bill_period_id' },
-    [tableNames.billPayments]: { type: 'has_many', foreignKey: 'bill_id' },
-    [tableNames.billItems]: { type: 'has_many', foreignKey: 'bill_id' },
-    [tableNames.billDiscounts]: { type: 'has_many', foreignKey: 'bill_id' },
+    bill_periods: { type: 'belongs_to', key: 'bill_period_id' },
+    bill_payments: { type: 'has_many', foreignKey: 'bill_id' },
+    bill_items: { type: 'has_many', foreignKey: 'bill_id' },
+    bill_discounts: { type: 'has_many', foreignKey: 'bill_id' },
   };
 
-  @children(tableNames.billPayments) billPayments;
-  @children(tableNames.billDiscounts) billDiscounts;
-  @children(tableNames.billItems) _billItems;
+  @children('bill_payments') billPayments;
+  @children('bill_discounts') billDiscounts;
+  @children('bill_items') _billItems;
 
   @lazy billItems = this._billItems.extend(Q.where('is_voided', Q.notEq(true)));
   @lazy billItemVoids = this._billItems.extend(Q.where('is_voided', true));
   @lazy _billModifierItems = this.collections
-    .get(tableNames.billItemModifierItems)
-    .query(Q.on(tableNames.billItems, 'bill_id', this.id));
+    .get('bill_item_modifier_items')
+    .query(Q.on('bill_items', 'bill_id', this.id));
   @lazy billModifierItems = this._billModifierItems.extend(Q.where('is_voided', Q.notEq(true)));
   @lazy billModifierItemVoids = this._billModifierItems.extend(Q.where('is_voided', true));
 
   @action addPayment = async (p: { paymentType: string; amount: number; isChange?: boolean }) => {
     const { paymentType, amount, isChange } = p;
-    await this.collections.get(tableNames.billPayments).create(payment => {
+    await this.collections.get('bill_payments').create(payment => {
       payment.paymentType.set(paymentType);
       payment.bill.set(this);
       Object.assign(payment, {
@@ -71,7 +69,7 @@ export class BillModel extends Model {
   };
 
   @action addDiscount = async (p: { discount }) => {
-    await this.collections.get(tableNames.billDiscounts).create(discount => {
+    await this.collections.get('bill_discounts').create(discount => {
       discount.bill.set(this);
       discount.discount.set(p.discount);
     });
@@ -82,7 +80,7 @@ export class BillModel extends Model {
     const [category, prices] = await Promise.all([item.category.fetch(), item.prices.fetch()]);
 
     const newItem = await this.database.action(() =>
-      this.collections.get(tableNames.billItems).create(billItem => {
+      this.collections.get('bill_items').create(billItem => {
         billItem.bill.set(this);
         billItem.priceGroup.set(priceGroup);
         billItem.category.set(category);

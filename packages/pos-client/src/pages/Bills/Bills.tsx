@@ -1,12 +1,8 @@
 import React, { useContext } from 'react';
-import { Text, Container } from '../../core';
+import { Container } from '../../core';
 import { SidebarHeader } from '../../components/SidebarHeader/SidebarHeader';
 import { SelectBill } from '../Checkout/sub-components/SelectBill/SelectBIll';
-import { BillSchema, BillProps } from '../../services/schemas';
-import { useRealmQuery } from 'react-use-realm';
 import { routes } from '../../navigators/SidebarNavigator';
-import { realm } from '../../services/Realm';
-import uuidv4 from 'uuid';
 import { BillPeriodContext } from '../../contexts/BillPeriodContext';
 
 // TODO: move to org

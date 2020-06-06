@@ -1,7 +1,6 @@
 import React from 'react';
 import withObservables from '@nozbe/with-observables';
-import { ListItem, Text } from '../../../../../../core';
-import { TextInput } from 'react-native-gesture-handler';
+import { Text } from '../../../../../../core';
 import { View } from 'native-base';
 import { ModifierItem } from './ModifierItem';
 

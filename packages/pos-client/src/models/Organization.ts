@@ -1,17 +1,17 @@
 import { Model, tableSchema } from '@nozbe/watermelondb';
-import { tableNames } from '.';
+import { field } from '@nozbe/watermelondb/decorators';
 
 export class OrganizationModel extends Model {
-  static table = tableNames.organizations;
+  static table = 'organizations';
 
-  @field('name') string;
-  @field('email') string;
-  @field('phone') string;
-  @field('address_line1') string;
-  @field('address_line2') string;
-  @field('address_city') string;
-  @field('address_county') string;
-  @field('address_postcode') string;
+  @field('name') name;
+  @field('email') email;
+  @field('phone') phone;
+  @field('address_line1') addressLine1;
+  @field('address_line2') addressLine2;
+  @field('address_city') addressCity;
+  @field('address_county') addressCounty;
+  @field('address_postcode') addressPostcode;
 }
 
 export const organizationSchema = tableSchema({

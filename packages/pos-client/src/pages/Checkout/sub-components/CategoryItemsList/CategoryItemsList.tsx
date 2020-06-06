@@ -17,11 +17,7 @@ interface CategoryItemsListProps {
   navigation: any; // TODO: type this
 }
 
-const WrappedCategoryItems: React.FC<CategoryItemsListProps> = ({
-  category,
-  items,
-  navigation,
-}) => {
+const WrappedCategoryItems: React.FC<CategoryItemsListProps> = ({ category, items, navigation }) => {
   const [searchValue, setSearchValue] = useState<string>('');
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [selectedItem, setSelectedItem] = useState<any>();
@@ -30,8 +26,7 @@ const WrappedCategoryItems: React.FC<CategoryItemsListProps> = ({
 
   const goBack = () => navigation.goBack();
 
-  const searchFilter = (item: any, searchValue: string) =>
-    item.name.toLowerCase().includes(searchValue.toLowerCase());
+  const searchFilter = (item: any, searchValue: string) => item.name.toLowerCase().includes(searchValue.toLowerCase());
 
   const onSearchHandler = (value: string) => setSearchValue(value);
   const onCancelHandler = () => {
@@ -44,10 +39,10 @@ const WrappedCategoryItems: React.FC<CategoryItemsListProps> = ({
       setSelectedItem(item);
       setModalOpen(true);
     } else {
-      const newItem = await currentBill.addItem({ item, priceGroup });
+      await currentBill.addItem({ item, priceGroup });
     }
   };
-
+  console.log('items', items);
   return (
     <Content>
       <SearchHeader onChangeText={onSearchHandler} value={searchValue} />
@@ -83,35 +78,35 @@ const WrappedCategoryItems: React.FC<CategoryItemsListProps> = ({
           <Right />
         </ListItem>
         {items
-          .filter(item => searchFilter(item, searchValue))
-          .map(item => (
-            <CategoryItem
-              key={item.id}
-              item={item}
-              priceGroup={priceGroup}
-              isActive={selectedItem === item}
-              onPressItem={onSelectItem}
-            />
-          ))}
+          .filter(item => (searchValue ? searchFilter(item, searchValue) : true))
+          .map(item => {
+            console.log('item', item);
+            console.log('priceGroup', priceGroup)
+            return (
+              <CategoryItem
+                key={item.id}
+                item={item}
+                priceGroup={priceGroup}
+                isActive={selectedItem === item}
+                onPressItem={onSelectItem}
+              />
+            );
+          })}
       </List>
     </Content>
   );
 };
 
 export const CategoryItems = withObservables<any, any>(['route'], ({ route }) => {
-
   const { category } = route.params;
   return {
-    category: category.observe(),
-    items: category.items.observe(),
+    category,
+    items: category.items,
   };
 })(WrappedCategoryItems);
 
 export const AllItems = withDatabase(
   withObservables<any, any>([], ({ database }) => ({
-    items: database.collections
-      .get('items')
-      .query()
-      .observe(),
+    items: database.collections.get('items').query(),
   }))(WrappedCategoryItems),
 );

@@ -10,7 +10,7 @@ import { addHeader, alignLeftRight, divider, starDivider, alignCenter, RECEIPT_W
 import { receiptTempate } from './template';
 import { capitalize } from 'lodash';
 import dayjs from 'dayjs';
-import { flatten, groupBy, sumBy } from 'lodash';
+import { flatten, sumBy } from 'lodash';
 import { tableNames } from '../../models';
 
 const symbol = '£'; // TODO: move

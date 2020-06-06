@@ -1,5 +1,4 @@
 import { Model, Q, tableSchema } from '@nozbe/watermelondb';
-import { tableNames } from '.';
 import { readonly, date, children, lazy, action } from '@nozbe/watermelondb/decorators';
 import dayjs from 'dayjs';
 
@@ -12,16 +11,16 @@ export const billPeriodSchema = tableSchema({
 });
 
 export class BillPeriodModel extends Model {
-  static table = tableNames.billPeriods;
+  static table = 'bill_periods';
 
   @readonly @date('created_at') createdAt;
   @date('closed_at') closedAt;
 
   static associations = {
-    [tableNames.bills]: { type: 'has_many', foreignKey: 'bill_period_id' },
+    bills: { type: 'has_many', foreignKey: 'bill_period_id' },
   };
 
-  @children(tableNames.bills) bills;
+  @children('bills') bills;
 
   @lazy openBills = this.bills.extend(Q.where('is_closed', Q.notEq(true)));
   @lazy closedBills = this.bills.extend(Q.where('is_closed', Q.eq(true)));
@@ -31,20 +30,16 @@ export class BillPeriodModel extends Model {
    * currently pending in a sale.
    */
 
-  @lazy _periodItems = this.collections
-    .get(tableNames.billItems)
-    .query(Q.on(tableNames.bills, 'bill_period_id', this.id));
+  @lazy _periodItems = this.collections.get('bill_items').query(Q.on('bills', 'bill_period_id', this.id));
   @lazy periodItems = this._periodItems.extend(Q.where('is_voided', Q.notEq(true)));
   @lazy periodItemVoids = this._periodItems.extend(Q.where('is_voided', Q.eq(true)));
   @lazy periodDiscounts = this.collections
-    .get(tableNames.billDiscounts)
-    .query(Q.on(tableNames.bills, 'bill_period_id', this.id));
-  @lazy periodPayments = this.collections
-    .get(tableNames.billPayments)
-    .query(Q.on(tableNames.bills, 'bill_period_id', this.id));
+    .get('bill_discounts')
+    .query(Q.on('bills', 'bill_period_id', this.id));
+  @lazy periodPayments = this.collections.get('bill_payments').query(Q.on('bills', 'bill_period_id', this.id));
 
   @action createBill = async (params: { reference: number }) => {
-    return this.collections.get(tableNames.bills).create(bill => {
+    return this.collections.get('bills').create(bill => {
       bill.reference = params.reference;
       bill.isClosed = false;
       bill.billPeriodId = this.id;

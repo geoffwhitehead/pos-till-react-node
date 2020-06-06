@@ -1,14 +1,13 @@
 import { Model, tableSchema } from '@nozbe/watermelondb';
-import { tableNames } from '.';
 import { nochange, field } from '@nozbe/watermelondb/decorators';
 
 export class PaymentTypeModel extends Model {
-  static table = tableNames.paymentTypes;
+  static table = 'payment_types';
 
   @nochange @field('name') name;
 
   static associations = {
-    [tableNames.billPayments]: { type: 'has_many', foreignKey: 'payment_type_id' },
+    bill_payments: { type: 'has_many', foreignKey: 'payment_type_id' },
   };
 }
 

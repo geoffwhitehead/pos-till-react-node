@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Text, Content, List, ListItem, Left, Icon, Body, Right } from '../../../../core';
 import { SearchHeader } from '../../../../components/SearchHeader/SearchHeader';
-import { ModifierProps } from '../../../../services/schemas';
 
 export const ItemModifierList: React.FC = ({ route, navigation }) => {
   const { item, modifier, createBillItem } = route.params;
@@ -17,7 +16,8 @@ export const ItemModifierList: React.FC = ({ route, navigation }) => {
 
   const onSearchHandler = (value: string) => setSearchValue(value);
 
-  const searchFilter = (modifier: ModifierProps, searchValue: string) =>
+  // TODO: type
+  const searchFilter = (modifier: any, searchValue: string) =>
     modifier.name.toLowerCase().includes(searchValue.toLowerCase());
 
   return (

@@ -29,6 +29,7 @@ import { View } from 'react-native';
 // const symbol = '£'; // TODO move
 
 export const ReportsInner = ({ database, navigation, billPeriods }) => {
+  console.log('billPeriods', billPeriods)
   const openDrawer = () => navigation.openDrawer();
   const onPrint = async (billPeriod: any) => {
     const commands = await periodReport(billPeriod, database);

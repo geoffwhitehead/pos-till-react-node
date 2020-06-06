@@ -1,5 +1,4 @@
 import React from 'react';
-import dayjs from 'dayjs';
 import withObservables from '@nozbe/with-observables';
 import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import { Content, ListItem, Left, List, Text, Body, Right } from '../../../core';

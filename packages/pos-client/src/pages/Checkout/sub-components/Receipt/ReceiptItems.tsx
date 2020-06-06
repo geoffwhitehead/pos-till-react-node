@@ -1,20 +1,19 @@
 import { Content, List, ActionSheet } from '../../../../core';
 import React, { useState, useEffect, useRef } from 'react';
-import { BillProps, DiscountProps } from '../../../../services/schemas';
-import { database } from '../../../../App';
 import { ItemsBreakdown } from './sub-components/ItemsBreakdown';
 import { DiscountsBreakdown } from './sub-components/DiscountsBreakdown';
 import { PaymentsBreakdown } from './sub-components/PaymentsBreakdown';
+import { useDatabase } from '@nozbe/watermelondb/hooks';
 
 interface ReceiptItemsProps {
-  bill: BillProps;
+  bill: any;
   readonly: boolean;
   billPayments: any;
   discountBreakdown: any;
   billItems: any;
-  discounts: DiscountProps[];
+  discounts: any[];
   billDiscounts: any;
-  paymentTypes: any
+  paymentTypes: any;
 }
 
 export const ReceiptItems: React.FC<ReceiptItemsProps> = ({
@@ -30,6 +29,8 @@ export const ReceiptItems: React.FC<ReceiptItemsProps> = ({
   const refContentList = useRef();
 
   useEffect(() => refContentList.current._root.scrollToEnd(), [billItems]);
+
+  const database = useDatabase();
 
   const [selected, setSelected] = useState(null);
 
@@ -72,13 +73,8 @@ export const ReceiptItems: React.FC<ReceiptItemsProps> = ({
           onSelect={resolveBillDiscountId(onRemove)}
           discountBreakdown={discountBreakdown}
         />
-        <PaymentsBreakdown {...common} payments={billPayments} paymentTypes={paymentTypes}/>
+        <PaymentsBreakdown {...common} payments={billPayments} paymentTypes={paymentTypes} />
       </List>
     </Content>
   );
 };
-
-
-
-
-

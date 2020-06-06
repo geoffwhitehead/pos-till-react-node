@@ -1,5 +1,4 @@
 import { Model, Q, tableSchema } from '@nozbe/watermelondb';
-import { tableNames } from '.';
 import {
   action,
   nochange,
@@ -32,7 +31,8 @@ export const billItemSchema = tableSchema({
 });
 
 export class BillItemModel extends Model {
-  static table = tableNames.billItems;
+  static table = 'bill_items';
+  
   @nochange @field('bill_id') billId;
   @nochange @field('item_id') itemId;
   @nochange @field('item_name') itemName;
@@ -45,13 +45,13 @@ export class BillItemModel extends Model {
   @readonly @date('updated_at') updatedAt;
   @field('is_voided') isVoided;
 
-  @immutableRelation(tableNames.bills, 'bill_id') bill;
-  @immutableRelation(tableNames.items, 'item_id') item;
-  @immutableRelation(tableNames.priceGroups, 'price_group_id') priceGroup;
-  @immutableRelation(tableNames.categories, 'category_id') category;
+  @immutableRelation('bills', 'bill_id') bill;
+  @immutableRelation('items', 'item_id') item;
+  @immutableRelation('price_groups', 'price_group_id') priceGroup;
+  @immutableRelation('categories', 'category_id') category;
 
-  @children(tableNames.billItemModifierItems) _billItemModifierItems;
-  @children(tableNames.billItemModifiers) billItemModifiers;
+  @children('bill_item_modifier_items') _billItemModifierItems;
+  @children('bill_item_modifiers') billItemModifiers;
 
   @lazy billItemModifierItems = this._billItemModifierItems.extend(Q.where('is_voided', Q.notEq(true)));
   @lazy billItemModifierItemVoids = this._billItemModifierItems.extend(Q.where('is_voided', true));
@@ -70,7 +70,7 @@ export class BillItemModel extends Model {
     const toCreate = [];
 
     const billItemModifierToCreate = this.collections
-      .get(tableNames.billItemModifiers)
+      .get('bill_item_modifiers')
       .prepareCreate(billItemModifier => {
         billItemModifier.modifier.set(modifier);
         billItemModifier.billItem.set(this);
@@ -83,7 +83,7 @@ export class BillItemModel extends Model {
       await modifierItems.map(async modifierItem => {
         const prices = await modifierItem.prices.fetch();
         const modifier = await modifierItem.modifier.fetch();
-        const mItem = this.collections.get(tableNames.billItemModifierItems).prepareCreate(billItemModifierItem => {
+        const mItem = this.collections.get('bill_item_modifier_items').prepareCreate(billItemModifierItem => {
           billItemModifierItem.billItem.set(this);
           billItemModifierItem.modifierItem.set(modifierItem);
           billItemModifierItem.billItemModifier.set(billItemModifierToCreate);
@@ -109,11 +109,11 @@ export class BillItemModel extends Model {
   };
 
   static associations = {
-    [tableNames.bills]: { type: 'belongs_to', key: 'bill_id' },
-    [tableNames.items]: { type: 'belongs_to', key: 'item_id' },
-    [tableNames.priceGroups]: { type: 'belongs_to', key: 'price_group_id' },
-    [tableNames.categories]: { type: 'belongs_to', key: 'category_id' },
-    [tableNames.billItemModifierItems]: { type: 'has_many', foreignKey: 'bill_item_id' },
-    [tableNames.billItemModifiers]: { type: 'has_many', foreignKey: 'bill_item_id' },
+    bills: { type: 'belongs_to', key: 'bill_id' },
+    items: { type: 'belongs_to', key: 'item_id' },
+    price_groups: { type: 'belongs_to', key: 'price_group_id' },
+    categories: { type: 'belongs_to', key: 'category_id' },
+    bill_item_modifier_items: { type: 'has_many', foreignKey: 'bill_item_id' },
+    bill_item_modifiers: { type: 'has_many', foreignKey: 'bill_item_id' },
   };
 }
