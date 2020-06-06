@@ -28,7 +28,7 @@ export const ReceiptItems: React.FC<ReceiptItemsProps> = ({
 }) => {
   const refContentList = useRef();
 
-  useEffect(() => refContentList.current._root.scrollToEnd(), [billItems]);
+  useEffect(() => refContentList.current._root.scrollToEnd(), [billItems, billDiscounts, billPayments]);
 
   const database = useDatabase();
 
