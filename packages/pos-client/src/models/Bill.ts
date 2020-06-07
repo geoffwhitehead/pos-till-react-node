@@ -11,8 +11,7 @@ import {
 } from '@nozbe/watermelondb/decorators';
 import { resolvePrice } from '../helpers';
 import dayjs from 'dayjs';
-import { Bill, BillItem } from './BillItem';
-import { TimeStampedModel } from './types';
+import { BillItem } from './BillItem';
 import { BillPeriod } from './BillPeriod';
 import { BillPayment } from './BillPayment';
 import { BillDiscount } from './BillDiscount';
@@ -56,9 +55,9 @@ export class Bill extends Model {
 
   @lazy billItems: Query<BillItem> = this._billItems.extend(Q.where('is_voided', Q.notEq(true)));
   @lazy billItemVoids: Query<BillItem> = this._billItems.extend(Q.where('is_voided', true));
-  @lazy _billModifierItems: Query<BillItemModifierItem> = this.collections
+  @lazy _billModifierItems = this.collections
     .get('bill_item_modifier_items')
-    .query(Q.on('bill_items', 'bill_id', this.id));
+    .query(Q.on('bill_items', 'bill_id', this.id)) as Query<BillItemModifierItem>;
   @lazy billModifierItems: Query<BillItemModifierItem> = this._billModifierItems.extend(Q.where('is_voided', Q.notEq(true)));
   @lazy billModifierItemVoids: Query<BillItemModifierItem> = this._billModifierItems.extend(Q.where('is_voided', true));
 

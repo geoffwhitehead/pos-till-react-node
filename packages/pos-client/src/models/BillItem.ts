@@ -1,4 +1,4 @@
-import { Model, Q, tableSchema } from '@nozbe/watermelondb';
+import { Model, Q, tableSchema, Relation, Query } from '@nozbe/watermelondb';
 import {
   action,
   nochange,
@@ -10,7 +10,14 @@ import {
   lazy,
 } from '@nozbe/watermelondb/decorators';
 import { resolvePrice } from '../helpers';
-import { TimeStampedModel } from './types';
+import { Bill } from './Bill';
+import { Item } from './Item';
+import { PriceGroup } from './PriceGroup';
+import { Category } from './Category';
+import { BillItemModifierItem } from './BillItemModifierItem';
+import { BillItemModifier } from './BillItemModifier';
+import { Modifier } from './Modifier';
+import { ModifierItem } from './ModifierItem';
 
 export const billItemSchema = tableSchema({
   name: 'bill_items',
@@ -31,43 +38,35 @@ export const billItemSchema = tableSchema({
   ],
 });
 
-// export interface Bill extends TimeStampedModel {
-//   billId: string,
-//   itemId: string,
-//   itemName: string,
-//   itemPrice: string,
-//   priceGroupName: string,
-//   priceGroupId: string,
-//   categoryId: string,
-//   categoryName: string,
-//   isVoided: boolean
-// }
-
 export class BillItem extends Model {
   static table = 'bill_items';
 
   @nochange @field('bill_id') billId: string;
-  @nochange @field('item_id') itemId;
-  @nochange @field('item_name') itemName;
-  @nochange @field('item_price') itemPrice;
-  @nochange @field('price_group_name') priceGroupName;
-  @nochange @field('price_group_id') priceGroupId;
-  @nochange @field('category_id') categoryId;
-  @nochange @field('category_name') categoryName;
-  @readonly @date('created_at') createdAt;
-  @readonly @date('updated_at') updatedAt;
-  @field('is_voided') isVoided;
+  @nochange @field('item_id') itemId: string;
+  @nochange @field('item_name') itemName: string;
+  @nochange @field('item_price') itemPrice: number;
+  @nochange @field('price_group_name') priceGroupName: string;
+  @nochange @field('price_group_id') priceGroupId: string;
+  @nochange @field('category_id') categoryId: string;
+  @nochange @field('category_name') categoryName: string;
+  @readonly @date('created_at') createdAt: Date;
+  @readonly @date('updated_at') updatedAt: Date;
+  @field('is_voided') isVoided: boolean;
 
-  @immutableRelation('bills', 'bill_id') bill;
-  @immutableRelation('items', 'item_id') item;
-  @immutableRelation('price_groups', 'price_group_id') priceGroup;
-  @immutableRelation('categories', 'category_id') category;
+  @immutableRelation('bills', 'bill_id') bill: Relation<Bill>;
+  @immutableRelation('items', 'item_id') item: Relation<Item>;
+  @immutableRelation('price_groups', 'price_group_id') priceGroup: Relation<PriceGroup>;
+  @immutableRelation('categories', 'category_id') category: Relation<Category>;
 
-  @children('bill_item_modifier_items') _billItemModifierItems;
-  @children('bill_item_modifiers') billItemModifiers;
+  @children('bill_item_modifier_items') _billItemModifierItems: Query<BillItemModifierItem>;
+  @children('bill_item_modifiers') billItemModifiers: Query<BillItemModifier>;
 
-  @lazy billItemModifierItems = this._billItemModifierItems.extend(Q.where('is_voided', Q.notEq(true)));
-  @lazy billItemModifierItemVoids = this._billItemModifierItems.extend(Q.where('is_voided', true));
+  @lazy billItemModifierItems: Query<BillItemModifierItem> = this._billItemModifierItems.extend(
+    Q.where('is_voided', Q.notEq(true)),
+  );
+  @lazy billItemModifierItemVoids: Query<BillItemModifierItem> = this._billItemModifierItems.extend(
+    Q.where('is_voided', true),
+  );
 
   @action void = async () => {
     const modifierItemsToVoid = await this.billItemModifierItems.fetch();
@@ -79,7 +78,7 @@ export class BillItem extends Model {
     });
   };
 
-  @action addModifierChoices = async (modifier, modifierItems, priceGroup) => {
+  @action addModifierChoices = async (modifier: Modifier, modifierItems: ModifierItem[], priceGroup: PriceGroup) => {
     const toCreate = [];
 
     const billItemModifierToCreate = this.collections.get('bill_item_modifiers').prepareCreate(billItemModifier => {

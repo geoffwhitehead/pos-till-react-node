@@ -1,12 +1,13 @@
-import { Model, tableSchema } from '@nozbe/watermelondb';
+import { Model, tableSchema, Query } from '@nozbe/watermelondb';
 import { children, nochange, field } from '@nozbe/watermelondb/decorators';
+import { Item } from './Item';
 
 export class Category extends Model {
   static table = 'categories';
 
-  @children('items') items;
+  @children('items') items: Query<Item>;
 
-  @nochange @field('name') name;
+  @nochange @field('name') name: string;
 
   static associations = {
     items: { type: 'has_many', foreignKey: 'category_id' },

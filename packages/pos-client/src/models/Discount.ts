@@ -4,9 +4,9 @@ import { nochange, field } from '@nozbe/watermelondb/decorators';
 export class Discount extends Model {
   static table = 'discounts';
 
-  @nochange @field('name') name;
-  @nochange @field('amount') amount;
-  @nochange @field('is_percent') isPercent;
+  @nochange @field('name') name: string;
+  @nochange @field('amount') amount: number;
+  @nochange @field('is_percent') isPercent: boolean;
 }
 
 export const discountSchema = tableSchema({

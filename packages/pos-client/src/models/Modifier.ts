@@ -1,12 +1,13 @@
-import { Model, tableSchema } from '@nozbe/watermelondb';
+import { Model, tableSchema, Query } from '@nozbe/watermelondb';
 import { field, children } from '@nozbe/watermelondb/decorators';
+import { ModifierItem } from './ModifierItem';
 
 export class Modifier extends Model {
   static table = 'modifiers';
 
-  @field('name') name;
-  @field('min_items') minItems;
-  @field('max_items') maxItems;
+  @field('name') name: string;
+  @field('min_items') minItems: number;
+  @field('max_items') maxItems: number;
 
   static associations = {
     item_modifiers: { type: 'has_many', foreignKey: 'modifier_id' },
@@ -14,7 +15,7 @@ export class Modifier extends Model {
     items: { type: 'belongs_to', foreignKey: 'modifier_id' },
   };
 
-  @children('modifier_items') modifierItems;
+  @children('modifier_items') modifierItems: Query<ModifierItem>;
 }
 
 export const modifierSchema = tableSchema({

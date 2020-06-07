@@ -4,7 +4,7 @@ import { field } from '@nozbe/watermelondb/decorators';
 export class PriceGroup extends Model {
   static table = 'price_groups';
 
-  @field('name') name;
+  @field('name') name: string;
 }
 
 export const priceGroupSchema = tableSchema({

@@ -4,14 +4,14 @@ import { field } from '@nozbe/watermelondb/decorators';
 export class Organization extends Model {
   static table = 'organizations';
 
-  @field('name') name;
-  @field('email') email;
-  @field('phone') phone;
-  @field('address_line1') addressLine1;
-  @field('address_line2') addressLine2;
-  @field('address_city') addressCity;
-  @field('address_county') addressCounty;
-  @field('address_postcode') addressPostcode;
+  @field('name') name: string;
+  @field('email') email: string;
+  @field('phone') phone: string;
+  @field('address_line1') addressLine1: string;
+  @field('address_line2') addressLine2: string;
+  @field('address_city') addressCity: string;
+  @field('address_county') addressCounty: string;
+  @field('address_postcode') addressPostcode: string;
 }
 
 export const organizationSchema = tableSchema({

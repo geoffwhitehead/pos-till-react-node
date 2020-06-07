@@ -1,14 +1,16 @@
-import { Model, tableSchema } from '@nozbe/watermelondb';
+import { Model, tableSchema, Relation } from '@nozbe/watermelondb';
 import { field, relation } from '@nozbe/watermelondb/decorators';
+import { Item } from './Item';
+import { Printer } from './Printer';
 
 export class ItemPrinter extends Model {
   static table = 'item_printers';
 
-  @field('item_id') itemId;
-  @field('printer_id') printerId;
+  @field('item_id') itemId: string;
+  @field('printer_id') printerId: string;
 
-  @relation('items', 'item_id') item;
-  @relation('printers', 'printer_id') printer;
+  @relation('items', 'item_id') item: Relation<Item>;
+  @relation('printers', 'printer_id') printer: Relation<Printer>;
 
   static associations = {
     items: { type: 'belongs_to', key: 'item_id' },

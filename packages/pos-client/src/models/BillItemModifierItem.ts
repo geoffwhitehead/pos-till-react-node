@@ -1,5 +1,10 @@
-import { Model, tableSchema } from '@nozbe/watermelondb';
+import { Model, tableSchema, Relation } from '@nozbe/watermelondb';
 import { action, nochange, field, immutableRelation } from '@nozbe/watermelondb/decorators';
+import { ModifierItem } from './ModifierItem';
+import { BillItemModifier } from './BillItemModifier';
+import { PriceGroup } from './PriceGroup';
+import { Modifier } from './Modifier';
+import { BillItem } from './BillItem';
 
 export const billItemModifierItemSchema = tableSchema({
   name: 'bill_item_modifier_items',
@@ -20,22 +25,22 @@ export const billItemModifierItemSchema = tableSchema({
 export class BillItemModifierItem extends Model {
   static table = 'bill_item_modifier_items';
 
-  @nochange @field('bill_item_id') billItemId;
-  @nochange @field('bill_item_modifier_id') billItemModifierId;
-  @nochange @field('modifier_id') modifierId;
-  @nochange @field('modifier_name') modifierName;
-  @nochange @field('modifier_item_id') modifierItemId;
-  @nochange @field('modifier_item_price') modifierItemPrice;
-  @nochange @field('modifier_item_name') modifierItemName;
-  @nochange @field('price_group_name') priceGroupName;
-  @nochange @field('price_group_id') priceGroupId;
-  @field('is_voided') isVoided;
+  @nochange @field('bill_item_id') billItemId: string;
+  @nochange @field('bill_item_modifier_id') billItemModifierId: string;
+  @nochange @field('modifier_id') modifierId: string;
+  @nochange @field('modifier_name') modifierName: string;
+  @nochange @field('modifier_item_id') modifierItemId: string;
+  @nochange @field('modifier_item_price') modifierItemPrice: number;
+  @nochange @field('modifier_item_name') modifierItemName: string;
+  @nochange @field('price_group_name') priceGroupName: string;
+  @nochange @field('price_group_id') priceGroupId: string;
+  @field('is_voided') isVoided: boolean;
 
-  @immutableRelation('bill_items', 'bill_item_id') billItem;
-  @immutableRelation('modifier_items', 'modifier_item_id') modifierItem;
-  @immutableRelation('bill_item_modifiers', 'bill_item_modifier_id') billItemModifier;
-  @immutableRelation('price_groups', 'price_group_id') priceGroup;
-  @immutableRelation('modifiers', 'modifier_id') modifier;
+  @immutableRelation('bill_items', 'bill_item_id') billItem: Relation<BillItem>;
+  @immutableRelation('modifier_items', 'modifier_item_id') modifierItem: Relation<ModifierItem>;
+  @immutableRelation('bill_item_modifiers', 'bill_item_modifier_id') billItemModifier: Relation<BillItemModifier>;
+  @immutableRelation('price_groups', 'price_group_id') priceGroup: Relation<PriceGroup>;
+  @immutableRelation('modifiers', 'modifier_id') modifier: Relation<Modifier>;
 
   static associations = {
     bill_items: { type: 'belongs_to', key: 'bill_item_id' },

@@ -1,5 +1,7 @@
-import { Model, tableSchema } from '@nozbe/watermelondb';
+import { Model, tableSchema, Relation } from '@nozbe/watermelondb';
 import { nochange, field, readonly, date, immutableRelation, action } from '@nozbe/watermelondb/decorators';
+import { Bill } from './Bill';
+import { Discount } from './Discount';
 
 export const billDiscountSchema = tableSchema({
   name: 'bill_discounts',
@@ -15,14 +17,14 @@ export const billDiscountSchema = tableSchema({
 export class BillDiscount extends Model {
   static table = 'bill_discounts';
 
-  @nochange @field('bill_id') billId;
-  @nochange @field('discount_id') discountId;
-  @readonly @date('created_at') createdAt;
-  @readonly @date('updated_at') updatedAt;
-  @field('closing_amount') closingAmount;
+  @nochange @field('bill_id') billId: string;
+  @nochange @field('discount_id') discountId: string;
+  @readonly @date('created_at') createdAt: Date;
+  @readonly @date('updated_at') updatedAt: Date;
+  @field('closing_amount') closingAmount: number;
 
-  @immutableRelation('bills', 'bill_id') bill;
-  @immutableRelation('discounts', 'discount_id') discount;
+  @immutableRelation('bills', 'bill_id') bill: Relation<Bill>;
+  @immutableRelation('discounts', 'discount_id') discount: Relation<Discount>;
 
   static associations = {
     bills: { type: 'belongs_to', key: 'bill_id' },
