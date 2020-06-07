@@ -10,7 +10,7 @@ export const billPeriodSchema = tableSchema({
   ],
 });
 
-export class BillPeriodModel extends Model {
+export class BillPeriod extends Model {
   static table = 'bill_periods';
 
   @readonly @date('created_at') createdAt;

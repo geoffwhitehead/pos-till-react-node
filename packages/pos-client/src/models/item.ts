@@ -1,7 +1,7 @@
 import { Model, Q, tableSchema } from '@nozbe/watermelondb';
 import { field, relation, children, lazy } from '@nozbe/watermelondb/decorators';
 
-export class ItemModel extends Model {
+export class Item extends Model {
   static table = 'items';
 
   @field('name') name;

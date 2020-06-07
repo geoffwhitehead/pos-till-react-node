@@ -10,6 +10,7 @@ import {
   lazy,
 } from '@nozbe/watermelondb/decorators';
 import { resolvePrice } from '../helpers';
+import { TimeStampedModel } from './types';
 
 export const billItemSchema = tableSchema({
   name: 'bill_items',
@@ -30,10 +31,22 @@ export const billItemSchema = tableSchema({
   ],
 });
 
-export class BillItemModel extends Model {
+// export interface Bill extends TimeStampedModel {
+//   billId: string,
+//   itemId: string,
+//   itemName: string,
+//   itemPrice: string,
+//   priceGroupName: string,
+//   priceGroupId: string,
+//   categoryId: string,
+//   categoryName: string,
+//   isVoided: boolean
+// }
+
+export class BillItem extends Model {
   static table = 'bill_items';
-  
-  @nochange @field('bill_id') billId;
+
+  @nochange @field('bill_id') billId: string;
   @nochange @field('item_id') itemId;
   @nochange @field('item_name') itemName;
   @nochange @field('item_price') itemPrice;
@@ -69,15 +82,13 @@ export class BillItemModel extends Model {
   @action addModifierChoices = async (modifier, modifierItems, priceGroup) => {
     const toCreate = [];
 
-    const billItemModifierToCreate = this.collections
-      .get('bill_item_modifiers')
-      .prepareCreate(billItemModifier => {
-        billItemModifier.modifier.set(modifier);
-        billItemModifier.billItem.set(this);
-        Object.assign(billItemModifier, {
-          modifierName: modifier.name,
-        });
+    const billItemModifierToCreate = this.collections.get('bill_item_modifiers').prepareCreate(billItemModifier => {
+      billItemModifier.modifier.set(modifier);
+      billItemModifier.billItem.set(this);
+      Object.assign(billItemModifier, {
+        modifierName: modifier.name,
       });
+    });
 
     const billItemModifierItemsToCreate = await Promise.all(
       await modifierItems.map(async modifierItem => {

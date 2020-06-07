@@ -12,7 +12,7 @@ export const billDiscountSchema = tableSchema({
   ],
 });
 
-export class BillDiscountModel extends Model {
+export class BillDiscount extends Model {
   static table = 'bill_discounts';
 
   @nochange @field('bill_id') billId;

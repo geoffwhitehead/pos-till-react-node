@@ -1,23 +1,23 @@
-import { billSchema, BillModel } from './Bill';
-import { billDiscountSchema, BillDiscountModel } from './BillDiscount';
-import { billItemSchema, BillItemModel } from './BillItem';
-import { billItemModifierSchema, BillItemModifierModel } from './BillItemModifier';
-import { billItemModifierItemSchema, BillItemModifierItemModel } from './BillItemModifierItem';
-import { billPaymentSchema, BillPaymentModel } from './BillPayment';
-import { billPeriodSchema, BillPeriodModel } from './BillPeriod';
-import { categorySchema, CategoryModel } from './Category';
-import { discountSchema, DiscountModel } from './Discount';
-import { itemSchema, ItemModel } from './Item';
-import { itemModifierSchema, ItemModifierModel } from './ItemModifier';
-import { itemPriceSchema, ItemPriceModel } from './ItemPrice';
-import { itemPrinterSchema, ItemPrinterModel } from './ItemPrinter';
-import { modifierSchema, ModifierModel } from './Modifier';
-import { modifierItemSchema, ModifierItemModel } from './ModifierItem';
-import { modifierPriceSchema, ModifierPriceModel } from './ModifierPrice';
-import { organizationSchema, OrganizationModel } from './Organization';
-import { paymentTypeSchema, PaymentTypeModel } from './PaymentType';
-import { printerSchema, PrinterModel } from './Printer';
-import { priceGroupSchema, PriceGroupModel } from './PriceGroup';
+import { billSchema, Bill } from './Bill';
+import { billDiscountSchema, BillDiscount } from './BillDiscount';
+import { billItemSchema, BillItem } from './BillItem';
+import { billItemModifierSchema, BillItemModifier } from './BillItemModifier';
+import { billItemModifierItemSchema, BillItemModifierItem } from './BillItemModifierItem';
+import { billPaymentSchema, BillPayment } from './BillPayment';
+import { billPeriodSchema, BillPeriod } from './BillPeriod';
+import { categorySchema, Category } from './Category';
+import { discountSchema, Discount } from './Discount';
+import { itemSchema, Item } from './Item';
+import { itemModifierSchema, ItemModifier } from './ItemModifier';
+import { itemPriceSchema, ItemPrice } from './ItemPrice';
+import { itemPrinterSchema, ItemPrinter } from './ItemPrinter';
+import { modifierSchema, Modifier } from './Modifier';
+import { modifierItemSchema, ModifierItem } from './ModifierItem';
+import { modifierPriceSchema, ModifierPrice } from './ModifierPrice';
+import { organizationSchema, Organization } from './Organization';
+import { paymentTypeSchema, PaymentType } from './PaymentType';
+import { printerSchema, Printer } from './Printer';
+import { priceGroupSchema, PriceGroup } from './PriceGroup';
 
 // export const tableNames = {
 //   modifiers: 'modifiers',
@@ -89,26 +89,26 @@ export const schemas = {
 };
 
 export const models = {
-  ItemModel,
-  ItemModifierModel,
-  ModifierItemModel,
-  ItemPrinterModel,
-  CategoryModel,
-  PrinterModel,
-  ModifierModel,
-  PriceGroupModel,
-  ItemPriceModel,
-  ModifierPriceModel,
-  PaymentTypeModel,
-  DiscountModel,
-  OrganizationModel,
-  BillModel,
-  BillDiscountModel,
-  BillItemModel,
-  BillPaymentModel,
-  BillPeriodModel,
-  BillItemModifierItemModel,
-  BillItemModifierModel,
+  Item,
+  ItemModifier,
+  ModifierItem,
+  ItemPrinter,
+  Category,
+  Printer,
+  Modifier,
+  PriceGroup,
+  ItemPrice,
+  ModifierPrice,
+  PaymentType,
+  Discount,
+  Organization,
+  Bill,
+  BillDiscount,
+  BillItem,
+  BillPayment,
+  BillPeriod,
+  BillItemModifierItem,
+  BillItemModifier,
 };
 
 // PROP EXPRTS

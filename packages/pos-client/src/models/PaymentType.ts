@@ -1,7 +1,7 @@
 import { Model, tableSchema } from '@nozbe/watermelondb';
 import { nochange, field } from '@nozbe/watermelondb/decorators';
 
-export class PaymentTypeModel extends Model {
+export class PaymentType extends Model {
   static table = 'payment_types';
 
   @nochange @field('name') name;

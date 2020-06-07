@@ -14,7 +14,7 @@ export const billPaymentSchema = tableSchema({
   ],
 });
 
-export class BillPaymentModel extends Model {
+export class BillPayment extends Model {
   static table = 'bill_payments';
 
   @nochange @field('payment_type_id') paymentTypeId;

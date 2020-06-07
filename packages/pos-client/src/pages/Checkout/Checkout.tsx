@@ -28,10 +28,14 @@ export const Checkout: React.FC<CheckoutProps> = ({ navigation }) => {
   const { currentBill, setCurrentBill } = useContext(CurrentBillContext);
 
   const [mode, setMode] = useState<Modes>(Modes.Items);
-
-  const clearBill = () => {
+  
+  const clearBill = async () => {
+    const x = await currentBill.billItems.fetch()
+    currentBill.addPayment
+    x.map(m => m.item)
     setCurrentBill(null);
     setMode(Modes.Bills);
+    
   };
   const openDrawer = () => navigation.openDrawer();
   const onCheckout = () => setMode(Modes.Payments);

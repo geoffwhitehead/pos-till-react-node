@@ -1,7 +1,7 @@
 import { Model, tableSchema } from '@nozbe/watermelondb';
 import { children, nochange, field } from '@nozbe/watermelondb/decorators';
 
-export class CategoryModel extends Model {
+export class Category extends Model {
   static table = 'categories';
 
   @children('items') items;

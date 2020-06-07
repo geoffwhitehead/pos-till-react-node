@@ -1,7 +1,7 @@
 import { Model, tableSchema } from '@nozbe/watermelondb';
 import { field, children } from '@nozbe/watermelondb/decorators';
 
-export class ModifierModel extends Model {
+export class Modifier extends Model {
   static table = 'modifiers';
 
   @field('name') name;

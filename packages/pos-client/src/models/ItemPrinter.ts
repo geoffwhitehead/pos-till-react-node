@@ -1,7 +1,7 @@
 import { Model, tableSchema } from '@nozbe/watermelondb';
 import { field, relation } from '@nozbe/watermelondb/decorators';
 
-export class ItemPrinterModel extends Model {
+export class ItemPrinter extends Model {
   static table = 'item_printers';
 
   @field('item_id') itemId;

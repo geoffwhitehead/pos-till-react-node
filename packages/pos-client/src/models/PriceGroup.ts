@@ -1,7 +1,7 @@
 import { Model, tableSchema } from '@nozbe/watermelondb';
 import { field } from '@nozbe/watermelondb/decorators';
 
-export class PriceGroupModel extends Model {
+export class PriceGroup extends Model {
   static table = 'price_groups';
 
   @field('name') name;

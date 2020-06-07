@@ -1,4 +1,4 @@
-import { Model, Q, tableSchema } from '@nozbe/watermelondb';
+import { Model, Q, tableSchema, Relation, Query } from '@nozbe/watermelondb';
 import {
   field,
   nochange,
@@ -11,6 +11,12 @@ import {
 } from '@nozbe/watermelondb/decorators';
 import { resolvePrice } from '../helpers';
 import dayjs from 'dayjs';
+import { Bill, BillItem } from './BillItem';
+import { TimeStampedModel } from './types';
+import { BillPeriod } from './BillPeriod';
+import { BillPayment } from './BillPayment';
+import { BillDiscount } from './BillDiscount';
+import { BillItemModifierItem } from './BillItemModifierItem';
 
 export const billSchema = tableSchema({
   name: 'bills',
@@ -24,18 +30,18 @@ export const billSchema = tableSchema({
   ],
 });
 
-export class BillModel extends Model {
+export class Bill extends Model {
   static table = 'bills';
 
-  @field('reference') reference;
-  @field('is_closed') isClosed;
-  @nochange @field('bill_period_id') billPeriodId;
-  @date('closed_at') closedAt;
+  @field('reference') reference: string;
+  @field('is_closed') isClosed: boolean;
+  @nochange @field('bill_period_id') billPeriodId: string;
+  @date('closed_at') closedAt: Date;
 
-  @readonly @date('created_at') createdAt;
-  @readonly @date('updated_at') updatedAt;
+  @readonly @date('created_at') createdAt: string;
+  @readonly @date('updated_at') updatedAt: string;
 
-  @immutableRelation('bill_periods', 'bill_period_id') billPeriod;
+  @immutableRelation('bill_periods', 'bill_period_id') billPeriod: Relation<BillPeriod>;
 
   static associations = {
     bill_periods: { type: 'belongs_to', key: 'bill_period_id' },
@@ -44,17 +50,17 @@ export class BillModel extends Model {
     bill_discounts: { type: 'has_many', foreignKey: 'bill_id' },
   };
 
-  @children('bill_payments') billPayments;
-  @children('bill_discounts') billDiscounts;
-  @children('bill_items') _billItems;
+  @children('bill_payments') billPayments: Query<BillPayment>;
+  @children('bill_discounts') billDiscounts: Query<BillDiscount>;
+  @children('bill_items') _billItems: Query<BillItem>;
 
-  @lazy billItems = this._billItems.extend(Q.where('is_voided', Q.notEq(true)));
-  @lazy billItemVoids = this._billItems.extend(Q.where('is_voided', true));
-  @lazy _billModifierItems = this.collections
+  @lazy billItems: Query<BillItem> = this._billItems.extend(Q.where('is_voided', Q.notEq(true)));
+  @lazy billItemVoids: Query<BillItem> = this._billItems.extend(Q.where('is_voided', true));
+  @lazy _billModifierItems: Query<BillItemModifierItem> = this.collections
     .get('bill_item_modifier_items')
     .query(Q.on('bill_items', 'bill_id', this.id));
-  @lazy billModifierItems = this._billModifierItems.extend(Q.where('is_voided', Q.notEq(true)));
-  @lazy billModifierItemVoids = this._billModifierItems.extend(Q.where('is_voided', true));
+  @lazy billModifierItems: Query<BillItemModifierItem> = this._billModifierItems.extend(Q.where('is_voided', Q.notEq(true)));
+  @lazy billModifierItemVoids: Query<BillItemModifierItem> = this._billModifierItems.extend(Q.where('is_voided', true));
 
   @action addPayment = async (p: { paymentType: string; amount: number; isChange?: boolean }) => {
     const { paymentType, amount, isChange } = p;

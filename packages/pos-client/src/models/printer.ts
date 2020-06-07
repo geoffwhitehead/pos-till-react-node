@@ -1,7 +1,7 @@
 import { Model, tableSchema } from '@nozbe/watermelondb';
 import { field, lazy } from '@nozbe/watermelondb/decorators';
 
-export class PrinterModel extends Model {
+export class Printer extends Model {
   static table = 'printers';
 
   @field('name') name;

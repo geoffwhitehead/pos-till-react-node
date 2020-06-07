@@ -17,7 +17,7 @@ export const billItemModifierItemSchema = tableSchema({
   ],
 });
 
-export class BillItemModifierItemModel extends Model {
+export class BillItemModifierItem extends Model {
   static table = 'bill_item_modifier_items';
 
   @nochange @field('bill_item_id') billItemId;
