@@ -46,8 +46,8 @@ export class BillPeriod extends Model {
     .get('bill_payments')
     .query(Q.on('bills', 'bill_period_id', this.id)) as Query<BillPayment>;
 
-  @action createBill = async (params: { reference: number }) => {
-    const b = await this.collections.get('bills').create(bill => {
+  @action createBill = async (params: { reference: string }): Promise<Bill> => {
+    const b = await this.collections.get<Bill>('bills').create(bill => {
       bill.reference = params.reference;
       bill.isClosed = false;
       bill.billPeriodId = this.id;
@@ -57,7 +57,7 @@ export class BillPeriod extends Model {
 
   @action closePeriod = async () => {
     this.update(billPeriod => {
-      billPeriod.closedAt = dayjs();
+      billPeriod.closedAt = dayjs().toDate();
     });
   };
 }

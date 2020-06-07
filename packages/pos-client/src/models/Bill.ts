@@ -16,6 +16,7 @@ import { BillPeriod } from './BillPeriod';
 import { BillPayment } from './BillPayment';
 import { BillDiscount } from './BillDiscount';
 import { BillItemModifierItem } from './BillItemModifierItem';
+import { PaymentType } from '.';
 
 export const billSchema = tableSchema({
   name: 'bills',
@@ -61,9 +62,9 @@ export class Bill extends Model {
   @lazy billModifierItems: Query<BillItemModifierItem> = this._billModifierItems.extend(Q.where('is_voided', Q.notEq(true)));
   @lazy billModifierItemVoids: Query<BillItemModifierItem> = this._billModifierItems.extend(Q.where('is_voided', true));
 
-  @action addPayment = async (p: { paymentType: string; amount: number; isChange?: boolean }) => {
+  @action addPayment = async (p: { paymentType: PaymentType; amount: number; isChange?: boolean }) => {
     const { paymentType, amount, isChange } = p;
-    await this.collections.get('bill_payments').create(payment => {
+    await this.collections.get<BillPayment>('bill_payments').create(payment => {
       payment.paymentType.set(paymentType);
       payment.bill.set(this);
       Object.assign(payment, {
@@ -74,18 +75,18 @@ export class Bill extends Model {
   };
 
   @action addDiscount = async (p: { discount }) => {
-    await this.collections.get('bill_discounts').create(discount => {
+    await this.collections.get<BillDiscount>('bill_discounts').create(discount => {
       discount.bill.set(this);
       discount.discount.set(p.discount);
     });
   };
 
-  @action addItem = async (p: { item; priceGroup }) => {
+  @action addItem = async (p: { item; priceGroup }): Promise<BillItem> => {
     const { item, priceGroup } = p;
     const [category, prices] = await Promise.all([item.category.fetch(), item.prices.fetch()]);
 
     const newItem = await this.database.action(() =>
-      this.collections.get('bill_items').create(billItem => {
+      this.collections.get<BillItem>('bill_items').create(billItem => {
         billItem.bill.set(this);
         billItem.priceGroup.set(priceGroup);
         billItem.category.set(category);
@@ -99,7 +100,7 @@ export class Bill extends Model {
       }),
     );
 
-    return newItem;
+    return newItem as BillItem; // TODO: dont cast
   };
 
   @action close = async () =>

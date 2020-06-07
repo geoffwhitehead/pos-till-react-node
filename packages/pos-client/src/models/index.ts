@@ -18,7 +18,7 @@ import { organizationSchema, Organization } from './Organization';
 import { paymentTypeSchema, PaymentType } from './PaymentType';
 import { printerSchema, Printer } from './Printer';
 import { priceGroupSchema, PriceGroup } from './PriceGroup';
-import { Model, tableSchema, TableSchema } from '@nozbe/watermelondb';
+import { Model, TableSchema } from '@nozbe/watermelondb';
 
 // export const tableNames = {
 //   modifiers: 'modifiers',
@@ -90,6 +90,29 @@ export const schemas: Record<string, TableSchema> = {
 };
 
 export const models: Record<string, typeof Model> = {
+  Item,
+  ItemModifier,
+  ModifierItem,
+  ItemPrinter,
+  Category,
+  Printer,
+  Modifier,
+  PriceGroup,
+  ItemPrice,
+  ModifierPrice,
+  PaymentType,
+  Discount,
+  Organization,
+  Bill,
+  BillDiscount,
+  BillItem,
+  BillPayment,
+  BillPeriod,
+  BillItemModifierItem,
+  BillItemModifier,
+};
+
+export {
   Item,
   ItemModifier,
   ModifierItem,

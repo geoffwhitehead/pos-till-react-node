@@ -81,7 +81,7 @@ export class BillItem extends Model {
   @action addModifierChoices = async (modifier: Modifier, modifierItems: ModifierItem[], priceGroup: PriceGroup) => {
     const toCreate = [];
 
-    const billItemModifierToCreate = this.collections.get('bill_item_modifiers').prepareCreate(billItemModifier => {
+    const billItemModifierToCreate = this.collections.get<BillItemModifier>('bill_item_modifiers').prepareCreate(billItemModifier => {
       billItemModifier.modifier.set(modifier);
       billItemModifier.billItem.set(this);
       Object.assign(billItemModifier, {
@@ -93,7 +93,7 @@ export class BillItem extends Model {
       await modifierItems.map(async modifierItem => {
         const prices = await modifierItem.prices.fetch();
         const modifier = await modifierItem.modifier.fetch();
-        const mItem = this.collections.get('bill_item_modifier_items').prepareCreate(billItemModifierItem => {
+        const mItem = this.collections.get<BillItemModifierItem>('bill_item_modifier_items').prepareCreate(billItemModifierItem => {
           billItemModifierItem.billItem.set(this);
           billItemModifierItem.modifierItem.set(modifierItem);
           billItemModifierItem.billItemModifier.set(billItemModifierToCreate);
