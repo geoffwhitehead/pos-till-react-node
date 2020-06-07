@@ -80,8 +80,6 @@ const WrappedCategoryItems: React.FC<CategoryItemsListProps> = ({ category, item
         {items
           .filter(item => (searchValue ? searchFilter(item, searchValue) : true))
           .map(item => {
-            console.log('item', item);
-            console.log('priceGroup', priceGroup)
             return (
               <CategoryItem
                 key={item.id}

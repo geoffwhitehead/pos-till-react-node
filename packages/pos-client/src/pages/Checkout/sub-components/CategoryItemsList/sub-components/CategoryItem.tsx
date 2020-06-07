@@ -3,6 +3,10 @@ import withObservables from '@nozbe/with-observables';
 import { ListItem, Left, Text, Icon, Body, Right } from '../../../../../core';
 import { StyleSheet } from 'react-native';
 import { resolvePrice } from '../../../../../helpers';
+import { formatNumber } from '../../../../../utils';
+
+// TODO : move this
+const currencySymbol = '£';
 
 interface CategoryItemProps {
   // TODO: types
@@ -31,7 +35,7 @@ const WrappedCategoryItem: React.FC<CategoryItemProps> = ({
       </Left>
       <Body>{modifierCount > 0 ? <Icon name="ios-arrow-forward" /> : null}</Body>
       <Right>
-        <Text>{resolvePrice(priceGroup, prices)}</Text>
+        <Text style={{ color: 'grey' }}>{formatNumber(resolvePrice(priceGroup, prices), currencySymbol)}</Text>
       </Right>
     </ListItem>
   );
