@@ -1,8 +1,9 @@
 import React from 'react';
+import { PriceGroup } from '../models/PriceGroup';
 
 type PriceGroupContextProps = {
-  setPriceGroup: (priceGroup: any) => void;
-  priceGroup: any;
+  setPriceGroup: (priceGroup: PriceGroup) => void;
+  priceGroup: PriceGroup;
 };
 
 export const PriceGroupContext = React.createContext<PriceGroupContextProps>({
