@@ -18,6 +18,7 @@ import { organizationSchema, Organization } from './Organization';
 import { paymentTypeSchema, PaymentType } from './PaymentType';
 import { printerSchema, Printer } from './Printer';
 import { priceGroupSchema, PriceGroup } from './PriceGroup';
+import { Model, tableSchema, TableSchema } from '@nozbe/watermelondb';
 
 // export const tableNames = {
 //   modifiers: 'modifiers',
@@ -42,7 +43,7 @@ import { priceGroupSchema, PriceGroup } from './PriceGroup';
 //   billItemModifierItems: 'bill_item_modifier_items',
 // };
 
-export const tableNames = {
+export const tableNames: Record<string, string> = {
   modifiers: modifierSchema.name,
   itemModifiers: itemModifierSchema.name,
   priceGroups: priceGroupSchema.name,
@@ -65,7 +66,7 @@ export const tableNames = {
   billItemModifierItems: billItemModifierItemSchema.name,
 };
 
-export const schemas = {
+export const schemas: Record<string, TableSchema> = {
   billSchema,
   billDiscountSchema,
   billItemSchema,
@@ -88,7 +89,7 @@ export const schemas = {
   printerSchema,
 };
 
-export const models = {
+export const models: Record<string, typeof Model> = {
   Item,
   ItemModifier,
   ModifierItem,
@@ -110,27 +111,3 @@ export const models = {
   BillItemModifierItem,
   BillItemModifier,
 };
-
-// PROP EXPRTS
-// export {
-//   Item,
-//   ItemModifier,
-//   ModifierItem,
-//   ItemPrinter,
-//   Category,
-//   Printer,
-//   Modifier,
-//   PriceGroup,
-//   ItemPrice,
-//   ModifierPrice,
-//   PaymentType,
-//   Discount,
-//   Organization,
-//   Bill,
-//   BillDiscount,
-//   BillItem,
-//   BillPayment,
-//   BillPeriod,
-//   BillItemModifierItem,
-//   BillItemModifier,
-// };

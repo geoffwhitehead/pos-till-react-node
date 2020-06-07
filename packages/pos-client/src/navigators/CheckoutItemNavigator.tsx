@@ -1,9 +1,8 @@
 import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
-import { CategoryItems, AllItems } from '../pages/Checkout/sub-components/CategoryItemsList/CategoryItemsList';
-import { ItemModifierList } from '../pages/Checkout/sub-components/ItemModifierList/ItemModifierList';
-import { Categories } from '../pages/Checkout/sub-components/CategoryList/CategoryList';
-import { SelectBill } from '../pages/Checkout/sub-components/SelectBill/SelectBIll';
+import { CategoryItems, AllItems } from '../screens/Checkout/sub-components/CategoryItemsList/CategoryItemsList';
+import { ItemModifierList } from '../screens/Checkout/sub-components/ItemModifierList/ItemModifierList';
+import { Categories } from '../screens/Checkout/sub-components/CategoryList/CategoryList';
 
 const Stack = createStackNavigator();
 

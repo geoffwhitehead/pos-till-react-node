@@ -1,6 +1,6 @@
 import { createStackNavigator } from '@react-navigation/stack'
-import { SignUp } from '../pages/SignUp/SignUp'
-import { SignIn } from '../pages/SignIn/SignIn'
+import { SignUp } from '../screens/SignUp/SignUp'
+import { SignIn } from '../screens/SignIn/SignIn'
 import React from 'react'
 
 export const AuthNavigator = () => {

@@ -1,11 +1,11 @@
 import React from 'react';
-import { SplashScreen } from './pages/SplashScreen/SplashScreen';
+import { SplashScreen } from './screens/SplashScreen/SplashScreen';
 import AsyncStorage from '@react-native-community/async-storage';
 import { AuthContext } from './contexts/AuthContext';
 import { api } from './api';
 import { signUp, signIn } from './api/auth';
-import { AuthNavigator } from './navigators';
-import { Main } from './pages/Main/Main';
+import { AuthNavigator } from './navigators/AuthNavigator';
+import { Main } from './screens/Main/Main';
 import { NavigationContainer } from '@react-navigation/native';
 import { Root } from 'native-base';
 import decode from 'jwt-decode';

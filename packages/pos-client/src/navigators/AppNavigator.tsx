@@ -1,11 +1,11 @@
 import { AuthNavigator } from './AuthNavigator';
 import { createStackNavigator } from '@react-navigation/stack';
-import { Main } from '../pages/Main/Main';
+import { Main } from '../screens/Main/Main';
 
 import React from 'react';
 
 // TODO: fix type
-export const AppNavigator = (accessToken: string, refreshToken: string, isPopulated: boolean) => {
+export const AppNavigator = (accessToken: string, refreshToken: string) => {
   const Stack = createStackNavigator();
 
   return (

@@ -1,9 +1,9 @@
 import { createDrawerNavigator } from '@react-navigation/drawer';
-import { Checkout } from '../pages/Checkout/Checkout';
-import { Items } from '../pages/Items/Items';
-import { Reports } from '../pages/Reports/Reports';
-import { Bills } from '../pages/Bills/Bills';
-import { Transactions } from '../pages/Transactions/Transactions';
+import { Checkout } from '../screens/Checkout/Checkout';
+import { Items } from '../screens/Items/Items';
+import { Reports } from '../screens/Reports/Reports';
+import { Bills } from '../screens/Bills/Bills';
+import { Transactions } from '../screens/Transactions/Transactions';
 
 import React from 'react';
 
