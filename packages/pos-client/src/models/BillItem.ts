@@ -18,6 +18,8 @@ import { BillItemModifierItem } from './BillItemModifierItem';
 import { BillItemModifier } from './BillItemModifier';
 import { Modifier } from './Modifier';
 import { ModifierItem } from './ModifierItem';
+import { Printer, BillItemPrintLog, tableNames } from '.';
+import { BillItemPrintLogStatus } from './BillItemPrintLog';
 
 export const billItemSchema = tableSchema({
   name: 'bill_items',
@@ -35,9 +37,11 @@ export const billItemSchema = tableSchema({
     { name: 'created_at', type: 'number' },
     { name: 'updated_at', type: 'number' },
     { name: 'is_voided', type: 'boolean' },
+    { name: 'print_status', type: 'string' },
   ],
 });
 
+export type PrintStatus = 'success' | 'error' | 'pending';
 export class BillItem extends Model {
   static table = 'bill_items';
 
@@ -52,6 +56,7 @@ export class BillItem extends Model {
   @readonly @date('created_at') createdAt: Date;
   @readonly @date('updated_at') updatedAt: Date;
   @field('is_voided') isVoided: boolean;
+  @field('print_status') printStatus: PrintStatus;
 
   @immutableRelation('bills', 'bill_id') bill: Relation<Bill>;
   @immutableRelation('items', 'item_id') item: Relation<Item>;
@@ -78,36 +83,54 @@ export class BillItem extends Model {
     });
   };
 
+  @action updatePrintStatus = async (printStatus: PrintStatus) => {
+    this.printStatus = printStatus;
+  };
+
+  @action createPrintLog = async (printer: Printer, status: BillItemPrintLogStatus) => {
+    const log = this.database.collections.get<BillItemPrintLog>(tableNames.BillItemPrintLog).create(log => {
+      log.billItem.set(this);
+      log.printer.set(printer);
+      log.status = status
+    });
+
+    return log
+  };
+
   @action addModifierChoices = async (modifier: Modifier, modifierItems: ModifierItem[], priceGroup: PriceGroup) => {
     const toCreate = [];
 
-    const billItemModifierToCreate = this.collections.get<BillItemModifier>('bill_item_modifiers').prepareCreate(billItemModifier => {
-      billItemModifier.modifier.set(modifier);
-      billItemModifier.billItem.set(this);
-      Object.assign(billItemModifier, {
-        modifierName: modifier.name,
+    const billItemModifierToCreate = this.collections
+      .get<BillItemModifier>('bill_item_modifiers')
+      .prepareCreate(billItemModifier => {
+        billItemModifier.modifier.set(modifier);
+        billItemModifier.billItem.set(this);
+        Object.assign(billItemModifier, {
+          modifierName: modifier.name,
+        });
       });
-    });
 
     const billItemModifierItemsToCreate = await Promise.all(
       await modifierItems.map(async modifierItem => {
         const prices = await modifierItem.prices.fetch();
         const modifier = await modifierItem.modifier.fetch();
-        const mItem = this.collections.get<BillItemModifierItem>('bill_item_modifier_items').prepareCreate(billItemModifierItem => {
-          billItemModifierItem.billItem.set(this);
-          billItemModifierItem.modifierItem.set(modifierItem);
-          billItemModifierItem.billItemModifier.set(billItemModifierToCreate);
-          billItemModifierItem.priceGroup.set(priceGroup);
-          billItemModifierItem.modifier.set(modifier);
-          Object.assign(billItemModifierItem, {
-            modifierName: modifier.name,
-            modifierItemName: modifierItem.name,
-            modifierItemPrice: resolvePrice(priceGroup, prices),
-            priceGroupName: priceGroup.name,
-            isVoided: false,
-            // billItemModifierId: billItemModifierToCreate.id,
+        const mItem = this.collections
+          .get<BillItemModifierItem>('bill_item_modifier_items')
+          .prepareCreate(billItemModifierItem => {
+            billItemModifierItem.billItem.set(this);
+            billItemModifierItem.modifierItem.set(modifierItem);
+            billItemModifierItem.billItemModifier.set(billItemModifierToCreate);
+            billItemModifierItem.priceGroup.set(priceGroup);
+            billItemModifierItem.modifier.set(modifier);
+            Object.assign(billItemModifierItem, {
+              modifierName: modifier.name,
+              modifierItemName: modifierItem.name,
+              modifierItemPrice: resolvePrice(priceGroup, prices),
+              priceGroupName: priceGroup.name,
+              isVoided: false,
+              // billItemModifierId: billItemModifierToCreate.id,
+            });
           });
-        });
         return mItem;
       }),
     );

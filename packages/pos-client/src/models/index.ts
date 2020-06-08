@@ -19,6 +19,7 @@ import { paymentTypeSchema, PaymentType } from './PaymentType';
 import { printerSchema, Printer } from './Printer';
 import { priceGroupSchema, PriceGroup } from './PriceGroup';
 import { Model, TableSchema } from '@nozbe/watermelondb';
+import { BillItemPrintLog, billItemPrintLogSchema } from './BillItemPrintLog';
 
 // export const tableNames = {
 //   modifiers: 'modifiers',
@@ -64,6 +65,7 @@ export const tableNames: Record<string, string> = {
   billItems: billItemSchema.name,
   billItemModifiers: billItemModifierSchema.name,
   billItemModifierItems: billItemModifierItemSchema.name,
+  billItemPrintLogs: billItemPrintLogSchema.name,
 };
 
 export const schemas: Record<string, TableSchema> = {
@@ -87,6 +89,7 @@ export const schemas: Record<string, TableSchema> = {
   paymentTypeSchema,
   priceGroupSchema,
   printerSchema,
+  billItemPrintLogSchema,
 };
 
 export const models: Record<string, typeof Model> = {
@@ -110,6 +113,7 @@ export const models: Record<string, typeof Model> = {
   BillPeriod,
   BillItemModifierItem,
   BillItemModifier,
+  BillItemPrintLog,
 };
 
 export {
@@ -133,4 +137,5 @@ export {
   BillPeriod,
   BillItemModifierItem,
   BillItemModifier,
+  BillItemPrintLog,
 };

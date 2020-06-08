@@ -2,6 +2,7 @@ import { Model, tableSchema, Relation } from '@nozbe/watermelondb';
 import { field, relation } from '@nozbe/watermelondb/decorators';
 import { Item } from './Item';
 import { Printer } from './Printer';
+import { tableNames, BillItemPrintLog } from '.';
 
 export class ItemPrinter extends Model {
   static table = 'item_printers';
