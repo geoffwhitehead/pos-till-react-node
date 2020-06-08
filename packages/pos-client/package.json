@@ -20,7 +20,7 @@
     "reset:cache": "watchman watch-del-all && react-native start --reset-cache"
   },
   "dependencies": {
-    "@nozbe/watermelondb": "^0.16.0",
+    "@nozbe/watermelondb": "^0.16.2",
     "@nozbe/with-observables": "^1.0.5",
     "@react-native-community/async-storage": "^1.8.0",
     "@react-native-community/masked-view": "^0.1.6",
