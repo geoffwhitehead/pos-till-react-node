@@ -6,16 +6,20 @@ import { ModifierGroup } from './ModifierGroup';
 import { keyBy, times } from 'lodash';
 import { View } from 'native-base';
 import { NumberPicker } from '../../../../../../components/NumberPicker/NumberPicker';
+import { Item, Bill, PriceGroup, Modifier, ModifierItem } from '../../../../../../models';
 
-interface ModifierListProps {
-  item?: any;
-  currentBill: any;
-  priceGroup: any;
+interface ModifierListOuterProps {
+  item: Item;
+  currentBill: Bill;
+  priceGroup: PriceGroup;
   onClose: () => void;
-  modifiers: any;
 }
 
-export const WrappedModifierList: React.FC<ModifierListProps> = ({
+interface ModifierListInnerProps {
+  modifiers: any; // TODO:
+}
+
+export const ModifierListInner: React.FC<ModifierListOuterProps & ModifierListInnerProps> = ({
   item,
   currentBill,
   priceGroup,
@@ -24,7 +28,9 @@ export const WrappedModifierList: React.FC<ModifierListProps> = ({
 }) => {
   const [quantity, setQuantity] = useState(1);
 
-  const [selectedModifiers, setSelectedModifiers] = useState(
+  const [selectedModifiers, setSelectedModifiers] = useState<
+    Record<string, { modifier: Modifier; items: ModifierItem[] }>
+  >(
     keyBy(
       modifiers.map(modifier => ({ modifier, items: [] })),
       'modifier.id',
@@ -51,7 +57,7 @@ export const WrappedModifierList: React.FC<ModifierListProps> = ({
     onClose();
   };
 
-  const onPressModifierItem = (modifier, modifierItem) => {
+  const onPressModifierItem = (modifier: Modifier, modifierItem: ModifierItem) => {
     const m = selectedModifiers[modifier.id];
     const containsModifier = m.items.includes(modifierItem);
     if (containsModifier) {
@@ -103,9 +109,9 @@ export const WrappedModifierList: React.FC<ModifierListProps> = ({
   );
 };
 
-export const ModifierList = withObservables<any, any>(['item'], ({ item }) => ({
+export const ModifierList = withObservables<ModifierListOuterProps, ModifierListInnerProps>(['item'], ({ item }) => ({
   modifiers: item.modifiers,
-}))(WrappedModifierList);
+}))(ModifierListInner);
 
 const styles = StyleSheet.create({
   modal: {

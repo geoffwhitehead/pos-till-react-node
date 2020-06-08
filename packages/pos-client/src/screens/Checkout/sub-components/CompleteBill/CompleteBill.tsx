@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text,  Button } from '../../../../core';
+import { Text, Button } from '../../../../core';
 import { formatNumber } from '../../../../utils';
 import { StyleSheet, View, BackHandler } from 'react-native';
 import { Fonts } from '../../../../theme';
@@ -8,11 +8,16 @@ import { useFocusEffect } from '@react-navigation/native';
 import { receiptBill } from '../../../../services/printer/receiptBill';
 import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import withObservables from '@nozbe/with-observables';
-import { tableNames } from '../../../../models';
+import { tableNames, Discount, Bill, PaymentType, PriceGroup } from '../../../../models';
+import { Database } from '@nozbe/watermelondb';
 
-interface CompleteBillProps {
-  bill: any;
+interface CompleteBillOuterProps {
+  bill: Bill;
   onCloseBill: () => void;
+  database: Database
+}
+
+interface CompleteBillInnerProps {
   billPayments: any;
   billItems: any;
   billDiscounts: any;
@@ -24,8 +29,7 @@ interface CompleteBillProps {
 // TODO : move this
 const currencySymbol = '£';
 
-const CompleteBillInner: React.FC<CompleteBillProps> = ({
-  bill,
+const CompleteBillInner: React.FC<CompleteBillOuterProps & CompleteBillInnerProps> = ({
   onCloseBill,
   billPayments,
   billItems,
@@ -66,15 +70,15 @@ const CompleteBillInner: React.FC<CompleteBillProps> = ({
 };
 
 const enhance = component =>
-  withDatabase<any, any>( // TODO: fix
-    withObservables<any, any>(['bill'], ({ bill, database }) => ({
+  withDatabase<any>( // TODO: fix
+    withObservables<CompleteBillOuterProps, CompleteBillInnerProps>(['bill'], ({ bill, database }) => ({
       bill,
       billPayments: bill.billPayments,
       billDiscounts: bill.billDiscounts,
       billItems: bill.billItems,
-      discounts: database.collections.get(tableNames.discounts).query(),
-      paymentTypes: database.collections.get(tableNames.paymentTypes).query(),
-      priceGroups: database.collections.get(tableNames.priceGroups).query(),
+      discounts: database.collections.get<Discount>(tableNames.discounts).query(),
+      paymentTypes: database.collections.get<PaymentType>(tableNames.paymentTypes).query(),
+      priceGroups: database.collections.get<PriceGroup>(tableNames.priceGroups).query(),
     }))(component),
   );
 

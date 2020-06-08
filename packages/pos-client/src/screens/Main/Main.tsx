@@ -1,28 +1,38 @@
 import React, { useState, useEffect } from 'react';
-import { SidebarNavigator } from '../../navigators';
+import { SidebarNavigator } from '../../navigators/SidebarNavigator';
 import { Loading } from '../Loading/Loading';
 import { BillPeriodContext } from '../../contexts/BillPeriodContext';
 import { PriceGroupContext } from '../../contexts/PriceGroupContext';
 import { populate } from './populate';
 import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import withObservables from '@nozbe/with-observables';
-import { Q } from '@nozbe/watermelondb';
-import { tableNames } from '../../models';
+import { Q, Database } from '@nozbe/watermelondb';
+import { tableNames, BillPeriod, PriceGroup, Bill } from '../../models';
 import { CurrentBillContext } from '../../contexts/CurrentBillContext';
 
-export const MainWrapped: React.FC<{
+interface MainInnerProps {
+  priceGroups: any; // TODO: fix type
+  openPeriods: any;
+}
+
+interface MainOuterProps {
   organizationId: string;
   userId: string;
-  priceGroups: any;
-  currentBillPeriod: any;
-  openPeriods: any;
-  database;
-}> = ({ organizationId, userId, priceGroups, openPeriods, database }) => {
-  // TODO: type
+  currentBillPeriod: BillPeriod;
+  database: Database;
+}
+
+export const MainWrapped: React.FC<MainOuterProps & MainInnerProps> = ({
+  organizationId,
+  userId,
+  priceGroups,
+  openPeriods,
+  database,
+}) => {
   const [populating, setPopulating] = useState(false); // TODO debug: reset to true
-  const [billPeriod, setBillPeriod] = useState(null);
-  const [priceGroup, setPriceGroup] = useState(null);
-  const [currentBill, setCurrentBill] = useState(null);
+  const [billPeriod, setBillPeriod] = useState<BillPeriod>(null);
+  const [priceGroup, setPriceGroup] = useState<PriceGroup>(null);
+  const [currentBill, setCurrentBill] = useState<Bill>(null);
 
   React.useEffect(() => {}, [setBillPeriod]);
 
@@ -50,8 +60,8 @@ export const MainWrapped: React.FC<{
       const setCurrentPeriod = async () => {
         if (openPeriods.length === 0) {
           console.log('tableNames', tableNames);
-          const billPeriodCollection = database.collections.get(tableNames.billPeriods);
-          const newPeriod = await database.action(async () => await billPeriodCollection.create());
+          const billPeriodCollection = database.collections.get<BillPeriod>(tableNames.billPeriods);
+          const newPeriod = await database.action<BillPeriod>(async () => await billPeriodCollection.create());
           setBillPeriod(newPeriod);
         } else {
           setBillPeriod(openPeriods[0]);
@@ -67,10 +77,6 @@ export const MainWrapped: React.FC<{
     }
   }, [priceGroups, populating]);
 
-  console.log('populating', populating);
-  console.log('priceGroup', priceGroup);
-  console.log('billPeriod', billPeriod);
-  console.log('priceGroups', priceGroups);
   return populating || !billPeriod || !priceGroup ? (
     <Loading />
   ) : (
@@ -85,13 +91,13 @@ export const MainWrapped: React.FC<{
 };
 
 export const Main = withDatabase<any>(
-  withObservables<any, any>([], ({ database }) => ({
+  withObservables<MainOuterProps, MainInnerProps>([], ({ database }) => ({
     priceGroups: database.collections
-      .get(tableNames.priceGroups)
+      .get<PriceGroup>(tableNames.priceGroups)
       .query()
       .observe(),
     openPeriods: database.collections
-      .get(tableNames.billPeriods)
+      .get<BillPeriod>(tableNames.billPeriods)
       .query(Q.where('closed_at', Q.eq(null)))
       .observe(),
   }))(MainWrapped),

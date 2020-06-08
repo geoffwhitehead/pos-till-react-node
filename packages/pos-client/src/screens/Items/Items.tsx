@@ -1,11 +1,23 @@
-import React from 'react';
+import React, { Component, ReactElement } from 'react';
 import { Text, Content, List, Separator, ListItem, Container } from '../../core';
 import { SidebarHeader } from '../../components/SidebarHeader/SidebarHeader';
 import { Loading } from '../Loading/Loading';
 import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import withObservables from '@nozbe/with-observables';
+import { DrawerNavigationProp } from '@react-navigation/drawer';
+import { SidebarDrawerStackParamList } from '../../navigators/SidebarNavigator';
+import { Database } from '@nozbe/watermelondb';
 
-export const WrappedItems = ({ navigation, items }) => {
+interface ItemsInnerProps {
+  items: any; // TODO: type
+}
+
+interface ItemsOuterProps {
+  navigation: DrawerNavigationProp<SidebarDrawerStackParamList, 'Items'>;
+  database: Database;
+}
+
+export const ItemsInner: React.FC<ItemsOuterProps & ItemsInnerProps> = ({ navigation, items }) => {
   const openDrawer = () => navigation.openDrawer();
 
   return !items ? (
@@ -41,11 +53,14 @@ export const WrappedItems = ({ navigation, items }) => {
   );
 };
 
-export const Items = withDatabase<any, any>( // TODO: fix type
-  withObservables<any, any>([], ({ database }) => ({
-    items: database.collections
-      .get('items')
-      .query()
-      .observe(),
-  }))(WrappedItems),
-);
+const enhance = c =>
+  withDatabase<any>( // TODO: fix type
+    withObservables<ItemsOuterProps, ItemsInnerProps>([], ({ database }) => ({
+      items: database.collections
+        .get('items')
+        .query()
+        .observe(),
+    }))(c),
+  );
+
+export const Items = enhance(ItemsInner);

@@ -3,22 +3,27 @@ import withObservables from '@nozbe/with-observables';
 import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import { Content, ListItem, Left, List, Text, Body, Right } from '../../../core';
 import { TransactionListRow } from './TransactionListRow';
-import { tableNames } from '../../../models';
+import { tableNames, Bill, PaymentType } from '../../../models';
+import { Database } from '@nozbe/watermelondb';
 
-interface TransactionListProps {
-  bills: any[];
-  onSelectBill: (bill: any) => void;
-  selectedBill?: any;
+interface TransactionListInnerProps {
   paymentTypes: any;
 }
 
-export const TransactionListInner: React.FC<TransactionListProps> = ({
+interface TransactionListOuterProps {
+  bills: Bill[];
+  onSelectBill: (b: Bill) => void;
+  selectedBill?: Bill;
+  database: Database
+}
+
+export const TransactionListInner: React.FC<TransactionListOuterProps & TransactionListInnerProps> = ({
   bills,
   onSelectBill,
   selectedBill,
   paymentTypes,
 }) => {
-  const sorterClosedAtDescending = (bill1, bill2) => bill2.closedAt - bill1.closedAt;
+  const sorterClosedAtDescending = (b1: Bill, b2: Bill) => b2.closedAt - b1.closedAt;
 
   return (
     <Content>
@@ -50,12 +55,12 @@ export const TransactionListInner: React.FC<TransactionListProps> = ({
   );
 };
 
+// TODO: type
 const enhance = c =>
-  withDatabase(
-    withObservables<any, any>([], ({ database }) => ({
-      paymentTypes: database.collections
-        .get(tableNames.paymentTypes)
-        .query()
+  withDatabase<any>(
+    withObservables<TransactionListOuterProps, TransactionListInnerProps>([], ({ database }) => ({
+      paymentTypes: database.collections.get<PaymentType>(tableNames.paymentTypes).query(),
     }))(c),
   );
+
 export const TransactionList = enhance(TransactionListInner);

@@ -3,6 +3,12 @@ import { SignUp } from '../screens/SignUp/SignUp'
 import { SignIn } from '../screens/SignIn/SignIn'
 import React from 'react'
 
+export type AuthStackParamList = {
+  SignIn: undefined;
+  SignUp: undefined;
+};
+
+
 export const AuthNavigator = () => {
   const Stack = createStackNavigator()
 

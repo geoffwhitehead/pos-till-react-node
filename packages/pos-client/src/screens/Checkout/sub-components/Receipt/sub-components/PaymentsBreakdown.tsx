@@ -2,17 +2,25 @@ import React from 'react';
 import { Separator, Text, ListItem, Left, Right } from '../../../../../core';
 import { formatNumber } from '../../../../../utils';
 import { capitalize } from 'lodash';
+import { BillPayment, PaymentType, Bill } from '../../../../../models';
 
 // TODO: move into org and fetch from db or something
 const currencySymbol = '£';
 
-const PaymentsBreakdown: React.FC<{
-  payments: any;
-  paymentTypes: any;
+interface PaymentsBreakdownProps {
+  payments: BillPayment[];
+  paymentTypes: PaymentType[];
   readonly: boolean;
-  selected: boolean;
-  onSelect: (payment) => void;
-}> = ({ payments, readonly, selected, onSelect, paymentTypes }) => {
+  // selected: BillPayment;
+  onSelect: (bP: BillPayment) => void;
+}
+const PaymentsBreakdown: React.FC<PaymentsBreakdownProps> = ({
+  payments,
+  readonly,
+  // selected,
+  onSelect,
+  paymentTypes,
+}) => {
   if (!payments || !payments.length) {
     return null;
   }
@@ -30,7 +38,7 @@ const PaymentsBreakdown: React.FC<{
           const paymentType = lookupPaymentType(payment.paymentTypeId);
           return (
             <>
-              <ListItem key={payment._id} selected={selected} onPress={() => onSelect(!readonly && payment)}>
+              <ListItem key={payment.id} onPress={() => onSelect(!readonly && payment)}>
                 <Left>
                   <Text>{`Payment: ${capitalize(paymentType.name)}`}</Text>
                 </Left>

@@ -1,18 +1,24 @@
 import React from 'react';
-import withObservables from '@nozbe/with-observables';
+import withObservables, { ExtractedObservables, ObservableConvertible } from '@nozbe/with-observables';
 import { Text } from '../../../../../../core';
 import { View } from 'native-base';
-import { ModifierItem } from './ModifierItem';
+import { ModifierItemRow } from './ModifierItemRow';
+import { ModifierItem, Modifier, PriceGroup } from '../../../../../../models';
+import { Query } from '@nozbe/watermelondb';
+import { Observable } from 'rxjs';
 
-interface ModifierGroupProps {
-  modifierItems: any;
-  modifier: any;
-  priceGroup: any;
-  onPressModifierItem: any;
-  selectedModifierItems: any[];
+interface ModifierGroupOuterProps {
+  modifier: Modifier;
+  priceGroup: PriceGroup;
+  onPressModifierItem: (m: Modifier, mI: ModifierItem) => void;
+  selectedModifierItems: ModifierItem[];
 }
 
-const WrappedModifierGroup: React.FC<ModifierGroupProps> = ({
+interface ModifierGroupInnerProps {
+  modifierItems: any; // TODO: type
+}
+
+const WrappedModifierGroup: React.FC<ModifierGroupInnerProps & ModifierGroupOuterProps> = ({
   modifier,
   priceGroup,
   modifierItems,
@@ -27,7 +33,7 @@ const WrappedModifierGroup: React.FC<ModifierGroupProps> = ({
     <View>
       <Text>{modifier.name}</Text>
       {modifierItems.map(item => (
-        <ModifierItem
+        <ModifierItemRow
           key={item.id}
           selected={selectedModifierItems.includes(item)}
           modifierItem={item}
@@ -39,6 +45,8 @@ const WrappedModifierGroup: React.FC<ModifierGroupProps> = ({
   );
 };
 
-export const ModifierGroup = withObservables<any, any>(['modifier'], ({ modifier }) => ({
+
+
+export const ModifierGroup = withObservables<ModifierGroupOuterProps, ModifierGroupInnerProps>(['modifier'], ({ modifier }) => ({
   modifierItems: modifier.modifierItems,
 }))(WrappedModifierGroup);

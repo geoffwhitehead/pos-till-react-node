@@ -21,27 +21,42 @@ import { periodReport } from '../../services/printer/periodReport';
 import { print } from '../../services/printer/printer';
 import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import withObservables from '@nozbe/with-observables';
-import { tableNames } from '../../models';
+import { tableNames, BillPeriod } from '../../models';
 import dayjs from 'dayjs';
 import { View } from 'react-native';
+import { Database } from '@nozbe/watermelondb';
+import { DrawerNavigationProp } from '@react-navigation/drawer';
+import { SidebarDrawerStackParamList } from '../../navigators/SidebarNavigator';
 
 // const ORG_PASSCODE = '1234'; // TODO: move to an org setting and hash
 // const symbol = '£'; // TODO move
+interface ReportsInnerProps {
+  billPeriods: any;
+  paymentTypes: any; // TODO: fix type
+}
 
-export const ReportsInner = ({ database, navigation, billPeriods }) => {
-  console.log('billPeriods', billPeriods)
+interface ReportsOuterProps {
+  database: Database;
+  navigation: DrawerNavigationProp<SidebarDrawerStackParamList, 'Reports'>;
+}
+
+export const ReportsInner: React.FC<ReportsOuterProps & ReportsInnerProps> = ({
+  database,
+  navigation,
+  billPeriods,
+}) => {
   const openDrawer = () => navigation.openDrawer();
-  const onPrint = async (billPeriod: any) => {
+  const onPrint = async (billPeriod: BillPeriod) => {
     const commands = await periodReport(billPeriod, database);
     print(commands);
   };
 
-  const closePeriod = async billPeriod => {
+  const closePeriod = async (billPeriod: BillPeriod) => {
     await database.action(async () => await billPeriod.closePeriod());
     onPrint(billPeriod);
   };
 
-  const confirmClosePeriod = async (billPeriod: any) => {
+  const confirmClosePeriod = async (billPeriod: BillPeriod) => {
     const openBills = await billPeriod.openBills.fetch();
     if (openBills.length > 0) {
       Toast.show({
@@ -63,9 +78,9 @@ export const ReportsInner = ({ database, navigation, billPeriods }) => {
       );
     }
   };
-  const sorterOpenedAtDescending = (p1, p2) => p2.createdAt - p1.createdAt;
+  const sorterOpenedAtDescending = (p1: BillPeriod, p2: BillPeriod) => p2.createdAt - p1.createdAt;
 
-  const [periods, setPeriods] = useState([]);
+  const [periods, setPeriods] = useState<BillPeriod[]>([]);
 
   useEffect(() => {
     setPeriods(
@@ -136,7 +151,7 @@ export const ReportsInner = ({ database, navigation, billPeriods }) => {
 
 const enhance = c =>
   withDatabase<any>(
-    withObservables<any, any>([], ({ database }) => ({
+    withObservables<ReportsOuterProps, ReportsInnerProps>([], ({ database }) => ({
       paymentTypes: database.collections.get(tableNames.paymentTypes).query(),
       billPeriods: database.collections.get(tableNames.billPeriods).query(),
     }))(c),

@@ -1,8 +1,14 @@
 import React, { useState, useContext } from 'react';
 import { Container, Input, Button, Header, Content, Item, Text } from '../../core';
 import { AuthContext } from '../../contexts/AuthContext';
+import { AuthStackParamList } from '../../navigators/AuthNavigator';
+import { StackNavigationProp } from '@react-navigation/stack';
 
-export const SignIn = ({ navigation }) => {
+interface SignInProps {
+  navigation: StackNavigationProp<AuthStackParamList, 'SignIn'>;
+}
+
+export const SignIn: React.FC<SignInProps> = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 

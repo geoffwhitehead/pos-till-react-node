@@ -5,21 +5,25 @@ import dayjs from 'dayjs';
 import withObservables from '@nozbe/with-observables';
 import { StyleSheet } from 'react-native';
 import { capitalize } from 'lodash';
+import { Bill, PaymentType } from '../../../models';
 
 const symbol = '£'; // TODO move
 
-interface TransactionListRowInnerProps {
-  bill: any;
-  onSelectBill: (bill) => void;
+interface TransactionListRowOuterProps {
+  bill: Bill;
+  onSelectBill: (b: Bill) => void;
   isSelected: boolean;
+  paymentTypes: PaymentType[];
+}
+
+interface TransactionListRowInnerProps {
   billItems: any;
   billModifierItems: any;
   billDiscounts: any;
   billPayments: any;
-  paymentTypes: any;
 }
 
-const TransactionListRowInner: React.FC<TransactionListRowInnerProps> = ({
+const TransactionListRowInner: React.FC<TransactionListRowOuterProps & TransactionListRowInnerProps> = ({
   isSelected,
   onSelectBill,
   bill,
@@ -29,7 +33,6 @@ const TransactionListRowInner: React.FC<TransactionListRowInnerProps> = ({
   billPayments,
   paymentTypes,
 }) => {
-
   if (!(billItems || billModifierItems || billDiscounts || billPayments)) {
     return <Text>Loading...</Text>;
   }
@@ -55,7 +58,7 @@ const TransactionListRowInner: React.FC<TransactionListRowInnerProps> = ({
   );
 };
 
-const enhance = withObservables<any, any>(['bill'], ({ bill }) => ({
+const enhance = withObservables<TransactionListRowOuterProps, TransactionListRowInnerProps>(['bill'], ({ bill }) => ({
   billItems: bill.billItems,
   billDiscounts: bill.billDiscounts,
   billPayments: bill.billPayments,

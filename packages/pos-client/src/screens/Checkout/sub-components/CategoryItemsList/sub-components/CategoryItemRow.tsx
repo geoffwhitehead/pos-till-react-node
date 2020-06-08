@@ -4,21 +4,24 @@ import { ListItem, Left, Text, Icon, Body, Right } from '../../../../../core';
 import { StyleSheet } from 'react-native';
 import { resolvePrice } from '../../../../../helpers';
 import { formatNumber } from '../../../../../utils';
+import { Item, PriceGroup } from '../../../../../models';
 
 // TODO : move this
 const currencySymbol = '£';
 
-interface CategoryItemProps {
-  // TODO: types
-  item: any;
+interface CategoryItemRowOuterProps {
+  item: Item;
   isActive: boolean;
-  priceGroup: any;
-  prices: any[];
-  modifierCount: any;
-  onPressItem: any;
+  priceGroup: PriceGroup;
+  onPressItem: (i: Item, mCount: number) => void;
 }
 
-const WrappedCategoryItem: React.FC<CategoryItemProps> = ({
+interface CategoryItemRowInnerProps {
+  prices: any; // TODO: type
+  modifierCount: any;
+}
+
+const CategoryItemRowInner: React.FC<CategoryItemRowOuterProps & CategoryItemRowInnerProps> = ({
   isActive,
   item,
   prices,
@@ -29,7 +32,7 @@ const WrappedCategoryItem: React.FC<CategoryItemProps> = ({
   const onPress = () => onPressItem(item, modifierCount);
 
   return (
-    <ListItem style={isActive && styles.activeRow} icon key={item._id} onPress={onPress}>
+    <ListItem style={isActive && styles.activeRow} icon key={item.id} onPress={onPress}>
       <Left>
         <Text>{item.name}</Text>
       </Left>
@@ -41,10 +44,10 @@ const WrappedCategoryItem: React.FC<CategoryItemProps> = ({
   );
 };
 
-export const CategoryItem = withObservables<any, any>(['item'], ({ item }) => ({
+export const CategoryItemRow = withObservables<CategoryItemRowOuterProps, CategoryItemRowInnerProps>(['item'], ({ item }) => ({
   prices: item.prices,
   modifierCount: item.modifiers.observeCount(),
-}))(WrappedCategoryItem);
+}))(CategoryItemRowInner);
 
 const styles = StyleSheet.create({
   activeRow: {

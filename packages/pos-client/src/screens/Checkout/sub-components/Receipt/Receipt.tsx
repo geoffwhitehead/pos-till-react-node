@@ -13,25 +13,32 @@ import { print } from '../../../../services/printer/printer';
 import { receiptBill } from '../../../../services/printer/receiptBill';
 import withObservables from '@nozbe/with-observables';
 import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
-import { tableNames } from '../../../../models';
+import { tableNames, Discount, PaymentType, PriceGroup, Bill } from '../../../../models';
+import { Database } from '@nozbe/watermelondb';
 
 // TODO: move into org and fetch from db or something
 const currencySymbol = '£';
 
-interface ReceiptProps {
-  bill: any; // TODO
-  billPayments: any[];
-  billDiscounts: any[];
-  billItems: any[];
-  discounts: any[];
-  onStore?: () => void;
-  onCheckout?: () => void;
-  complete: boolean;
+// TODO: type these
+interface ReceiptInnerProps {
+  billPayments: any;
+  billDiscounts: any;
+  billItems: any;
+  discounts: any;
   paymentTypes: any;
   priceGroups: any;
 }
 
-export const ReceiptInner: React.FC<ReceiptProps> = ({
+interface ReceiptOuterProps {
+  onStore?: () => void;
+  onCheckout?: () => void;
+  bill: Bill
+  database: Database
+  complete: boolean;
+
+}
+
+export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
   bill,
   billItems,
   billDiscounts,
@@ -59,10 +66,10 @@ export const ReceiptInner: React.FC<ReceiptProps> = ({
   };
 
   if (!bill || !summary) {
-    return <Text>Loading ... </Text>;
+    return <Text>Loading ... </Text>; // TODO: loading component
   }
 
-  const { totalDiscount, total, totalPayable, totalPayments, balance } = summary;
+  const { totalDiscount, totalPayable, balance } = summary;
 
   return (
     <Grid style={styles.grid}>
@@ -84,12 +91,11 @@ export const ReceiptInner: React.FC<ReceiptProps> = ({
       <Row>
         <ReceiptItems
           readonly={complete}
-          bill={bill}
+          // bill={bill}
           billItems={billItems}
           discountBreakdown={summary.discountBreakdown}
           billPayments={billPayments}
           billDiscounts={billDiscounts}
-          discounts={discounts}
           paymentTypes={paymentTypes}
         />
       </Row>
@@ -129,20 +135,20 @@ export const ReceiptInner: React.FC<ReceiptProps> = ({
 };
 
 const enhance = component =>
-  withDatabase<any, any>( // TODO: fix
-    withObservables<any, any>(['bill'], ({ bill, database }) => ({
+  withDatabase<any>( // TODO: type
+    withObservables<ReceiptOuterProps, ReceiptInnerProps>(['bill'], ({ bill, database }) => ({
       bill,
       billPayments: bill.billPayments,
       billDiscounts: bill.billDiscounts,
       billItems: bill.billItems,
       discounts: database.collections
-        .get(tableNames.discounts)
+        .get<Discount>(tableNames.discounts)
         .query(),
       paymentTypes: database.collections
-        .get(tableNames.paymentTypes)
+        .get<PaymentType>(tableNames.paymentTypes)
         .query(),
       priceGroups: database.collections
-        .get(tableNames.priceGroups)
+        .get<PriceGroup>(tableNames.priceGroups)
         .query(),
     }))(component),
   );

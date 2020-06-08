@@ -4,21 +4,21 @@ import { ItemsBreakdown } from './sub-components/ItemsBreakdown';
 import { DiscountsBreakdown } from './sub-components/DiscountsBreakdown';
 import { PaymentsBreakdown } from './sub-components/PaymentsBreakdown';
 import { useDatabase } from '@nozbe/watermelondb/hooks';
+import { Bill, BillPayment, BillItem, Discount, BillDiscount, PaymentType } from '../../../../models';
+import { BillSummary } from '../../../../utils';
 
 interface ReceiptItemsProps {
-  bill: any;
+  // bill: Bill;
   readonly: boolean;
-  billPayments: any;
-  discountBreakdown: any;
-  billItems: any;
-  discounts: any[];
-  billDiscounts: any;
-  paymentTypes: any;
+  billPayments: BillPayment[];
+  discountBreakdown: BillSummary['discountBreakdown'];
+  billItems: BillItem[];
+  // discounts: Discount[];
+  billDiscounts: BillDiscount[];
+  paymentTypes: PaymentType[];
 }
 
 export const ReceiptItems: React.FC<ReceiptItemsProps> = ({
-  bill,
-  discounts,
   readonly,
   billItems,
   discountBreakdown,
@@ -32,7 +32,7 @@ export const ReceiptItems: React.FC<ReceiptItemsProps> = ({
 
   const database = useDatabase();
 
-  const [selected, setSelected] = useState(null);
+  // const [selected, setSelected] = useState<BillPayment | BillItem | BillDiscount>(null);
 
   // PROGRESS: continue implementing remove on payents and discounts . unlike item - add a void function that doesnt soft delete
   const remove = async item => {
@@ -60,7 +60,7 @@ export const ReceiptItems: React.FC<ReceiptItemsProps> = ({
 
   const common = {
     readonly: readonly,
-    selected,
+    // selected,
     onSelect: onRemove,
   };
 

@@ -2,20 +2,26 @@ import React, { useState, useEffect } from 'react';
 import { ListItem, Left, Text, Body, Right } from 'native-base';
 import { formatNumber, _total, billSummary, BillSummary } from '../../../../utils';
 import withObservables from '@nozbe/with-observables';
-import { tableNames } from '../../../../models';
+import { tableNames, Bill, Discount } from '../../../../models';
 import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
+import { Database } from '@nozbe/watermelondb';
 
 const symbol = '£'; // TODO: move to org settings
 
-interface BillRowProps {
-  bill: any;
-  onSelectBill: (bill: any) => void;
+interface BillRowInnerProps {
   billPayments: any;
   billDiscounts: any;
   billItems: any;
   discounts: any;
 }
-export const WrappedBillRow: React.FC<BillRowProps> = ({
+
+interface BillRowOuterProps {
+  bill: Bill;
+  onSelectBill: (bill: Bill) => void;
+  database: Database
+}
+
+export const WrappedBillRow: React.FC<BillRowInnerProps & BillRowOuterProps> = ({
   bill,
   onSelectBill,
   billItems,
@@ -51,12 +57,12 @@ export const WrappedBillRow: React.FC<BillRowProps> = ({
 
 const enhance = component =>
   withDatabase<any>( // TODO: fix
-    withObservables<any, any>(['bill'], ({ database, bill }) => ({
+    withObservables<BillRowOuterProps, BillRowInnerProps>(['bill'], ({ database, bill }) => ({
       bill,
       billPayments: bill.billPayments,
       billDiscounts: bill.billDiscounts,
       billItems: bill.billItems,
-      discounts: database.collections.get(tableNames.discounts).query(),
+      discounts: database.collections.get<Discount>(tableNames.discounts).query(),
     }))(component),
   );
 

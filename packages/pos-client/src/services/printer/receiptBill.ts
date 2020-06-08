@@ -2,6 +2,7 @@ import { formatNumber, billSummary, BillSummary } from '../../utils';
 import { alignCenter, alignLeftRight, addHeader, divider, alignRight } from './printer';
 import { receiptTempate } from './template';
 import { capitalize, groupBy } from 'lodash';
+import { BillItem, BillDiscount, BillPayment, Discount, PriceGroup, PaymentType } from '../../models';
 
 const symbol = '£';
 const modPrefix = ' -';
@@ -17,12 +18,12 @@ const org = {
 };
 
 export const receiptBill = async (
-  billItems: any,
-  billDiscounts: any,
-  billPayments: any,
-  discounts: any,
-  priceGroups: any,
-  paymentTypes: any,
+  billItems: BillItem[],
+  billDiscounts: BillDiscount[],
+  billPayments: BillPayment[],
+  discounts: Discount[],
+  priceGroups: PriceGroup[],
+  paymentTypes: PaymentType[],
 ) => {
   const summary = await billSummary(billItems, billDiscounts, billPayments, discounts);
 

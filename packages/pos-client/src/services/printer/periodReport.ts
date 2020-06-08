@@ -11,7 +11,8 @@ import { receiptTempate } from './template';
 import { capitalize } from 'lodash';
 import dayjs from 'dayjs';
 import { flatten, sumBy } from 'lodash';
-import { tableNames } from '../../models';
+import { tableNames, BillPeriod } from '../../models';
+import { Database } from '@nozbe/watermelondb';
 
 const symbol = '£'; // TODO: move
 
@@ -26,21 +27,23 @@ const org = {
   vat: '123 345 567',
 };
 
-const printGroupCommands: (
-  group: Record<string, number>,
-  nameResolver: (id: string) => string,
-  symbol: string,
-) => Record<any, any>[] = (group, nameResolver, symbol) =>
-  Object.keys(group).reduce((acc, id) => {
-    return [
-      ...acc,
-      {
-        appendBitmapText: alignLeftRight(capitalize(nameResolver(id)), formatNumber(group[id], symbol)),
-      },
-    ];
-  }, []);
+// const printGroupCommands: (
+//   group: Record<string, number>,
+//   nameResolver: (id: string) => string,
+//   symbol: string,
+// ) => Record<any, any>[] = (group, nameResolver, symbol) =>
+//   Object.keys(group).reduce((acc, id) => {
+//     return [
+//       ...acc,
+//       {
+//         appendBitmapText: alignLeftRight(capitalize(nameResolver(id)), formatNumber(group[id], symbol)),
+//       },
+//     ];
+//   }, []);
 
-export const periodReport = async (billPeriod, database) => {
+
+  // TODO type this func
+export const periodReport = async (billPeriod: BillPeriod, database: Database) => {
   let c = [];
 
   const [

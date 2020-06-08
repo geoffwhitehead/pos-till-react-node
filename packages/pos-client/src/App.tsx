@@ -193,7 +193,6 @@ export const App = () => {
     return <SplashScreen />;
   }
 
-  console.log('models', models);
   return (
     // {/* native base wrapper */}
 

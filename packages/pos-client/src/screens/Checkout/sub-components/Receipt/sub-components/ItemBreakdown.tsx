@@ -3,13 +3,31 @@ import { capitalize } from 'lodash';
 import React from 'react';
 import { formatNumber } from '../../../../../utils';
 import withObservables from '@nozbe/with-observables';
+import { BillItem } from '../../../../../models';
 
 // TODO: move into org and fetch from db or something
 const currencySymbol = '£';
 
-const ItemBreakdownInner = ({ item, modifierItems, readonly, selected, onSelect }) => {
+interface ItemBreakdownInnerProps {
+  modifierItems: any;
+}
+
+interface ItemBreakdownOuterProps {
+  item: BillItem;
+  readonly: boolean;
+  // selected: BillItem;
+  onSelect: (i: BillItem) => void;
+}
+
+const ItemBreakdownInner: React.FC<ItemBreakdownOuterProps & ItemBreakdownInnerProps> = ({
+  item,
+  modifierItems,
+  readonly,
+  // selected,
+  onSelect,
+}) => {
   return (
-    <ListItem noIndent key={item.id} selected={selected === item} onPress={() => !readonly && onSelect(item)}>
+    <ListItem noIndent key={item.id} onPress={() => !readonly && onSelect(item)}>
       <Left>
         <Content>
           <Text>{`${capitalize(item.itemName)}`}</Text>
@@ -28,6 +46,9 @@ const ItemBreakdownInner = ({ item, modifierItems, readonly, selected, onSelect 
   );
 };
 
-export const ItemBreakdown = withObservables<any, any>(['item'], ({ item }) => ({
-  modifierItems: item.billItemModifierItems,
-}))(ItemBreakdownInner);
+export const ItemBreakdown = withObservables<ItemBreakdownOuterProps, ItemBreakdownInnerProps>(
+  ['item'],
+  ({ item }) => ({
+    modifierItems: item.billItemModifierItems,
+  }),
+)(ItemBreakdownInner);

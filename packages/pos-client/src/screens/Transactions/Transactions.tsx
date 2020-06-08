@@ -5,16 +5,25 @@ import { Receipt } from '../Checkout/sub-components/Receipt/Receipt';
 import { TransactionList } from './sub-components/TransactionList';
 import withObservables from '@nozbe/with-observables';
 import { withBillPeriod } from '../../hocs/withBillPeriod';
+import { DrawerNavigationProp } from '@react-navigation/drawer';
+import { SidebarDrawerStackParamList } from '../../navigators/SidebarNavigator';
+import { Bill, BillPeriod } from '../../models';
 
-interface TransactionsProps {
-  navigation: any; // TODO
-  closedBills: any
+interface TransactionsOuterProps {
+  navigation: DrawerNavigationProp<SidebarDrawerStackParamList, 'Transactions'>;
+  billPeriod: BillPeriod
 }
 
-export const TransactionsInner: React.FC<TransactionsProps> = ({ navigation, closedBills }) => {
+interface TransactionsInnerProps {
+  closedBills: any;
+}
 
-  const [selectedBill, setSelectedBill] = useState<any | null>(null);
-  const selectBillHandler = (bill: any) => setSelectedBill(bill);
+export const TransactionsInner: React.FC<TransactionsOuterProps & TransactionsInnerProps> = ({
+  navigation,
+  closedBills,
+}) => {
+  const [selectedBill, setSelectedBill] = useState<Bill | null>(null);
+  const selectBillHandler = (b: Bill) => setSelectedBill(b);
 
   return (
     <Container>
@@ -31,7 +40,7 @@ export const TransactionsInner: React.FC<TransactionsProps> = ({ navigation, clo
 
 const enhance = c =>
   withBillPeriod(
-    withObservables<any, any>(['billPeriod'], ({ billPeriod }) => ({
+    withObservables<TransactionsOuterProps, TransactionsInnerProps>(['billPeriod'], ({ billPeriod }) => ({
       billPeriod,
       closedBills: billPeriod.closedBills,
     }))(c),

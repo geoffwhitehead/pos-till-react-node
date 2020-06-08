@@ -1,31 +1,37 @@
 import React, { useState, useContext } from 'react';
 import { Text, Content, List, ListItem, Left, Body, Right, Button } from '../../../../core';
-import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import withObservables from '@nozbe/with-observables';
 import { CurrentBillContext } from '../../../../contexts/CurrentBillContext';
 import { BillRowEmpty } from './BillRowEmpty';
 import { BillRow } from './BillRow';
+import { Bill, BillPeriod } from '../../../../models';
 
-interface SelectBillProps {
+interface SelectBillInnerProps {
   openBills: any; // TODO: fix types
-  maxBills: number;
-  billPeriod: any;
-  onSelectBill?: (bill: any) => void;
+}
+
+interface SelectBillOuterProps {
+  billPeriod: BillPeriod;
+  onSelectBill?: (bill: Bill) => void; // Created from 2 places
 }
 
 // TODO: fetch from org / state
 const maxBills = 40; // TODO: move to org settings
 
-export const WrappedSelectBill: React.FC<SelectBillProps> = ({ onSelectBill, openBills, billPeriod }) => {
+export const WrappedSelectBill: React.FC<SelectBillOuterProps & SelectBillInnerProps> = ({
+  onSelectBill,
+  openBills,
+  billPeriod,
+}) => {
   const { setCurrentBill } = useContext(CurrentBillContext);
   const [showOpen, setShowOpen] = useState<boolean>(false);
 
-  const bills = openBills.reduce((acc, bill) => {
+  const bills: (Bill | undefined)[] = openBills.reduce((acc, bill) => {
     acc[bill.reference - 1] = bill;
     return [...acc];
   }, Array(maxBills).fill(null));
 
-  const _onSelectBill = (bill: any) => {
+  const _onSelectBill = (bill: Bill) => {
     setCurrentBill(bill);
     onSelectBill && onSelectBill(bill);
   };
@@ -62,7 +68,12 @@ export const WrappedSelectBill: React.FC<SelectBillProps> = ({ onSelectBill, ope
             bill ? (
               <BillRow key={bill.id} bill={bill} onSelectBill={_onSelectBill} />
             ) : (
-              <BillRowEmpty billPeriod={billPeriod} key={index} reference={index + 1} onSelectBill={_onSelectBill} />
+              <BillRowEmpty
+                billPeriod={billPeriod}
+                key={index}
+                reference={(index + 1).toString()}
+                onSelectBill={_onSelectBill}
+              />
             ),
           )}
       </List>
@@ -70,12 +81,9 @@ export const WrappedSelectBill: React.FC<SelectBillProps> = ({ onSelectBill, ope
   );
 };
 
-const enhance = c =>
-  withDatabase<any>(
-    withObservables<any, any>(['billPeriod'], ({ billPeriod, database }) => ({
-      billPeriod,
-      openBills: billPeriod.openBills,
-    }))(c),
-  );
+const enhance = withObservables<SelectBillOuterProps, SelectBillInnerProps>(['billPeriod'], ({ billPeriod }) => ({
+  billPeriod,
+  openBills: billPeriod.openBills,
+}));
 
 export const SelectBill = enhance(WrappedSelectBill);

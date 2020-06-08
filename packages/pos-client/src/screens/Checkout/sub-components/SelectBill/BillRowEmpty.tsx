@@ -1,19 +1,19 @@
 import React from 'react';
 import { ListItem, Left, Text, Body, Right } from '../../../../core';
 import { useDatabase } from '@nozbe/watermelondb/hooks';
+import { Bill, BillPeriod } from '../../../../models';
 
 interface BillRowEmptyProps {
   reference: string;
-  onSelectBill: (bill: any) => void;
-  billPeriod: any;
+  onSelectBill: (b: Bill) => void;
+  billPeriod: BillPeriod;
 }
 
 export const BillRowEmpty: React.FC<BillRowEmptyProps> = ({ onSelectBill, reference, billPeriod }) => {
-
   const database = useDatabase();
 
   const createBill = async () => {
-    const bill = await database.action(async () => await billPeriod.createBill({ reference }));
+    const bill = await database.action<Bill>(async () => await billPeriod.createBill({ reference }));
     onSelectBill(bill);
   };
 

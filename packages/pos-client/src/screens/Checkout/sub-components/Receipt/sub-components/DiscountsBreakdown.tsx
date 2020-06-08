@@ -1,16 +1,17 @@
+import React from "react";
 import { formatNumber } from "../../../../../utils";
 import { Separator, Text, ListItem, Left, Right } from "native-base";
-import React from "react";
 
 // TODO: move into org and fetch from db or something
 const currencySymbol = '£';
 
-export const DiscountsBreakdown: React.FC<{
-    discountBreakdown: any;
-    readonly: boolean;
-    selected: any;
-    onSelect: (item) => void;
-  }> = ({ discountBreakdown, readonly, selected, onSelect }) => {
+interface DiscountBreakdownProps {
+  discountBreakdown: any;
+  readonly: boolean;
+  // selected: boolean;
+  onSelect: (billDiscountId: string) => void;
+}
+export const DiscountsBreakdown: React.FC<DiscountBreakdownProps> = ({ discountBreakdown, readonly, onSelect }) => {
     if (!discountBreakdown || !discountBreakdown.length) {
       return null;
     }
@@ -29,7 +30,7 @@ export const DiscountsBreakdown: React.FC<{
           return (
             <ListItem
               key={breakdown.billDiscountId}
-              selected={selected}
+              // selected={selected} // TODO: check this
               onPress={() => !readonly && onSelect(breakdown.billDiscountId)}
             >
               <Left>

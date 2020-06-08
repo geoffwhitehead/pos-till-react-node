@@ -3,18 +3,19 @@ import { Separator, Text, ListItem } from '../../../../../core';
 import React from 'react';
 import { capitalize } from 'lodash';
 import { ItemBreakdown } from './ItemBreakdown';
+import { BillItem } from '../../../../../models';
 
 export const ItemsBreakdown: React.FC<{
-  items: any;
+  items: BillItem[];
   readonly: boolean;
-  selected: boolean;
-  onSelect: (item) => void;
-}> = ({ items, readonly, selected, onSelect }) => {
+  // selected: BillItem;
+  onSelect: (bI: BillItem) => void;
+}> = ({ items, readonly, onSelect }) => {
   if (!items) {
     return null;
   }
 
-  const billItemGroups = groupBy(items, item => item.priceGroupId);
+  const billItemGroups: Record<string, BillItem[]> = groupBy(items, item => item.priceGroupId);
 
   return (
     <>
@@ -27,7 +28,7 @@ export const ItemsBreakdown: React.FC<{
             <Text>{capitalize(itemGroup[0].priceGroupName)}</Text>
           </ListItem>,
           ...itemGroup.map(item => (
-            <ItemBreakdown item={item} readonly={readonly} selected={selected} onSelect={onSelect} />
+            <ItemBreakdown item={item} readonly={readonly} onSelect={onSelect} />
           )),
         ];
       })}

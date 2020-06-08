@@ -1,18 +1,30 @@
 import React, { useState } from 'react';
 import { Text, Content, List, ListItem, Left, Icon, Body, Right } from '../../../../core';
 import { SearchHeader } from '../../../../components/SearchHeader/SearchHeader';
-import { routes } from '../../../../navigators/CheckoutItemNavigator';
+import { routes, CheckoutItemStackParamList } from '../../../../navigators/CheckoutItemNavigator';
 import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import withObservables from '@nozbe/with-observables';
+import { Database } from '@nozbe/watermelondb';
+import { RouteProp } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { Category } from '../../../../models';
 
-export const CategoriesWrapped: React.FC<any> = ({ navigation, route, categories }) => {
+interface CategoriesInnerProps {
+  categories: any; // TODO: type
+}
 
+interface CategoriesOuterProps {
+  database: Database;
+  route: RouteProp<CheckoutItemStackParamList, 'CategoryList'>;
+  navigation: StackNavigationProp<CheckoutItemStackParamList, 'CategoryList'>;
+}
+
+export const CategoriesInner: React.FC<CategoriesOuterProps & CategoriesInnerProps> = ({ navigation, categories }) => {
   const [searchValue, setSearchValue] = useState<string>('');
 
-  const onPressCategoryFactory: (category?: any) => () => void = category => () => {
+  const onPressCategoryFactory = (category?: Category) => () => {
     if (!category) {
-      navigation.navigate(routes.allItems, {
-      });
+      navigation.navigate(routes.allItems, {});
     } else {
       navigation.navigate(routes.categoryItemList, {
         category,
@@ -22,7 +34,7 @@ export const CategoriesWrapped: React.FC<any> = ({ navigation, route, categories
 
   const onSearchHandler = (value: string) => setSearchValue(value);
 
-  const searchFilter = (category: any, searchValue: string) =>
+  const searchFilter = (category: Category, searchValue: string) =>
     category.name.toLowerCase().includes(searchValue.toLowerCase());
 
   return (
@@ -61,11 +73,12 @@ export const CategoriesWrapped: React.FC<any> = ({ navigation, route, categories
   );
 };
 
-export const Categories = withDatabase(
-  withObservables<any, any>([], ({ database }) => ({
+// TODO: type
+export const Categories = withDatabase<any>(
+  withObservables<CategoriesOuterProps, CategoriesInnerProps>([], ({ database }) => ({
     categories: database.collections
       .get('categories')
       .query()
       .observe(),
-  }))(CategoriesWrapped),
+  }))(CategoriesInner),
 );

@@ -9,6 +9,8 @@ import { Payments } from './sub-components/Payments/Payments';
 import { CompleteBill } from './sub-components/CompleteBill/CompleteBill';
 import { BillPeriodContext } from '../../contexts/BillPeriodContext';
 import { CurrentBillContext } from '../../contexts/CurrentBillContext';
+import { DrawerNavigationProp } from '@react-navigation/drawer';
+import { SidebarDrawerStackParamList } from '../../navigators/SidebarNavigator';
 
 export enum Modes {
   Payments = 'payments',
@@ -20,7 +22,7 @@ export enum Modes {
 }
 
 interface CheckoutProps {
-  navigation: any; // TODO: fix
+  navigation: DrawerNavigationProp<SidebarDrawerStackParamList, 'Checkout'>;
 }
 
 export const Checkout: React.FC<CheckoutProps> = ({ navigation }) => {
@@ -28,14 +30,13 @@ export const Checkout: React.FC<CheckoutProps> = ({ navigation }) => {
   const { currentBill, setCurrentBill } = useContext(CurrentBillContext);
 
   const [mode, setMode] = useState<Modes>(Modes.Items);
-  
+
   const clearBill = async () => {
-    const x = await currentBill.billItems.fetch()
-    currentBill.addPayment
-    x.map(m => m.item)
+    const x = await currentBill.billItems.fetch();
+    currentBill.addPayment;
+    x.map(m => m.item);
     setCurrentBill(null);
     setMode(Modes.Bills);
-    
   };
   const openDrawer = () => navigation.openDrawer();
   const onCheckout = () => setMode(Modes.Payments);

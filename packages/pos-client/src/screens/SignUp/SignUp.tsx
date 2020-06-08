@@ -4,6 +4,8 @@ import { StyleSheet } from 'react-native'
 import { AuthContext } from '../../contexts/AuthContext'
 import { Formik } from 'formik'
 import * as Yup from 'yup'
+import { StackNavigationProp } from '@react-navigation/stack'
+import { AuthStackParamList } from '../../navigators/AuthNavigator'
 
 const SignupSchema = Yup.object().shape({
   firstName: Yup.string()
@@ -24,7 +26,11 @@ const SignupSchema = Yup.object().shape({
   passwordConfirmation: Yup.string().oneOf([Yup.ref('password'), null], 'Passwords must match'),
 })
 
-export const SignUp = ({ navigation }) => {
+interface SignUpProps {
+  navigation: StackNavigationProp<AuthStackParamList, 'SignUp'>;
+}
+
+export const SignUp: React.FC<SignUpProps> = () => {
   const { signUp } = React.useContext(AuthContext)
 
   const initialValues = {
@@ -109,11 +115,11 @@ export const SignUp = ({ navigation }) => {
   )
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-})
+// const styles = StyleSheet.create({
+//   container: {
+//     flex: 1,
+//     backgroundColor: '#fff',
+//     alignItems: 'center',
+//     justifyContent: 'center',
+//   },
+// })

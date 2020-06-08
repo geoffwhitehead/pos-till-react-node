@@ -7,26 +7,39 @@ import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import withObservables from '@nozbe/with-observables';
 import { PriceGroupContext } from '../../../../contexts/PriceGroupContext';
 import { CurrentBillContext } from '../../../../contexts/CurrentBillContext';
-import { CategoryItem } from './sub-components/CategoryItem';
+import { CategoryItemRow } from './sub-components/CategoryItemRow';
+import { Category, Item, Modifier } from '../../../../models';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { CheckoutItemStackParamList } from '../../../../navigators/CheckoutItemNavigator';
+import { RouteProp } from '@react-navigation/native';
+import { Database } from '@nozbe/watermelondb';
 
-interface CategoryItemsListProps {
-  category: any;
-  items: any[];
-  modifiers: any[];
-  route: any;
-  navigation: any; // TODO: type this
+interface CategoryItemsListOuterProps {
+  database?: Database;
+  category?: Category;
+  modifiers: Modifier[];
+  route: RouteProp<CheckoutItemStackParamList, 'CategoryItemsList'>;
+  navigation: StackNavigationProp<CheckoutItemStackParamList, 'CategoryItemsList'>; // TODO: type this
 }
 
-const WrappedCategoryItems: React.FC<CategoryItemsListProps> = ({ category, items, navigation }) => {
+interface CategoryItemsListInnerProps {
+  items: any; // TODO: type
+}
+
+const CategoryItemsInner: React.FC<CategoryItemsListOuterProps & CategoryItemsListInnerProps> = ({
+  category,
+  items,
+  navigation,
+}) => {
   const [searchValue, setSearchValue] = useState<string>('');
   const [modalOpen, setModalOpen] = useState<boolean>(false);
-  const [selectedItem, setSelectedItem] = useState<any>();
+  const [selectedItem, setSelectedItem] = useState<Item>();
   const { priceGroup } = useContext(PriceGroupContext);
   const { currentBill } = useContext(CurrentBillContext);
 
   const goBack = () => navigation.goBack();
 
-  const searchFilter = (item: any, searchValue: string) => item.name.toLowerCase().includes(searchValue.toLowerCase());
+  const searchFilter = (item: Item, searchValue: string) => item.name.toLowerCase().includes(searchValue.toLowerCase());
 
   const onSearchHandler = (value: string) => setSearchValue(value);
   const onCancelHandler = () => {
@@ -34,7 +47,7 @@ const WrappedCategoryItems: React.FC<CategoryItemsListProps> = ({ category, item
     setSelectedItem(null);
   };
 
-  const onSelectItem = async (item, modifierCount) => {
+  const onSelectItem = async (item: Item, modifierCount: number) => {
     if (modifierCount > 0) {
       setSelectedItem(item);
       setModalOpen(true);
@@ -42,7 +55,6 @@ const WrappedCategoryItems: React.FC<CategoryItemsListProps> = ({ category, item
       await currentBill.addItem({ item, priceGroup });
     }
   };
-  console.log('items', items);
   return (
     <Content>
       <SearchHeader onChangeText={onSearchHandler} value={searchValue} />
@@ -81,7 +93,7 @@ const WrappedCategoryItems: React.FC<CategoryItemsListProps> = ({ category, item
           .filter(item => (searchValue ? searchFilter(item, searchValue) : true))
           .map(item => {
             return (
-              <CategoryItem
+              <CategoryItemRow
                 key={item.id}
                 item={item}
                 priceGroup={priceGroup}
@@ -95,16 +107,19 @@ const WrappedCategoryItems: React.FC<CategoryItemsListProps> = ({ category, item
   );
 };
 
-export const CategoryItems = withObservables<any, any>(['route'], ({ route }) => {
-  const { category } = route.params;
-  return {
-    category,
-    items: category.items,
-  };
-})(WrappedCategoryItems);
+export const CategoryItems = withObservables<CategoryItemsListOuterProps, CategoryItemsListInnerProps>(
+  ['route'],
+  ({ route }) => {
+    const { category } = route.params;
+    return {
+      category,
+      items: category.items,
+    };
+  },
+)(CategoryItemsInner);
 
-export const AllItems = withDatabase(
-  withObservables<any, any>([], ({ database }) => ({
-    items: database.collections.get('items').query(),
-  }))(WrappedCategoryItems),
+export const AllItems = withDatabase<any>( // TODO: type
+  withObservables<CategoryItemsListOuterProps, CategoryItemsListInnerProps>([], ({ database }) => ({
+    items: database.collections.get<Item>('items').query(),
+  }))(CategoryItemsInner),
 );

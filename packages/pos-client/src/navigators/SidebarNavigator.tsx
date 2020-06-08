@@ -7,7 +7,7 @@ import { Transactions } from '../screens/Transactions/Transactions';
 
 import React from 'react';
 
-export const routes = {
+export const sidebarRoutes: Record<string, string> = {
   checkout: 'Checkout',
   items: 'Items',
   reports: 'Reports',
@@ -15,18 +15,24 @@ export const routes = {
   transactions: 'Transactions',
 };
 
-interface SidebarNavigatorProps {}
+export type SidebarDrawerStackParamList = {
+  Checkout: undefined;
+  Items: undefined;
+  Reports: undefined;
+  Bills: undefined;
+  Transactions: undefined;
+};
 
-export const SidebarNavigator: React.FC<SidebarNavigatorProps> = () => {
-  const Drawer = createDrawerNavigator();
+export const SidebarNavigator: React.FC<{}> = () => {
+  const Drawer = createDrawerNavigator<SidebarDrawerStackParamList>();
 
   return (
     <Drawer.Navigator initialRouteName="Checkout">
-      <Drawer.Screen name={routes.checkout} component={Checkout} initial/>
-      <Drawer.Screen name={routes.items} component={Items} />
-      <Drawer.Screen name={routes.reports} component={Reports} />
-      <Drawer.Screen name={routes.bills} component={Bills} />
-      <Drawer.Screen name={routes.transactions} component={Transactions} />
+      <Drawer.Screen name="Checkout" component={Checkout} />
+      <Drawer.Screen name="Items" component={Items} />
+      <Drawer.Screen name="Reports" component={Reports} />
+      <Drawer.Screen name="Bills" component={Bills} />
+      <Drawer.Screen name="Transactions" component={Transactions} />
     </Drawer.Navigator>
   );
 };
