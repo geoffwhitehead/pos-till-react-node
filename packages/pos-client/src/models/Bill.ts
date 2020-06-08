@@ -57,9 +57,11 @@ export class Bill extends Model {
   @lazy billItems: Query<BillItem> = this._billItems.extend(Q.where('is_voided', Q.notEq(true)));
   @lazy billItemVoids: Query<BillItem> = this._billItems.extend(Q.where('is_voided', true));
   @lazy _billModifierItems = this.collections
-    .get('bill_item_modifier_items')
+    .get<BillItemModifierItem>('bill_item_modifier_items')
     .query(Q.on('bill_items', 'bill_id', this.id)) as Query<BillItemModifierItem>;
-  @lazy billModifierItems: Query<BillItemModifierItem> = this._billModifierItems.extend(Q.where('is_voided', Q.notEq(true)));
+  @lazy billModifierItems: Query<BillItemModifierItem> = this._billModifierItems.extend(
+    Q.where('is_voided', Q.notEq(true)),
+  );
   @lazy billModifierItemVoids: Query<BillItemModifierItem> = this._billModifierItems.extend(Q.where('is_voided', true));
 
   @action addPayment = async (p: { paymentType: PaymentType; amount: number; isChange?: boolean }) => {

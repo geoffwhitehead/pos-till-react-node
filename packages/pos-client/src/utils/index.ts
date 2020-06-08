@@ -1,4 +1,5 @@
 import { flatten, uniq, groupBy, sumBy } from 'lodash';
+import { BillItem, BillItemModifierItem } from '../models';
 
 export const formatNumber: (value: number, symbol?: string) => string = (value, symbol = '') =>
   `${symbol}${(value ? value / 100 : 0).toFixed(2)}`;
@@ -36,13 +37,17 @@ export const _discountBreakdown = (total: number, billDiscounts: any, discounts)
   return arrDiscounts;
 };
 
-export const itemsBreakdown = async (
-  items: any[],
-): Promise<{ item: any; mods: any[]; total: number }[]> => {
+interface ItemsBreakdownProps {
+  item: BillItem;
+  mods: BillItemModifierItem[];
+  total: number;
+}
+
+export const itemsBreakdown = async (items: BillItem[]): Promise<ItemsBreakdownProps[]> => {
   // TODO: fix type
   const itemsWithModifiers: any = await Promise.all(
     items.map(async item => {
-      const mods = await item.billItemModifierItems.fetch();
+      const mods = await item._billItemModifierItems.fetch();
       return {
         item,
         mods,
@@ -54,7 +59,7 @@ export const itemsBreakdown = async (
 };
 
 export const _total = async (items: any[]): Promise<{ total: number; itemsBreakdown: any }> => {
-  const breakdown = await itemsBreakdown(items);// TODO: fix type
+  const breakdown = await itemsBreakdown(items); // TODO: fix type
   const total = breakdown.reduce((out, item) => out + item.total, 0);
   return { total, itemsBreakdown: breakdown };
 };

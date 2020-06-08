@@ -8,12 +8,10 @@ import { Bill, BillPayment, BillItem, Discount, BillDiscount, PaymentType } from
 import { BillSummary } from '../../../../utils';
 
 interface ReceiptItemsProps {
-  // bill: Bill;
   readonly: boolean;
   billPayments: BillPayment[];
   discountBreakdown: BillSummary['discountBreakdown'];
   billItems: BillItem[];
-  // discounts: Discount[];
   billDiscounts: BillDiscount[];
   paymentTypes: PaymentType[];
 }
@@ -32,9 +30,6 @@ export const ReceiptItems: React.FC<ReceiptItemsProps> = ({
 
   const database = useDatabase();
 
-  // const [selected, setSelected] = useState<BillPayment | BillItem | BillDiscount>(null);
-
-  // PROGRESS: continue implementing remove on payents and discounts . unlike item - add a void function that doesnt soft delete
   const remove = async item => {
     await database.action(() => item.void());
   };
@@ -60,7 +55,6 @@ export const ReceiptItems: React.FC<ReceiptItemsProps> = ({
 
   const common = {
     readonly: readonly,
-    // selected,
     onSelect: onRemove,
   };
 

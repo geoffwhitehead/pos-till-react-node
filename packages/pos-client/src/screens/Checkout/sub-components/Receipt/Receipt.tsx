@@ -1,11 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Text, Col, Grid, Row, Button } from '../../../../core';
 import { StyleSheet } from 'react-native';
-import {
-  formatNumber,
-  billSummary,
-  BillSummary,
-} from '../../../../utils';
+import { formatNumber, billSummary, BillSummary } from '../../../../utils';
 import { Fonts } from '../../../../theme';
 import { ReceiptItems } from './ReceiptItems';
 import dayjs from 'dayjs';
@@ -27,15 +23,15 @@ interface ReceiptInnerProps {
   discounts: any;
   paymentTypes: any;
   priceGroups: any;
+  billModifierItems: any;
 }
 
 interface ReceiptOuterProps {
   onStore?: () => void;
   onCheckout?: () => void;
-  bill: Bill
-  database: Database
+  bill: Bill;
+  database: Database;
   complete: boolean;
-
 }
 
 export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
@@ -49,6 +45,7 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
   discounts,
   paymentTypes,
   priceGroups,
+  billModifierItems,
 }) => {
   const [summary, setSummary] = useState<BillSummary>();
 
@@ -58,7 +55,7 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
       setSummary(summary);
     };
     summary();
-  }, [billItems, billDiscounts, billPayments]);
+  }, [billItems, billDiscounts, billPayments, billModifierItems]); // keep billModifierItems
 
   const onPrint = async () => {
     const commands = await receiptBill(billItems, billDiscounts, billPayments, discounts, priceGroups, paymentTypes);
@@ -91,7 +88,6 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
       <Row>
         <ReceiptItems
           readonly={complete}
-          // bill={bill}
           billItems={billItems}
           discountBreakdown={summary.discountBreakdown}
           billPayments={billPayments}
@@ -141,15 +137,14 @@ const enhance = component =>
       billPayments: bill.billPayments,
       billDiscounts: bill.billDiscounts,
       billItems: bill.billItems,
-      discounts: database.collections
-        .get<Discount>(tableNames.discounts)
-        .query(),
-      paymentTypes: database.collections
-        .get<PaymentType>(tableNames.paymentTypes)
-        .query(),
-      priceGroups: database.collections
-        .get<PriceGroup>(tableNames.priceGroups)
-        .query(),
+      discounts: database.collections.get<Discount>(tableNames.discounts).query(),
+      paymentTypes: database.collections.get<PaymentType>(tableNames.paymentTypes).query(),
+      priceGroups: database.collections.get<PriceGroup>(tableNames.priceGroups).query(),
+      /**
+       * billModifierItems is here purely to cause a re render and recalculation of the
+       * bill summary
+       */
+      billModifierItems: bill.billModifierItems,
     }))(component),
   );
 

@@ -65,7 +65,6 @@ export const Checkout: React.FC<CheckoutProps> = ({ navigation }) => {
     }
   };
 
-  console.log('currentBill', currentBill)
   return (
     <Container>
       <SidebarHeader title="Checkout" onOpen={openDrawer} disableNav={mode === Modes.Complete} />
