@@ -33,7 +33,7 @@ export const billSchema = tableSchema({
 export class Bill extends Model {
   static table = 'bills';
 
-  @field('reference') reference: string;
+  @field('reference') reference: number;
   @field('is_closed') isClosed: boolean;
   @nochange @field('bill_period_id') billPeriodId: string;
   @date('closed_at') closedAt: Date;

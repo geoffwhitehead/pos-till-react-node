@@ -29,7 +29,6 @@ export const WrappedBillRow: React.FC<BillRowInnerProps & BillRowOuterProps> = (
   billDiscounts,
   discounts,
 }) => {
-  const _onSelectBill = () => onSelectBill(bill);
   const [summary, setSummary] = useState<BillSummary>();
 
   useEffect(() => {
@@ -41,7 +40,7 @@ export const WrappedBillRow: React.FC<BillRowInnerProps & BillRowOuterProps> = (
   }, [billItems]);
 
   return (
-    <ListItem onPress={_onSelectBill}>
+    <ListItem onPress={() => onSelectBill(bill)}>
       <Left>
         <Text style={{ color: 'green' }}>{`${bill.reference}: Open`}</Text>
       </Left>

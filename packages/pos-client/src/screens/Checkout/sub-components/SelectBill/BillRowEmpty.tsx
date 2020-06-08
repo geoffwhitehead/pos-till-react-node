@@ -4,7 +4,7 @@ import { useDatabase } from '@nozbe/watermelondb/hooks';
 import { Bill, BillPeriod } from '../../../../models';
 
 interface BillRowEmptyProps {
-  reference: string;
+  reference: number;
   onSelectBill: (b: Bill) => void;
   billPeriod: BillPeriod;
 }
