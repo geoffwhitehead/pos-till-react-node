@@ -2,22 +2,23 @@
 
 ## Todo
 
-FIX TYPESCRIPT TYPES EVERYWHERE
-
 **Current**
 
--   App performance isnt great with realm. With around 1000 items in the db the UI is very unresponsive taking seconds to respond to user input.
+-   ~App performance isnt great with realm. With around 1000 items in the db the UI is very unresponsive taking seconds to respond to user input.
 -   Using memo and callbacks is unpredicatable because react doesnt seem to work well with the realm objects.
-    -Not sure where the problems lies as its even slightly laggy with 10s of items in the UI. Although that could be down to running in the sim not built for prod
+    -Not sure where the problems lies as its even slightly laggy with 10s of items in the UI. Although that could be down to running in the sim not built for prod~
+
+
+    fix typescript types
 
 TODO:
 
--   Look at watermelonDB
+-   ~Look at watermelonDB
 -   Does it return plain js objects.
 -   look at creating a layer so it will make swapping out the db easier in the future if needed
 -   branch and create a simple demo with 1000 records.
 -   should redux be used?
--   ANDROID SETUP: complete setup for watermelon: https://nozbe.github.io/WatermelonDB/Installation.html
+-   ANDROID SETUP: complete setup for watermelon: https://nozbe.github.io/WatermelonDB/Installation.html~
 
 **Auth**
 
@@ -36,16 +37,16 @@ TODO:
 -   unit testing
 -   no results / empty responses are not handling in most places
 -   auth: add an auth service that will be able to: - lookup a users organization based on their email address. Not sure how to implement - might need to be untenanted so it has access to all organizations users. - this should allow multiple users per organization.
--   look into sessions
--   invalidate jwt on logout
+-   ~look into sessions~
+-   ~invalidate jwt on logout~
 -   add events system (RabbitMQ maybe)
 -   batch job - upload data
 -   add debug package
 -   verification process for auth. quick CRA or just hit an endpoint from an email
 -
 -   **BUGS**
--   ids etc are not being created for subdocuments when using mongoose.insertMany
--   fix populate to work with the api refactor
+-   ~ids etc are not being created for subdocuments when using mongoose.insertMany
+-   fix populate to work with the api refactor~
 
 **App**
 
@@ -56,12 +57,5 @@ TODO:
 -   Voids - add button to void - override delete to update deletedOn field - reports should include voids
 -   send to kitchen functionality - add linked printers array on items - store record of sent bill items. Dont send twice. - kitchen printer receipt format
 -   prevent ending bill period with active bill
--   **performance**: things are a bit slow. realm objects dont work with react lifecycle and memo. Potentially lots of unnecessary re-renders. Look into using a redux layer and converting the realm objects to standard js objects. Potentially use sagas with redux.
--   sidebar brand
--   update app to use organization
--   create settings page displaying org details.
--   create printers page configure printers
--   logout section
--   feature: the kitchen printer will need to show what time the food should be prepared for. - This can be defaulted to ASAP. - have a flag on the price group that requires the user to enter a time - no default. This will ensures take away orders are dealt with appropriately. - update the kitchen printer receipt.
 -   **BUGS**
 -   on change bill - reset screen
