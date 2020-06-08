@@ -32,9 +32,6 @@ export const Checkout: React.FC<CheckoutProps> = ({ navigation }) => {
   const [mode, setMode] = useState<Modes>(Modes.Items);
 
   const clearBill = async () => {
-    const x = await currentBill.billItems.fetch();
-    currentBill.addPayment;
-    x.map(m => m.item);
     setCurrentBill(null);
     setMode(Modes.Bills);
   };
@@ -68,6 +65,7 @@ export const Checkout: React.FC<CheckoutProps> = ({ navigation }) => {
     }
   };
 
+  console.log('currentBill', currentBill)
   return (
     <Container>
       <SidebarHeader title="Checkout" onOpen={openDrawer} disableNav={mode === Modes.Complete} />

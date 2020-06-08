@@ -1,9 +1,9 @@
 import React from 'react';
-import { Bill, Bill } from '../models/Bill';
+import { Bill } from '../models/Bill';
 
 type CurrentBillContextProps = {
   setCurrentBill: (bill: Bill) => void;
-  currentBill: Bill; 
+  currentBill: Bill;
 };
 export const CurrentBillContext = React.createContext<CurrentBillContextProps>({
   setCurrentBill: () => {},
