@@ -11,6 +11,7 @@ import withObservables from '@nozbe/with-observables';
 import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import { tableNames, Discount, PaymentType, PriceGroup, Bill } from '../../../../models';
 import { Database } from '@nozbe/watermelondb';
+import { PrintStatus } from '../../../../models/BillItem';
 
 // TODO: move into org and fetch from db or something
 const currencySymbol = '£';
@@ -48,6 +49,13 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
   billModifierItems,
 }) => {
   const [summary, setSummary] = useState<BillSummary>();
+
+  const _onStore = () => {
+    console.log('billItems', billItems);
+    const toPrint = billItems.filter(({ printStatus }) => !(printStatus === 'success' || printStatus === 'pending'));
+
+    console.log('toPrint', toPrint);
+  };
 
   useEffect(() => {
     const summary = async () => {
@@ -115,7 +123,7 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
       {!complete && (
         <Row style={styles.r5}>
           <Col>
-            <Button style={styles.buttons} block small onPress={onStore}>
+            <Button style={styles.buttons} block small onPress={_onStore}>
               <Text>Store</Text>
             </Button>
           </Col>
