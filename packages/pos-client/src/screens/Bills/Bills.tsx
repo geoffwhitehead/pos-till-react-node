@@ -13,6 +13,7 @@ export const Bills = ({ navigation }) => {
   return (
     <Container>
       <SidebarHeader title="Bills" onOpen={openDrawer} />
+      {/* Refactor SelectBill component so that its not being imported from checkout */}
       <SelectBill billPeriod={billPeriod} onSelectBill={onSelectBill}/>
     </Container>
   );

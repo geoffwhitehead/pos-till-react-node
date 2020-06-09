@@ -87,8 +87,9 @@ export class Bill extends Model {
 
   @action addItem = async (p: { item; priceGroup }): Promise<BillItem> => {
     const { item, priceGroup } = p;
-    const [category, prices] = await Promise.all([item.category.fetch(), item.prices.fetch()]);
+    const [category, prices, printers] = await Promise.all([item.category.fetch(), item.prices.fetch(), item.printers.fetch()]);
 
+    console.log('printers', printers)
     const newItem = await this.database.action(() =>
       this.collections.get<BillItem>('bill_items').create(billItem => {
         billItem.bill.set(this);
@@ -100,6 +101,7 @@ export class Bill extends Model {
           itemPrice: resolvePrice(priceGroup, prices),
           priceGroupName: priceGroup.name,
           categoryName: category.name,
+          printStatus: printers.length ? "" : "success"
         });
       }),
     );
@@ -110,6 +112,6 @@ export class Bill extends Model {
   @action close = async () =>
     await this.update(bill => {
       bill.isClosed = true;
-      bill.closedAt = dayjs();
+      bill.closedAt = dayjs().toDate();
     });
 }

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ListItem, Left, Text, Body, Right } from 'native-base';
+import { ListItem, Left, Text, Body, Right, Icon } from '../../../../core';
 import { formatNumber, _total, billSummary, BillSummary } from '../../../../utils';
 import withObservables from '@nozbe/with-observables';
 import { tableNames, Bill, Discount } from '../../../../models';
@@ -18,7 +18,7 @@ interface BillRowInnerProps {
 interface BillRowOuterProps {
   bill: Bill;
   onSelectBill: (bill: Bill) => void;
-  database: Database
+  database: Database;
 }
 
 export const WrappedBillRow: React.FC<BillRowInnerProps & BillRowOuterProps> = ({
@@ -39,11 +39,31 @@ export const WrappedBillRow: React.FC<BillRowInnerProps & BillRowOuterProps> = (
     summary();
   }, [billItems]);
 
+  const renderPrintErrors = () => {
+    const hasUnstoredItems = billItems.some(bI => bI.printStatus === '');
+    const hasPrintErrors = billItems.some(bI => bI.printStatus === 'error');
+
+    if (hasPrintErrors) {
+      return [
+        <Icon active name="ios-warning" style={{ marginLeft: 20, marginRight: 2, color: 'grey' }} />,
+        <Text note>Print Error</Text>,
+      ];
+    }
+    if (hasUnstoredItems) {
+      return [
+        <Icon active name="ios-warning" style={{ marginLeft: 20, marginRight: 2, color: 'grey' }} />,
+        <Text note>Unsent Items</Text>,
+      ];
+    }
+    return null;
+  };
   return (
     <ListItem onPress={() => onSelectBill(bill)}>
       <Left>
         <Text style={{ color: 'green' }}>{`${bill.reference}: Open`}</Text>
+        {renderPrintErrors()}
       </Left>
+      
       <Body>
         <Text style={{ color: 'grey' }}>{summary ? formatNumber(summary.balance, symbol) : '...'}</Text>
       </Body>
