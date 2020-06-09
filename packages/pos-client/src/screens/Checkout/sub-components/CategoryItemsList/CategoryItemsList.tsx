@@ -75,7 +75,6 @@ const CategoryItemsInner: React.FC<CategoryItemsListOuterProps & CategoryItemsLi
             currentBill={currentBill}
             onClose={onCancelHandler}
             item={selectedItem}
-            onPressItem={onSelectItem}
           />
         )}
       </Modal>
@@ -90,7 +89,7 @@ const CategoryItemsInner: React.FC<CategoryItemsListOuterProps & CategoryItemsLi
           <Right />
         </ListItem>
         {items
-          .filter(item => (searchValue ? searchFilter(item, searchValue) : true))
+          .filter(item => searchFilter(item, searchValue))
           .map(item => {
             return (
               <CategoryItemRow
