@@ -24,9 +24,9 @@ export const CategoriesInner: React.FC<CategoriesOuterProps & CategoriesInnerPro
 
   const onPressCategoryFactory = (category?: Category) => () => {
     if (!category) {
-      navigation.navigate(routes.allItems, {});
+      navigation.navigate("AllItemsList");
     } else {
-      navigation.navigate(routes.categoryItemList, {
+      navigation.navigate("CategoryItemsList", {
         category,
       });
     }
