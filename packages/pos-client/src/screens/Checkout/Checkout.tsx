@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { Container, Grid, Col } from '../../core';
 import { SidebarHeader } from '../../components/SidebarHeader/SidebarHeader';
-import { Loading } from '../Loading/Loading';
 import { CheckoutItemNavigator } from '../../navigators/CheckoutItemNavigator';
 import { Receipt } from './sub-components/Receipt/Receipt';
 import { SelectBill } from './sub-components/SelectBill/SelectBIll';
@@ -11,6 +10,7 @@ import { BillPeriodContext } from '../../contexts/BillPeriodContext';
 import { CurrentBillContext } from '../../contexts/CurrentBillContext';
 import { DrawerNavigationProp } from '@react-navigation/drawer';
 import { SidebarDrawerStackParamList } from '../../navigators/SidebarNavigator';
+import { Loading } from '../../components/Loading/Loading';
 
 export enum Modes {
   Payments = 'payments',

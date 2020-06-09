@@ -1,12 +1,12 @@
 import React, { Component, ReactElement } from 'react';
 import { Text, Content, List, Separator, ListItem, Container } from '../../core';
 import { SidebarHeader } from '../../components/SidebarHeader/SidebarHeader';
-import { Loading } from '../Loading/Loading';
 import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import withObservables from '@nozbe/with-observables';
 import { DrawerNavigationProp } from '@react-navigation/drawer';
 import { SidebarDrawerStackParamList } from '../../navigators/SidebarNavigator';
 import { Database } from '@nozbe/watermelondb';
+import { Loading } from '../../components/Loading/Loading';
 
 interface ItemsInnerProps {
   items: any; // TODO: type

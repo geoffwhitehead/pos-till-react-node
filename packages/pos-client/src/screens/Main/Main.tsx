@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { SidebarNavigator } from '../../navigators/SidebarNavigator';
-import { Loading } from '../Loading/Loading';
 import { BillPeriodContext } from '../../contexts/BillPeriodContext';
 import { PriceGroupContext } from '../../contexts/PriceGroupContext';
 import { populate } from './populate';
@@ -9,6 +8,7 @@ import withObservables from '@nozbe/with-observables';
 import { Q, Database } from '@nozbe/watermelondb';
 import { tableNames, BillPeriod, PriceGroup, Bill } from '../../models';
 import { CurrentBillContext } from '../../contexts/CurrentBillContext';
+import { Loading } from '../../components/Loading/Loading';
 
 interface MainInnerProps {
   priceGroups: any; // TODO: fix type
