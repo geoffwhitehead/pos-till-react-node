@@ -64,6 +64,14 @@ export class Bill extends Model {
   @lazy billModifierItems: Query<BillItemModifierItem> = this._billModifierItems.extend(
     Q.where('is_voided', Q.notEq(true)),
   );
+  @lazy billItemsIncPendingVoids: Query<BillItem> = this._billItems.extend(
+    Q.or(
+      Q.where('is_voided', Q.notEq(true)),
+      Q.where('print_status', 'void'),
+      Q.where('print_status', 'void_pending'),
+      Q.where('print_status', 'void_error'),
+    ),
+  );
   @lazy billModifierItemVoids: Query<BillItemModifierItem> = this._billModifierItems.extend(Q.where('is_voided', true));
 
   @action addPayment = async (p: { paymentType: PaymentType; amount: number; isChange?: boolean }) => {
@@ -87,9 +95,13 @@ export class Bill extends Model {
 
   @action addItem = async (p: { item; priceGroup }): Promise<BillItem> => {
     const { item, priceGroup } = p;
-    const [category, prices, printers] = await Promise.all([item.category.fetch(), item.prices.fetch(), item.printers.fetch()]);
+    const [category, prices, printers] = await Promise.all([
+      item.category.fetch(),
+      item.prices.fetch(),
+      item.printers.fetch(),
+    ]);
 
-    console.log('printers', printers)
+    console.log('printers', printers);
     const newItem = await this.database.action(() =>
       this.collections.get<BillItem>('bill_items').create(billItem => {
         billItem.bill.set(this);
@@ -101,7 +113,7 @@ export class Bill extends Model {
           itemPrice: resolvePrice(priceGroup, prices),
           priceGroupName: priceGroup.name,
           categoryName: category.name,
-          printStatus: printers.length ? "" : "success"
+          printStatus: printers.length ? '' : 'success',
         });
       }),
     );

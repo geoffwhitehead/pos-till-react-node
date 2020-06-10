@@ -18,7 +18,6 @@ interface ItemBreakdownOuterProps {
   onSelect: (i: BillItem) => void;
 }
 
-
 const ItemBreakdownInner: React.FC<ItemBreakdownOuterProps & ItemBreakdownInnerProps> = ({
   item,
   modifierItems,
@@ -34,7 +33,11 @@ const ItemBreakdownInner: React.FC<ItemBreakdownOuterProps & ItemBreakdownInnerP
     >
       <Left>
         <Content>
-          <Text>{`${capitalize(item.itemName)}`}</Text>
+          {item.isVoided ? (
+            <Text style={{ color: 'red' }}>{`VOID - ${capitalize(item.itemName)}`}</Text>
+          ) : (
+            <Text>{`${capitalize(item.itemName)}`}</Text>
+          )}
           {modifierItems.map(m => (
             <Text key={`${m.id}-name`}>{`- ${m.modifierItemName}`}</Text>
           ))}
@@ -67,6 +70,14 @@ const styles = {
     borderLeftWidth: 8,
   },
   error: {
+    borderLeftColor: 'red',
+    borderLeftWidth: 8,
+  },
+  void_pending: {
+    borderLeftColor: 'yellow',
+    borderLeftWidth: 8,
+  },
+  void_error: {
     borderLeftColor: 'red',
     borderLeftWidth: 8,
   },

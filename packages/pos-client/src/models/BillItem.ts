@@ -41,7 +41,7 @@ export const billItemSchema = tableSchema({
   ],
 });
 
-export type PrintStatus = 'success' | 'error' | 'pending';
+export type PrintStatus = 'success' | 'error' | 'pending' | '' | 'void' | 'void_pending' | 'void_error';
 export class BillItem extends Model {
   static table = 'bill_items';
 
@@ -69,11 +69,14 @@ export class BillItem extends Model {
   @lazy billItemModifierItems: Query<BillItemModifierItem> = this._billItemModifierItems.extend(
     Q.where('is_voided', Q.notEq(true)),
   );
+
   @lazy billItemModifierItemVoids: Query<BillItemModifierItem> = this._billItemModifierItems.extend(
     Q.where('is_voided', true),
   );
 
-  @lazy printers = this.collections.get('printers').query(Q.on('item_printers', 'item_id', this.itemId)) as Query<Printer>;
+  @lazy printers = this.collections.get('printers').query(Q.on('item_printers', 'item_id', this.itemId)) as Query<
+    Printer
+  >;
 
   @action void = async () => {
     const modifierItemsToVoid = await this.billItemModifierItems.fetch();
@@ -82,6 +85,9 @@ export class BillItem extends Model {
 
     await this.update(billItem => {
       billItem.isVoided = true;
+      if (billItem.printStatus != '') {
+        billItem.printStatus = 'void';
+      }
     });
   };
 
@@ -93,10 +99,10 @@ export class BillItem extends Model {
     const log = this.database.collections.get<BillItemPrintLog>(tableNames.BillItemPrintLog).create(log => {
       log.billItem.set(this);
       log.printer.set(printer);
-      log.status = status
+      log.status = status;
     });
 
-    return log
+    return log;
   };
 
   @action addModifierChoices = async (modifier: Modifier, modifierItems: ModifierItem[], priceGroup: PriceGroup) => {

@@ -15,6 +15,7 @@ import { PrintStatus, BillItem } from '../../../../models/BillItem';
 import { kitchenReceipt } from '../../../../services/printer/kitchenReceipt';
 import { flatten, pickBy } from 'lodash';
 import { database } from '../../../../database';
+import { Loading } from '../../../../components/Loading/Loading';
 
 // TODO: move into org and fetch from db or something
 const currencySymbol = '£';
@@ -24,6 +25,7 @@ interface ReceiptInnerProps {
   billPayments: any[];
   billDiscounts: any[];
   billItems: any[];
+  billItemsIncPendingVoids: any[];
   discounts: any[];
   paymentTypes: any[];
   priceGroups: any[];
@@ -43,6 +45,7 @@ interface ReceiptOuterProps {
 export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
   bill,
   billItems,
+  billItemsIncPendingVoids,
   billDiscounts,
   billPayments,
   onStore,
@@ -60,17 +63,18 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
   const [isStoreDisabled, setIsStoreDisabled] = useState(false);
   const _onStore = async () => {
     setIsStoreDisabled(true);
-    const billItemsToPrint = billItems.filter(
-      ({ printStatus }) => !(printStatus === 'success' || printStatus === 'pending'),
+    const billItemsToPrint = billItemsIncPendingVoids.filter(
+      ({ printStatus }) => !(printStatus === 'success' || printStatus === 'pending' || printStatus === 'void_pending'),
     ) as BillItem[];
 
+    console.log('billItemToPrint', billItemsToPrint);
     if (billItemsToPrint.length) {
       await database.action(
         async () =>
           await database.batch(
             ...billItemsToPrint.map(bI =>
               bI.prepareUpdate(billItem => {
-                billItem.printStatus = 'pending';
+                billItem.printStatus = billItem.isVoided ? 'void_pending' : 'pending';
               }),
             ),
           ),
@@ -95,7 +99,11 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
           }
           return billItems.map(bI =>
             bI.prepareUpdate(billItem => {
-              billItem.printStatus = status;
+              if (billItem.isVoided && status === 'error') {
+                billItem.printStatus = 'void_error';
+              } else {
+                billItem.printStatus = status;
+              }
             }),
           );
         }),
@@ -103,11 +111,11 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
 
       console.log('updates', updates);
 
-      await database.action(async () => await database.batch(...flatten(updates)));
-
-      setIsStoreDisabled(false);
+      await database.action(async () => {
+        await database.batch(...flatten(updates));
+      });
     }
-    console.log('toPrint', billItemsToPrint);
+    setIsStoreDisabled(false);
   };
 
   useEffect(() => {
@@ -124,7 +132,7 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
   };
 
   if (!bill || !summary) {
-    return <Text>Loading ... </Text>; // TODO: loading component
+    return <Loading />;
   }
 
   const { totalDiscount, totalPayable, balance } = summary;
@@ -149,7 +157,7 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
       <Row>
         <ReceiptItems
           readonly={complete}
-          billItems={billItems}
+          billItems={billItemsIncPendingVoids}
           discountBreakdown={summary.discountBreakdown}
           billPayments={billPayments}
           billDiscounts={billDiscounts}
@@ -198,6 +206,7 @@ const enhance = component =>
       billPayments: bill.billPayments,
       billDiscounts: bill.billDiscounts,
       billItems: bill.billItems,
+      billItemsIncPendingVoids: bill.billItemsIncPendingVoids,
       discounts: database.collections.get<Discount>(tableNames.discounts).query(),
       paymentTypes: database.collections.get<PaymentType>(tableNames.paymentTypes).query(),
       priceGroups: database.collections.get<PriceGroup>(tableNames.priceGroups).query(),

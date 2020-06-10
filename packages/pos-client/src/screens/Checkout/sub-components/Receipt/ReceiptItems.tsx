@@ -30,7 +30,7 @@ export const ReceiptItems: React.FC<ReceiptItemsProps> = ({
 
   const database = useDatabase();
 
-  const remove = async item => {
+  const remove = async (item: BillItem) => {
     await database.action(() => item.void());
   };
 
@@ -43,7 +43,7 @@ export const ReceiptItems: React.FC<ReceiptItemsProps> = ({
         title: 'Select option',
       },
       i => {
-        remove(item);
+        i === 0 && remove(item);
       },
     );
   };

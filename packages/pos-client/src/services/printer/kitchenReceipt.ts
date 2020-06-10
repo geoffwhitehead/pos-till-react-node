@@ -83,18 +83,25 @@ const generatePrintCommands = (p: {
   const grouped = Object.values(
     groupBy(itemsToPrint, ({ billItem, mods }) => {
       // construct a unique string for this particular combination of item and modifiers
-      return [billItem.itemId, ...mods.map(m => m.modifierItemId)].toString();
+      return [billItem.itemId, ...mods.map(m => m.modifierItemId), billItem.isVoided].toString();
     }),
   );
 
   const quantifiedItems = grouped.map(grp => ({
     quantity: grp.length,
+    isVoided: grp[0].billItem.isVoided,
     billItem: grp[0].billItem,
     mods: grp[0].mods,
   }));
 
-  quantifiedItems.map(({ quantity, billItem, mods }) => {
-    c.push({ appendBitmapText: alignLeftRight(billItem.itemName.toUpperCase(), quantity.toString()) });
+  quantifiedItems.map(({ quantity, billItem, mods, isVoided }) => {
+      if (isVoided) {
+          c.push({ appendBitmapText: alignLeftRight(`${'[VOID] ' + billItem.itemName.toUpperCase()}`, quantity.toString()) });
+
+      } else {
+        c.push({ appendBitmapText: alignLeftRight(`${billItem.itemName.toUpperCase()}`, quantity.toString()) });
+
+      }
     mods.map(mod => {
       c.push({ appendBitmapText: modPrefix + mod.modifierItemName.toUpperCase() });
     });
