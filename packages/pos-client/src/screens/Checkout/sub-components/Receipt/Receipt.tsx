@@ -67,7 +67,6 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
       ({ printStatus }) => !(printStatus === 'success' || printStatus === 'pending' || printStatus === 'void_pending'),
     ) as BillItem[];
 
-    console.log('billItemToPrint', billItemsToPrint);
     if (billItemsToPrint.length) {
       await database.action(
         async () =>
@@ -108,8 +107,6 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
           );
         }),
       );
-
-      console.log('updates', updates);
 
       await database.action(async () => {
         await database.batch(...flatten(updates));

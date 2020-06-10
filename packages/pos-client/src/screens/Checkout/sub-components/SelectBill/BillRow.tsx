@@ -9,10 +9,11 @@ import { Database } from '@nozbe/watermelondb';
 const symbol = '£'; // TODO: move to org settings
 
 interface BillRowInnerProps {
-  billPayments: any;
-  billDiscounts: any;
-  billItems: any;
-  discounts: any;
+  billPayments: any[];
+  billDiscounts: any[];
+  billItems: any[];
+  billItemsIncPendingVoids: any[]
+  discounts: any[];
 }
 
 interface BillRowOuterProps {
@@ -25,6 +26,7 @@ export const WrappedBillRow: React.FC<BillRowInnerProps & BillRowOuterProps> = (
   bill,
   onSelectBill,
   billItems,
+  billItemsIncPendingVoids,
   billPayments,
   billDiscounts,
   discounts,
@@ -40,8 +42,9 @@ export const WrappedBillRow: React.FC<BillRowInnerProps & BillRowOuterProps> = (
   }, [billItems]);
 
   const renderPrintErrors = () => {
-    const hasUnstoredItems = billItems.some(bI => bI.printStatus === '');
-    const hasPrintErrors = billItems.some(bI => bI.printStatus === 'error');
+    const hasUnstoredItems = billItemsIncPendingVoids.some(bI => ['', 'void'].includes(bI.printStatus));
+    const hasPrintErrors = billItemsIncPendingVoids.some(bI => ['error', 'void_error'].includes(bI.printStatus));
+    const hasPendingPrints = billItemsIncPendingVoids.some(bI => ['pending', 'void_pending'].includes(bI.printStatus));
 
     if (hasPrintErrors) {
       return [
@@ -55,6 +58,12 @@ export const WrappedBillRow: React.FC<BillRowInnerProps & BillRowOuterProps> = (
         <Text note>Unsent Items</Text>,
       ];
     }
+    if (hasPendingPrints) {
+      return [
+        <Icon active name="ios-print" style={{ marginLeft: 20, marginRight: 2, color: 'grey' }} />,
+        <Text note>Printing</Text>,
+      ];
+    }
     return null;
   };
   return (
@@ -63,7 +72,7 @@ export const WrappedBillRow: React.FC<BillRowInnerProps & BillRowOuterProps> = (
         <Text style={{ color: 'green' }}>{`${bill.reference}: Open`}</Text>
         {renderPrintErrors()}
       </Left>
-      
+
       <Body>
         <Text style={{ color: 'grey' }}>{summary ? formatNumber(summary.balance, symbol) : '...'}</Text>
       </Body>
@@ -81,6 +90,7 @@ const enhance = component =>
       billPayments: bill.billPayments,
       billDiscounts: bill.billDiscounts,
       billItems: bill.billItems,
+      billItemsIncPendingVoids: bill.billItemsIncPendingVoids,
       discounts: database.collections.get<Discount>(tableNames.discounts).query(),
     }))(component),
   );

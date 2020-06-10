@@ -85,6 +85,7 @@ export class BillItem extends Model {
 
     await this.update(billItem => {
       billItem.isVoided = true;
+      // only need to run through the void print process if the item has already been sent
       if (billItem.printStatus != '') {
         billItem.printStatus = 'void';
       }
