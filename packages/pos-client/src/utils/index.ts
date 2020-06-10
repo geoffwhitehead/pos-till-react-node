@@ -17,7 +17,16 @@ export const _totalDiscount = (
   };
 };
 
-export const _discountBreakdown = (total: number, billDiscounts: any, discounts) => {
+type  DiscountBreakdownProps = {
+  billDiscountId: string,
+  discountId: string,
+  isPercent: boolean,
+  amount: number,
+  name: string,
+  calculatedDiscount: number
+}
+
+export const _discountBreakdown = (total: number, billDiscounts: any, discounts): DiscountBreakdownProps[] => {
   let rollingTotal = total;
   const lookupDiscount = billDiscount => discounts.find(discount => discount.id === billDiscount.discountId);
 
@@ -72,11 +81,11 @@ export const _totalPayments = (payments: any): number => {
 export type BillSummary = {
   total: number;
   totalDiscount: number;
-  discountBreakdown: ReturnType<typeof _discountBreakdown>;
+  discountBreakdown: DiscountBreakdownProps[];
   totalPayable: number;
   totalPayments: number;
   balance: number;
-  itemsBreakdown: ReturnType<typeof itemsBreakdown>;
+  itemsBreakdown: ItemsBreakdownProps[];
 };
 export const billSummary = async (billItems, billDiscounts, billPayments, discounts): Promise<BillSummary> => {
   const { total, itemsBreakdown } = await _total(billItems);

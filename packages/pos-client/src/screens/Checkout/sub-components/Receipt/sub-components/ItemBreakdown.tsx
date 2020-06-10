@@ -15,19 +15,23 @@ interface ItemBreakdownInnerProps {
 interface ItemBreakdownOuterProps {
   item: BillItem;
   readonly: boolean;
-  // selected: BillItem;
   onSelect: (i: BillItem) => void;
 }
+
 
 const ItemBreakdownInner: React.FC<ItemBreakdownOuterProps & ItemBreakdownInnerProps> = ({
   item,
   modifierItems,
   readonly,
-  // selected,
   onSelect,
 }) => {
   return (
-    <ListItem noIndent key={item.id} onPress={() => !readonly && onSelect(item)}>
+    <ListItem
+      style={item.printStatus && styles[item.printStatus]}
+      noIndent
+      key={item.id}
+      onPress={() => !readonly && onSelect(item)}
+    >
       <Left>
         <Content>
           <Text>{`${capitalize(item.itemName)}`}</Text>
@@ -52,3 +56,18 @@ export const ItemBreakdown = withObservables<ItemBreakdownOuterProps, ItemBreakd
     modifierItems: item.billItemModifierItems,
   }),
 )(ItemBreakdownInner);
+
+const styles = {
+  success: {
+    borderLeftColor: 'green',
+    borderLeftWidth: 8,
+  },
+  pending: {
+    borderLeftColor: 'yellow',
+    borderLeftWidth: 8,
+  },
+  error: {
+    borderLeftColor: 'red',
+    borderLeftWidth: 8,
+  },
+};

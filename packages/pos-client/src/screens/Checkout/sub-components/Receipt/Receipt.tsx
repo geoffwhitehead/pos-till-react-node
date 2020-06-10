@@ -9,22 +9,27 @@ import { print } from '../../../../services/printer/printer';
 import { receiptBill } from '../../../../services/printer/receiptBill';
 import withObservables from '@nozbe/with-observables';
 import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
-import { tableNames, Discount, PaymentType, PriceGroup, Bill } from '../../../../models';
-import { Database } from '@nozbe/watermelondb';
-import { PrintStatus } from '../../../../models/BillItem';
+import { tableNames, Discount, PaymentType, PriceGroup, Bill, Printer } from '../../../../models';
+import { Database, tableName } from '@nozbe/watermelondb';
+import { PrintStatus, BillItem } from '../../../../models/BillItem';
+import { kitchenReceipt } from '../../../../services/printer/kitchenReceipt';
+import { flatten, pickBy } from 'lodash';
+import { database } from '../../../../database';
 
 // TODO: move into org and fetch from db or something
 const currencySymbol = '£';
 
 // TODO: type these
 interface ReceiptInnerProps {
-  billPayments: any;
-  billDiscounts: any;
-  billItems: any;
-  discounts: any;
-  paymentTypes: any;
-  priceGroups: any;
-  billModifierItems: any;
+  billPayments: any[];
+  billDiscounts: any[];
+  billItems: any[];
+  discounts: any[];
+  paymentTypes: any[];
+  priceGroups: any[];
+  billModifierItems: any[];
+  printers: any[];
+  database: Database;
 }
 
 interface ReceiptOuterProps {
@@ -47,14 +52,62 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
   paymentTypes,
   priceGroups,
   billModifierItems,
+  printers,
+  database,
 }) => {
   const [summary, setSummary] = useState<BillSummary>();
 
-  const _onStore = () => {
-    console.log('billItems', billItems);
-    const toPrint = billItems.filter(({ printStatus }) => !(printStatus === 'success' || printStatus === 'pending'));
+  const [isStoreDisabled, setIsStoreDisabled] = useState(false);
+  const _onStore = async () => {
+    setIsStoreDisabled(true);
+    const billItemsToPrint = billItems.filter(
+      ({ printStatus }) => !(printStatus === 'success' || printStatus === 'pending'),
+    ) as BillItem[];
 
-    console.log('toPrint', toPrint);
+    if (billItemsToPrint.length) {
+      await database.action(
+        async () =>
+          await database.batch(
+            ...billItemsToPrint.map(bI =>
+              bI.prepareUpdate(billItem => {
+                billItem.printStatus = 'pending';
+              }),
+            ),
+          ),
+      );
+
+      const toPrint = await kitchenReceipt({
+        billItems: billItemsToPrint,
+        printers,
+        priceGroups,
+        reference: bill.reference.toString(),
+        prepTime: dayjs().add(10, 'minute'),
+      });
+
+      const updates = await Promise.all(
+        toPrint.map(async ({ billItems, printer, commands }) => {
+          let status: PrintStatus;
+          const { success } = await print(commands, printer, false);
+          if (success) {
+            status = 'success';
+          } else {
+            status = 'error';
+          }
+          return billItems.map(bI =>
+            bI.prepareUpdate(billItem => {
+              billItem.printStatus = status;
+            }),
+          );
+        }),
+      );
+
+      console.log('updates', updates);
+
+      await database.action(async () => await database.batch(...flatten(updates)));
+
+      setIsStoreDisabled(false);
+    }
+    console.log('toPrint', billItemsToPrint);
   };
 
   useEffect(() => {
@@ -67,7 +120,7 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
 
   const onPrint = async () => {
     const commands = await receiptBill(billItems, billDiscounts, billPayments, discounts, priceGroups, paymentTypes);
-    print(commands, false);
+    print(commands, printers[0], false);
   };
 
   if (!bill || !summary) {
@@ -123,7 +176,7 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
       {!complete && (
         <Row style={styles.r5}>
           <Col>
-            <Button style={styles.buttons} block small onPress={_onStore}>
+            <Button style={styles.buttons} block small disabled={isStoreDisabled} onPress={_onStore}>
               <Text>Store</Text>
             </Button>
           </Col>
@@ -148,6 +201,7 @@ const enhance = component =>
       discounts: database.collections.get<Discount>(tableNames.discounts).query(),
       paymentTypes: database.collections.get<PaymentType>(tableNames.paymentTypes).query(),
       priceGroups: database.collections.get<PriceGroup>(tableNames.priceGroups).query(),
+      printers: database.collections.get<Printer>(tableNames.printers).query(),
       /**
        * billModifierItems is here purely to cause a re render and recalculation of the
        * bill summary

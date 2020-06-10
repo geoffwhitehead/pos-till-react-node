@@ -1,5 +1,6 @@
 import { StarPRNT } from 'react-native-star-prnt';
 import { Toast } from '../../core';
+import { Printer } from '../../models';
 
 export const RECEIPT_WIDTH = 39; // TODO: move to settings - printer width
 const port = 'TCP:192.168.1.78';
@@ -40,7 +41,7 @@ export async function portDiscovery() {
   }
 }
 
-export async function print(commands: any[], openDrawer: boolean = false) {
+export async function print(commands: any[], printer: Printer, openDrawer: boolean = false) {
   // const x = await portDiscovery();
 
   // console.log('x', x);
@@ -48,15 +49,16 @@ export async function print(commands: any[], openDrawer: boolean = false) {
   openDrawer && commands.push({ openCashDrawer: 1 });
   try {
     console.log('start');
-    await StarPRNT.print('StarGraphic', commands, port);
+    await StarPRNT.print('StarGraphic', commands, printer.address || port);
     console.log('end');
+    return { success: true };
   } catch (e) {
-    console.error('Error ', e);
     Toast.show({
       text: `Failed to print. Check connection...`,
       buttonText: 'Okay',
       duration: 5000,
       type: 'danger',
     });
+    return { success: false, error: e };
   }
 }

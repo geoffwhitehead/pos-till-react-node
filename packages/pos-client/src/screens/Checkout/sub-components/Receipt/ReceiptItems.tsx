@@ -1,5 +1,5 @@
 import { Content, List, ActionSheet } from '../../../../core';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { ItemsBreakdown } from './sub-components/ItemsBreakdown';
 import { DiscountsBreakdown } from './sub-components/DiscountsBreakdown';
 import { PaymentsBreakdown } from './sub-components/PaymentsBreakdown';

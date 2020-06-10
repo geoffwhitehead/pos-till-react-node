@@ -8,7 +8,6 @@ import { BillItem } from '../../../../../models';
 export const ItemsBreakdown: React.FC<{
   items: BillItem[];
   readonly: boolean;
-  // selected: BillItem;
   onSelect: (bI: BillItem) => void;
 }> = ({ items, readonly, onSelect }) => {
   if (!items) {

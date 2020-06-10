@@ -73,6 +73,8 @@ export class BillItem extends Model {
     Q.where('is_voided', true),
   );
 
+  @lazy printers = this.collections.get('printers').query(Q.on('item_printers', 'item_id', this.itemId)) as Query<Printer>;
+
   @action void = async () => {
     const modifierItemsToVoid = await this.billItemModifierItems.fetch();
 
