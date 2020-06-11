@@ -1,4 +1,4 @@
-import { tableNames } from '../../models';
+import { tableNames, PaymentType, Category, PriceGroup, Printer } from '../../models';
 import { Model, Database } from '@nozbe/watermelondb';
 import { getItems } from '../../api/item';
 import { getCategories } from '../../api/category';
@@ -33,6 +33,7 @@ export const populate = async (database: Database) => {
 
   let toCreate = [];
 
+  console.log('responses', responses);
   const okResponse = response => {
     if (response.ok && response.data?.success) {
       return response.data.data;
@@ -40,23 +41,26 @@ export const populate = async (database: Database) => {
       throw new Error('Failed: Response: ' + response.data?.success + 'Problem: ' + response.problem);
     }
   };
-  const categoriesCollection = database.collections.get<any & Model>(tableNames.categories);
-  const priceGroupsCollection = database.collections.get<any & Model>(tableNames.priceGroups);
-  const printersCollection = database.collections.get<any & Model>(tableNames.printers);
-  const paymentTypesCollection = database.collections.get(tableNames.paymentTypes);
+  const categoriesCollection = database.collections.get<Category>(tableNames.categories);
+  const priceGroupsCollection = database.collections.get<PriceGroup>(tableNames.priceGroups);
+  const printersCollection = database.collections.get<Printer>(tableNames.printers);
+  const paymentTypesCollection = database.collections.get<PaymentType>(tableNames.paymentTypes);
 
   console.log('--------------- START');
 
   const paymentTypesToCreate = okResponse(responses[6]).map(({ _id, name }) =>
     paymentTypesCollection.prepareCreate(
       catchFn(paymentType => {
-        paymentType._raw = sanitizedRaw({ id: _id }, categoriesCollection.schema);
+        console.log('paymentType', paymentType);
+        paymentType._raw = sanitizedRaw({ id: _id }, paymentTypesCollection.schema);
         Object.assign(paymentType, { name });
       }),
     ),
   );
   toCreate.push(...paymentTypesToCreate);
 
+  console.log('responses[6]', responses[6])
+  console.log('toCreate', toCreate);
   const categoriesToCreate = okResponse(responses[1]).map(({ _id, name, shortName }) =>
     categoriesCollection.prepareCreate(
       catchFn(category => {
@@ -72,7 +76,7 @@ export const populate = async (database: Database) => {
     priceGroupsCollection.prepareCreate(
       catchFn(priceGroup => {
         priceGroup._raw = sanitizedRaw({ id: _id }, priceGroupsCollection.schema);
-        Object.assign(priceGroup, { name,  isPrepTimeRequired});
+        Object.assign(priceGroup, { name, isPrepTimeRequired });
       }),
     ),
   );

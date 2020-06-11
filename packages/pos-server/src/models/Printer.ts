@@ -26,7 +26,7 @@ const PrinterSchema: Schema<PrinterProps> = new Schema({
     },
     printWidth: {
         type: Number,
-    }
+    },
 });
 
 const Printer = tenantModel<PrinterProps>('Printer', PrinterSchema);
