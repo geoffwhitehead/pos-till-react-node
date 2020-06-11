@@ -6,6 +6,7 @@ export class PriceGroup extends Model {
 
   @field('name') name: string;
   @field('short_name') shortName: string;
+  @field('is_prep_time_required') isPrepTimeRequired: string;
 }
 
 export const priceGroupSchema = tableSchema({
@@ -13,5 +14,6 @@ export const priceGroupSchema = tableSchema({
   columns: [
     { name: 'name', type: 'string' },
     { name: 'short_name', type: 'string' },
+    { name: 'is_prep_time_required', type: 'string' },
   ],
 });

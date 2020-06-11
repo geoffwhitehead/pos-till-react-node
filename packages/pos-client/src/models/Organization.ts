@@ -12,6 +12,11 @@ export class Organization extends Model {
   @field('address_city') addressCity: string;
   @field('address_county') addressCounty: string;
   @field('address_postcode') addressPostcode: string;
+  @field('default_price_group') defaultPriceGroup: string;
+  @field('receipt_printer') receiptPrinter: string;
+  @field('currency') currency: string;
+  @field('max_bills') maxBills: number;
+
 }
 
 export const organizationSchema = tableSchema({

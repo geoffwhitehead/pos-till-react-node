@@ -5,6 +5,7 @@ export interface PriceGroupProps {
     _id?: mongoose.Types.ObjectId;
     name: string;
     shortName?: string;
+    isPrepTimeRequired: boolean
 }
 
 const PriceGroupSchema: Schema<PriceGroupProps> = new Schema(
@@ -16,6 +17,10 @@ const PriceGroupSchema: Schema<PriceGroupProps> = new Schema(
         shortName: {
             type: String,
             maxlength: 10,
+        },
+        isPrepTimeRequired: {
+            type: Boolean,
+            default: false
         }
     },
     { timestamps: true },

@@ -10,7 +10,6 @@ export interface OrganizationProps {
     vat?: string;
     settings?: {
         defaultPriceGroup?: mongoose.Types.ObjectId;
-        enforcedPrepTimeGroups?: mongoose.Types.ObjectId;
         receiptPrinter?: mongoose.Types.ObjectId;
         currency: string,
         maxBills: number
@@ -31,7 +30,6 @@ export const OrganizationValidation = {
     vat: Joi.string(),
     settings: Joi.object({
         defaultPriceGroup: Joi.string(),
-        enforcedPrepTimeGroups: Joi.string(),
         receiptPrinter: Joi.string(),
         currency: Joi.string(),
         maxBills: Joi.number()
@@ -65,7 +63,6 @@ const OrganizationSchema: Schema<OrganizationProps> = new Schema(
         },
         settings: {
             defaultPriceGroup: { type: Schema.Types.ObjectId, ref: 'PriceGroup' },
-            enforcedPrepTimeGroups: [{ type: Schema.Types.ObjectId, ref: 'PriceGroup' }],
             receiptPrinter: { type: Schema.Types.ObjectId, ref: 'Printer' },
             currency: String,
             maxBills: Number
