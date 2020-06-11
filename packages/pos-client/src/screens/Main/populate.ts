@@ -59,7 +59,7 @@ export const populate = async (database: Database) => {
   );
   toCreate.push(...paymentTypesToCreate);
 
-  console.log('responses[6]', responses[6])
+  console.log('responses[6]', responses[6]);
   console.log('toCreate', toCreate);
   const categoriesToCreate = okResponse(responses[1]).map(({ _id, name, shortName }) =>
     categoriesCollection.prepareCreate(

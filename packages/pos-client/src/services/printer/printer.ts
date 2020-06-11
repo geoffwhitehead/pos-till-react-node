@@ -2,44 +2,14 @@ import { StarPRNT } from 'react-native-star-prnt';
 import { Toast } from '../../core';
 import { Printer } from '../../models';
 
-export const RECEIPT_WIDTH = 15; // TODO: move to settings - printer width
+// export const RECEIPT_WIDTH = 15; // TODO: move to settings - printer width
 // export const RECEIPT_WIDTH = 39; // TODO: move to settings - printer width
-const port = 'TCP:192.168.1.78';
-const kPort = 'TCP:192.168.1.84';
-const kEmulation = 'StarDotImpact'
-const rEmulation = 'StarGraphic'
+// const port = 'TCP:192.168.1.78';
+// const kPort = 'TCP:192.168.1.84';
+// const kEmulation = 'StarDotImpact'
+// const rEmulation = 'StarGraphic'
 
-export const alignLeftRight = (left: string, right: string = '', rightWidth = 12) => {
-  const leftWidth = RECEIPT_WIDTH - rightWidth;
-  const lines = Math.ceil(left.length / leftWidth);
-  const spaces = RECEIPT_WIDTH * lines - right.length - left.length;
-  return `${left}${' '.repeat(spaces)}${right}`;
-};
 
-export const alignLeftRightSingle = (left: string, right: string, width) => {
-  const spaces = width - left.length - right.length
-  return `${left}${' '.repeat(spaces)}${right}`;
-}
-
-export const alignCenter = string => {
-  const leftSpaces = Math.floor(RECEIPT_WIDTH / 2 - string.length / 2);
-  return `${' '.repeat(leftSpaces)}${string}`;
-};
-
-export const alignRight = string => {
-  const leftSpaces = Math.floor(RECEIPT_WIDTH - string.length);
-  return `${' '.repeat(leftSpaces)}${string}`;
-};
-
-export const divider = { appendBitmapText: '-'.repeat(RECEIPT_WIDTH) };
-export const starDivider = { appendBitmapText: '*'.repeat(RECEIPT_WIDTH) };
-export const newLine = { appendBitmapText: ' \n' };
-
-export const addHeader = (c: any[], header: string): void => {
-  c.push({ appendBitmapText: ' ' });
-  c.push({ appendBitmapText: header });
-  c.push(divider);
-};
 
 export async function portDiscovery() {
   try {
@@ -58,7 +28,8 @@ export async function print(commands: any[], printer: Printer, openDrawer: boole
   openDrawer && commands.push({ openCashDrawer: 1 });
   try {
     console.log('start');
-    await StarPRNT.print(kEmulation, commands, printer.address || kPort);
+    console.log('printer', printer)
+    await StarPRNT.print(printer.emulation, commands, printer.address);
     console.log('end');
     return { success: true };
   } catch (e) {

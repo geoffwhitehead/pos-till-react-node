@@ -40,12 +40,24 @@ export const maintenanceService = ({
 }: InjectedDependencies): MaintenanceService => {
     const seed = async () => {
         const results = await printerRepository.insert([
-            { name: 'Star SP700', type: 'ethernet', address: 'TCP:192.168.1.84', emulation: 'StarDotImpact', printWidth: 14 },
-            { name: 'Star TSP100', type: 'wifi', address: 'TCP:192.168.1.78', emulation: 'StarGraphic' , printWidth: 39},
+            {
+                name: 'Star SP700',
+                type: 'ethernet',
+                address: 'TCP:192.168.1.84',
+                emulation: 'StarDotImpact',
+                printWidth: 14,
+            },
+            {
+                name: 'Star TSP100',
+                type: 'wifi',
+                address: 'TCP:192.168.1.78',
+                emulation: 'StarGraphic',
+                printWidth: 39,
+            },
         ]);
 
-        const printer: PrinterProps = results.find(r => r.name === 'Star TSP100');
-        
+        const printer: PrinterProps = results.find(r => r.name === 'Star SP700');
+
         const categories = [
             {
                 name: 'Starters',

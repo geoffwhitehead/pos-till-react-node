@@ -18,12 +18,12 @@ export const ItemsBreakdown: React.FC<{
 
   return (
     <>
-      <Separator bordered>
+      <Separator bordered key="ib_sep">
         <Text>Items</Text>
       </Separator>
       {Object.values(billItemGroups).map(itemGroup => {
         return [
-          <ListItem itemHeader first>
+          <ListItem itemHeader first key={itemGroup[0].priceGroupId}>
             <Text>{capitalize(itemGroup[0].priceGroupName)}</Text>
           </ListItem>,
           ...itemGroup.map(item => (

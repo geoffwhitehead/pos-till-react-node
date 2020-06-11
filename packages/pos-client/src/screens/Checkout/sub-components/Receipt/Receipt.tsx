@@ -124,8 +124,11 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
   }, [billItems, billDiscounts, billPayments, billModifierItems]); // keep billModifierItems
 
   const onPrint = async () => {
-    const commands = await receiptBill(billItems, billDiscounts, billPayments, discounts, priceGroups, paymentTypes);
-    print(commands, printers[0], false);
+    const receiptPrinter = printers[1] // TODO: fetch id for printer from org
+    console.log('onPrint')
+    const commands = await receiptBill(billItems, billDiscounts, billPayments, discounts, priceGroups, paymentTypes,receiptPrinter );
+    console.log('commands', commands)
+    print(commands, receiptPrinter, false); 
   };
 
   if (!bill || !summary) {

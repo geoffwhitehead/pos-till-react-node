@@ -61,7 +61,7 @@ export const ReceiptItems: React.FC<ReceiptItemsProps> = ({
   return (
     <Content ref={refContentList}>
       <List style={{ paddingBottom: 60 }}>
-        <ItemsBreakdown {...common} items={billItems} />
+        <ItemsBreakdown key="items_breakdown" {...common} items={billItems} />
         <DiscountsBreakdown
           {...common}
           onSelect={resolveBillDiscountId(onRemove)}
