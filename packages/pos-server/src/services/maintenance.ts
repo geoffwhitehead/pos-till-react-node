@@ -11,7 +11,7 @@ export interface MaintenanceService {
     // seed: () => Promise<{ success: boolean }>;
 }
 
-const ITEMS_TO_SEED = 5;
+const ITEMS_TO_SEED = 250;
 const PRICE_GROUPS = ['Main', 'Take Away']; // TODO: fix so generate price grouips handles varuious sizes
 
 const generatePriceGroups: (priceGroups: PriceGroupProps[]) => ItemPriceProps[] = priceGroups => {
@@ -39,28 +39,37 @@ export const maintenanceService = ({
     logger,
 }: InjectedDependencies): MaintenanceService => {
     const seed = async () => {
-        const results = await printerRepository.insert([{ name: '123', type: '', address: '' }]);
+        const results = await printerRepository.insert([
+            { name: 'Star SP700', type: 'ethernet', address: 'TCP:192.168.1.84', emulation: 'StarDotImpact', printWidth: 14 },
+            { name: 'Star TSP100', type: 'wifi', address: 'TCP:192.168.1.78', emulation: 'StarGraphic' , printWidth: 39},
+        ]);
 
-        const printer: PrinterProps = results[0];
+        const printer: PrinterProps = results.find(r => r.name === 'Star TSP100');
+        
         const categories = [
             {
                 name: 'Starters',
+                shortName: 'Starters',
                 linkedPrinters: [],
             },
             {
                 name: 'Mains',
+                shortName: 'Mains',
                 linkedPrinters: [],
             },
             {
                 name: 'Desserts',
+                shortName: 'Desserts',
                 linkedPrinters: [],
             },
             {
                 name: 'Wine',
+                shortName: 'Wine',
                 linkedPrinters: [],
             },
             {
                 name: 'Beer',
+                shortName: 'Beer',
                 linkedPrinters: [],
             },
         ];
@@ -85,14 +94,17 @@ export const maintenanceService = ({
             items: [
                 {
                     name: 'Chicken',
+                    shortName: 'Chicken',
                     price: generatePriceGroups(priceGroups),
                 },
                 {
                     name: 'Beef',
+                    shortName: 'Beef',
                     price: generatePriceGroups(priceGroups),
                 },
                 {
                     name: 'Pork',
+                    shortName: 'Pork',
                     price: generatePriceGroups(priceGroups),
                 },
             ],
@@ -101,12 +113,14 @@ export const maintenanceService = ({
         const newModifier = await modifierRepository.create(modifier);
 
         const items = [...Array(ITEMS_TO_SEED)].map(() => {
+            const productName = faker.commerce.product();
             return {
-                name: faker.commerce.product(),
+                name: productName,
+                shortName: productName.slice(0, 9),
                 categoryId: insertedCategories[random(categories.length - 1)]._id,
                 price: generatePriceGroups(priceGroups),
                 stock: 10,
-                modifiers: faker.random.boolean() ? [newModifier._id]: [],
+                modifiers: faker.random.boolean() ? [newModifier._id] : [],
                 linkedPrinters: [printer._id],
             };
         });
