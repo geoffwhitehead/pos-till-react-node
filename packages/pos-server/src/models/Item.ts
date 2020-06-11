@@ -5,6 +5,7 @@ import { ItemPriceSubSchema, ItemPriceProps } from './ItemPrice';
 export interface ItemProps {
     _id?: mongoose.Types.ObjectId;
     name: string;
+    shortName: string;
     categoryId: mongoose.Types.ObjectId;
     price: ItemPriceProps[];
     stock?: number;
@@ -17,6 +18,10 @@ const ItemSchema: Schema<ItemProps> = new Schema(
         name: {
             type: String,
             required: true,
+        },
+        shortName: {
+            type: String,
+            maxlength: 10,
         },
         linkedPrinters: [{ type: Schema.Types.ObjectId, ref: 'Printer' }],
         categoryId: { type: Schema.Types.ObjectId, ref: 'Category' },
@@ -31,14 +36,6 @@ const ItemSchema: Schema<ItemProps> = new Schema(
     },
     { timestamps: true },
 );
-
-// ItemSchema.path('price').get(function(num) {
-//     return (num / 100).toFixed(2);
-// });
-
-// ItemSchema.path('price').set(function(num) {
-//     return num * 100;
-// });
 
 const Item = tenantModel<ItemProps>('Item', ItemSchema);
 

@@ -5,6 +5,7 @@ import { PrinterProps } from './Printer';
 export interface CategoryProps {
     _id?: mongoose.Types.ObjectId;
     name: string;
+    shortName: string;
     linkedPrinters: PrinterProps[];
 }
 
@@ -12,6 +13,10 @@ const CategorySchema: Schema<CategoryProps> = new Schema({
     name: {
         type: String,
         required: true,
+    },
+    shortName: {
+        type: String,
+        maxlength: 10,
     },
     linkedPrinters: [{ groupId: { type: Schema.Types.ObjectId, ref: 'Printer' }, default: [] }],
 });
