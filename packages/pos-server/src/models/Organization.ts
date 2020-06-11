@@ -12,7 +12,8 @@ export interface OrganizationProps {
         defaultPriceGroup?: mongoose.Types.ObjectId;
         enforcedPrepTimeGroups?: mongoose.Types.ObjectId;
         receiptPrinter?: mongoose.Types.ObjectId;
-        currency: string
+        currency: string,
+        maxBills: number
     };
     address: {
         line1: string;
@@ -32,7 +33,8 @@ export const OrganizationValidation = {
         defaultPriceGroup: Joi.string(),
         enforcedPrepTimeGroups: Joi.string(),
         receiptPrinter: Joi.string(),
-        currency: Joi.string()
+        currency: Joi.string(),
+        maxBills: Joi.number()
     }),
     address: Joi.object({
         line1: Joi.string().required(),
@@ -65,7 +67,8 @@ const OrganizationSchema: Schema<OrganizationProps> = new Schema(
             defaultPriceGroup: { type: Schema.Types.ObjectId, ref: 'PriceGroup' },
             enforcedPrepTimeGroups: [{ type: Schema.Types.ObjectId, ref: 'PriceGroup' }],
             receiptPrinter: { type: Schema.Types.ObjectId, ref: 'Printer' },
-            currency: String
+            currency: String,
+            maxBills: Number
         },
         address: {
             type: {
