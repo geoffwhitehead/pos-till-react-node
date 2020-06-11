@@ -86,7 +86,7 @@ export const populate = async (database: Database) => {
     printersCollection.prepareCreate(
       catchFn(printer => {
         printer._raw = sanitizedRaw({ id: _id }, printersCollection.schema);
-        Object.assign(printer, { name, type, address, printWidth, emulation });
+        Object.assign(printer, { name, type, address, printWidth: parseInt(printWidth), emulation });
       }),
     ),
   );

@@ -21,7 +21,7 @@ export const printerSchema = tableSchema({
     { name: 'name', type: 'string' },
     { name: 'type', type: 'string' },
     { name: 'address', type: 'string' },
-    { name: 'print_width', type: 'string' },
+    { name: 'print_width', type: 'number' },
     { name: 'emulation', type: 'string' },
   ],
 });
