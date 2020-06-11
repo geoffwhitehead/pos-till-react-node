@@ -12,7 +12,7 @@ interface BillRowInnerProps {
   billPayments: any[];
   billDiscounts: any[];
   billItems: any[];
-  billItemsIncPendingVoids: any[]
+  billItemsIncPendingVoids: any[];
   discounts: any[];
 }
 
@@ -20,6 +20,7 @@ interface BillRowOuterProps {
   bill: Bill;
   onSelectBill: (bill: Bill) => void;
   database: Database;
+  key: string;
 }
 
 export const WrappedBillRow: React.FC<BillRowInnerProps & BillRowOuterProps> = ({
@@ -30,6 +31,7 @@ export const WrappedBillRow: React.FC<BillRowInnerProps & BillRowOuterProps> = (
   billPayments,
   billDiscounts,
   discounts,
+  key,
 }) => {
   const [summary, setSummary] = useState<BillSummary>();
 
@@ -67,7 +69,7 @@ export const WrappedBillRow: React.FC<BillRowInnerProps & BillRowOuterProps> = (
     return null;
   };
   return (
-    <ListItem onPress={() => onSelectBill(bill)}>
+    <ListItem key={key} onPress={() => onSelectBill(bill)}>
       <Left>
         <Text style={{ color: 'green' }}>{`${bill.reference}: Open`}</Text>
         {renderPrintErrors()}

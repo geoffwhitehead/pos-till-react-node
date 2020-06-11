@@ -7,9 +7,10 @@ interface BillRowEmptyProps {
   reference: number;
   onSelectBill: (b: Bill) => void;
   billPeriod: BillPeriod;
+  key: string;
 }
 
-export const BillRowEmpty: React.FC<BillRowEmptyProps> = ({ onSelectBill, reference, billPeriod }) => {
+export const BillRowEmpty: React.FC<BillRowEmptyProps> = ({ key, onSelectBill, reference, billPeriod }) => {
   const database = useDatabase();
 
   const createBill = async () => {
@@ -18,7 +19,7 @@ export const BillRowEmpty: React.FC<BillRowEmptyProps> = ({ onSelectBill, refere
   };
 
   return (
-    <ListItem onPress={createBill}>
+    <ListItem key={key} onPress={createBill}>
       <Left>
         <Text style={{ color: 'red' }}>{`${reference}: Closed`}</Text>
       </Left>
