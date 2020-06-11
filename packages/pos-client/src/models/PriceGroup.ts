@@ -5,9 +5,13 @@ export class PriceGroup extends Model {
   static table = 'price_groups';
 
   @field('name') name: string;
+  @field('short_name') shortName: string;
 }
 
 export const priceGroupSchema = tableSchema({
   name: 'price_groups',
-  columns: [{ name: 'name', type: 'string' }],
+  columns: [
+    { name: 'name', type: 'string' },
+    { name: 'short_name', type: 'string' },
+  ],
 });

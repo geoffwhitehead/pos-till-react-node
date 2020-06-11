@@ -15,6 +15,7 @@ export const billItemModifierItemSchema = tableSchema({
     { name: 'modifier_name', type: 'string' },
     { name: 'modifier_item_id', type: 'string' },
     { name: 'modifier_item_name', type: 'string' },
+    { name: 'modifier_item_short_name', type: 'string' },
     { name: 'modifier_item_price', type: 'number' },
     { name: 'price_group_name', type: 'string' },
     { name: 'price_group_id', type: 'string' },
@@ -32,6 +33,7 @@ export class BillItemModifierItem extends Model {
   @nochange @field('modifier_item_id') modifierItemId: string;
   @nochange @field('modifier_item_price') modifierItemPrice: number;
   @nochange @field('modifier_item_name') modifierItemName: string;
+  @nochange @field('modifier_item_short_name') modifierItemShortName: string;
   @nochange @field('price_group_name') priceGroupName: string;
   @nochange @field('price_group_id') priceGroupId: string;
   @field('is_voided') isVoided: boolean;

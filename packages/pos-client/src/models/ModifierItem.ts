@@ -7,6 +7,7 @@ export class ModifierItem extends Model {
   static table = 'modifier_items';
 
   @field('name') name: string;
+  @field('short_name') shortName: string;
   @field('modifier_id') modifierId: string;
 
   @relation('modifiers', 'modifier_id') modifier: Relation<Modifier>;
@@ -24,5 +25,6 @@ export const modifierItemSchema = tableSchema({
   columns: [
     { name: 'modifier_id', type: 'string', isIndexed: true },
     { name: 'name', type: 'string' },
+    { name: 'short_name', type: 'string' },
   ],
 });

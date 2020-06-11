@@ -27,6 +27,7 @@ export const billItemSchema = tableSchema({
     { name: 'bill_id', type: 'string', isIndexed: true },
     { name: 'item_id', type: 'string' },
     { name: 'item_name', type: 'string' },
+    { name: 'item_short_name', type: 'string' },
     { name: 'item_price', type: 'number' },
     { name: 'price_group_name', type: 'string' },
     { name: 'price_group_id', type: 'string' },
@@ -48,6 +49,7 @@ export class BillItem extends Model {
   @nochange @field('bill_id') billId: string;
   @nochange @field('item_id') itemId: string;
   @nochange @field('item_name') itemName: string;
+  @nochange @field('item_short_name') itemShortName: string;
   @nochange @field('item_price') itemPrice: number;
   @nochange @field('price_group_name') priceGroupName: string;
   @nochange @field('price_group_id') priceGroupId: string;

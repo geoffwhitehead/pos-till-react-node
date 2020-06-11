@@ -9,6 +9,7 @@ export class Item extends Model {
   static table = 'items';
 
   @field('name') name: string;
+  @field('short_name') shortName: string;
   @field('category_id') categoryId: string;
 
   @relation('categories', 'category_id') category: Relation<Category>;
@@ -33,6 +34,7 @@ export const itemSchema = tableSchema({
   name: 'items',
   columns: [
     { name: 'name', type: 'string' },
+    { name: 'short_name', type: 'string' },
     { name: 'category_id', type: 'string', isIndexed: true },
   ],
 });

@@ -8,6 +8,7 @@ export class Category extends Model {
   @children('items') items: Query<Item>;
 
   @nochange @field('name') name: string;
+  @field('short_name') shortName: string;
 
   static associations = {
     items: { type: 'has_many', foreignKey: 'category_id' },
@@ -16,5 +17,8 @@ export class Category extends Model {
 
 export const categorySchema = tableSchema({
   name: 'categories',
-  columns: [{ name: 'name', type: 'string' }],
+  columns: [
+    { name: 'name', type: 'string' },
+    { name: 'short_name', type: 'string' },
+  ],
 });
