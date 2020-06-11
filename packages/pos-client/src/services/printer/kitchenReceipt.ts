@@ -1,7 +1,7 @@
 import dayjs, { Dayjs } from 'dayjs';
 import { BillItem, PriceGroup, Printer, BillItemModifierItem } from '../../models';
 import { groupBy, flatten, omit } from 'lodash';
-import { alignCenter, starDivider, alignLeftRight } from './printer';
+import { alignCenter, starDivider, alignLeftRight, alignLeftRightSingle } from './printer';
 
 const modPrefix = ' -'; // TODO: move to settings
 const referenceName = 'Table';
@@ -73,7 +73,7 @@ const generatePrintCommands = (p: {
 
   const c = [];
 
-  c.push(starDivider);
+  c.push({ appendFontStyle: 'B' });
   c.push({ appendBitmapText: alignCenter(priceGroup.name.toUpperCase()) });
   c.push({ appendBitmapText: alignCenter('IN: ' + dayjs().format('HH:mm')) });
   c.push({ appendBitmapText: alignCenter('PREP: ' + prepTime.format('HH:mm')) });
@@ -95,13 +95,13 @@ const generatePrintCommands = (p: {
   }));
 
   quantifiedItems.map(({ quantity, billItem, mods, isVoided }) => {
-      if (isVoided) {
-          c.push({ appendBitmapText: alignLeftRight(`${'[VOID] ' + billItem.itemName.toUpperCase()}`, quantity.toString()) });
-
-      } else {
-        c.push({ appendBitmapText: alignLeftRight(`${billItem.itemName.toUpperCase()}`, quantity.toString()) });
-
-      }
+    if (isVoided) {
+      c.push({
+        appendBitmapText: alignLeftRightSingle(`${'[V] ' + billItem.itemName.toUpperCase()}`, quantity.toString(), 14),
+      });
+    } else {
+      c.push({ appendBitmapText: alignLeftRightSingle(`${billItem.itemName}`, quantity.toString(), 14) });
+    }
     mods.map(mod => {
       c.push({ appendBitmapText: modPrefix + mod.modifierItemName.toUpperCase() });
     });
