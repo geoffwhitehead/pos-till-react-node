@@ -57,32 +57,32 @@ export const populate = async (database: Database) => {
   );
   toCreate.push(...paymentTypesToCreate);
 
-  const categoriesToCreate = okResponse(responses[1]).map(({ _id, name }) =>
+  const categoriesToCreate = okResponse(responses[1]).map(({ _id, name, shortName }) =>
     categoriesCollection.prepareCreate(
       catchFn(category => {
         category._raw = sanitizedRaw({ id: _id }, categoriesCollection.schema);
-        Object.assign(category, { name });
+        Object.assign(category, { name, shortName });
       }),
     ),
   );
 
   toCreate.push(...categoriesToCreate);
 
-  const priceGroupsToCreate = okResponse(responses[4]).map(({ _id, name }) =>
+  const priceGroupsToCreate = okResponse(responses[4]).map(({ _id, name, isPrepTimeRequired }) =>
     priceGroupsCollection.prepareCreate(
       catchFn(priceGroup => {
         priceGroup._raw = sanitizedRaw({ id: _id }, priceGroupsCollection.schema);
-        Object.assign(priceGroup, { name });
+        Object.assign(priceGroup, { name,  isPrepTimeRequired});
       }),
     ),
   );
   toCreate.push(...priceGroupsToCreate);
 
-  const printersToCreate = okResponse(responses[5]).map(({ _id, name, type, address }) =>
+  const printersToCreate = okResponse(responses[5]).map(({ _id, name, type, address, printWidth, emulation }) =>
     printersCollection.prepareCreate(
       catchFn(printer => {
         printer._raw = sanitizedRaw({ id: _id }, printersCollection.schema);
-        Object.assign(printer, { name, type, address });
+        Object.assign(printer, { name, type, address, printWidth, emulation });
       }),
     ),
   );
@@ -102,7 +102,7 @@ export const populate = async (database: Database) => {
   toCreate.push(...discountsToCreate);
 
   okResponse(responses[0]).map(
-    ({ _id: itemId, name, categoryId, price: itemPrices, modifiers, linkedPrinters: linkedPrinterIds }) => {
+    ({ _id: itemId, name, shortName, categoryId, price: itemPrices, modifiers, linkedPrinters: linkedPrinterIds }) => {
       const itemsCollection = database.collections.get<any & Model>(tableNames.items);
       const itemPricesCollection = database.collections.get(tableNames.itemPrices);
       const itemPrintersCollection = database.collections.get(tableNames.itemPrinters);
@@ -140,7 +140,7 @@ export const populate = async (database: Database) => {
       const itemToCreate = itemsCollection.prepareCreate(
         catchFn(item => {
           item._raw = sanitizedRaw({ id: itemId }, itemsCollection.schema);
-          Object.assign(item, { name, categoryId });
+          Object.assign(item, { name, categoryId, shortName });
         }),
       );
 
@@ -166,7 +166,7 @@ export const populate = async (database: Database) => {
       const modifierToCreate = modifierItemsCollection.prepareCreate(
         catchFn(newItem => {
           newItem._raw = sanitizedRaw({ id: mItem._id }, modifierItemsCollection.schema);
-          Object.assign(newItem, { name: mItem.name, modifierId: _id });
+          Object.assign(newItem, { name: mItem.name, shortName: mItem.shortName, modifierId: _id });
         }),
       );
 
