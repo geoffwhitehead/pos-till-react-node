@@ -4,8 +4,10 @@ import { tenantModel } from './utils/multiTenant';
 export interface PrinterProps {
     _id?: mongoose.Types.ObjectId;
     name: string;
-    type?: string;
+    type?: 'wifi' | 'ethernet';
     address?: string;
+    printWidth: number;
+    emulation: 'StarPRNT' | 'StarLine' | 'StarGraphic' | 'StarDotImpact' | 'EscPosMobile' | 'EscPos';
 }
 
 const PrinterSchema: Schema<PrinterProps> = new Schema({
@@ -19,6 +21,12 @@ const PrinterSchema: Schema<PrinterProps> = new Schema({
     address: {
         type: String,
     },
+    emulation: {
+        type: String,
+    },
+    printWidth: {
+        type: Number,
+    }
 });
 
 const Printer = tenantModel<PrinterProps>('Printer', PrinterSchema);
