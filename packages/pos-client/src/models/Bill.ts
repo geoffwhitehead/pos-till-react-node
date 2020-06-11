@@ -16,7 +16,7 @@ import { BillPeriod } from './BillPeriod';
 import { BillPayment } from './BillPayment';
 import { BillDiscount } from './BillDiscount';
 import { BillItemModifierItem } from './BillItemModifierItem';
-import { PaymentType } from '.';
+import { PaymentType, Item, PriceGroup, Discount } from '.';
 
 export const billSchema = tableSchema({
   name: 'bills',
@@ -86,14 +86,14 @@ export class Bill extends Model {
     });
   };
 
-  @action addDiscount = async (p: { discount }) => {
+  @action addDiscount = async (p: { discount: Discount }) => {
     await this.collections.get<BillDiscount>('bill_discounts').create(discount => {
       discount.bill.set(this);
       discount.discount.set(p.discount);
     });
   };
 
-  @action addItem = async (p: { item; priceGroup }): Promise<BillItem> => {
+  @action addItem = async (p: { item: Item; priceGroup: PriceGroup }): Promise<BillItem> => {
     const { item, priceGroup } = p;
     const [category, prices, printers] = await Promise.all([
       item.category.fetch(),
@@ -110,6 +110,7 @@ export class Bill extends Model {
         billItem.item.set(item);
         Object.assign(billItem, {
           itemName: item.name,
+          itemShortName: item.shortName,
           itemPrice: resolvePrice(priceGroup, prices),
           priceGroupName: priceGroup.name,
           categoryName: category.name,

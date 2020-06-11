@@ -136,6 +136,7 @@ export class BillItem extends Model {
             Object.assign(billItemModifierItem, {
               modifierName: modifier.name,
               modifierItemName: modifierItem.name,
+              modifierItemShortName: modifierItem.shortName,
               modifierItemPrice: resolvePrice(priceGroup, prices),
               priceGroupName: priceGroup.name,
               isVoided: false,
