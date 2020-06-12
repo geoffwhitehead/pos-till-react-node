@@ -27,7 +27,7 @@ export const ItemsBreakdown: React.FC<{
             <Text>{capitalize(itemGroup[0].priceGroupName)}</Text>
           </ListItem>,
           ...itemGroup.map(item => (
-            <ItemBreakdown item={item} readonly={readonly} onSelect={onSelect} />
+            <ItemBreakdown key={item.id} item={item} readonly={readonly} onSelect={onSelect} />
           )),
         ];
       })}

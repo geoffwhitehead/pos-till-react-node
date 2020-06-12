@@ -83,15 +83,35 @@ export class BillItem extends Model {
   @action void = async () => {
     const modifierItemsToVoid = await this.billItemModifierItems.fetch();
 
-    await modifierItemsToVoid.map(async modifierItem => await this.subAction(modifierItem.void));
+    let updates = [];
 
-    await this.update(billItem => {
-      billItem.isVoided = true;
+    // const modifierItemCollection = this.database.collections.get<BillItemModifierItem>(tableNames.billItemModifierItems);
+
+    const modifierItemUpdates = modifierItemsToVoid.map(modItem => modItem.prepareUpdate(mItem => {
+      mItem.isVoided = true
+    }))
+
+    const billItemUpdate = this.prepareUpdate(bItem => {
+      bItem.isVoided = true;
       // only need to run through the void print process if the item has already been sent
-      if (billItem.printStatus != '') {
-        billItem.printStatus = 'void';
+      if (bItem.printStatus != '') {
+        bItem.printStatus = 'void';
       }
-    });
+    })
+
+    updates.push(...modifierItemUpdates, billItemUpdate)
+
+    await this.database.batch(...updates)
+
+    // await Promise.all(modifierItemsToVoid.map(modifierItem => this.subAction(modifierItem.void)));
+
+    // await this.update(billItem => {
+    //   billItem.isVoided = true;
+    //   // only need to run through the void print process if the item has already been sent
+    //   if (billItem.printStatus != '') {
+    //     billItem.printStatus = 'void';
+    //   }
+    // });
   };
 
   @action updatePrintStatus = async (printStatus: PrintStatus) => {

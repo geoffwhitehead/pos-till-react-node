@@ -1,7 +1,7 @@
 import dayjs, { Dayjs } from 'dayjs';
 import { BillItem, PriceGroup, Printer, BillItemModifierItem } from '../../models';
 import { groupBy, flatten, omit } from 'lodash';
-import { alignCenter, starDivider, alignLeftRight, alignLeftRightSingle } from './printer';
+import { alignCenter, starDivider, alignLeftRightSingle } from './helpers';
 
 const modPrefix = ' -'; // TODO: move to settings
 const referenceName = 'Table';
@@ -73,12 +73,11 @@ const generatePrintCommands = (p: {
 
   const c = [];
 
-  c.push({ appendFontStyle: 'B' });
-  c.push({ appendBitmapText: alignCenter(priceGroup.name.toUpperCase()) });
-  c.push({ appendBitmapText: alignCenter('IN: ' + dayjs().format('HH:mm')) });
-  c.push({ appendBitmapText: alignCenter('PREP: ' + prepTime.format('HH:mm')) });
-  c.push({ appendBitmapText: alignCenter(referenceName.toUpperCase() + ': ' + reference) });
-  c.push(starDivider);
+  c.push({ appendBitmapText: alignCenter(priceGroup.shortName.toUpperCase(), printer.printWidth) });
+  c.push({ appendBitmapText: alignCenter('IN: ' + dayjs().format('HH:mm'), printer.printWidth) });
+  c.push({ appendBitmapText: alignCenter('PREP: ' + prepTime.format('HH:mm'), printer.printWidth) });
+  c.push({ appendBitmapText: alignCenter(referenceName.toUpperCase() + ': ' + reference, printer.printWidth) });
+  c.push(starDivider(printer.printWidth));
 
   const grouped = Object.values(
     groupBy(itemsToPrint, ({ billItem, mods }) => {
@@ -97,13 +96,13 @@ const generatePrintCommands = (p: {
   quantifiedItems.map(({ quantity, billItem, mods, isVoided }) => {
     if (isVoided) {
       c.push({
-        appendBitmapText: alignLeftRightSingle(`${'[V] ' + billItem.itemName.toUpperCase()}`, quantity.toString(), 14),
+        appendBitmapText: alignLeftRightSingle(`${'[V] ' + billItem.itemShortName.toUpperCase()}`, quantity.toString(), 14),
       });
     } else {
-      c.push({ appendBitmapText: alignLeftRightSingle(`${billItem.itemName}`, quantity.toString(), 14) });
+      c.push({ appendBitmapText: alignLeftRightSingle(`${billItem.itemShortName}`, quantity.toString(), 14) });
     }
     mods.map(mod => {
-      c.push({ appendBitmapText: modPrefix + mod.modifierItemName.toUpperCase() });
+      c.push({ appendBitmapText: modPrefix + mod.modifierItemShortName.toUpperCase() });
     });
   });
 
