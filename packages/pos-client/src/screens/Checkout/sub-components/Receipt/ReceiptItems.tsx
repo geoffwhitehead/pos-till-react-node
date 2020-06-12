@@ -31,7 +31,7 @@ export const ReceiptItems: React.FC<ReceiptItemsProps> = ({
   const database = useDatabase();
 
   const remove = async (item: BillItem) => {
-    await database.action(() => item.void());
+    await item.void();
   };
 
   const onRemove = item => {

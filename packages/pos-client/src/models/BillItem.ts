@@ -76,6 +76,9 @@ export class BillItem extends Model {
     Q.where('is_voided', true),
   );
 
+  // used in the kitchen printer when printing voided items
+  @lazy modifierItemsIncVoids: Query<BillItemModifierItem> = this._billItemModifierItems
+
   @lazy printers = this.collections.get('printers').query(Q.on('item_printers', 'item_id', this.itemId)) as Query<
     Printer
   >;
@@ -85,11 +88,11 @@ export class BillItem extends Model {
 
     let updates = [];
 
-    // const modifierItemCollection = this.database.collections.get<BillItemModifierItem>(tableNames.billItemModifierItems);
-
-    const modifierItemUpdates = modifierItemsToVoid.map(modItem => modItem.prepareUpdate(mItem => {
-      mItem.isVoided = true
-    }))
+    const modifierItemUpdates = modifierItemsToVoid.map(modItem =>
+      modItem.prepareUpdate(mItem => {
+        mItem.isVoided = true;
+      }),
+    );
 
     const billItemUpdate = this.prepareUpdate(bItem => {
       bItem.isVoided = true;
@@ -97,21 +100,12 @@ export class BillItem extends Model {
       if (bItem.printStatus != '') {
         bItem.printStatus = 'void';
       }
-    })
+    });
 
-    updates.push(...modifierItemUpdates, billItemUpdate)
-
-    await this.database.batch(...updates)
-
-    // await Promise.all(modifierItemsToVoid.map(modifierItem => this.subAction(modifierItem.void)));
-
-    // await this.update(billItem => {
-    //   billItem.isVoided = true;
-    //   // only need to run through the void print process if the item has already been sent
-    //   if (billItem.printStatus != '') {
-    //     billItem.printStatus = 'void';
-    //   }
-    // });
+    updates.push(...modifierItemUpdates, billItemUpdate);
+    await this.database.action(async () => {
+      await this.database.batch(...updates);
+    });
   };
 
   @action updatePrintStatus = async (printStatus: PrintStatus) => {

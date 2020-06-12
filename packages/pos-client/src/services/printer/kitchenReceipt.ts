@@ -1,9 +1,9 @@
 import dayjs, { Dayjs } from 'dayjs';
 import { BillItem, PriceGroup, Printer, BillItemModifierItem } from '../../models';
-import { groupBy, flatten, omit } from 'lodash';
+import { groupBy, flatten, omit, capitalize } from 'lodash';
 import { alignCenter, starDivider, alignLeftRightSingle } from './helpers';
 
-const modPrefix = ' -'; // TODO: move to settings
+const modPrefix = '- '; // TODO: move to settings
 const referenceName = 'Table';
 
 export const kitchenReceipt = async (p: {
@@ -18,7 +18,7 @@ export const kitchenReceipt = async (p: {
   const populatedItems = await Promise.all(
     billItems.map(async billItem => {
       const [mods, printers] = await Promise.all([
-        await billItem.billItemModifierItems.fetch(),
+        await billItem.modifierItemsIncVoids.fetch(),
         await billItem.printers.fetch(),
       ]);
       return {
@@ -54,7 +54,7 @@ export const kitchenReceipt = async (p: {
   const printCommands = recieptGroupings.map(grp =>
     generatePrintCommands({
       ...grp,
-      itemsToPrint: grp.itemsToPrint.map(grp => omit(grp, 'printers')),
+      itemsToPrint: grp.itemsToPrint.map(grp => omit(grp, 'printers')), // disard printers and use from grouping
       prepTime,
       reference,
     }),
@@ -96,13 +96,22 @@ const generatePrintCommands = (p: {
   quantifiedItems.map(({ quantity, billItem, mods, isVoided }) => {
     if (isVoided) {
       c.push({
-        appendBitmapText: alignLeftRightSingle(`${'[V] ' + billItem.itemShortName.toUpperCase()}`, quantity.toString(), 14),
+        appendBitmapText: alignLeftRightSingle(
+          `${('VOID ' + capitalize(billItem.itemShortName)).slice(0, printer.printWidth)}`,
+          quantity.toString(),
+          printer.printWidth,
+        ),
       });
     } else {
-      c.push({ appendBitmapText: alignLeftRightSingle(`${billItem.itemShortName}`, quantity.toString(), 14) });
+      c.push({
+        appendBitmapText: alignLeftRightSingle(`${billItem.itemShortName}`, quantity.toString(), printer.printWidth),
+      });
     }
+    console.log('***********');
+    console.log('mods', mods);
     mods.map(mod => {
-      c.push({ appendBitmapText: modPrefix + mod.modifierItemShortName.toUpperCase() });
+      console.log('mod', mod);
+      c.push({ appendBitmapText: modPrefix + capitalize(mod.modifierItemShortName) });
     });
   });
 
