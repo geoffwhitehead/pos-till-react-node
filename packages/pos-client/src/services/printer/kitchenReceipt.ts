@@ -73,7 +73,8 @@ const generatePrintCommands = (p: {
 
   const c = [];
 
-  c.push({ appendBitmapText: alignCenter(priceGroup.shortName.toUpperCase(), printer.printWidth) });
+  const pGName = priceGroup.shortName || priceGroup.name
+  c.push({ appendBitmapText: alignCenter(pGName.toUpperCase(), printer.printWidth) });
   c.push({ appendBitmapText: alignCenter('IN: ' + dayjs().format('HH:mm'), printer.printWidth) });
   c.push({ appendBitmapText: alignCenter('PREP: ' + prepTime.format('HH:mm'), printer.printWidth) });
   c.push({ appendBitmapText: alignCenter(referenceName.toUpperCase() + ': ' + reference, printer.printWidth) });
