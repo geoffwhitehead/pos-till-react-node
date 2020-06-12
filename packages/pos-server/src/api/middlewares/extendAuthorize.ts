@@ -3,7 +3,12 @@ import config from '../../config';
 import Container from 'typedi';
 import { AuthService } from '../../services/auth';
 import { Logger } from 'winston';
-import { access } from 'fs';
+import { Request } from 'express';
+
+export interface AuthorizedRequest extends Request {
+    organizationId: string;
+    userId: string;
+}
 
 export const getTokenFromHeader = req => {
     if (
