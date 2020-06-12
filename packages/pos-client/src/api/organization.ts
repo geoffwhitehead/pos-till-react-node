@@ -8,12 +8,17 @@ export interface OrganizationServerProps {
   email: string;
   phone: string;
   vat?: string;
-  defaultPriceGroup?: string;
   address: {
     line1: string;
     line2?: string;
     city: string;
     county: string;
     postcode: string;
+  };
+  settings?: {
+    defaultPriceGroup?: string;
+    receiptPrinter?: string;
+    currency: string;
+    maxBills: number;
   };
 }

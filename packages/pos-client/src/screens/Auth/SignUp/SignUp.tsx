@@ -1,11 +1,8 @@
-import React from 'react'
-import { Container, Input, Button, Header, Content, Item, Text, Form, Label } from '../../core'
-import { StyleSheet } from 'react-native'
-import { AuthContext } from '../../contexts/AuthContext'
-import { Formik } from 'formik'
-import * as Yup from 'yup'
-import { StackNavigationProp } from '@react-navigation/stack'
-import { AuthStackParamList } from '../../navigators/AuthNavigator'
+import React from 'react';
+import { Container, Input, Button, Header, Content, Item, Text, Form, Label } from '../../../core';
+import { AuthContext } from '../../../contexts/AuthContext';
+import { Formik } from 'formik';
+import * as Yup from 'yup';
 
 const SignupSchema = Yup.object().shape({
   firstName: Yup.string()
@@ -24,14 +21,12 @@ const SignupSchema = Yup.object().shape({
     .max(50, 'Too Long!')
     .required('Required'),
   passwordConfirmation: Yup.string().oneOf([Yup.ref('password'), null], 'Passwords must match'),
-})
+});
 
-interface SignUpProps {
-  navigation: StackNavigationProp<AuthStackParamList, 'SignUp'>;
-}
+interface SignUpProps {}
 
 export const SignUp: React.FC<SignUpProps> = () => {
-  const { signUp } = React.useContext(AuthContext)
+  const { signUp } = React.useContext(AuthContext);
 
   const initialValues = {
     firstName: '',
@@ -39,7 +34,7 @@ export const SignUp: React.FC<SignUpProps> = () => {
     email: '',
     password: '',
     passwordConfirmation: '',
-  }
+  };
 
   return (
     <Formik
@@ -48,14 +43,14 @@ export const SignUp: React.FC<SignUpProps> = () => {
       onSubmit={({ passwordConfirmation, ...values }) => signUp(values)}
     >
       {({ handleChange, handleBlur, handleSubmit, errors, touched, values }) => {
-        const { firstName, lastName, password, passwordConfirmation, email } = values
+        const { firstName, lastName, password, passwordConfirmation, email } = values;
         const err = {
           firstName: !!(touched.firstName && errors.firstName),
           lastName: !!(touched.lastName && errors.lastName),
           email: !!(touched.email && errors.email),
           password: !!(touched.password && errors.password),
           passwordConfirmation: !!(touched.passwordConfirmation && errors.passwordConfirmation),
-        }
+        };
         return (
           <Container>
             <Header />
@@ -63,27 +58,15 @@ export const SignUp: React.FC<SignUpProps> = () => {
               <Form>
                 <Item stackedLabel error={err.firstName}>
                   <Label>First Name</Label>
-                  <Input
-                    onChangeText={handleChange('firstName')}
-                    onBlur={handleBlur('firstName')}
-                    value={firstName}
-                  />
+                  <Input onChangeText={handleChange('firstName')} onBlur={handleBlur('firstName')} value={firstName} />
                 </Item>
                 <Item stackedLabel error={err.lastName}>
                   <Label>Last Name</Label>
-                  <Input
-                    onChangeText={handleChange('lastName')}
-                    onBlur={handleBlur('lastName')}
-                    value={lastName}
-                  />
+                  <Input onChangeText={handleChange('lastName')} onBlur={handleBlur('lastName')} value={lastName} />
                 </Item>
                 <Item stackedLabel error={err.email}>
                   <Label>Email</Label>
-                  <Input
-                    onChangeText={handleChange('email')}
-                    onBlur={handleBlur('email')}
-                    value={email}
-                  />
+                  <Input onChangeText={handleChange('email')} onBlur={handleBlur('email')} value={email} />
                 </Item>
                 <Item stackedLabel error={err.password}>
                   <Label>Password</Label>
@@ -109,11 +92,11 @@ export const SignUp: React.FC<SignUpProps> = () => {
               </Form>
             </Content>
           </Container>
-        )
+        );
       }}
     </Formik>
-  )
-}
+  );
+};
 
 // const styles = StyleSheet.create({
 //   container: {

@@ -9,7 +9,7 @@ import { BillItem } from '../../../../../models';
 const currencySymbol = '£';
 
 interface ItemBreakdownInnerProps {
-  modifierItems: any;
+  modifierItems: any; // TODO
 }
 
 interface ItemBreakdownOuterProps {
@@ -34,12 +34,12 @@ const ItemBreakdownInner: React.FC<ItemBreakdownOuterProps & ItemBreakdownInnerP
       <Left>
         <Content>
           {item.isVoided ? (
-            <Text style={{ color: 'red' }}>{`VOID - ${capitalize(item.itemName)}`}</Text>
+            <Text style={styles.void}>{`VOID ${capitalize(item.itemName)}`}</Text>
           ) : (
             <Text>{`${capitalize(item.itemName)}`}</Text>
           )}
           {modifierItems.map(m => (
-            <Text key={`${m.id}-name`}>{`- ${m.modifierItemName}`}</Text>
+            <Text style={styles.void} key={`${m.id}-name`}>{`- ${m.modifierItemName}`}</Text>
           ))}
         </Content>
       </Left>
@@ -56,7 +56,7 @@ const ItemBreakdownInner: React.FC<ItemBreakdownOuterProps & ItemBreakdownInnerP
 export const ItemBreakdown = withObservables<ItemBreakdownOuterProps, ItemBreakdownInnerProps>(
   ['item'],
   ({ item }) => ({
-    modifierItems: item.billItemModifierItems,
+    modifierItems: item.modifierItemsIncVoids,
   }),
 )(ItemBreakdownInner);
 
@@ -80,5 +80,8 @@ const styles = {
   void_error: {
     borderLeftColor: 'red',
     borderLeftWidth: 8,
+  },
+  void: {
+    color: 'red',
   },
 };
