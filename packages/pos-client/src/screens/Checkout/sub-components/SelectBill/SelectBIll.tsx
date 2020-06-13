@@ -5,6 +5,7 @@ import { CurrentBillContext } from '../../../../contexts/CurrentBillContext';
 import { BillRowEmpty } from './BillRowEmpty';
 import { BillRow } from './BillRow';
 import { Bill, BillPeriod } from '../../../../models';
+import { OrganizationContext } from '../../../../contexts/OrganizationContext';
 
 interface SelectBillInnerProps {
   openBills: any; // TODO: fix types
@@ -15,21 +16,20 @@ interface SelectBillOuterProps {
   onSelectBill?: (bill: Bill) => void; // Created from 2 places
 }
 
-// TODO: fetch from org / state
-const maxBills = 40; // TODO: move to org settings
-
 export const WrappedSelectBill: React.FC<SelectBillOuterProps & SelectBillInnerProps> = ({
   onSelectBill,
   openBills,
   billPeriod,
 }) => {
   const { setCurrentBill } = useContext(CurrentBillContext);
+  const { organization } = useContext(OrganizationContext);
+
   const [showOpen, setShowOpen] = useState<boolean>(false);
 
   const bills: (Bill | null)[] = openBills.reduce((acc, bill) => {
     acc[bill.reference - 1] = bill;
     return [...acc];
-  }, Array(maxBills).fill(null));
+  }, Array(organization.maxBills).fill(null));
 
   const _onSelectBill = (bill: Bill) => {
     setCurrentBill(bill);

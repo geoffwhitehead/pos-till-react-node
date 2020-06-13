@@ -13,7 +13,7 @@ import { getOrganization, OrganizationServerProps } from '../../api/organization
 // import { getOrganization } from '../../api/organization';
 
 export const populate = async (database: Database) => {
-  // return;
+  return;
   try {
     await database.action(async () => {
       await database.unsafeResetDatabase();
@@ -113,7 +113,7 @@ export const populate = async (database: Database) => {
       addressCity: a.city,
       addressCounty: a.county,
       addressPostcode: a.postcode,
-      ...s
+      ...s,
     });
   });
   toCreate.push(organizationToCreate);

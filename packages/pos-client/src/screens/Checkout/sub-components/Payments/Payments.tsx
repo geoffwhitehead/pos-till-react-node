@@ -55,7 +55,7 @@ const PaymentsInner: React.FC<PaymentOuterProps & PaymentInnerProps> = ({
   const denominations = [500, 1000, 2000, 3000, 5000]; // TODO: grab from org settings or create new table, will vary based on currency
   // TODO: refactor to grab currency from org
   const currencySymbol = '£';
-
+  
   const [summary, setSummary] = useState<BillSummary>(null);
 
   // const checkComplete = async () => balance(currentBill) <= 0 && (await onCompleteBill(currentBill));

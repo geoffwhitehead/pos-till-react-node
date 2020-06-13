@@ -6,15 +6,21 @@ import {
   modifierSummary,
   priceGroupSummmary,
 } from '../../utils';
-import { addHeader, alignLeftRight, divider, starDivider, alignCenter, RECEIPT_WIDTH, newLine } from './printer';
+import { addHeader, alignLeftRight, divider, starDivider, alignCenter, newLine } from './helpers';
 import { receiptTempate } from './template';
 import { capitalize } from 'lodash';
 import dayjs from 'dayjs';
 import { flatten, sumBy } from 'lodash';
-import { tableNames, BillPeriod, Category, PaymentType, Discount, PriceGroup } from '../../models';
+import {
+  tableNames,
+  BillPeriod,
+  Category,
+  PaymentType,
+  Discount,
+  PriceGroup,
+  Printer,
+} from '../../models';
 import { Database } from '@nozbe/watermelondb';
-
-const symbol = '£'; // TODO: move
 
 // TODO: fetch from db
 const org = {
@@ -41,9 +47,7 @@ const org = {
 //     ];
 //   }, []);
 
-
-  // TODO type this func
-export const periodReport = async (billPeriod: BillPeriod, database: Database) => {
+export const periodReport = async (billPeriod: BillPeriod, database: Database, printer: Printer, currency: string) => {
   let c = [];
 
   const [
@@ -89,35 +93,41 @@ export const periodReport = async (billPeriod: BillPeriod, database: Database) =
   const modifierTotals = modifierSummary(billModifierItems);
 
   c.push(starDivider);
-  c.push({ appendBitmapText: alignCenter(billPeriod.closedAt ? '-- END PERIOD REPORT --' : '-- STATUS REPORT --') });
+  c.push({
+    appendBitmapText: alignCenter(
+      billPeriod.closedAt ? '-- END PERIOD REPORT --' : '-- STATUS REPORT --',
+      printer.printWidth,
+    ),
+  });
 
   console.log('billPeriod', billPeriod);
   c.push({
     appendBitmapText: alignLeftRight(
       `Opened: `,
       dayjs(billPeriod.createdAt).format('DD/MM/YYYY HH:mm:ss'),
-      Math.round(RECEIPT_WIDTH / 2),
+      Math.round(printer.printWidth / 2),
     ),
   });
   c.push({
     appendBitmapText: alignLeftRight(
       `Closed: `,
       billPeriod.closedAt ? dayjs(billPeriod.closedAt).format('DD/MM/YYYY HH:mm:ss') : '',
-      Math.round(RECEIPT_WIDTH / 2),
+      Math.round(printer.printWidth / 2),
     ),
   });
   c.push(starDivider);
 
-  addHeader(c, 'Bills');
-  c.push({ appendBitmapText: alignLeftRight('Total: ', bills.length.toString()) });
+  addHeader(c, 'Bills', printer.printWidth);
+  c.push({ appendBitmapText: alignLeftRight('Total: ', bills.length.toString(), printer.printWidth) });
 
-  addHeader(c, 'Category Totals');
+  addHeader(c, 'Category Totals', printer.printWidth);
   c.push(
     ...categoryTotals.breakdown.map(categoryTotal => {
       return {
         appendBitmapText: alignLeftRight(
           capitalize(categories.find(c => c.id === categoryTotal.categoryId).name),
-          `${categoryTotal.count} / ${formatNumber(categoryTotal.total, symbol)}`,
+          `${categoryTotal.count} / ${formatNumber(categoryTotal.total, currency)}`,
+          printer.printWidth,
         ),
       };
     }),
@@ -125,21 +135,23 @@ export const periodReport = async (billPeriod: BillPeriod, database: Database) =
   c.push({
     appendBitmapText: alignLeftRight(
       'Total: ',
-      `${categoryTotals.count} / ${formatNumber(categoryTotals.total, symbol)}`,
+      `${categoryTotals.count} / ${formatNumber(categoryTotals.total, currency)}`,
+      printer.printWidth,
     ),
   });
 
-  addHeader(c, 'Modifier Totals');
+  addHeader(c, 'Modifier Totals', printer.printWidth);
   modifierTotals.breakdown.map(modifierGroup => {
     c.push({
-      appendBitmapText: alignCenter(modifierGroup.modifierName),
+      appendBitmapText: alignCenter(modifierGroup.modifierName, printer.printWidth),
     });
     c.push(
       ...modifierGroup.breakdown.map(modifierItemGroup => {
         return {
           appendBitmapText: alignLeftRight(
             capitalize(modifierItemGroup.modifierItemName),
-            `${modifierItemGroup.count} / ${formatNumber(modifierItemGroup.total, symbol)}`,
+            `${modifierItemGroup.count} / ${formatNumber(modifierItemGroup.total, currency)}`,
+            printer.printWidth,
           ),
         };
       }),
@@ -148,54 +160,63 @@ export const periodReport = async (billPeriod: BillPeriod, database: Database) =
   c.push({
     appendBitmapText: alignLeftRight(
       'Total: ',
-      `${modifierTotals.count} / ${formatNumber(modifierTotals.total, symbol)}`,
+      `${modifierTotals.count} / ${formatNumber(modifierTotals.total, currency)}`,
+      printer.printWidth,
     ),
   });
 
-  addHeader(c, 'Discount Totals');
+  addHeader(c, 'Discount Totals', printer.printWidth);
   const discountTotals = finalizedDiscountSummary(periodDiscounts, discounts);
   c.push(
     ...discountTotals.breakdown.map(discountTotal => ({
       appendBitmapText: alignLeftRight(
         capitalize(discountTotal.name),
-        `${discountTotal.count} / ${formatNumber(discountTotal.total, symbol)}`,
+        `${discountTotal.count} / ${formatNumber(discountTotal.total, currency)}`,
+        printer.printWidth,
       ),
     })),
   );
   c.push({
     appendBitmapText: alignLeftRight(
       'Total: ',
-      `${discountTotals.count} / ${formatNumber(discountTotals.total, symbol)}`,
+      `${discountTotals.count} / ${formatNumber(discountTotals.total, currency)}`,
+      printer.printWidth,
     ),
   });
   c.push(divider);
 
-  addHeader(c, 'Payment Totals');
+  addHeader(c, 'Payment Totals', printer.printWidth);
   const paymentTotals = paymentSummary(periodPayments, paymentTypes);
   c.push(
     ...paymentTotals.breakdown.map(paymentTotal => ({
       appendBitmapText: alignLeftRight(
         capitalize(paymentTotal.name),
-        `${paymentTotal.count} / ${formatNumber(paymentTotal.total, symbol)}`,
+        `${paymentTotal.count} / ${formatNumber(paymentTotal.total, currency)}`,
+        printer.printWidth,
       ),
     })),
   );
   c.push({
     appendBitmapText: alignLeftRight(
       'Total: ',
-      `${paymentTotals.count} / ${formatNumber(paymentTotals.total, symbol)}`,
+      `${paymentTotals.count} / ${formatNumber(paymentTotals.total, currency)}`,
+      printer.printWidth,
     ),
   });
 
-  addHeader(c, 'Voids / Corrections');
+  addHeader(c, 'Voids / Corrections', printer.printWidth);
   const voidTotal = sumBy(periodItemVoids, 'itemPrice') + sumBy(billModifierItemVoids, 'modifierItemPrice');
   // dont include modifier items in the count as these are cancelled as part od the item.
   const voidCount = periodItemVoids.length;
   c.push({
-    appendBitmapText: alignLeftRight('Total: ', `${voidCount} / ${formatNumber(voidTotal, symbol)}`),
+    appendBitmapText: alignLeftRight(
+      'Total: ',
+      `${voidCount} / ${formatNumber(voidTotal, currency)}`,
+      printer.printWidth,
+    ),
   });
 
-  addHeader(c, 'Totals');
+  addHeader(c, 'Totals', printer.printWidth);
 
   const priceGroupTotals = priceGroupSummmary(periodItems, billModifierItems, priceGroups);
 
@@ -204,7 +225,8 @@ export const periodReport = async (billPeriod: BillPeriod, database: Database) =
       return {
         appendBitmapText: alignLeftRight(
           priceGroupTotal.name,
-          `${priceGroupTotal.count} / ${formatNumber(priceGroupTotal.total, symbol)}`,
+          `${priceGroupTotal.count} / ${formatNumber(priceGroupTotal.total, currency)}`,
+          printer.printWidth,
         ),
       };
     }),
@@ -212,7 +234,7 @@ export const periodReport = async (billPeriod: BillPeriod, database: Database) =
   const billItemsTotal = sumBy(periodItems, 'itemPrice');
   const billModifierItemsTotal = sumBy(billModifierItems, 'modifierItemPrice');
   const salesTotal = billItemsTotal + billModifierItemsTotal - discountTotals.total;
-  c.push({ appendBitmapText: alignLeftRight('Sales Total: ', formatNumber(salesTotal, symbol)) });
+  c.push({ appendBitmapText: alignLeftRight('Sales Total: ', formatNumber(salesTotal, currency), printer.printWidth) });
 
-  return receiptTempate(c, org);
+  return receiptTempate(c, org, printer.printWidth);
 };

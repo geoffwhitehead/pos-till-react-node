@@ -1,12 +1,10 @@
 import { ListItem, Left, Content, Text, Right } from '../../../../../core';
 import { capitalize } from 'lodash';
-import React from 'react';
+import React, { useContext } from 'react';
 import { formatNumber } from '../../../../../utils';
 import withObservables from '@nozbe/with-observables';
 import { BillItem } from '../../../../../models';
-
-// TODO: move into org and fetch from db or something
-const currencySymbol = '£';
+import { OrganizationContext } from '../../../../../contexts/OrganizationContext';
 
 interface ItemBreakdownInnerProps {
   modifierItems: any; // TODO
@@ -24,6 +22,8 @@ const ItemBreakdownInner: React.FC<ItemBreakdownOuterProps & ItemBreakdownInnerP
   readonly,
   onSelect,
 }) => {
+  const { organization } = useContext(OrganizationContext);
+  
   return (
     <ListItem
       style={item.printStatus && styles[item.printStatus]}
@@ -44,9 +44,9 @@ const ItemBreakdownInner: React.FC<ItemBreakdownOuterProps & ItemBreakdownInnerP
         </Content>
       </Left>
       <Right>
-        <Text>{`${formatNumber(item.itemPrice, currencySymbol)}`}</Text>
+        <Text>{`${formatNumber(item.itemPrice, organization.currency)}`}</Text>
         {modifierItems.map(m => (
-          <Text key={`${m.id}-price`}>{formatNumber(m.modifierItemPrice, currencySymbol)}</Text>
+          <Text key={`${m.id}-price`}>{formatNumber(m.modifierItemPrice, organization.currency)}</Text>
         ))}
       </Right>
     </ListItem>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Text, Col, Grid, Row, Button } from '../../../../core';
 import { StyleSheet } from 'react-native';
 import { formatNumber, billSummary, BillSummary } from '../../../../utils';
@@ -16,9 +16,7 @@ import { kitchenReceipt } from '../../../../services/printer/kitchenReceipt';
 import { flatten, pickBy } from 'lodash';
 import { database } from '../../../../database';
 import { Loading } from '../../../../components/Loading/Loading';
-
-// TODO: move into org and fetch from db or something
-const currencySymbol = '£';
+import { OrganizationContext } from '../../../../contexts/OrganizationContext';
 
 // TODO: type these
 interface ReceiptInnerProps {
@@ -59,8 +57,10 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
   database,
 }) => {
   const [summary, setSummary] = useState<BillSummary>();
-
   const [isStoreDisabled, setIsStoreDisabled] = useState(false);
+
+  const { organization } = useContext(OrganizationContext)
+
   const _onStore = async () => {
     setIsStoreDisabled(true);
     const billItemsToPrint = billItemsIncPendingVoids.filter(
@@ -174,16 +174,16 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
         />
       </Row>
       <Row style={styles.r3}>
-        {<Text>{`Discount: ${formatNumber(totalDiscount, currencySymbol)}`}</Text>}
+        {<Text>{`Discount: ${formatNumber(totalDiscount, organization.currency)}`}</Text>}
 
-        <Text>{`Total: ${formatNumber(totalPayable, currencySymbol)}`}</Text>
+        <Text>{`Total: ${formatNumber(totalPayable, organization.currency)}`}</Text>
         {complete && (
           <Text>{`Change Due: ${formatNumber(
             Math.abs(billPayments.find(payment => payment.isChange).amount),
-            currencySymbol,
+            organization.currency,
           )}`}</Text>
         )}
-        <Text style={Fonts.h3}>{`Balance: ${formatNumber(balance, currencySymbol)}`}</Text>
+        <Text style={Fonts.h3}>{`Balance: ${formatNumber(balance, organization.currency)}`}</Text>
       </Row>
       <Row style={styles.r4}>
         <Button style={styles.printButton} block small info onPress={onPrint}>

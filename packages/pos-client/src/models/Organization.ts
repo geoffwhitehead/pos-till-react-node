@@ -1,5 +1,6 @@
-import { Model, tableSchema } from '@nozbe/watermelondb';
+import { Model, tableSchema, Relation } from '@nozbe/watermelondb';
 import { field, relation } from '@nozbe/watermelondb/decorators';
+import { Printer, PriceGroup } from '.';
 
 export class Organization extends Model {
   static table = 'organizations';
@@ -18,8 +19,8 @@ export class Organization extends Model {
   @field('max_bills') maxBills: number;
 
 
-  @relation('price_groups', "default_price_group_id") defaultPriceGroup
-  @relation('printers', "receipt_printer_id") receiptPrinter
+  @relation('price_groups', "default_price_group_id") defaultPriceGroup: Relation<PriceGroup>
+  @relation('printers', "receipt_printer_id") receiptPrinter: Relation<Printer>
 }
 
 export const organizationSchema = tableSchema({

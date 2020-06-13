@@ -122,5 +122,5 @@ export const receiptBill = async (
   c.push({ appendBitmapText: alignCenter(`VAT: ${org.vat}`, printer.printWidth) });
   c.push({ appendBitmapText: ' ' });
 
-  return receiptTempate(c, org, printer);
+  return receiptTempate(c, org, printer.printWidth);
 };

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import {
   Toast,
   Container,
@@ -27,9 +27,9 @@ import { View } from 'react-native';
 import { Database } from '@nozbe/watermelondb';
 import { DrawerNavigationProp } from '@react-navigation/drawer';
 import { SidebarDrawerStackParamList } from '../../navigators/SidebarNavigator';
+import { OrganizationContext } from '../../contexts/OrganizationContext';
 
 // const ORG_PASSCODE = '1234'; // TODO: move to an org setting and hash
-// const symbol = '£'; // TODO move
 interface ReportsInnerProps {
   billPeriods: any;
   paymentTypes: any; // TODO: fix type
@@ -45,10 +45,14 @@ export const ReportsInner: React.FC<ReportsOuterProps & ReportsInnerProps> = ({
   navigation,
   billPeriods,
 }) => {
+  const { organization } = useContext(OrganizationContext);
+
   const openDrawer = () => navigation.openDrawer();
+
   const onPrint = async (billPeriod: BillPeriod) => {
-    const commands = await periodReport(billPeriod, database);
-    print(commands);
+    const receiptPrinter = await organization.receiptPrinter.fetch();
+    const commands = await periodReport(billPeriod, database, receiptPrinter, organization.currency);
+    print(commands, receiptPrinter);
   };
 
   const closePeriod = async (billPeriod: BillPeriod) => {
@@ -154,6 +158,7 @@ const enhance = c =>
     withObservables<ReportsOuterProps, ReportsInnerProps>([], ({ database }) => ({
       paymentTypes: database.collections.get(tableNames.paymentTypes).query(),
       billPeriods: database.collections.get(tableNames.billPeriods).query(),
+      printer,
     }))(c),
   );
 

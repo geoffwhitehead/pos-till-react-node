@@ -1,26 +1,20 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Separator, Text, ListItem, Left, Right } from '../../../../../core';
 import { formatNumber } from '../../../../../utils';
 import { capitalize } from 'lodash';
-import { BillPayment, PaymentType, Bill } from '../../../../../models';
-
-// TODO: move into org and fetch from db or something
-const currencySymbol = '£';
+import { BillPayment, PaymentType } from '../../../../../models';
+import { OrganizationContext } from '../../../../../contexts/OrganizationContext';
 
 interface PaymentsBreakdownProps {
   payments: BillPayment[];
   paymentTypes: PaymentType[];
   readonly: boolean;
-  // selected: BillPayment;
   onSelect: (bP: BillPayment) => void;
 }
-const PaymentsBreakdown: React.FC<PaymentsBreakdownProps> = ({
-  payments,
-  readonly,
-  // selected,
-  onSelect,
-  paymentTypes,
-}) => {
+
+const PaymentsBreakdown: React.FC<PaymentsBreakdownProps> = ({ payments, readonly, onSelect, paymentTypes }) => {
+  const { organization } = useContext(OrganizationContext);
+
   if (!payments || !payments.length) {
     return null;
   }
@@ -43,7 +37,7 @@ const PaymentsBreakdown: React.FC<PaymentsBreakdownProps> = ({
                   <Text>{`Payment: ${capitalize(paymentType.name)}`}</Text>
                 </Left>
                 <Right>
-                  <Text>{`${formatNumber(payment.amount, currencySymbol)}`}</Text>
+                  <Text>{`${formatNumber(payment.amount, organization.currency)}`}</Text>
                 </Right>
               </ListItem>
             </>

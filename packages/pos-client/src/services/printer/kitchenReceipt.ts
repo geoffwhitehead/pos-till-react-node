@@ -3,8 +3,8 @@ import { BillItem, PriceGroup, Printer, BillItemModifierItem } from '../../model
 import { groupBy, flatten, omit, capitalize } from 'lodash';
 import { alignCenter, starDivider, alignLeftRightSingle } from './helpers';
 
-const modPrefix = '- '; // TODO: move to settings
-const referenceName = 'Table';
+const MOD_PREFIX = '- ';
+const REF_NAME = 'Table';
 
 export const kitchenReceipt = async (p: {
   billItems: BillItem[];
@@ -77,7 +77,7 @@ const generatePrintCommands = (p: {
   c.push({ appendBitmapText: alignCenter(pGName.toUpperCase(), printer.printWidth) });
   c.push({ appendBitmapText: alignCenter('IN: ' + dayjs().format('HH:mm'), printer.printWidth) });
   c.push({ appendBitmapText: alignCenter('PREP: ' + prepTime.format('HH:mm'), printer.printWidth) });
-  c.push({ appendBitmapText: alignCenter(referenceName.toUpperCase() + ': ' + reference, printer.printWidth) });
+  c.push({ appendBitmapText: alignCenter(REF_NAME.toUpperCase() + ': ' + reference, printer.printWidth) });
   c.push(starDivider(printer.printWidth));
 
   const grouped = Object.values(
@@ -112,7 +112,7 @@ const generatePrintCommands = (p: {
     console.log('mods', mods);
     mods.map(mod => {
       console.log('mod', mod);
-      c.push({ appendBitmapText: modPrefix + capitalize(mod.modifierItemShortName) });
+      c.push({ appendBitmapText: MOD_PREFIX + capitalize(mod.modifierItemShortName) });
     });
   });
 
