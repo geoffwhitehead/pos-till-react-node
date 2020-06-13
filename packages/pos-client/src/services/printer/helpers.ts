@@ -1,22 +1,22 @@
 export const alignLeftRight = (left: string, right: string = '', receiptWidth:number, rightWidth = 12) => {
-    const leftWidth = receiptWidth - rightWidth;
+    const leftWidth = Math.max(receiptWidth - rightWidth, 0);
     const lines = Math.ceil(left.length / leftWidth);
-    const spaces = receiptWidth * lines - right.length - left.length;
+    const spaces = Math.max(receiptWidth * lines - right.length - left.length, 0);
     return `${left}${' '.repeat(spaces)}${right}`;
   };
   
   export const alignLeftRightSingle = (left: string, right: string, width) => {
-    const spaces = width - left.length - right.length
+    const spaces = Math.max(width - left.length - right.length, 0)
     return `${left}${' '.repeat(spaces)}${right}`;
   }
   
   export const alignCenter = (string:string, receiptWidth:number) => {
-    const leftSpaces = Math.floor(receiptWidth / 2 - string.length / 2);
+    const leftSpaces = Math.max(Math.floor(receiptWidth / 2 - string.length / 2), 0);
     return `${' '.repeat(leftSpaces)}${string}`;
   };
   
   export const alignRight = (string: string, receiptWidth: number) => {
-    const leftSpaces = Math.floor(receiptWidth - string.length);
+    const leftSpaces = Math.max(Math.floor(receiptWidth - string.length), 0);
     return `${' '.repeat(leftSpaces)}${string}`;
   };
   

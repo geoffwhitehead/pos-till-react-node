@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Text, Button } from '../../../../core';
 import { formatNumber } from '../../../../utils';
 import { StyleSheet, View, BackHandler } from 'react-native';
@@ -8,8 +8,9 @@ import { useFocusEffect } from '@react-navigation/native';
 import { receiptBill } from '../../../../services/printer/receiptBill';
 import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import withObservables from '@nozbe/with-observables';
-import { tableNames, Discount, Bill, PaymentType, PriceGroup } from '../../../../models';
+import { tableNames, Discount, Bill, PaymentType, PriceGroup, Printer } from '../../../../models';
 import { Database } from '@nozbe/watermelondb';
+import { OrganizationContext } from '../../../../contexts/OrganizationContext';
 
 interface CompleteBillOuterProps {
   bill: Bill;
@@ -24,6 +25,7 @@ interface CompleteBillInnerProps {
   discounts: any;
   priceGroups: any;
   paymentTypes: any;
+  printers: any
 }
 
 // TODO : move this
@@ -37,10 +39,15 @@ const CompleteBillInner: React.FC<CompleteBillOuterProps & CompleteBillInnerProp
   discounts,
   priceGroups,
   paymentTypes,
+  printers
 }) => {
+  const { organization } = useContext(OrganizationContext)
+
   const onPrint = async () => {
-    const commands = await receiptBill(billItems, billDiscounts, billPayments, discounts, priceGroups, paymentTypes);
-    await print(commands, true);
+    const receiptPrinter = printers.find(p => p.id === organization.receiptPrinterId)
+
+    const commands = await receiptBill(billItems, billDiscounts, billPayments, discounts, priceGroups, paymentTypes, receiptPrinter);
+    await print(commands, receiptPrinter, true);
   };
   useFocusEffect(
     React.useCallback(() => {
@@ -79,6 +86,7 @@ const enhance = component =>
       discounts: database.collections.get<Discount>(tableNames.discounts).query(),
       paymentTypes: database.collections.get<PaymentType>(tableNames.paymentTypes).query(),
       priceGroups: database.collections.get<PriceGroup>(tableNames.priceGroups).query(),
+      printers: database.collections.get<Printer>(tableNames.printers).query()
     }))(component),
   );
 

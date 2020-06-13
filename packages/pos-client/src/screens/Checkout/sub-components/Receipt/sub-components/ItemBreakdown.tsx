@@ -1,9 +1,9 @@
 import { ListItem, Left, Content, Text, Right } from '../../../../../core';
 import { capitalize } from 'lodash';
-import React, { useContext } from 'react';
+import React, { useContext, Fragment } from 'react';
 import { formatNumber } from '../../../../../utils';
 import withObservables from '@nozbe/with-observables';
-import { BillItem } from '../../../../../models';
+import { BillItem, BillItemModifierItem } from '../../../../../models';
 import { OrganizationContext } from '../../../../../contexts/OrganizationContext';
 
 interface ItemBreakdownInnerProps {
@@ -22,8 +22,11 @@ const ItemBreakdownInner: React.FC<ItemBreakdownOuterProps & ItemBreakdownInnerP
   readonly,
   onSelect,
 }) => {
-  const { organization } = useContext(OrganizationContext);
-  
+  const {organization} = useContext(OrganizationContext)
+
+  const prefix = item.isVoided ? 'VOID ' : item.isComp ? 'COMP ' : '';
+  const style = item.isVoided ? styles.void : item.isComp ? styles.comp : {};
+
   return (
     <ListItem
       style={item.printStatus && styles[item.printStatus]}
@@ -33,20 +36,17 @@ const ItemBreakdownInner: React.FC<ItemBreakdownOuterProps & ItemBreakdownInnerP
     >
       <Left>
         <Content>
-          {item.isVoided ? (
-            <Text style={styles.void}>{`VOID ${capitalize(item.itemName)}`}</Text>
-          ) : (
-            <Text>{`${capitalize(item.itemName)}`}</Text>
-          )}
+          <Text style={style}>{`${prefix}${capitalize(item.itemName)}`}</Text>
+
           {modifierItems.map(m => (
-            <Text style={item.isVoided ? styles.void : {}} key={`${m.id}-name`}>{`- ${m.modifierItemName}`}</Text>
+            <Text style={style} key={`${m.id}-name`}>{`- ${m.modifierItemName}`}</Text>
           ))}
         </Content>
       </Left>
       <Right>
-        <Text>{`${formatNumber(item.itemPrice, organization.currency)}`}</Text>
+        <Text style={style}>{`${formatNumber(item.isComp ? 0 : item.itemPrice, organization.currency)}`}</Text>
         {modifierItems.map(m => (
-          <Text key={`${m.id}-price`}>{formatNumber(m.modifierItemPrice, organization.currency)}</Text>
+          <Text style={style} key={`${m.id}-price`}>{formatNumber(item.isComp ? 0 : m.modifierItemPrice, organization.currency)}</Text>
         ))}
       </Right>
     </ListItem>
@@ -56,6 +56,7 @@ const ItemBreakdownInner: React.FC<ItemBreakdownOuterProps & ItemBreakdownInnerP
 export const ItemBreakdown = withObservables<ItemBreakdownOuterProps, ItemBreakdownInnerProps>(
   ['item'],
   ({ item }) => ({
+    item,
     modifierItems: item.modifierItemsIncVoids,
   }),
 )(ItemBreakdownInner);
@@ -83,5 +84,8 @@ const styles = {
   },
   void: {
     color: 'red',
+  },
+  comp: {
+    color: 'grey',
   },
 };

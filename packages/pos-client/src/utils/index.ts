@@ -1,5 +1,5 @@
 import { flatten, uniq, groupBy, sumBy } from 'lodash';
-import { BillItem, BillItemModifierItem } from '../models';
+import { BillItem, BillItemModifierItem, BillDiscount, BillPayment, Discount, PriceGroup } from '../models';
 
 export const formatNumber: (value: number, symbol?: string) => string = (value, symbol = '') =>
   `${symbol}${(value ? value / 100 : 0).toFixed(2)}`;
@@ -17,14 +17,14 @@ export const _totalDiscount = (
   };
 };
 
-type  DiscountBreakdownProps = {
-  billDiscountId: string,
-  discountId: string,
-  isPercent: boolean,
-  amount: number,
-  name: string,
-  calculatedDiscount: number
-}
+type DiscountBreakdownProps = {
+  billDiscountId: string;
+  discountId: string;
+  isPercent: boolean;
+  amount: number;
+  name: string;
+  calculatedDiscount: number;
+};
 
 export const _discountBreakdown = (total: number, billDiscounts: any, discounts): DiscountBreakdownProps[] => {
   let rollingTotal = total;
@@ -60,7 +60,7 @@ export const itemsBreakdown = async (items: BillItem[]): Promise<ItemsBreakdownP
       return {
         item,
         mods,
-        total: mods.reduce((out, mod) => out + mod.modifierItemPrice, item.itemPrice),
+        total: mods.reduce((out, mod) => out + getModifierItemPrice(mod), getItemPrice(item)),
       };
     }),
   );
@@ -87,8 +87,17 @@ export type BillSummary = {
   balance: number;
   itemsBreakdown: ItemsBreakdownProps[];
 };
-export const billSummary = async (billItems, billDiscounts, billPayments, discounts): Promise<BillSummary> => {
+export const billSummary = async (
+  billItems: BillItem[],
+  billDiscounts: BillDiscount[],
+  billPayments: BillPayment[],
+  discounts: Discount[],
+): Promise<BillSummary> => {
+console.log('billItems', billItems)
+
   const { total, itemsBreakdown } = await _total(billItems);
+
+  console.log('itemsBreakdown', itemsBreakdown)
   const totalPayments = _totalPayments(billPayments);
   const discountBreakdown = _totalDiscount(total, billDiscounts, discounts);
   return {
@@ -102,10 +111,16 @@ export const billSummary = async (billItems, billDiscounts, billPayments, discou
   };
 };
 
+
 type TransactionSummary = {
   total: number;
   paymentMethods: string[];
 };
+
+export const getItemPrice = (billItem: BillItem) => (billItem.isComp ? 0 : billItem.itemPrice);
+
+export const getModifierItemPrice = (modifierItem: BillItemModifierItem) =>
+  modifierItem.isComp ? 0 : modifierItem.modifierItemPrice;
 
 export const transactionSummary = (
   billItems,
@@ -114,8 +129,11 @@ export const transactionSummary = (
   billPayments,
   paymentTypes,
 ): TransactionSummary => {
-  const modifierTotal = billItemModifierItems.reduce((out, modifierItem) => out + modifierItem.modifierItemPrice, 0);
-  const itemTotal = billItems.reduce((out, billItem) => out + billItem.itemPrice, 0);
+  const modifierTotal = billItemModifierItems.reduce(
+    (out, modifierItem) => out + getModifierItemPrice(modifierItem),
+    0,
+  );
+  const itemTotal = billItems.reduce((out, billItem) => out + getItemPrice(billItem), 0);
   const billDiscountsTotal = billDiscounts.reduce((out, billDiscount) => out + billDiscount.closingAmount, 0);
   const lookupPaymentType = id => paymentTypes.find(pT => pT.id === id).name;
   const paymentMethods = uniq(billPayments.map(bP => bP.paymentTypeId)).map(lookupPaymentType);
@@ -153,7 +171,7 @@ export const categorySummary = billItems => {
   const totals = Object.keys(groupedBillItems).map(key => ({
     categoryId: key,
     count: groupedBillItems[key].length,
-    total: groupedBillItems[key].reduce((out, item) => out + item.itemPrice, 0),
+    total: groupedBillItems[key].reduce((out, item) => out + getItemPrice(item), 0),
   }));
 
   console.log('totals', totals);
@@ -161,7 +179,7 @@ export const categorySummary = billItems => {
 };
 
 // TODO: look at refactoring and improving performance of this function
-export const modifierSummary = billItemModifierItems => {
+export const modifierSummary = (billItemModifierItems: BillItemModifierItem[]) => {
   // group all the items by their modifier name
   const groupedModifierItems = groupBy(billItemModifierItems, mI => mI.modifierId);
 
@@ -181,7 +199,7 @@ export const modifierSummary = billItemModifierItems => {
 
           return {
             modifierItemName: modifierItemNameKey,
-            total: sumBy(modifierItemGroup, 'modifierItemPrice'),
+            total: sumBy(modifierItemGroup, mI => getModifierItemPrice(mI)),
             count: modifierItemGroup.length,
           };
         });
@@ -199,14 +217,18 @@ export const modifierSummary = billItemModifierItems => {
   return { breakdown: groups, count: sumBy(groups, 'count'), total: sumBy(groups, 'total') };
 };
 
-export const priceGroupSummmary = (billItems, billItemModifierItems, priceGroups) => {
+export const priceGroupSummmary = (
+  billItems: BillItem[],
+  billItemModifierItems: BillItemModifierItem[],
+  priceGroups: PriceGroup[],
+) => {
   const itemsGrouped = groupBy(billItems, 'priceGroupId');
   const modifiersGrouped = groupBy(billItemModifierItems, 'priceGroupId');
   const itemBreakdown = priceGroups.map(({ name, id }) => {
     return {
       name,
       priceGroupId: id,
-      total: itemsGrouped[id] ? sumBy(itemsGrouped[id], 'itemPrice') : 0,
+      total: itemsGrouped[id] ? sumBy(itemsGrouped[id], item => getItemPrice(item)) : 0,
       count: itemsGrouped[id] ? itemsGrouped[id].length : 0,
     };
   });
@@ -214,7 +236,7 @@ export const priceGroupSummmary = (billItems, billItemModifierItems, priceGroups
     return {
       name,
       priceGroupId: id,
-      total: modifiersGrouped[id] ? sumBy(modifiersGrouped[id], 'modifierItemPrice') : 0,
+      total: modifiersGrouped[id] ? sumBy(modifiersGrouped[id], mI => getModifierItemPrice(mI)) : 0,
       count: modifiersGrouped[id] ? modifiersGrouped[id].length : 0,
     };
   });

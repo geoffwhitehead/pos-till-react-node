@@ -5,21 +5,15 @@ import {
   categorySummary,
   modifierSummary,
   priceGroupSummmary,
+  getItemPrice,
+  getModifierItemPrice,
 } from '../../utils';
-import { addHeader, alignLeftRight, divider, starDivider, alignCenter, newLine } from './helpers';
+import { addHeader, alignLeftRight, divider, starDivider, alignCenter } from './helpers';
 import { receiptTempate } from './template';
 import { capitalize } from 'lodash';
 import dayjs from 'dayjs';
 import { flatten, sumBy } from 'lodash';
-import {
-  tableNames,
-  BillPeriod,
-  Category,
-  PaymentType,
-  Discount,
-  PriceGroup,
-  Printer,
-} from '../../models';
+import { tableNames, BillPeriod, Category, PaymentType, Discount, PriceGroup, Printer } from '../../models';
 import { Database } from '@nozbe/watermelondb';
 
 // TODO: fetch from db
@@ -92,7 +86,7 @@ export const periodReport = async (billPeriod: BillPeriod, database: Database, p
   const categoryTotals = categorySummary(periodItems);
   const modifierTotals = modifierSummary(billModifierItems);
 
-  c.push(starDivider);
+  c.push(starDivider(printer.printWidth));
   c.push({
     appendBitmapText: alignCenter(
       billPeriod.closedAt ? '-- END PERIOD REPORT --' : '-- STATUS REPORT --',
@@ -115,7 +109,7 @@ export const periodReport = async (billPeriod: BillPeriod, database: Database, p
       Math.round(printer.printWidth / 2),
     ),
   });
-  c.push(starDivider);
+  c.push(starDivider(printer.printWidth));
 
   addHeader(c, 'Bills', printer.printWidth);
   c.push({ appendBitmapText: alignLeftRight('Total: ', bills.length.toString(), printer.printWidth) });
@@ -183,7 +177,7 @@ export const periodReport = async (billPeriod: BillPeriod, database: Database, p
       printer.printWidth,
     ),
   });
-  c.push(divider);
+  c.push(divider(printer.printWidth));
 
   addHeader(c, 'Payment Totals', printer.printWidth);
   const paymentTotals = paymentSummary(periodPayments, paymentTypes);
@@ -216,6 +210,25 @@ export const periodReport = async (billPeriod: BillPeriod, database: Database, p
     ),
   });
 
+  addHeader(c, 'Complimentary Totals', printer.printWidth);
+  const compItems = periodItems.filter(item => item.isComp);
+  const compMods = billModifierItems.filter(mod => mod.isComp);
+
+  c.push({
+    appendBitmapText: alignLeftRight(
+      'Items',
+      `${compItems.length} / ${formatNumber(sumBy(compItems, 'itemPrice'), currency)}`,
+      printer.printWidth,
+    ),
+  });
+  c.push({
+    appendBitmapText: alignLeftRight(
+      'Modifiers',
+      `${compMods.length} / ${formatNumber(sumBy(compMods, 'modifierItemPrice'), currency)}`,
+      printer.printWidth,
+    ),
+  });
+
   addHeader(c, 'Totals', printer.printWidth);
 
   const priceGroupTotals = priceGroupSummmary(periodItems, billModifierItems, priceGroups);
@@ -231,8 +244,8 @@ export const periodReport = async (billPeriod: BillPeriod, database: Database, p
       };
     }),
   );
-  const billItemsTotal = sumBy(periodItems, 'itemPrice');
-  const billModifierItemsTotal = sumBy(billModifierItems, 'modifierItemPrice');
+  const billItemsTotal = sumBy(periodItems, item => getItemPrice(item));
+  const billModifierItemsTotal = sumBy(billModifierItems, mod => getModifierItemPrice(mod));
   const salesTotal = billItemsTotal + billModifierItemsTotal - discountTotals.total;
   c.push({ appendBitmapText: alignLeftRight('Sales Total: ', formatNumber(salesTotal, currency), printer.printWidth) });
 

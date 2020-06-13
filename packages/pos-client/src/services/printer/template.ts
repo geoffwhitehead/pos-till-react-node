@@ -23,7 +23,7 @@ export const receiptTempate = (commands: any[], org, printWidth: number) => {
       appendBitmapText: alignLeftRight(
         `Date: ${date}`,
         `Time: ${time}`,
-        printer.printWidth,
+        printWidth,
         Math.round(printWidth / 2),
       ),
     },

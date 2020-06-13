@@ -19,7 +19,6 @@ interface BillRowOuterProps {
   bill: Bill;
   onSelectBill: (bill: Bill) => void;
   database: Database;
-  key: string;
 }
 
 export const WrappedBillRow: React.FC<BillRowInnerProps & BillRowOuterProps> = ({
@@ -30,13 +29,13 @@ export const WrappedBillRow: React.FC<BillRowInnerProps & BillRowOuterProps> = (
   billPayments,
   billDiscounts,
   discounts,
-  key,
 }) => {
   const [summary, setSummary] = useState<BillSummary>();
   const { organization } = useContext(OrganizationContext)
 
   useEffect(() => {
     const summary = async () => {
+      console.log('billItems', billItems)
       const summary = await billSummary(billItems, billDiscounts, billPayments, discounts);
       setSummary(summary);
     };
@@ -69,7 +68,7 @@ export const WrappedBillRow: React.FC<BillRowInnerProps & BillRowOuterProps> = (
     return null;
   };
   return (
-    <ListItem key={key} onPress={() => onSelectBill(bill)}>
+    <ListItem key={bill.id} onPress={() => onSelectBill(bill)}>
       <Left>
         <Text style={{ color: 'green' }}>{`${bill.reference}: Open`}</Text>
         {renderPrintErrors()}

@@ -55,6 +55,7 @@ export class Bill extends Model {
   @children('bill_items') _billItems: Query<BillItem>;
 
   @lazy billItems: Query<BillItem> = this._billItems.extend(Q.where('is_voided', Q.notEq(true)));
+  @lazy billItemsNoComp: Query<BillItem> = this.billItems.extend(Q.where('is_comp', Q.notEq(true)));
   @lazy billItemsPrintErrors: Query<BillItem> = this._billItems.extend(Q.where('print_status', 'error'));
   @lazy billItemsNotStored: Query<BillItem> = this._billItems.extend(Q.where('print_status', null));
   @lazy billItemVoids: Query<BillItem> = this._billItems.extend(Q.where('is_voided', true));

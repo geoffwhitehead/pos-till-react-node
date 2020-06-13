@@ -6,6 +6,7 @@ export interface PrinterProps {
     name: string;
     type?: 'wifi' | 'ethernet';
     address?: string;
+    macAddress?: string;
     printWidth: number;
     emulation: 'StarPRNT' | 'StarLine' | 'StarGraphic' | 'StarDotImpact' | 'EscPosMobile' | 'EscPos';
 }
@@ -19,6 +20,9 @@ const PrinterSchema: Schema<PrinterProps> = new Schema({
         type: String,
     },
     address: {
+        type: String,
+    },
+    macAddress: {
         type: String,
     },
     emulation: {

@@ -52,6 +52,7 @@ export const ReportsInner: React.FC<ReportsOuterProps & ReportsInnerProps> = ({
   const onPrint = async (billPeriod: BillPeriod) => {
     const receiptPrinter = await organization.receiptPrinter.fetch();
     const commands = await periodReport(billPeriod, database, receiptPrinter, organization.currency);
+    console.log('commands', commands)
     print(commands, receiptPrinter);
   };
 
@@ -158,7 +159,6 @@ const enhance = c =>
     withObservables<ReportsOuterProps, ReportsInnerProps>([], ({ database }) => ({
       paymentTypes: database.collections.get(tableNames.paymentTypes).query(),
       billPeriods: database.collections.get(tableNames.billPeriods).query(),
-      printer,
     }))(c),
   );
 

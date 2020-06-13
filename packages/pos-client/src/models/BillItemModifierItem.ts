@@ -20,6 +20,7 @@ export const billItemModifierItemSchema = tableSchema({
     { name: 'price_group_name', type: 'string' },
     { name: 'price_group_id', type: 'string' },
     { name: 'is_voided', type: 'boolean' },
+    { name: 'is_comp', type: 'boolean' },
   ],
 });
 
@@ -37,6 +38,7 @@ export class BillItemModifierItem extends Model {
   @nochange @field('price_group_name') priceGroupName: string;
   @nochange @field('price_group_id') priceGroupId: string;
   @field('is_voided') isVoided: boolean;
+  @field('is_comp') isComp: boolean;
 
   @immutableRelation('bill_items', 'bill_item_id') billItem: Relation<BillItem>;
   @immutableRelation('modifier_items', 'modifier_item_id') modifierItem: Relation<ModifierItem>;

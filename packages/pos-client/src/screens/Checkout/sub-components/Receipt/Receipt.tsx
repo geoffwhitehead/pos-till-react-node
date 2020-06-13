@@ -23,6 +23,7 @@ interface ReceiptInnerProps {
   billPayments: any[];
   billDiscounts: any[];
   billItems: any[];
+  billItemsNoComp: any[]
   billItemsIncPendingVoids: any[];
   discounts: any[];
   paymentTypes: any[];
@@ -43,6 +44,7 @@ interface ReceiptOuterProps {
 export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
   bill,
   billItems,
+  billItemsNoComp,
   billItemsIncPendingVoids,
   billDiscounts,
   billPayments,
@@ -118,15 +120,18 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
 
   useEffect(() => {
     const summary = async () => {
-      const summary = await billSummary(billItems, billDiscounts, billPayments, discounts);
+      const summary = await billSummary(billItemsNoComp, billDiscounts, billPayments, discounts);
       setSummary(summary);
     };
     summary();
-  }, [billItems, billDiscounts, billPayments, billModifierItems]); // keep billModifierItems
+  }, [billItemsNoComp, billDiscounts, billPayments, billModifierItems]); // keep billModifierItems
 
   const onPrint = async () => {
-    const receiptPrinter = printers[1]; // TODO: fetch id for printer from org
+    const receiptPrinter = printers.find(p => p.id === organization.receiptPrinterId)
+    console.log('printers', printers)
+    console.log('receiptPrinter', receiptPrinter)
     console.log('onPrint');
+    console.log('billItems', billItems)
     const commands = await receiptBill(
       billItems,
       billDiscounts,
@@ -137,6 +142,7 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
       receiptPrinter,
     );
     console.log('commands', commands);
+
     print(commands, receiptPrinter, false);
   };
 
@@ -215,6 +221,7 @@ const enhance = component =>
       billPayments: bill.billPayments,
       billDiscounts: bill.billDiscounts,
       billItems: bill.billItems,
+      billItemsNoComp: bill.billItemsNoComp,
       billItemsIncPendingVoids: bill.billItemsIncPendingVoids,
       discounts: database.collections.get<Discount>(tableNames.discounts).query(),
       paymentTypes: database.collections.get<PaymentType>(tableNames.paymentTypes).query(),

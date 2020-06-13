@@ -12,9 +12,9 @@ export async function portDiscovery() {
 }
 
 export async function print(commands: any[], printer: Printer, openDrawer: boolean = false) {
-  // const x = await portDiscovery();
+  // await portDiscovery();
 
-  // console.log('x', x);
+  console.log('printer', printer)
   commands.push({ appendCutPaper: StarPRNT.CutPaperAction.PartialCutWithFeed });
   openDrawer && commands.push({ openCashDrawer: 1 });
   try {

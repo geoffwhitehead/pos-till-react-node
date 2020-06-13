@@ -37,6 +37,7 @@ export const billItemSchema = tableSchema({
     { name: 'category_id', type: 'string' },
     { name: 'created_at', type: 'number' },
     { name: 'updated_at', type: 'number' },
+    { name: 'is_comp', type: 'boolean' },
     { name: 'is_voided', type: 'boolean' },
     { name: 'print_status', type: 'string' },
   ],
@@ -57,6 +58,7 @@ export class BillItem extends Model {
   @nochange @field('category_name') categoryName: string;
   @readonly @date('created_at') createdAt: Date;
   @readonly @date('updated_at') updatedAt: Date;
+  @field('is_comp') isComp: boolean;
   @field('is_voided') isVoided: boolean;
   @field('print_status') printStatus: PrintStatus;
 
@@ -77,7 +79,7 @@ export class BillItem extends Model {
   );
 
   // used in the kitchen printer when printing voided items
-  @lazy modifierItemsIncVoids: Query<BillItemModifierItem> = this._billItemModifierItems
+  @lazy modifierItemsIncVoids: Query<BillItemModifierItem> = this._billItemModifierItems;
 
   @lazy printers = this.collections.get('printers').query(Q.on('item_printers', 'item_id', this.itemId)) as Query<
     Printer
@@ -99,6 +101,49 @@ export class BillItem extends Model {
       // only need to run through the void print process if the item has already been sent
       if (bItem.printStatus != '') {
         bItem.printStatus = 'void';
+      }
+    });
+
+    updates.push(...modifierItemUpdates, billItemUpdate);
+    await this.database.action(async () => {
+      await this.database.batch(...updates);
+    });
+  };
+
+  @action makeComp = async () => {
+    const modifierItemsToComp = await this.billItemModifierItems.fetch();
+
+    const billItemUpdate = this.prepareUpdate(bI => {
+      bI.isComp = true;
+    });
+
+    const modsToUpdate = modifierItemsToComp.map(mI =>
+      mI.prepareUpdate(modifierItem => {
+        modifierItem.isComp = true;
+      }),
+    );
+
+    await this.database.action(async () => {
+      await this.database.batch(billItemUpdate, ...modsToUpdate);
+    });
+  };
+
+  @action voidNoPrint = async () => {
+    const modifierItemsToVoid = await this.billItemModifierItems.fetch();
+
+    let updates = [];
+
+    const modifierItemUpdates = modifierItemsToVoid.map(modItem =>
+      modItem.prepareUpdate(mItem => {
+        mItem.isVoided = true;
+      }),
+    );
+
+    const billItemUpdate = this.prepareUpdate(bItem => {
+      bItem.isVoided = true;
+      // only need to run through the void print process if the item has already been sent
+      if (bItem.printStatus != '') {
+        bItem.printStatus = 'void_no_print';
       }
     });
 

@@ -33,5 +33,5 @@ export class BillPayment extends Model {
   @immutableRelation('payment_types', 'payment_type_id') paymentType: Relation<PaymentType>;
   @immutableRelation('bills', 'bill_id') bill: Relation<Bill>;
 
-  @action close = async () => await this.destroyPermanently();
+  @action void = async () => await this.destroyPermanently();
 }

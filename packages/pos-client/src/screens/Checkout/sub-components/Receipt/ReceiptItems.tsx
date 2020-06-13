@@ -28,46 +28,57 @@ export const ReceiptItems: React.FC<ReceiptItemsProps> = ({
 
   useEffect(() => refContentList.current._root.scrollToEnd(), [billItems, billDiscounts, billPayments]);
 
-  const database = useDatabase();
-
-  const remove = async (item: BillItem) => {
+  const remove = async (item: BillItem | BillPayment | BillDiscount) => {
     await item.void();
   };
 
-  const onRemove = item => {
+  const removeNoPrint = async (item: BillItem) => {
+    await item.voidNoPrint();
+  };
+
+  const makeComplimentary = async (item: BillItem) => {
+    await item.makeComp();
+  };
+
+  const onRemoveBillItem = (item: BillItem ) => {
+    const options = ['Make complimentary', 'Remove', 'Force remove (no print)', 'Cancel'];
+    ActionSheet.show(
+      {
+        options,
+        cancelButtonIndex: options.length - 1,
+        title: item.itemName,
+      },
+      i => ([makeComplimentary, remove, removeNoPrint][i])(item),
+    );
+  };
+
+  const onRemove = (item: BillDiscount | BillPayment ) => {
     const options = ['Remove', 'Cancel'];
     ActionSheet.show(
       {
         options,
         cancelButtonIndex: options.length - 1,
-        title: 'Select option',
+        title: 'Options',
       },
-      i => {
-        i === 0 && remove(item);
-      },
+      i => ([remove][i])(item),
     );
   };
 
-  const resolveBillDiscountId = fn => billDiscountId => {
+  const resolveBillDiscount = fn => billDiscountId => {
     const billDiscount = billDiscounts.find(({ id }) => id === billDiscountId);
     billDiscount && fn(billDiscount);
-  };
-
-  const common = {
-    readonly: readonly,
-    onSelect: onRemove,
   };
 
   return (
     <Content ref={refContentList}>
       <List style={{ paddingBottom: 60 }}>
-        <ItemsBreakdown key="items_breakdown" {...common} items={billItems} />
+        <ItemsBreakdown key="items_breakdown" readonly={readonly} onSelect={onRemoveBillItem} items={billItems} />
         <DiscountsBreakdown
-          {...common}
-          onSelect={resolveBillDiscountId(onRemove)}
+readonly={readonly}
+          onSelect={resolveBillDiscount(onRemove)}
           discountBreakdown={discountBreakdown}
         />
-        <PaymentsBreakdown {...common} payments={billPayments} paymentTypes={paymentTypes} />
+        <PaymentsBreakdown readonly={readonly} onSelect={onRemove} payments={billPayments} paymentTypes={paymentTypes} />
       </List>
     </Content>
   );

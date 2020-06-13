@@ -1,4 +1,4 @@
-import { formatNumber, billSummary, BillSummary } from '../../utils';
+import { formatNumber, billSummary, BillSummary, getItemPrice, getModifierItemPrice } from '../../utils';
 import { alignCenter, alignLeftRight, addHeader, divider, alignRight } from './helpers';
 import { receiptTempate } from './template';
 import { capitalize, groupBy } from 'lodash';
@@ -26,6 +26,27 @@ export const receiptBill = async (
   paymentTypes: PaymentType[],
   printer: Printer,
 ) => {
+  const printItemsGroup = (group: BillSummary['itemsBreakdown']) => {
+    group.map(({ item, mods, total }) => {
+      c.push({
+        appendBitmapText: alignLeftRight(
+          capitalize(item.itemName),
+          formatNumber(getItemPrice(item), symbol),
+          printer.printWidth,
+        ),
+      });
+      mods.map(mod => {
+        c.push({
+          appendBitmapText: alignLeftRight(
+            `${modPrefix} ${capitalize(mod.modifierItemName)}`,
+            formatNumber(getModifierItemPrice(mod), symbol),
+            printer.printWidth,
+          ),
+        });
+      });
+    });
+  };
+
   const summary = await billSummary(billItems, billDiscounts, billPayments, discounts);
 
   console.log('billItems', billItems);
@@ -48,27 +69,17 @@ export const receiptBill = async (
   Object.values(itemGroups).map((group, i) => {
     const pG = lookupPriceGroup(Object.keys(itemGroups)[i]);
     c.push({ appendBitmapText: alignCenter(pG.name, printer.printWidth) });
-    group.map(({ item, mods, total }) => {
-      c.push({
-        appendBitmapText: alignLeftRight(
-          capitalize(item.itemName),
-          formatNumber(item.itemPrice, symbol),
-          printer.printWidth,
-        ),
-      });
-      mods.map(mod => {
-        c.push({
-          appendBitmapText: alignLeftRight(
-            `${modPrefix} ${capitalize(mod.modifierItemName)}`,
-            formatNumber(mod.modifierItemPrice, symbol),
-            printer.printWidth,
-          ),
-        });
-      });
-    });
+
+    const stdGroup = group.filter(({ item }) => !item.isComp);
+
+    printItemsGroup(stdGroup);
   });
 
   c.push({ appendBitmapText: alignRight(`Total: ${formatNumber(summary.total, symbol)}`, printer.printWidth) });
+
+  const compItems = summary.itemsBreakdown.filter(({ item }) => item.isComp)
+  compItems.length && addHeader(c, 'Complimentary Items', printer.printWidth);
+  printItemsGroup(compItems);
 
   billDiscounts.length > 0 && addHeader(c, 'Discounts', printer.printWidth);
 
