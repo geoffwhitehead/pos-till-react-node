@@ -14,6 +14,7 @@ export default (app: Router) => {
         const organizationService = Container.get('organizationService') as OrganizationService;
         try {
             const organization = await organizationService.findByIdAndUpdate(objectId(req.organizationId), req.body);
+            console.log('organization', organization)
             res.status(200).json({ success: true, data: organization })
 
         } catch (err) {

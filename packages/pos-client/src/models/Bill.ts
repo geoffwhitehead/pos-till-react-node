@@ -102,7 +102,7 @@ export class Bill extends Model {
     ]);
 
     console.log('printers', printers);
-    const newItem = await this.database.action(() =>
+    const newItem = await this.database.action<BillItem>(() =>
       this.collections.get<BillItem>('bill_items').create(billItem => {
         billItem.bill.set(this);
         billItem.priceGroup.set(priceGroup);
@@ -119,7 +119,7 @@ export class Bill extends Model {
       }),
     );
 
-    return newItem as BillItem; // TODO: dont cast
+    return newItem
   };
 
   @action close = async () =>

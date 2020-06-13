@@ -21,7 +21,7 @@ export class BillPayment extends Model {
 
   @nochange @field('payment_type_id') paymentTypeId: string;
   @nochange @field('amount') amount: number;
-  @nochange @field('is_change') isChange: boolean; // TODO: update to credit / debit
+  @nochange @field('is_change') isChange: boolean; // TODO: rethink this - update to credit / debit? 
   @readonly @date('created_at') createdAt: Date;
   @readonly @date('updated_at') updatedAt: Date;
 

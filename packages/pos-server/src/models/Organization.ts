@@ -62,10 +62,13 @@ const OrganizationSchema: Schema<OrganizationProps> = new Schema(
             type: String,
         },
         settings: {
-            defaultPriceGroup: { type: Schema.Types.ObjectId, ref: 'PriceGroup' },
-            receiptPrinter: { type: Schema.Types.ObjectId, ref: 'Printer' },
-            currency: String,
-            maxBills: Number
+            type: {
+                defaultPriceGroup: { type: Schema.Types.ObjectId, ref: 'PriceGroup' },
+                receiptPrinter: { type: Schema.Types.ObjectId, ref: 'Printer' },
+                currency: String,
+                maxBills: Number
+            },
+            default: {}
         },
         address: {
             type: {

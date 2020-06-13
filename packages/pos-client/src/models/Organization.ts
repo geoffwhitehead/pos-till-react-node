@@ -1,5 +1,5 @@
 import { Model, tableSchema } from '@nozbe/watermelondb';
-import { field } from '@nozbe/watermelondb/decorators';
+import { field, relation } from '@nozbe/watermelondb/decorators';
 
 export class Organization extends Model {
   static table = 'organizations';
@@ -12,11 +12,14 @@ export class Organization extends Model {
   @field('address_city') addressCity: string;
   @field('address_county') addressCounty: string;
   @field('address_postcode') addressPostcode: string;
-  @field('default_price_group') defaultPriceGroup: string;
-  @field('receipt_printer') receiptPrinter: string;
+  @field('default_price_group_id') defaultPriceGroupId: string;
+  @field('receipt_printer_id') receiptPrinterId: string;
   @field('currency') currency: string;
   @field('max_bills') maxBills: number;
 
+
+  @relation('price_groups', "default_price_group_id") defaultPriceGroup
+  @relation('printers', "receipt_printer_id") receiptPrinter
 }
 
 export const organizationSchema = tableSchema({
@@ -30,5 +33,9 @@ export const organizationSchema = tableSchema({
     { name: 'address_city', type: 'string' },
     { name: 'address_county', type: 'string' },
     { name: 'address_postcode', type: 'string' },
+    { name: 'default_price_group_id', type: 'string' },
+    { name: 'receipt_printer_id', type: 'string' },
+    { name: 'currency', type: 'string' },
+    { name: 'max_bills', type: 'number' },
   ],
 });

@@ -1,4 +1,4 @@
-import { tableNames, PaymentType, Category, PriceGroup, Printer } from '../../models';
+import { tableNames, PaymentType, Category, PriceGroup, Printer, Organization } from '../../models';
 import { Model, Database } from '@nozbe/watermelondb';
 import { getItems } from '../../api/item';
 import { getCategories } from '../../api/category';
@@ -9,10 +9,11 @@ import { getPrinters } from '../../api/printer';
 import { getPaymentTypes } from '../../api/paymentType';
 import { sanitizedRaw } from '@nozbe/watermelondb/RawRecord';
 import catchFn from './catchFn';
+import { getOrganization, OrganizationServerProps } from '../../api/organization';
 // import { getOrganization } from '../../api/organization';
 
 export const populate = async (database: Database) => {
-  return;
+  // return;
   try {
     await database.action(async () => {
       await database.unsafeResetDatabase();
@@ -22,13 +23,14 @@ export const populate = async (database: Database) => {
   }
 
   const responses = await Promise.all([
-    getItems(),
+    getItems(), //0
     getCategories(),
-    getModifiers(),
+    getModifiers(), //2
     getDiscounts(),
-    getPriceGroups(),
+    getPriceGroups(), //4
     getPrinters(),
-    getPaymentTypes(),
+    getPaymentTypes(), //6
+    getOrganization(),
   ]);
 
   let toCreate = [];
@@ -45,8 +47,11 @@ export const populate = async (database: Database) => {
   const priceGroupsCollection = database.collections.get<PriceGroup>(tableNames.priceGroups);
   const printersCollection = database.collections.get<Printer>(tableNames.printers);
   const paymentTypesCollection = database.collections.get<PaymentType>(tableNames.paymentTypes);
+  const organizationCollection = database.collections.get<Organization>(tableNames.organizations);
 
   console.log('--------------- START');
+
+  console.log('responses[7]', responses[7]);
 
   const paymentTypesToCreate = okResponse(responses[6]).map(({ _id, name }) =>
     paymentTypesCollection.prepareCreate(
@@ -92,6 +97,26 @@ export const populate = async (database: Database) => {
   );
 
   toCreate.push(...printersToCreate);
+
+  const organizationToCreate = organizationCollection.prepareCreate(organization => {
+    const { _id, name, email, phone, vat, address: a, settings: s }: OrganizationServerProps = okResponse(responses[7]);
+
+    organization._raw = sanitizedRaw({ id: _id }, organizationCollection.schema);
+
+    Object.assign(organization, {
+      name,
+      email,
+      phone,
+      vat,
+      addressLine1: a.line1,
+      addressLine2: a.line2,
+      addressCity: a.city,
+      addressCounty: a.county,
+      addressPostcode: a.postcode,
+      ...s
+    });
+  });
+  toCreate.push(organizationToCreate);
 
   const discountsToCreate = okResponse(responses[3]).map(({ _id, name, amount, isPercent }) => {
     const discountsCollection = database.collections.get<any & Model>(tableNames.discounts);

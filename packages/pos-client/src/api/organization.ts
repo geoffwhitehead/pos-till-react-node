@@ -1,7 +1,7 @@
 import { api } from './index';
 
-export const getOrganization = (organizationId: string) =>
-  api.get<OrganizationServerProps>(`/organization/${organizationId}`);
+export const getOrganization = () =>
+  api.get<OrganizationServerProps>(`/organization`);
 export interface OrganizationServerProps {
   _id?: string;
   name: string;
@@ -16,9 +16,9 @@ export interface OrganizationServerProps {
     postcode: string;
   };
   settings?: {
-    defaultPriceGroup?: string;
-    receiptPrinter?: string;
-    currency: string;
-    maxBills: number;
+    defaultPriceGroupId?: string;
+    receiptPrinterId?: string;
+    currency?: string;
+    maxBills?: number;
   };
 }
