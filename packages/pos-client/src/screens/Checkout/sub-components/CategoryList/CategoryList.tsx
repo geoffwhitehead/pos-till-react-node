@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Text, Content, List, ListItem, Left, Icon, Body, Right } from '../../../../core';
 import { SearchHeader } from '../../../../components/SearchHeader/SearchHeader';
-import { routes, CheckoutItemStackParamList } from '../../../../navigators/CheckoutItemNavigator';
+import { CheckoutItemStackParamList } from '../../../../navigators/CheckoutItemNavigator';
 import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import withObservables from '@nozbe/with-observables';
 import { Database } from '@nozbe/watermelondb';
@@ -73,12 +73,10 @@ export const CategoriesInner: React.FC<CategoriesOuterProps & CategoriesInnerPro
   );
 };
 
-// TODO: type
 export const Categories = withDatabase<any>(
   withObservables<CategoriesOuterProps, CategoriesInnerProps>([], ({ database }) => ({
     categories: database.collections
       .get('categories')
       .query()
-      .observe(),
   }))(CategoriesInner),
 );

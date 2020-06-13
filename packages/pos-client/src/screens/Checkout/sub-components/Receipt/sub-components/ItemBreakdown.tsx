@@ -39,7 +39,7 @@ const ItemBreakdownInner: React.FC<ItemBreakdownOuterProps & ItemBreakdownInnerP
             <Text>{`${capitalize(item.itemName)}`}</Text>
           )}
           {modifierItems.map(m => (
-            <Text style={styles.void} key={`${m.id}-name`}>{`- ${m.modifierItemName}`}</Text>
+            <Text style={item.isVoided ? styles.void : {}} key={`${m.id}-name`}>{`- ${m.modifierItemName}`}</Text>
           ))}
         </Content>
       </Left>

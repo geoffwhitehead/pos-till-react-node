@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { Text, Content, List, ListItem, Left, Icon, Body, Right } from '../../../../core';
 import { SearchHeader } from '../../../../components/SearchHeader/SearchHeader';
 import Modal from 'react-native-modal';
@@ -8,11 +8,15 @@ import withObservables from '@nozbe/with-observables';
 import { PriceGroupContext } from '../../../../contexts/PriceGroupContext';
 import { CurrentBillContext } from '../../../../contexts/CurrentBillContext';
 import { CategoryItemRow } from './sub-components/CategoryItemRow';
-import { Category, Item, Modifier } from '../../../../models';
+import { Category, Item, Modifier, ItemPrice, tableNames, PriceGroup } from '../../../../models';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { CheckoutItemStackParamList } from '../../../../navigators/CheckoutItemNavigator';
 import { RouteProp } from '@react-navigation/native';
 import { Database } from '@nozbe/watermelondb';
+import { Loading } from '../../../../components/Loading/Loading';
+import { groupBy } from 'lodash';
+import { resolvePrice } from '../../../../helpers';
+import { OrganizationContext } from '../../../../contexts/OrganizationContext';
 
 interface CategoryItemsListOuterProps {
   database?: Database;
@@ -24,19 +28,24 @@ interface CategoryItemsListOuterProps {
 
 interface CategoryItemsListInnerProps {
   items: any; // TODO: type
+  prices: any;
 }
 
 const CategoryItemsInner: React.FC<CategoryItemsListOuterProps & CategoryItemsListInnerProps> = ({
   category,
   items,
   navigation,
+  prices,
 }) => {
   const [searchValue, setSearchValue] = useState<string>('');
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [selectedItem, setSelectedItem] = useState<Item>();
+  const [groupedPrices, setGroupedPrices] = useState<Record<string, PriceGroup[]>>();
+
+  const { organization} = useContext(OrganizationContext)
   const { priceGroup } = useContext(PriceGroupContext);
   const { currentBill } = useContext(CurrentBillContext);
-
+  
   const goBack = () => navigation.goBack();
 
   const searchFilter = (item: Item, searchValue: string) => item.name.toLowerCase().includes(searchValue.toLowerCase());
@@ -47,6 +56,10 @@ const CategoryItemsInner: React.FC<CategoryItemsListOuterProps & CategoryItemsLi
     setSelectedItem(null);
   };
 
+  useEffect(() => {
+    setGroupedPrices(groupBy(prices, 'itemId'));
+  }, [prices, items]);
+
   const onSelectItem = async (item: Item, modifierCount: number) => {
     if (modifierCount > 0) {
       setSelectedItem(item);
@@ -55,6 +68,11 @@ const CategoryItemsInner: React.FC<CategoryItemsListOuterProps & CategoryItemsLi
       await currentBill.addItem({ item, priceGroup });
     }
   };
+
+  if (!groupedPrices) {
+    return <Loading />;
+  }
+
   return (
     <Content>
       <SearchHeader onChangeText={onSearchHandler} value={searchValue} />
@@ -95,9 +113,10 @@ const CategoryItemsInner: React.FC<CategoryItemsListOuterProps & CategoryItemsLi
               <CategoryItemRow
                 key={item.id}
                 item={item}
-                priceGroup={priceGroup}
+                price={resolvePrice(priceGroup, groupedPrices[item.id])}
                 isActive={selectedItem === item}
                 onPressItem={onSelectItem}
+                currency={organization.currency}
               />
             );
           })}
@@ -106,19 +125,20 @@ const CategoryItemsInner: React.FC<CategoryItemsListOuterProps & CategoryItemsLi
   );
 };
 
-export const CategoryItems = withObservables<CategoryItemsListOuterProps, CategoryItemsListInnerProps>(
-  ['route'],
-  ({ route }) => {
+export const CategoryItems = withDatabase<any>(
+  withObservables<CategoryItemsListOuterProps, CategoryItemsListInnerProps>(['route'], ({ route, database }) => {
     const { category } = route.params;
     return {
       category,
       items: category.items,
+      prices: database.collections.get<ItemPrice>(tableNames.itemPrices).query(),
     };
-  },
-)(CategoryItemsInner);
+  })(CategoryItemsInner),
+);
 
 export const AllItems = withDatabase<any>( // TODO: type
   withObservables<CategoryItemsListOuterProps, CategoryItemsListInnerProps>([], ({ database }) => ({
     items: database.collections.get<Item>('items').query(),
+    prices: database.collections.get<ItemPrice>(tableNames.itemPrices).query(),
   }))(CategoryItemsInner),
 );
