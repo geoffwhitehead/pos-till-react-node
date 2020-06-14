@@ -10,7 +10,7 @@ export interface ItemProps {
     price: ItemPriceProps[];
     stock?: number;
     modifiers?: mongoose.Types.ObjectId[];
-    linkedPrinters: mongoose.Types.ObjectId[];
+    printerGroups: mongoose.Types.ObjectId[];
 }
 
 const ItemSchema: Schema<ItemProps> = new Schema(
@@ -23,7 +23,7 @@ const ItemSchema: Schema<ItemProps> = new Schema(
             type: String,
             maxlength: 10,
         },
-        linkedPrinters: [{ type: Schema.Types.ObjectId, ref: 'Printer' }],
+        printerGroups: [{ type: Schema.Types.ObjectId, ref: 'PrinterGroup' }],
         categoryId: { type: Schema.Types.ObjectId, ref: 'Category' },
         price: [ItemPriceSubSchema],
         modifiers: [

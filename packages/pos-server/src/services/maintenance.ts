@@ -3,7 +3,6 @@ import { random } from 'lodash';
 import { PriceGroupProps } from '../models/PriceGroup';
 import { InjectedDependencies } from '.';
 import { PrinterProps } from '../models/Printer';
-import { objectId } from '../utils/objectId';
 import { ItemPriceProps } from '../models/ItemPrice';
 
 export interface MaintenanceService {
@@ -35,6 +34,7 @@ export const maintenanceService = ({
         modifierRepository,
         itemRepository,
         printerRepository,
+        printerGroupRepository
     },
     logger,
 }: InjectedDependencies): MaintenanceService => {
@@ -56,33 +56,42 @@ export const maintenanceService = ({
             },
         ]);
 
-        const printer: PrinterProps = results.find(r => r.name === 'Star SP700');
+        const thermalPrinter: PrinterProps = results.find(r => r.name === 'Star TSP100');
+        const kitchenPrinter: PrinterProps = results.find(r => r.name === 'Star SP700');
+
+        const printerGroupResults = await printerGroupRepository.insert([
+            {
+                name: 'Starter',
+                printers: [kitchenPrinter._id]
+            },
+            {
+                name: 'Kitchen',
+                printers: [kitchenPrinter._id]
+            }
+        ]);
+
+        console.log('printerGroupResults', printerGroupResults)
 
         const categories = [
             {
                 name: 'Starters',
                 shortName: 'Starters',
-                linkedPrinters: [],
             },
             {
                 name: 'Mains',
                 shortName: 'Mains',
-                linkedPrinters: [],
             },
             {
                 name: 'Desserts',
                 shortName: 'Desserts',
-                linkedPrinters: [],
             },
             {
                 name: 'Wine',
                 shortName: 'Wine',
-                linkedPrinters: [],
             },
             {
                 name: 'Beer',
                 shortName: 'Beer',
-                linkedPrinters: [],
             },
         ];
 
@@ -133,7 +142,7 @@ export const maintenanceService = ({
                 price: generatePriceGroups(priceGroups),
                 stock: 10,
                 modifiers: faker.random.boolean() ? [newModifier._id] : [],
-                linkedPrinters: [printer._id],
+                printerGroups: [printerGroupResults[0]._id, printerGroupResults[1]._id],
             };
         });
 

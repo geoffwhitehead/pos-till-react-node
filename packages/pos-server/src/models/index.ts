@@ -6,6 +6,7 @@ import { Modifier } from './Modifier';
 import { PriceGroup } from './PriceGroup';
 import { Organization } from './Organization';
 import { Printer } from './Printer';
+import { PrinterGroup } from "./PrinterGroup"
 
 export default {
     User,
@@ -16,4 +17,5 @@ export default {
     Modifier,
     PriceGroup,
     Printer,
+    PrinterGroup
 };

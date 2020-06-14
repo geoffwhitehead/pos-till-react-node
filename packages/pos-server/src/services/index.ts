@@ -8,6 +8,7 @@ import { maintenanceService } from './maintenance';
 import { printerService } from './printer';
 import { organizationService } from './organization';
 import { EnvConfig } from '../config';
+import { printerGroupService } from './printerGroup';
 
 export interface InjectedDependencies {
     mailer: MailerService;
@@ -46,6 +47,10 @@ const services = [
     {
         name: 'printerService',
         service: printerService,
+    },
+    {
+        name: 'printerGroupService',
+        service: printerGroupService
     },
     {
         name: 'organizationService',
