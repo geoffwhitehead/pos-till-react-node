@@ -8,7 +8,7 @@ import { styles } from './styles';
 
 interface OrganizationTabProps {}
 
-const OrganizationTabSchema = Yup.object().shape({
+const organizationTabSchema = Yup.object().shape({
   name: Yup.string()
     .min(2, 'Too Short')
     .max(50, 'Too Long')
@@ -79,7 +79,7 @@ export const OrganizationTab: React.FC<OrganizationTabProps> = () => {
     <Container>
       <Formik
         initialValues={initialValues}
-        validationSchema={OrganizationTabSchema}
+        validationSchema={organizationTabSchema}
         onSubmit={values => updateOrganization(values)}
       >
         {({ handleChange, handleBlur, handleSubmit, errors, touched, values }) => {
@@ -112,7 +112,6 @@ export const OrganizationTab: React.FC<OrganizationTabProps> = () => {
                 <Row>
                   <Col>
                     <Form style={styles.form}>
-                      {/* <H2 style={styles.heading}>Organization</H2> */}
                       <Text style={styles.text} note>
                         General company details. This information will also be printed on receipt and report headers
                       </Text>
@@ -185,15 +184,6 @@ export const OrganizationTab: React.FC<OrganizationTabProps> = () => {
                   </Col>
                 </Row>
               </Grid>
-
-              {/* <Item stackedLabel error={err.name}>
-                        <Label>Name</Label>
-                        <Input
-                          onChangeText={handleChange('firstName')}
-                          onBlur={handleBlur('firstName')}
-                          value={firstName}
-                        />
-                      </Item> */}
             </Content>
           );
         }}

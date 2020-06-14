@@ -7,9 +7,7 @@ import {
   Grid,
   Col,
   Row,
-  Icon,
   Button,
-  H2,
   List,
   ListItem,
   Left,
@@ -20,7 +18,6 @@ import withObservables from '@nozbe/with-observables';
 import { tableNames, Printer } from '../../../models';
 import { Database } from '@nozbe/watermelondb';
 import { Loading } from '../../../components/Loading/Loading';
-import { styles } from './styles';
 import { capitalize } from 'lodash';
 import { PrinterDetails } from './PrinterDetails';
 import { portDiscovery } from '../../../services/printer/printer';

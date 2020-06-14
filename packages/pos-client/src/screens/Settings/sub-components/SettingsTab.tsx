@@ -30,7 +30,7 @@ interface SettingsTabOuterProps {
   database: Database;
 }
 
-const SettingsSchema = Yup.object().shape({
+const settingsSchema = Yup.object().shape({
   defaultPriceGroupId: Yup.string()
     .min(1, 'Too Short')
     .max(40, 'Too Long')
@@ -91,7 +91,7 @@ const SettingsTabInner: React.FC<SettingsTabOuterProps & SettingsTabInnerProps> 
     <Container>
       <Formik
         initialValues={initialValues}
-        validationSchema={SettingsSchema}
+        validationSchema={settingsSchema}
         onSubmit={values => updateOrganization(values)}
       >
         {({ handleChange, handleBlur, handleSubmit, errors, touched, values }) => {
