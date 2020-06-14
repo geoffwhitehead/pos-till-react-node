@@ -13,7 +13,7 @@ import { getOrganization, OrganizationServerProps } from '../../api/organization
 // import { getOrganization } from '../../api/organization';
 
 export const populate = async (database: Database) => {
-  return
+  return;
   try {
     await database.action(async () => {
       await database.unsafeResetDatabase();
@@ -87,13 +87,14 @@ export const populate = async (database: Database) => {
   );
   toCreate.push(...priceGroupsToCreate);
 
-  const printersToCreate = okResponse(responses[5]).map(({ _id, name, type, address, printWidth, emulation, macAddress }) =>
-    printersCollection.prepareCreate(
-      catchFn(printer => {
-        printer._raw = sanitizedRaw({ id: _id }, printersCollection.schema);
-        Object.assign(printer, { name, type, address, printWidth: parseInt(printWidth), emulation, macAddress });
-      }),
-    ),
+  const printersToCreate = okResponse(responses[5]).map(
+    ({ _id, name, type, address, printWidth, emulation, macAddress }) =>
+      printersCollection.prepareCreate(
+        catchFn(printer => {
+          printer._raw = sanitizedRaw({ id: _id }, printersCollection.schema);
+          Object.assign(printer, { name, type, address, printWidth: parseInt(printWidth), emulation, macAddress });
+        }),
+      ),
   );
 
   toCreate.push(...printersToCreate);

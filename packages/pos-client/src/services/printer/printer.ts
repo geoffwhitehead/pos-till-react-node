@@ -1,11 +1,11 @@
-import { StarPRNT } from 'react-native-star-prnt';
+import { StarPRNT, Printers } from 'react-native-star-prnt';
 import { Toast } from '../../core';
 import { Printer } from '../../models';
 
-export async function portDiscovery() {
+export async function portDiscovery(): Promise<Printers> {
   try {
     let printers = await StarPRNT.portDiscovery('All');
-    console.log(printers);
+    return printers;
   } catch (e) {
     console.error(e);
   }
@@ -14,7 +14,7 @@ export async function portDiscovery() {
 export async function print(commands: any[], printer: Printer, openDrawer: boolean = false) {
   // await portDiscovery();
 
-  console.log('printer', printer)
+  console.log('printer', printer);
   commands.push({ appendCutPaper: StarPRNT.CutPaperAction.PartialCutWithFeed });
   openDrawer && commands.push({ openCashDrawer: 1 });
   try {

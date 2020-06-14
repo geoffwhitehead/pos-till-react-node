@@ -6,4 +6,7 @@ export interface PrinterServerProps {
   name: string;
   type?: string;
   address?: string;
+  macAddress?: string;
+  printWidth: string;
+  emulation: string
 }

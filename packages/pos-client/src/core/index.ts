@@ -27,5 +27,10 @@ export {
   Segment,
   Card,
   CardItem,
-  Picker
+  Picker,
+  Tab,
+  Tabs,
+  H1,
+  H2,
+  H3
 } from 'native-base';

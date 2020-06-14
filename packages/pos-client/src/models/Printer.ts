@@ -1,6 +1,15 @@
 import { Model, tableSchema, Query, Q } from '@nozbe/watermelondb';
 import { field } from '@nozbe/watermelondb/decorators';
 
+export enum Emulations {
+  'StarPRNT' = 'StarPRNT',
+  'StarLine' = 'StarLine',
+  'StarGraphic' = 'StarGraphic',
+  'StarDotImpact' = 'StarDotImpact',
+  'EscPosMobile' = 'EscPosMobile',
+  'EscPos' = 'EscPos'
+}
+
 export class Printer extends Model {
   static table = 'printers';
 
@@ -9,7 +18,7 @@ export class Printer extends Model {
   @field('address') address: string;
   @field('macAddress') macAddress: string;
   @field('print_width') printWidth: number;
-  @field('emulation') emulation: 'StarPRNT' | 'StarLine' | 'StarGraphic' | 'StarDotImpact' | 'EscPosMobile' | 'EscPos';
+  @field('emulation') emulation: Emulations;
 
   static associations = {
     item_printers: { type: 'has_many', foreignKey: 'printer_id' },

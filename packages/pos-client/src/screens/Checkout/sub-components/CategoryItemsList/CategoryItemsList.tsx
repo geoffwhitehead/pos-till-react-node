@@ -38,7 +38,6 @@ const CategoryItemsInner: React.FC<CategoryItemsListOuterProps & CategoryItemsLi
   prices,
 }) => {
   const [searchValue, setSearchValue] = useState<string>('');
-  const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [selectedItem, setSelectedItem] = useState<Item>();
   const [groupedPrices, setGroupedPrices] = useState<Record<string, PriceGroup[]>>();
 
