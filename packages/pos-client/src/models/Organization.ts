@@ -8,6 +8,7 @@ export class Organization extends Model {
   @field('name') name: string;
   @field('email') email: string;
   @field('phone') phone: string;
+  @field('vat') vat: string;
   @field('address_line1') addressLine1: string;
   @field('address_line2') addressLine2: string;
   @field('address_city') addressCity: string;
@@ -29,6 +30,7 @@ export const organizationSchema = tableSchema({
     { name: 'name', type: 'string' },
     { name: 'email', type: 'string' },
     { name: 'phone', type: 'string' },
+    { name: 'vat', type: 'string' },
     { name: 'address_line1', type: 'string' },
     { name: 'address_line2', type: 'string' },
     { name: 'address_city', type: 'string' },

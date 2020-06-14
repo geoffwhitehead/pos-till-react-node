@@ -24,5 +24,8 @@ export {
   Row,
   Toast,
   ActionSheet,
-  Segment
+  Segment,
+  Card,
+  CardItem,
+  Picker
 } from 'native-base';

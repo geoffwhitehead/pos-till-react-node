@@ -1,4 +1,4 @@
-import React, { Component, ReactElement } from 'react';
+import React from 'react';
 import { Text, Content, List, Separator, ListItem, Container } from '../../core';
 import { SidebarHeader } from '../../components/SidebarHeader/SidebarHeader';
 import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
@@ -32,12 +32,12 @@ export const ItemsInner: React.FC<ItemsOuterProps & ItemsInnerProps> = ({ naviga
             const currentRecordIsNewCategory =
               !firstRecord && items[index - 1].categoryId.name !== item.categoryId.name;
             const Item = (
-              <ListItem key={`${item._id}-li`}>
+              <ListItem key={`${item.id}-li`}>
                 <Text>{item.name}</Text>
               </ListItem>
             );
             const Seperator = (
-              <Separator bordered key={`${item._id}-s`}>
+              <Separator bordered key={`${item.id}-s`}>
                 <Text>{item.categoryId.name}</Text>
               </Separator>
             );

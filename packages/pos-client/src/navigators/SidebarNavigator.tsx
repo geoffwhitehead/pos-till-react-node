@@ -6,6 +6,7 @@ import { Bills } from '../screens/Bills/Bills';
 import { Transactions } from '../screens/Transactions/Transactions';
 
 import React from 'react';
+import { Settings } from '../screens/Settings/Settings';
 
 export const sidebarRoutes: Record<string, string> = {
   checkout: 'Checkout',
@@ -13,6 +14,7 @@ export const sidebarRoutes: Record<string, string> = {
   reports: 'Reports',
   bills: 'Bills',
   transactions: 'Transactions',
+  settings: 'Settings'
 };
 
 export type SidebarDrawerStackParamList = {
@@ -21,18 +23,20 @@ export type SidebarDrawerStackParamList = {
   Reports: undefined;
   Bills: undefined;
   Transactions: undefined;
+  Settings: undefined
 };
 
 export const SidebarNavigator: React.FC<{}> = () => {
   const Drawer = createDrawerNavigator<SidebarDrawerStackParamList>();
 
   return (
-    <Drawer.Navigator initialRouteName="Checkout">
+    <Drawer.Navigator initialRouteName="Settings">
       <Drawer.Screen name="Checkout" component={Checkout} />
       <Drawer.Screen name="Items" component={Items} />
       <Drawer.Screen name="Reports" component={Reports} />
       <Drawer.Screen name="Bills" component={Bills} />
       <Drawer.Screen name="Transactions" component={Transactions} />
+      <Drawer.Screen name="Settings" component={Settings} />
     </Drawer.Navigator>
   );
 };

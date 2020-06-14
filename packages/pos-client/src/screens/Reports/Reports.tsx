@@ -21,7 +21,7 @@ import { periodReport } from '../../services/printer/periodReport';
 import { print } from '../../services/printer/printer';
 import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import withObservables from '@nozbe/with-observables';
-import { tableNames, BillPeriod } from '../../models';
+import { tableNames, BillPeriod, PaymentType, Printer } from '../../models';
 import dayjs from 'dayjs';
 import { View } from 'react-native';
 import { Database } from '@nozbe/watermelondb';
@@ -36,8 +36,8 @@ interface ReportsInnerProps {
 }
 
 interface ReportsOuterProps {
-  database: Database;
   navigation: DrawerNavigationProp<SidebarDrawerStackParamList, 'Reports'>;
+  database: Database;
 }
 
 export const ReportsInner: React.FC<ReportsOuterProps & ReportsInnerProps> = ({
@@ -52,7 +52,7 @@ export const ReportsInner: React.FC<ReportsOuterProps & ReportsInnerProps> = ({
   const onPrint = async (billPeriod: BillPeriod) => {
     const receiptPrinter = await organization.receiptPrinter.fetch();
     const commands = await periodReport(billPeriod, database, receiptPrinter, organization.currency);
-    console.log('commands', commands)
+    console.log('commands', commands);
     print(commands, receiptPrinter);
   };
 
@@ -157,8 +157,8 @@ export const ReportsInner: React.FC<ReportsOuterProps & ReportsInnerProps> = ({
 const enhance = c =>
   withDatabase<any>(
     withObservables<ReportsOuterProps, ReportsInnerProps>([], ({ database }) => ({
-      paymentTypes: database.collections.get(tableNames.paymentTypes).query(),
-      billPeriods: database.collections.get(tableNames.billPeriods).query(),
+      paymentTypes: database.collections.get<PaymentType>(tableNames.paymentTypes).query(),
+      billPeriods: database.collections.get<Printer>(tableNames.billPeriods).query(),
     }))(c),
   );
 
