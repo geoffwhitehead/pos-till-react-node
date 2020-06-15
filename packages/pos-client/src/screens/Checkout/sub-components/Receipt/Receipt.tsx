@@ -67,7 +67,8 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
     organization && printers ? printers.find(p => p.id === organization.receiptPrinterId) : undefined;
 
   const _onStore = async () => {
-    setIsStoreDisabled(true);
+    // setIsStoreDisabled(true);
+    onStore()
     const billItemsToPrint = billItemsIncPendingVoids.filter(
       ({ printStatus }) => !(printStatus === 'success' || printStatus === 'pending' || printStatus === 'void_pending'),
     ) as BillItem[];
@@ -94,7 +95,6 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
 
       const printStatuses = await Promise.all(
         toPrint.map(async ({ billItems, printer, commands }) => {
-          // let status: PrintStatus;
           const res = await print(commands, printer, false);
           return billItems.map(billItem => {
             return {
@@ -138,7 +138,7 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
         await database.batch(...flatten(updates));
       });
     }
-    setIsStoreDisabled(false);
+    // setIsStoreDisabled(false);
   };
 
   useEffect(() => {

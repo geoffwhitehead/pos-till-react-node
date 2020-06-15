@@ -1,11 +1,9 @@
 import React, { useState, useContext } from 'react';
-import { Container, Input, Button, H2, Header, Content, Item, Text, Label, Form } from '../../../core';
+import { Container, Input, Button, Content, Item, Text, Label, Form } from '../../../core';
 import { AuthContext } from '../../../contexts/AuthContext';
 import { AuthStackParamList } from '../../../navigators/AuthNavigator';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { Organization } from '../../../models';
 import { RouteProp } from '@react-navigation/native';
-import { alignCenter } from '../../../services/printer/helpers';
 import { View } from 'react-native';
 
 interface SignInProps {
@@ -20,8 +18,6 @@ export const SignIn: React.FC<SignInProps> = ({ navigation, route }) => {
 
   const { signIn } = useContext(AuthContext);
 
-  console.log('email', email);
-  console.log('organization', organization);
   return (
     <Container>
       <Content>

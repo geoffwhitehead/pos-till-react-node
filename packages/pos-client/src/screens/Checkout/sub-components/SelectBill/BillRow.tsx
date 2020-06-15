@@ -42,6 +42,7 @@ export const WrappedBillRow: React.FC<BillRowInnerProps & BillRowOuterProps> = (
   }, [billItems]);
 
   const renderPrintErrors = () => {
+    // TODO: these need to be observable queries so they will update as things error etc.
     const hasUnstoredItems = billItemsIncPendingVoids.some(bI => ['', 'void'].includes(bI.printStatus));
     const hasPrintErrors = billItemsIncPendingVoids.some(bI => ['error', 'void_error'].includes(bI.printStatus));
     const hasPendingPrints = billItemsIncPendingVoids.some(bI => ['pending', 'void_pending'].includes(bI.printStatus));

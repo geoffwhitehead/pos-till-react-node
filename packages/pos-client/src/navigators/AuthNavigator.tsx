@@ -22,28 +22,11 @@ export type AuthStackParamList = {
 };
 
 export const AuthNavigatorInner: React.FC<AuthNavigatorInnerProps> = ({ database, organizations }) => {
-  // if (!organization) {
-  //   return <Loading />;
-  // }
 
   if(!organizations) {
     return <Loading/>
   }
 
-  // console.log('organizations', organizations);
-  // const [organization, so] = useState();
-
-  // const x = async () => {
-  //   const o = await database.collections
-  //     .get<Organization>(tableNames.organizations)
-  //     .query()
-  //     .fetch();
-  //   console.log('o', o);
-  //   so(o);
-  // };
-  // x();
-
-  console.log('organizations', organizations);
   const Stack = createStackNavigator();
 
   return (

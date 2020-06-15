@@ -14,21 +14,17 @@ import { getOrganization } from '../../api/organization';
 import { okResponse } from '../../api';
 
 interface MainInnerProps {
-  priceGroups: any; // TODO: fix type
-  openPeriods: any;
-  organizations: any;
+  priceGroups: PriceGroup[]; // TODO: fix type
+  openPeriods: BillPeriod[];
+  organizations: Organization[];
 }
 
 interface MainOuterProps {
-  // organizationId: string;
-  // userId: string;
   currentBillPeriod: BillPeriod;
   database: Database;
 }
 
 export const MainWrapped: React.FC<MainOuterProps & MainInnerProps> = ({
-  // organizationId,
-  // userId,
   priceGroups,
   openPeriods,
   database,
@@ -40,15 +36,8 @@ export const MainWrapped: React.FC<MainOuterProps & MainInnerProps> = ({
   const [currentBill, setCurrentBill] = useState<Bill>();
   const [organization, setOrganization] = useState<Organization>();
 
-  console.log('syncDone', syncDone);
-  // console.log('billPeriod', billPeriod);
-  // console.log('priceGroup', priceGroup);
-  // console.log('organization', organization);
-  // console.log('priceGroups', priceGroups);
-
   useEffect(() => {
     const checkSync = async () => {
-      console.log('checking sync');
       try {
         const organizations = await database.collections
           .get<Organization>(tableNames.organizations)
@@ -60,8 +49,6 @@ export const MainWrapped: React.FC<MainOuterProps & MainInnerProps> = ({
         } else {
           const dbOrg = organizations[0];
           const serverOrg = okResponse(await getOrganization());
-          console.log('dbOrg', dbOrg);
-          console.log('serverOrg', serverOrg);
           if (serverOrg && serverOrg.syncId !== dbOrg.syncId) {
             await populate(database);
           } else {
