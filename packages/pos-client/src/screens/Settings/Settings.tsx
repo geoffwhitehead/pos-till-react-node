@@ -33,6 +33,7 @@ import { H1, Tabs, Tab } from 'native-base';
 import { OrganizationTab } from './sub-components/OrganizationTab';
 import { SettingsTab } from './sub-components/SettingsTab';
 import { PrintersTab } from './sub-components/PrintersTab';
+import { PrinterGroupsTab } from './sub-components/PrinterGroupsTab';
 
 interface SettingsOuterProps {
   navigation: DrawerNavigationProp<SidebarDrawerStackParamList, 'Settings'>;
@@ -53,6 +54,9 @@ const SettingsInner: React.FC<SettingsOuterProps & SettingsInnerProps> = ({ navi
           </Tab>
           <Tab heading="Printers">
             <PrintersTab />
+          </Tab>
+          <Tab heading="Printer Groups">
+            <PrinterGroupsTab />
           </Tab>
         </Tabs>
       </Content>

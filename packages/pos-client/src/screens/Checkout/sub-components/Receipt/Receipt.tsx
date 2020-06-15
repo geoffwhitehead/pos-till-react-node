@@ -89,12 +89,9 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
         prepTime: dayjs().add(10, 'minute'),
       });
 
-      console.log('toPrint', toPrint);
-
       const updates = await Promise.all(
         toPrint.map(async ({ billItems, printer, commands }) => {
           let status: PrintStatus;
-          console.log('commands', commands);
           const { success } = await print(commands, printer, false);
           if (success) {
             status = 'success';

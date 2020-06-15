@@ -1,7 +1,8 @@
 export const styles = {
   heading: {
-    margin: 10,
-    marginTop: 30,
+    margin: 30,
+    display: 'flex', 
+    justifyContent: 'space-between',
   },
   text: {
     margin: 10,
