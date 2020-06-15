@@ -20,11 +20,12 @@ import { tableNames, Printer, PriceGroup } from '../../../models';
 import { Database } from '@nozbe/watermelondb';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
-import { H1 } from 'native-base';
+import { H1, H2, ActionSheet } from 'native-base';
 import { OrganizationContext } from '../../../contexts/OrganizationContext';
 import { Loading } from '../../../components/Loading/Loading';
 import { styles } from './styles';
 import { useDatabase } from '@nozbe/watermelondb/hooks';
+import { AuthContext } from '../../../contexts/AuthContext';
 
 interface SettingsTabOuterProps {
   database: Database;
@@ -57,6 +58,7 @@ const SettingsTabInner: React.FC<SettingsTabOuterProps & SettingsTabInnerProps> 
   const { organization } = useContext(OrganizationContext);
   const [loading, setLoading] = useState(false);
   const database = useDatabase();
+  const { signOut } = useContext(AuthContext)
 
   const initialValues = {
     defaultPriceGroupId: organization.defaultPriceGroupId,
@@ -86,6 +88,21 @@ const SettingsTabInner: React.FC<SettingsTabOuterProps & SettingsTabInnerProps> 
   if (!printers) {
     return <Loading />;
   }
+
+  const areYouSure = (fn) => {
+    const options = ['Yes', 'Cancel'];
+    ActionSheet.show(
+      {
+        options,
+        cancelButtonIndex: options.length - 1,
+        title: 'Are you sure?',
+      },
+      index => {
+        index === 0 && fn();
+      },
+    );
+  };
+  
   return (
     <Container>
       <Formik
@@ -105,12 +122,12 @@ const SettingsTabInner: React.FC<SettingsTabOuterProps & SettingsTabInnerProps> 
           return (
             <Content style={styles.container}>
               <Grid>
-              <Col style={styles.column}>
-                <H1 style={styles.heading}>Settings</H1>
+                <Col style={styles.column}>
+                  <H1 style={styles.heading}>Settings</H1>
                 </Col>
                 <Row>
                   <Col style={styles.column}>
-                    <Form >
+                    <Form>
                       <Text style={styles.text} note>
                         Select a thermal printer used to print standard customer receipts.
                       </Text>
@@ -154,7 +171,7 @@ const SettingsTabInner: React.FC<SettingsTabOuterProps & SettingsTabInnerProps> 
                     </Form>
                   </Col>
                   <Col style={styles.column}>
-                    <Form >
+                    <Form>
                       <Text style={styles.text} note>
                         This is the maximum number of simultaneous bills you can have open and the range of bill
                         references.
@@ -178,9 +195,17 @@ const SettingsTabInner: React.FC<SettingsTabOuterProps & SettingsTabInnerProps> 
                     </Form>
                   </Col>
                 </Row>
-                <Row>
-                  <Button style={styles.button} disabled={loading} onPress={handleSubmit}>
+                <Row style={styles.row}>
+                  <Button disabled={loading} onPress={handleSubmit}>
                     <Text>Save</Text>
+                  </Button>
+                </Row>
+                <Row style={{...styles.row, borderWidth: 1, borderColor: 'lightgrey', padding: 10}}>
+                  <Button danger style={styles.button} onPress={() => areYouSure(signOut)}>
+                    <Text>Sign out</Text>
+                  </Button>
+                  <Button danger style={styles.button}>
+                    <Text>Unlink account</Text>
                   </Button>
                 </Row>
               </Grid>

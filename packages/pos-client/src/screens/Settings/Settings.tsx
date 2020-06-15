@@ -46,11 +46,11 @@ const SettingsInner: React.FC<SettingsOuterProps & SettingsInnerProps> = ({ navi
       <SidebarHeader title="Settings" onOpen={() => navigation.openDrawer()} />
       <Content>
         <Tabs>
-          <Tab heading="Organization Details">
-            <OrganizationTab />
-          </Tab>
           <Tab heading="Settings">
             <SettingsTab />
+          </Tab>
+          <Tab heading="Organization Details">
+            <OrganizationTab />
           </Tab>
           <Tab heading="Printers">
             <PrintersTab />

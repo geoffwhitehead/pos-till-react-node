@@ -7,6 +7,7 @@ import { Loading } from '../components/Loading/Loading';
 import { SignUp } from '../screens/Auth/SignUp/SignUp';
 import { SignIn } from '../screens/Auth/SignIn/SignIn';
 import { database } from '../database';
+import React from 'react'
 
 interface AuthNavigatorInnerProps {
   database: Database;
@@ -15,7 +16,7 @@ interface AuthNavigatorInnerProps {
 
 export type AuthStackParamList = {
   SignIn: {
-    organization?: Organization
+    organization?: Organization;
   };
   SignUp: undefined;
 };
@@ -25,8 +26,6 @@ export const AuthNavigatorInner: React.FC<AuthNavigatorInnerProps> = ({ organiza
     return <Loading />;
   }
 
-  const org = organization.length ? organization[0] : null;
-
   const Stack = createStackNavigator();
 
   return (
@@ -35,7 +34,7 @@ export const AuthNavigatorInner: React.FC<AuthNavigatorInnerProps> = ({ organiza
         name="SignIn"
         component={SignIn}
         initialParams={{
-          organization: org,
+          organization: organization.length ? organization[0] : null,
         }}
         options={{
           title: 'SignIn',
@@ -50,7 +49,9 @@ export const AuthNavigatorInner: React.FC<AuthNavigatorInnerProps> = ({ organiza
 const enhance = c =>
   withDatabase(
     withObservables([], () => ({
-      organization: database.collections.get<Organization>(tableNames.organization),
+      organization: database.collections
+        .get<Organization>(tableNames.organizations)
+        .query()
     }))(c),
   );
 

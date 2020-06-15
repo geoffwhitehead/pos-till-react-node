@@ -206,9 +206,9 @@ export const App = () => {
               <AuthNavigator />
             ) : (
               // user is authenticated
-              <AuthContext.Provider value={authContext}>
+              // <AuthContext.Provider value={authContext}>
                 <Main organizationId={organizationId} userId={userId} />
-              </AuthContext.Provider>
+              // </AuthContext.Provider>
             )}
           </AuthContext.Provider>
         </NavigationContainer>

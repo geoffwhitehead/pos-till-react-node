@@ -28,6 +28,12 @@ export const styles = {
     marginRight: 20
   },
   button: {
-    margin: 20
+    margin: 3
+  },
+  row: {
+    marginLeft: 30,
+    marginRight: 30,
+    marginTop:10,
+    marginBottom:10
   }
 };
