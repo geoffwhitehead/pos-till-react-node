@@ -107,11 +107,11 @@ export const OrganizationTab: React.FC<OrganizationTabProps> = () => {
           };
 
           return (
-            <Content>
+            <Content style={styles.container}>
               <Grid>
                 <Row>
-                  <Col>
-                    <Form style={styles.form}>
+                  <Col style={styles.column}>
+                    <Form>
                       <Text style={styles.text} note>
                         General company details. This information will also be printed on receipt and report headers
                       </Text>
@@ -131,13 +131,10 @@ export const OrganizationTab: React.FC<OrganizationTabProps> = () => {
                         <Label>VAT</Label>
                         <Input onChangeText={handleChange('vat')} onBlur={handleBlur('vat')} value={vat} />
                       </Item>
-                      <Button disabled={loading} onPress={handleSubmit}>
-                        <Text>Save</Text>
-                      </Button>
                     </Form>
                   </Col>
-                  <Col>
-                    <Form style={styles.form}>
+                  <Col style={styles.column}>
+                    <Form>
                       <H2 style={styles.heading}>Address</H2>
 
                       <Item stackedLabel error={err.addressLine1}>
@@ -182,6 +179,12 @@ export const OrganizationTab: React.FC<OrganizationTabProps> = () => {
                       </Item>
                     </Form>
                   </Col>
+                </Row>
+                <Row>
+                <Button style={styles.indent} disabled={loading} onPress={handleSubmit}>
+                  <Text>Save</Text>
+                </Button>
+
                 </Row>
               </Grid>
             </Content>

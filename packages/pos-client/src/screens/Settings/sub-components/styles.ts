@@ -1,6 +1,6 @@
 export const styles = {
   heading: {
-    margin: 30,
+    marginBottom: 20,
     display: 'flex', 
     justifyContent: 'space-between',
   },
@@ -19,5 +19,15 @@ export const styles = {
   },
   indent: {
     marginLeft: 30
+  },
+  container: {
+    margin: 30
+  },
+  column: {
+    marginLeft: 20,
+    marginRight: 20
+  },
+  button: {
+    margin: 20
   }
 };

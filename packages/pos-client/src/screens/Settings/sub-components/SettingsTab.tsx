@@ -103,12 +103,14 @@ const SettingsTabInner: React.FC<SettingsTabOuterProps & SettingsTabInnerProps> 
           };
 
           return (
-            <Content>
+            <Content style={styles.container}>
               <Grid>
-                <H1 style={{ ...styles.heading, ...styles.indent }}>Settings</H1>
+              <Col style={styles.column}>
+                <H1 style={styles.heading}>Settings</H1>
+                </Col>
                 <Row>
-                  <Col>
-                    <Form style={styles.form}>
+                  <Col style={styles.column}>
+                    <Form >
                       <Text style={styles.text} note>
                         Select a thermal printer used to print standard customer receipts.
                       </Text>
@@ -151,8 +153,8 @@ const SettingsTabInner: React.FC<SettingsTabOuterProps & SettingsTabInnerProps> 
                       </Item>
                     </Form>
                   </Col>
-                  <Col>
-                    <Form style={styles.form}>
+                  <Col style={styles.column}>
+                    <Form >
                       <Text style={styles.text} note>
                         This is the maximum number of simultaneous bills you can have open and the range of bill
                         references.
@@ -177,7 +179,7 @@ const SettingsTabInner: React.FC<SettingsTabOuterProps & SettingsTabInnerProps> 
                   </Col>
                 </Row>
                 <Row>
-                  <Button style={styles.indent} disabled={loading} onPress={handleSubmit}>
+                  <Button style={styles.button} disabled={loading} onPress={handleSubmit}>
                     <Text>Save</Text>
                   </Button>
                 </Row>
