@@ -23,7 +23,8 @@ export const WrappedSearchHeader: React.FC<SearchHeaderProps> = ({ priceGroups, 
         title: 'Select price group',
       },
       index => {
-        setPriceGroup(priceGroups[index]);
+        console.log('index', index)
+        index < priceGroups.length && setPriceGroup(priceGroups[index]);
       },
     );
   };

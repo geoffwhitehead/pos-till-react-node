@@ -40,7 +40,7 @@ export const ReceiptItems: React.FC<ReceiptItemsProps> = ({
     await item.makeComp();
   };
 
-  const onRemoveBillItem = (item: BillItem ) => {
+  const onRemoveBillItem = (item: BillItem) => {
     const options = ['Make complimentary', 'Remove', 'Force remove (no print)', 'Cancel'];
     ActionSheet.show(
       {
@@ -48,11 +48,14 @@ export const ReceiptItems: React.FC<ReceiptItemsProps> = ({
         cancelButtonIndex: options.length - 1,
         title: item.itemName,
       },
-      i => ([makeComplimentary, remove, removeNoPrint][i])(item),
+      i => {
+        const fns = [makeComplimentary, remove, removeNoPrint];
+        i < fns.length && fns[i](item);
+      },
     );
   };
 
-  const onRemove = (item: BillDiscount | BillPayment ) => {
+  const onRemove = (item: BillDiscount | BillPayment) => {
     const options = ['Remove', 'Cancel'];
     ActionSheet.show(
       {
@@ -60,7 +63,7 @@ export const ReceiptItems: React.FC<ReceiptItemsProps> = ({
         cancelButtonIndex: options.length - 1,
         title: 'Options',
       },
-      i => ([remove][i])(item),
+      i => i < options.length && [remove][i](item),
     );
   };
 
@@ -74,11 +77,16 @@ export const ReceiptItems: React.FC<ReceiptItemsProps> = ({
       <List style={{ paddingBottom: 60 }}>
         <ItemsBreakdown key="items_breakdown" readonly={readonly} onSelect={onRemoveBillItem} items={billItems} />
         <DiscountsBreakdown
-readonly={readonly}
+          readonly={readonly}
           onSelect={resolveBillDiscount(onRemove)}
           discountBreakdown={discountBreakdown}
         />
-        <PaymentsBreakdown readonly={readonly} onSelect={onRemove} payments={billPayments} paymentTypes={paymentTypes} />
+        <PaymentsBreakdown
+          readonly={readonly}
+          onSelect={onRemove}
+          payments={billPayments}
+          paymentTypes={paymentTypes}
+        />
       </List>
     </Content>
   );
