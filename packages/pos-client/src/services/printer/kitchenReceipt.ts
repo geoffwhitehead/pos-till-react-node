@@ -19,7 +19,11 @@ export const kitchenReceipt = async (p: {
     billItems.map(async billItem => {
       const [mods, printers] = await Promise.all([
         await billItem.modifierItemsIncVoids.fetch(),
-        await billItem.printers.fetch(),
+        await new Promise(async (res, rej) => {
+          const item = await billItem.item.fetch()
+          const printers = await item.printers.fetch()
+          res(printers)
+        })
       ]);
       return {
         billItem,

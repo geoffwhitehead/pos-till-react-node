@@ -43,7 +43,7 @@ export const billItemSchema = tableSchema({
   ],
 });
 
-export type PrintStatus = 'success' | 'error' | 'pending' | '' | 'void' | 'void_pending' | 'void_error';
+export type PrintStatus = 'success' | 'error' | 'pending' | '' | 'void' | 'void_pending' | 'void_error' | 'void_no_print';
 export class BillItem extends Model {
   static table = 'bill_items';
 
