@@ -10,6 +10,8 @@ import { tableNames, BillPeriod, PriceGroup, Bill, Organization } from '../../mo
 import { CurrentBillContext } from '../../contexts/CurrentBillContext';
 import { Loading } from '../../components/Loading/Loading';
 import { OrganizationContext } from '../../contexts/OrganizationContext';
+import { getOrganization } from '../../api/organization';
+import { okResponse } from '../../api';
 
 interface MainInnerProps {
   priceGroups: any; // TODO: fix type
@@ -32,39 +34,61 @@ export const MainWrapped: React.FC<MainOuterProps & MainInnerProps> = ({
   database,
   organizations,
 }) => {
-  const [populating, setPopulating] = useState(false); // TODO debug: reset to true
+  const [syncDone, setSyncDone] = useState(false); // TODO debug: reset to true
   const [billPeriod, setBillPeriod] = useState<BillPeriod>();
   const [priceGroup, setPriceGroup] = useState<PriceGroup>();
   const [currentBill, setCurrentBill] = useState<Bill>();
   const [organization, setOrganization] = useState<Organization>();
 
+  console.log('syncDone', syncDone);
+  // console.log('billPeriod', billPeriod);
+  // console.log('priceGroup', priceGroup);
+  // console.log('organization', organization);
+  // console.log('priceGroups', priceGroups);
+
   useEffect(() => {
-    const populateAsync = async () => {
-      // TODO: SYNC.
+    const checkSync = async () => {
+      console.log('checking sync');
       try {
-        console.log('database', database);
-        await populate(database);
-        setPopulating(false);
-      } catch (err) {
-        console.log('Populating failed', err);
+        const organizations = await database.collections
+          .get<Organization>(tableNames.organizations)
+          .query()
+          .fetch();
+
+        if (organizations.length === 0) {
+          await populate(database);
+        } else {
+          const dbOrg = organizations[0];
+          const serverOrg = okResponse(await getOrganization());
+          console.log('dbOrg', dbOrg);
+          console.log('serverOrg', serverOrg);
+          if (serverOrg && serverOrg.syncId !== dbOrg.syncId) {
+            await populate(database);
+          } else {
+            console.log('matching sync id');
+          }
+        }
+      } catch (e) {
+        console.error(e);
       }
+      setSyncDone(true);
     };
 
-    populateAsync();
+    checkSync();
   }, []);
 
   useEffect(() => {
-    if (organizations && !populating) {
+    if (organizations.length > 0) {
       setOrganization(organizations[0]);
     }
-  }, [populating, organizations]);
+  }, [organizations, syncDone]);
 
   useEffect(() => {
     /**
      * If refreshing data in populate - make sure to only run after population is complete
      */
 
-    if (!populating && openPeriods) {
+    if (syncDone && openPeriods) {
       const setCurrentPeriod = async () => {
         if (openPeriods.length === 0) {
           const billPeriodCollection = database.collections.get<BillPeriod>(tableNames.billPeriods);
@@ -76,21 +100,16 @@ export const MainWrapped: React.FC<MainOuterProps & MainInnerProps> = ({
       };
       setCurrentPeriod();
     }
-  }, [setBillPeriod, populating, openPeriods]);
+  }, [setBillPeriod, syncDone, openPeriods]);
 
   useEffect(() => {
-    if (priceGroups && organization && !populating) {
-      const pG = priceGroups.find(pg => pg.id === organization.defaultPriceGroupId)
+    if (priceGroups && organization && syncDone) {
+      const pG = priceGroups.find(pg => pg.id === organization.defaultPriceGroupId);
       setPriceGroup(pG || priceGroups[0]); // TODO: use first price group - need to change this to use default flag
     }
-  }, [priceGroups, populating, organization]);
+  }, [priceGroups, syncDone, organization]);
 
-  console.log('populating', populating);
-  console.log('billPeriod', billPeriod);
-  console.log('priceGroup', priceGroup);
-  console.log('organization', organization);
-  console.log('priceGroups', priceGroups)
-  return populating || !billPeriod || !priceGroup || !organization ? (
+  return !syncDone || !billPeriod || !priceGroup || !organization ? (
     <Loading />
   ) : (
     <OrganizationContext.Provider value={{ organization, setOrganization }}>

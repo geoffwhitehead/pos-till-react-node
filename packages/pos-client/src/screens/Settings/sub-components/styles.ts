@@ -15,7 +15,7 @@ export const styles = {
     borderRadius: 5,
     backgroundColor: 'white',
     // width: 400,
-    padding: 10,
+    padding: 30,
   },
   indent: {
     marginLeft: 30

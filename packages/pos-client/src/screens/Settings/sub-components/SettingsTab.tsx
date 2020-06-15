@@ -58,7 +58,7 @@ const SettingsTabInner: React.FC<SettingsTabOuterProps & SettingsTabInnerProps> 
   const { organization } = useContext(OrganizationContext);
   const [loading, setLoading] = useState(false);
   const database = useDatabase();
-  const { signOut } = useContext(AuthContext)
+  const { signOut, unlink } = useContext(AuthContext);
 
   const initialValues = {
     defaultPriceGroupId: organization.defaultPriceGroupId,
@@ -89,7 +89,7 @@ const SettingsTabInner: React.FC<SettingsTabOuterProps & SettingsTabInnerProps> 
     return <Loading />;
   }
 
-  const areYouSure = (fn) => {
+  const areYouSure = fn => {
     const options = ['Yes', 'Cancel'];
     ActionSheet.show(
       {
@@ -102,7 +102,7 @@ const SettingsTabInner: React.FC<SettingsTabOuterProps & SettingsTabInnerProps> 
       },
     );
   };
-  
+
   return (
     <Container>
       <Formik
@@ -200,13 +200,19 @@ const SettingsTabInner: React.FC<SettingsTabOuterProps & SettingsTabInnerProps> 
                     <Text>Save</Text>
                   </Button>
                 </Row>
-                <Row style={{...styles.row, borderWidth: 1, borderColor: 'lightgrey', padding: 10}}>
+                <Row style={{ ...styles.row, borderWidth: 1, borderColor: 'lightgrey', padding: 10 }}>
                   <Button danger style={styles.button} onPress={() => areYouSure(signOut)}>
                     <Text>Sign out</Text>
                   </Button>
-                  <Button danger style={styles.button}>
+                  <Button danger style={styles.button} onPress={() => areYouSure(unlink)}>
                     <Text>Unlink account</Text>
                   </Button>
+                </Row>
+                <Row style={styles.row}>
+                  <Text note>
+                    * unlinking an account will completely remove the account, erasing all product and transactional
+                    data.
+                  </Text>
                 </Row>
               </Grid>
             </Content>

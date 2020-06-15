@@ -1,16 +1,15 @@
 import React, { useState, useContext } from 'react';
-import { Container, Input, Button, Header, Content, Item, Text, Label, Form } from '../../../core';
+import { Container, Input, Button, H2, Header, Content, Item, Text, Label, Form } from '../../../core';
 import { AuthContext } from '../../../contexts/AuthContext';
 import { AuthStackParamList } from '../../../navigators/AuthNavigator';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { Organization } from '../../../models';
 import { RouteProp } from '@react-navigation/native';
-import { View } from 'native-base';
 import { alignCenter } from '../../../services/printer/helpers';
+import { View } from 'react-native';
 
 interface SignInProps {
   navigation: StackNavigationProp<AuthStackParamList, 'SignIn'>;
-  organization: Organization;
   route: RouteProp<AuthStackParamList, 'SignIn'>;
 }
 
@@ -22,6 +21,7 @@ export const SignIn: React.FC<SignInProps> = ({ navigation, route }) => {
   const { signIn } = useContext(AuthContext);
 
   console.log('email', email);
+  console.log('organization', organization);
   return (
     <Container>
       <Content>
@@ -36,14 +36,13 @@ export const SignIn: React.FC<SignInProps> = ({ navigation, route }) => {
 
               <Input value={password} onChangeText={setPassword} secureTextEntry />
             </Item>
-              <Button style={styles.button} onPress={() => signIn({ email, password })}>
-                <Text>Sign in</Text>
-              </Button>
-            {!organization && (
-              <Button style={styles.button} light onPress={() => navigation.navigate('SignUp')}>
-                <Text>Register</Text>
-              </Button>
-            )}
+            <Button style={styles.button} onPress={() => signIn({ email, password })}>
+              <Text>Sign in</Text>
+            </Button>
+            <Button style={styles.button} disabled={!!organization} light onPress={() => navigation.navigate('SignUp')}>
+              <Text>Register</Text>
+            </Button>
+            {organization && <Text note>* This terminal is currently linked with {organization.name}.</Text>}
           </Form>
         </View>
       </Content>
@@ -59,9 +58,9 @@ const styles = {
     display: 'flex',
     justifyContent: 'center',
     flexDirection: 'row',
-    marginTop: 100
+    marginTop: 100,
   },
   button: {
-    margin: 20
-  }
+    margin: 20,
+  },
 };

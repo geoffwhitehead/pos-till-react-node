@@ -21,4 +21,5 @@ export interface OrganizationServerProps {
     currency?: string;
     maxBills?: number;
   };
+  syncId: string
 }

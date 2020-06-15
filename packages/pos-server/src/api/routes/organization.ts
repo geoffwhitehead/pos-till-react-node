@@ -13,8 +13,7 @@ export default (app: Router) => {
         const logger = Container.get('logger') as LoggerService;
         const organizationService = Container.get('organizationService') as OrganizationService;
         try {
-            const organization = await organizationService.findByIdAndUpdate(objectId(req.organizationId), req.body);
-            console.log('organization', organization)
+            const organization = await organizationService.findById(objectId(req.organizationId));
             res.status(200).json({ success: true, data: organization })
 
         } catch (err) {
@@ -23,19 +22,19 @@ export default (app: Router) => {
         }
     });
 
-    route.post('/', async (req: Request, res: Response, next: NextFunction) => {
-        const logger = Container.get('logger') as LoggerService;
-        const organizationService = Container.get('organizationService') as OrganizationService;
+    // route.post('/', async (req: Request, res: Response, next: NextFunction) => {
+    //     const logger = Container.get('logger') as LoggerService;
+    //     const organizationService = Container.get('organizationService') as OrganizationService;
 
-        try {
-            const organization = await organizationService.findById(objectId(req.params.id))
-            res.status(200).json({ success: true, data: organization })
+    //     try {
+    //         const organization = await organizationService.create(req.params)
+    //         res.status(200).json({ success: true, data: organization })
 
-        } catch (err) {
-            logger.error(`🔥 error: ${err}`);
-            return next(err);
-        }
-    });
+    //     } catch (err) {
+    //         logger.error(`🔥 error: ${err}`);
+    //         return next(err);
+    //     }
+    // });
 
     route.put('/:id', async (req: AuthorizedRequest, res: Response, next: NextFunction) => {
         const logger = Container.get('logger') as LoggerService;
@@ -50,18 +49,18 @@ export default (app: Router) => {
         }
     });
 
-    route.get('/:id', async (req: AuthorizedRequest, res: Response, next: NextFunction) => {
-        const logger = Container.get('logger') as LoggerService;
-        const organizationService = Container.get('organizationService') as OrganizationService;
+    // route.get('/:id', async (req: AuthorizedRequest, res: Response, next: NextFunction) => {
+    //     const logger = Container.get('logger') as LoggerService;
+    //     const organizationService = Container.get('organizationService') as OrganizationService;
 
-        console.log('req.params', req.params);
-        try {
-            const organization = await organizationService.findById(objectId(req.params.id));
-            res.status(200).json({ success: true, data: organization })
+    //     console.log('req.params', req.params);
+    //     try {
+    //         const organization = await organizationService.findById(objectId(req.params.id));
+    //         res.status(200).json({ success: true, data: organization })
 
-        } catch (err) {
-            logger.error(`🔥 error: ${err}`);
-            return next(err);
-        }
-    });
+    //     } catch (err) {
+    //         logger.error(`🔥 error: ${err}`);
+    //         return next(err);
+    //     }
+    // });
 };

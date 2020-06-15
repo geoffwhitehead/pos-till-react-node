@@ -8,6 +8,7 @@ import { OrganizationProps } from '../models/Organization';
 import { UserProps, UserPropsFull } from '../models/User';
 import { createLoggerContext } from '../loaders/logger';
 import { omit } from 'lodash';
+import uuid from 'uuid'
 
 export interface AuthService {
     signUp: (
@@ -77,7 +78,7 @@ export const authService = ({
         logger.info('Hashing password', loggerContext);
         const hashedPassword = await argon2.hash(password, { salt: randomBytes(32) });
 
-        const organizationRecord = await organizationRepository.create({ name, email, phone, address });
+        const organizationRecord = await organizationRepository.create({ name, email, phone, address, syncId: uuid() });
         logger.info(`Created organization: ${organizationRecord._id}`, loggerContext);
 
         if (!organizationRecord) {

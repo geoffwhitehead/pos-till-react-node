@@ -21,6 +21,7 @@ export interface OrganizationProps {
         county: string;
         postcode: string;
     };
+    syncId: string
 }
 
 export const OrganizationValidation = {
@@ -94,6 +95,9 @@ const OrganizationSchema: Schema<OrganizationProps> = new Schema(
             },
             required: true,
         },
+        syncId: {
+            type: String,
+        }
     },
     { timestamps: true },
 );

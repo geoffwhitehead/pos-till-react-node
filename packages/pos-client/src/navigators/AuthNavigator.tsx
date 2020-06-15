@@ -7,11 +7,11 @@ import { Loading } from '../components/Loading/Loading';
 import { SignUp } from '../screens/Auth/SignUp/SignUp';
 import { SignIn } from '../screens/Auth/SignIn/SignIn';
 import { database } from '../database';
-import React from 'react'
+import React, { useState } from 'react';
 
 interface AuthNavigatorInnerProps {
   database: Database;
-  organization: Organization[];
+  organizations: Organization[];
 }
 
 export type AuthStackParamList = {
@@ -21,11 +21,29 @@ export type AuthStackParamList = {
   SignUp: undefined;
 };
 
-export const AuthNavigatorInner: React.FC<AuthNavigatorInnerProps> = ({ organization }) => {
-  if (!organization) {
-    return <Loading />;
+export const AuthNavigatorInner: React.FC<AuthNavigatorInnerProps> = ({ database, organizations }) => {
+  // if (!organization) {
+  //   return <Loading />;
+  // }
+
+  if(!organizations) {
+    return <Loading/>
   }
 
+  // console.log('organizations', organizations);
+  // const [organization, so] = useState();
+
+  // const x = async () => {
+  //   const o = await database.collections
+  //     .get<Organization>(tableNames.organizations)
+  //     .query()
+  //     .fetch();
+  //   console.log('o', o);
+  //   so(o);
+  // };
+  // x();
+
+  console.log('organizations', organizations);
   const Stack = createStackNavigator();
 
   return (
@@ -34,7 +52,7 @@ export const AuthNavigatorInner: React.FC<AuthNavigatorInnerProps> = ({ organiza
         name="SignIn"
         component={SignIn}
         initialParams={{
-          organization: organization.length ? organization[0] : null,
+          organization: organizations.length ? organizations[0] : null,
         }}
         options={{
           title: 'SignIn',
@@ -49,9 +67,7 @@ export const AuthNavigatorInner: React.FC<AuthNavigatorInnerProps> = ({ organiza
 const enhance = c =>
   withDatabase(
     withObservables([], () => ({
-      organization: database.collections
-        .get<Organization>(tableNames.organizations)
-        .query()
+      organizations: database.collections.get<Organization>(tableNames.organizations).query(),
     }))(c),
   );
 

@@ -166,16 +166,19 @@ const s = {
   pl: {
     margin: 5,
     marginRight: 0,
-    borderColor: 'grey',
-    borderWidth: 1,
-    borderRadius: 2,
-    borderRightWidth: 1,
-    borderRightStyle: 'dashed',
+    // borderColor: 'lightgrey',
+    // borderWidth: 1,
+    // borderRadius: 2,
+    // borderRight: 'none'
+
   },
   pr: {
     margin: 5,
-    borderColor: 'grey',
-    borderWidth: 1,
-    borderRadius: 2,
+    // borderColor: 'lightgrey',
+    // borderWidth: 1,
+    // borderRadius: 2,
+    // marginLeft: 0,
+    // borderLeft: 'none'
+
   },
 };

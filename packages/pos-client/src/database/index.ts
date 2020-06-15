@@ -14,3 +14,18 @@ export const database = new Database({
   modelClasses: Object.values(models),
   actionsEnabled: true,
 });
+
+export const resetDatabase = async () => {
+  try {
+    await database.action(async () => {
+      await database.unsafeResetDatabase();
+      return { success: true };
+    });
+  } catch (e) {
+    console.log('ERRROR resetting db :', e);
+    return {
+      success: false,
+      error: e,
+    };
+  }
+};

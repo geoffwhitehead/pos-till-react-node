@@ -1,4 +1,4 @@
-import { create } from 'apisauce';
+import { create, ApiResponse } from 'apisauce';
 import AsyncStorage from '@react-native-community/async-storage';
 
 // TODO: learn how to use env vars in react native ios builds
@@ -27,5 +27,14 @@ api.addMonitor(async response => {
     }
   }
 });
+
+// TODO: refactor this ...
+export const okResponse = (response)  => {
+  if (response.ok && response.data?.success) {
+    return response.data.data;
+  } else {
+    throw new Error('Failed: Response: ' + response.data?.success + 'Problem: ' + response.problem);
+  }
+};
 
 export { api };

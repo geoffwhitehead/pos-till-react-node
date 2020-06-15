@@ -20,16 +20,13 @@ import { sanitizedRaw } from '@nozbe/watermelondb/RawRecord';
 import catchFn from './catchFn';
 import { getOrganization, OrganizationServerProps } from '../../api/organization';
 import { getPrinterGroups } from '../../api/printerGroup';
+import { resetDatabase } from '../../database';
+import { okResponse } from '../../api';
 
 export const populate = async (database: Database) => {
-  return;
-  try {
-    await database.action(async () => {
-      await database.unsafeResetDatabase();
-    });
-  } catch (e) {
-    console.log('ERRROR resetting db :', e);
-  }
+  // return;
+
+  await resetDatabase()
 
   const responses = await Promise.all([
     getItems(), //0
@@ -46,13 +43,7 @@ export const populate = async (database: Database) => {
   let toCreate = [];
 
   console.log('responses', responses);
-  const okResponse = response => {
-    if (response.ok && response.data?.success) {
-      return response.data.data;
-    } else {
-      throw new Error('Failed: Response: ' + response.data?.success + 'Problem: ' + response.problem);
-    }
-  };
+ 
   const categoriesCollection = database.collections.get<Category>(tableNames.categories);
   const priceGroupsCollection = database.collections.get<PriceGroup>(tableNames.priceGroups);
   const printersCollection = database.collections.get<Printer>(tableNames.printers);
@@ -127,7 +118,7 @@ export const populate = async (database: Database) => {
   });
 
   const organizationToCreate = organizationCollection.prepareCreate(organization => {
-    const { _id, name, email, phone, vat, address: a, settings: s }: OrganizationServerProps = okResponse(responses[7]);
+    const { _id, name, email, phone, vat, address: a, settings: s, syncId }: OrganizationServerProps = okResponse(responses[7]);
 
     organization._raw = sanitizedRaw({ id: _id }, organizationCollection.schema);
 
@@ -142,6 +133,7 @@ export const populate = async (database: Database) => {
       addressCounty: a.county,
       addressPostcode: a.postcode,
       ...s,
+      syncId
     });
   });
   toCreate.push(organizationToCreate);

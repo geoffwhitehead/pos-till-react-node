@@ -10,7 +10,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { Root } from 'native-base';
 import decode from 'jwt-decode';
 import DatabaseProvider from '@nozbe/watermelondb/DatabaseProvider';
-import { database } from './database';
+import { database, resetDatabase } from './database';
 import { models } from './models';
 
 export const App = () => {
@@ -182,6 +182,14 @@ export const App = () => {
           console.error('Sign up failed', err);
         }
       },
+      unlink: async () => {
+        try {
+          await resetDatabase();
+          await unsetAuth();
+        } catch (err) {
+          console.error('sign out failed', err);
+        }
+      },
     }),
     [],
   );
@@ -207,7 +215,7 @@ export const App = () => {
             ) : (
               // user is authenticated
               // <AuthContext.Provider value={authContext}>
-                <Main organizationId={organizationId} userId={userId} />
+              <Main organizationId={organizationId} userId={userId} />
               // </AuthContext.Provider>
             )}
           </AuthContext.Provider>
