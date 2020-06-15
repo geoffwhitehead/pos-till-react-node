@@ -80,10 +80,16 @@ export const MainWrapped: React.FC<MainOuterProps & MainInnerProps> = ({
 
   useEffect(() => {
     if (priceGroups && organization && !populating) {
-      setPriceGroup(priceGroups.find(pg => pg.id === organization.defaultPriceGroupId)); // TODO: use first price group - need to change this to use default flag
+      const pG = priceGroups.find(pg => pg.id === organization.defaultPriceGroupId)
+      setPriceGroup(pG || priceGroups[0]); // TODO: use first price group - need to change this to use default flag
     }
   }, [priceGroups, populating, organization]);
 
+  console.log('populating', populating);
+  console.log('billPeriod', billPeriod);
+  console.log('priceGroup', priceGroup);
+  console.log('organization', organization);
+  console.log('priceGroups', priceGroups)
   return populating || !billPeriod || !priceGroup || !organization ? (
     <Loading />
   ) : (

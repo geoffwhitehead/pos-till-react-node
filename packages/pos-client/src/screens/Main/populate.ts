@@ -1,4 +1,13 @@
-import { tableNames, PaymentType, Category, PriceGroup, Printer, Organization } from '../../models';
+import {
+  tableNames,
+  PaymentType,
+  Category,
+  PriceGroup,
+  Printer,
+  Organization,
+  PrinterGroup,
+  PrinterGroupPrinter,
+} from '../../models';
 import { Model, Database } from '@nozbe/watermelondb';
 import { getItems } from '../../api/item';
 import { getCategories } from '../../api/category';
@@ -10,7 +19,7 @@ import { getPaymentTypes } from '../../api/paymentType';
 import { sanitizedRaw } from '@nozbe/watermelondb/RawRecord';
 import catchFn from './catchFn';
 import { getOrganization, OrganizationServerProps } from '../../api/organization';
-// import { getOrganization } from '../../api/organization';
+import { getPrinterGroups } from '../../api/printerGroup';
 
 export const populate = async (database: Database) => {
   return;
@@ -31,6 +40,7 @@ export const populate = async (database: Database) => {
     getPrinters(),
     getPaymentTypes(), //6
     getOrganization(),
+    getPrinterGroups(), // 8
   ]);
 
   let toCreate = [];
@@ -48,7 +58,7 @@ export const populate = async (database: Database) => {
   const printersCollection = database.collections.get<Printer>(tableNames.printers);
   const paymentTypesCollection = database.collections.get<PaymentType>(tableNames.paymentTypes);
   const organizationCollection = database.collections.get<Organization>(tableNames.organizations);
-
+  const printerGroupsCollection = database.collections.get<PrinterGroup>(tableNames.printerGroups);
   console.log('--------------- START');
 
   console.log('responses[7]', responses[7]);
@@ -99,6 +109,29 @@ export const populate = async (database: Database) => {
 
   toCreate.push(...printersToCreate);
 
+  const printerGroupsToCreate = okResponse(responses[8]).map(({ _id, name, printers: printerIds }) => {
+    const printerGroupsPrintersCollection = database.collections.get<PrinterGroupPrinter>(
+      tableNames.printerGroupsPrinters,
+    );
+
+    const printerGroupPrinterLinksToCreate = printerIds.map(printerId => {
+      return printerGroupsPrintersCollection.prepareCreate(
+        catchFn(printerGroupPrinter => {
+          Object.assign(printerGroupPrinter, { printerGroupId: _id, printerId });
+        }),
+      );
+    });
+
+    const printerGroup = printerGroupsCollection.prepareCreate(
+      catchFn(printerGroup => {
+        printerGroup._raw = sanitizedRaw({ id: _id }, printerGroupsCollection.schema);
+        Object.assign(printerGroup, { name });
+      }),
+    );
+
+    toCreate.push(printerGroup, ...printerGroupPrinterLinksToCreate);
+  });
+
   const organizationToCreate = organizationCollection.prepareCreate(organization => {
     const { _id, name, email, phone, vat, address: a, settings: s }: OrganizationServerProps = okResponse(responses[7]);
 
@@ -132,10 +165,11 @@ export const populate = async (database: Database) => {
   toCreate.push(...discountsToCreate);
 
   okResponse(responses[0]).map(
-    ({ _id: itemId, name, shortName, categoryId, price: itemPrices, modifiers, linkedPrinters: linkedPrinterIds }) => {
+    ({ _id: itemId, name, shortName, categoryId, price: itemPrices, modifiers, printerGroupId }) => {
+      console.log('printerGroupId', printerGroupId)
       const itemsCollection = database.collections.get<any & Model>(tableNames.items);
       const itemPricesCollection = database.collections.get(tableNames.itemPrices);
-      const itemPrintersCollection = database.collections.get(tableNames.itemPrinters);
+      // const itemPrintersCollection = database.collections.get(tableNames.itemPrinters);
       const itemModifiersCollection = database.collections.get(tableNames.itemModifiers);
 
       const itemModifiersToCreate = modifiers.map(modifierId => {
@@ -159,22 +193,22 @@ export const populate = async (database: Database) => {
         ),
       );
 
-      const printerLinksToCreate = linkedPrinterIds.map(linkedPrinterId => {
-        return itemPrintersCollection.prepareCreate(
-          catchFn(_itemPrinter => {
-            Object.assign(_itemPrinter, { itemId, printerId: linkedPrinterId });
-          }),
-        );
-      });
+      // const printerLinksToCreate = linkedPrinterIds.map(linkedPrinterId => {
+      //   return itemPrintersCollection.prepareCreate(
+      //     catchFn(_itemPrinter => {
+      //       Object.assign(_itemPrinter, { itemId, printerId: linkedPrinterId });
+      //     }),
+      //   );
+      // });
 
       const itemToCreate = itemsCollection.prepareCreate(
         catchFn(item => {
           item._raw = sanitizedRaw({ id: itemId }, itemsCollection.schema);
-          Object.assign(item, { name, categoryId, shortName });
+          Object.assign(item, { name, categoryId, shortName, printerGroupId });
         }),
       );
 
-      toCreate.push(...itemModifiersToCreate, ...itemPricesToCreate, ...printerLinksToCreate, itemToCreate);
+      toCreate.push(...itemModifiersToCreate, ...itemPricesToCreate, itemToCreate);
     },
   );
 

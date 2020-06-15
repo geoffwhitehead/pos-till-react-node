@@ -23,7 +23,7 @@ interface ReceiptInnerProps {
   billPayments: any[];
   billDiscounts: any[];
   billItems: any[];
-  billItemsNoComp: any[]
+  billItemsNoComp: any[];
   billItemsIncPendingVoids: any[];
   discounts: any[];
   paymentTypes: any[];
@@ -61,7 +61,7 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
   const [summary, setSummary] = useState<BillSummary>();
   const [isStoreDisabled, setIsStoreDisabled] = useState(false);
 
-  const { organization } = useContext(OrganizationContext)
+  const { organization } = useContext(OrganizationContext);
 
   const _onStore = async () => {
     setIsStoreDisabled(true);
@@ -88,6 +88,8 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
         reference: bill.reference.toString(),
         prepTime: dayjs().add(10, 'minute'),
       });
+
+      console.log('toPrint', toPrint);
 
       const updates = await Promise.all(
         toPrint.map(async ({ billItems, printer, commands }) => {
@@ -127,11 +129,11 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
   }, [billItemsNoComp, billDiscounts, billPayments, billModifierItems]); // keep billModifierItems
 
   const onPrint = async () => {
-    const receiptPrinter = printers.find(p => p.id === organization.receiptPrinterId)
-    console.log('printers', printers)
-    console.log('receiptPrinter', receiptPrinter)
+    const receiptPrinter = printers.find(p => p.id === organization.receiptPrinterId);
+    console.log('printers', printers);
+    console.log('receiptPrinter', receiptPrinter);
     console.log('onPrint');
-    console.log('billItems', billItems)
+    console.log('billItems', billItems);
     const commands = await receiptBill(
       billItems,
       billDiscounts,

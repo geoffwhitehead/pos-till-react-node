@@ -38,13 +38,14 @@ const CategoryItemsInner: React.FC<CategoryItemsListOuterProps & CategoryItemsLi
   prices,
 }) => {
   const [searchValue, setSearchValue] = useState<string>('');
+  const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [selectedItem, setSelectedItem] = useState<Item>();
   const [groupedPrices, setGroupedPrices] = useState<Record<string, PriceGroup[]>>();
 
-  const { organization} = useContext(OrganizationContext)
+  const { organization } = useContext(OrganizationContext);
   const { priceGroup } = useContext(PriceGroupContext);
   const { currentBill } = useContext(CurrentBillContext);
-  
+
   const goBack = () => navigation.goBack();
 
   const searchFilter = (item: Item, searchValue: string) => item.name.toLowerCase().includes(searchValue.toLowerCase());
@@ -64,6 +65,7 @@ const CategoryItemsInner: React.FC<CategoryItemsListOuterProps & CategoryItemsLi
       setSelectedItem(item);
       setModalOpen(true);
     } else {
+      console.log('currentBill', currentBill);
       await currentBill.addItem({ item, priceGroup });
     }
   };

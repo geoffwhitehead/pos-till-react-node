@@ -10,7 +10,7 @@ import { discountSchema, Discount } from './Discount';
 import { itemSchema, Item } from './Item';
 import { itemModifierSchema, ItemModifier } from './ItemModifier';
 import { itemPriceSchema, ItemPrice } from './ItemPrice';
-import { itemPrinterSchema, ItemPrinter } from './ItemPrinter';
+// import { itemPrinterSchema, ItemPrinter } from './ItemPrinter';
 import { modifierSchema, Modifier } from './Modifier';
 import { modifierItemSchema, ModifierItem } from './ModifierItem';
 import { modifierPriceSchema, ModifierPrice } from './ModifierPrice';
@@ -20,6 +20,8 @@ import { printerSchema, Printer } from './Printer';
 import { priceGroupSchema, PriceGroup } from './PriceGroup';
 import { Model, TableSchema } from '@nozbe/watermelondb';
 import { BillItemPrintLog, billItemPrintLogSchema } from './BillItemPrintLog';
+import { printerGroupSchema, PrinterGroup } from './PrinterGroup';
+import { printerGroupPrinterSchema, PrinterGroupPrinter } from './PrinterGroupPrinter';
 
 // export const tableNames = {
 //   modifiers: 'modifiers',
@@ -56,7 +58,7 @@ export const tableNames: Record<string, string> = {
   organizations: organizationSchema.name,
   printers: printerSchema.name,
   categories: categorySchema.name,
-  itemPrinters: itemPrinterSchema.name,
+  // itemPrinters: itemPrinterSchema.name,
   items: itemSchema.name,
   billPayments: billPaymentSchema.name,
   bills: billSchema.name,
@@ -66,6 +68,8 @@ export const tableNames: Record<string, string> = {
   billItemModifiers: billItemModifierSchema.name,
   billItemModifierItems: billItemModifierItemSchema.name,
   billItemPrintLogs: billItemPrintLogSchema.name,
+  printerGroups: printerGroupSchema.name,
+  printerGroupsPrinters: printerGroupPrinterSchema.name
 };
 
 export const schemas: Record<string, TableSchema> = {
@@ -81,7 +85,7 @@ export const schemas: Record<string, TableSchema> = {
   itemSchema,
   itemModifierSchema,
   itemPriceSchema,
-  itemPrinterSchema,
+  // itemPrinterSchema,
   modifierSchema,
   modifierItemSchema,
   modifierPriceSchema,
@@ -90,13 +94,15 @@ export const schemas: Record<string, TableSchema> = {
   priceGroupSchema,
   printerSchema,
   billItemPrintLogSchema,
+  printerGroupSchema,
+  printerGroupPrinterSchema
 };
 
 export const models: Record<string, typeof Model> = {
   Item,
   ItemModifier,
   ModifierItem,
-  ItemPrinter,
+  // ItemPrinter,
   Category,
   Printer,
   Modifier,
@@ -114,13 +120,15 @@ export const models: Record<string, typeof Model> = {
   BillItemModifierItem,
   BillItemModifier,
   BillItemPrintLog,
+  PrinterGroup,
+  PrinterGroupPrinter
 };
 
 export {
   Item,
   ItemModifier,
   ModifierItem,
-  ItemPrinter,
+  // ItemPrinter,
   Category,
   Printer,
   Modifier,
@@ -138,4 +146,6 @@ export {
   BillItemModifierItem,
   BillItemModifier,
   BillItemPrintLog,
+  PrinterGroup,
+  PrinterGroupPrinter
 };

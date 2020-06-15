@@ -142,7 +142,7 @@ export const maintenanceService = ({
                 price: generatePriceGroups(priceGroups),
                 stock: 10,
                 modifiers: faker.random.boolean() ? [newModifier._id] : [],
-                printerGroups: [printerGroupResults[0]._id, printerGroupResults[1]._id],
+                printerGroupId: printerGroupResults[random(1)]._id,
             };
         });
 

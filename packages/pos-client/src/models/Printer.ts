@@ -21,7 +21,7 @@ export class Printer extends Model {
   @field('emulation') emulation: Emulations;
 
   static associations = {
-    item_printers: { type: 'has_many', foreignKey: 'printer_id' },
+    printer_groups_printers: { type: 'has_many', foreignKey: 'printer_id' },
   };
 }
 

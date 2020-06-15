@@ -81,9 +81,9 @@ export class BillItem extends Model {
   // used in the kitchen printer when printing voided items
   @lazy modifierItemsIncVoids: Query<BillItemModifierItem> = this._billItemModifierItems;
 
-  @lazy printers = this.collections.get('printers').query(Q.on('item_printers', 'item_id', this.itemId)) as Query<
-    Printer
-  >;
+  // @lazy printers = this.collections.get('printers').query(Q.on('item_printers', 'item_id', this.itemId)) as Query<
+  //   Printer
+  // >;
 
   @action void = async () => {
     const modifierItemsToVoid = await this.billItemModifierItems.fetch();

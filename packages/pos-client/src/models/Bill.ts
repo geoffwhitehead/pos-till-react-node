@@ -96,11 +96,19 @@ export class Bill extends Model {
 
   @action addItem = async (p: { item: Item; priceGroup: PriceGroup }): Promise<BillItem> => {
     const { item, priceGroup } = p;
+
+    console.log('start ************');
+    const x = await item.printers.fetch()
+    console.log('x', x)
+    console.log('item', item)
+    console.log('priceGroup', priceGroup)
     const [category, prices, printers] = await Promise.all([
       item.category.fetch(),
       item.prices.fetch(),
       item.printers.fetch(),
     ]);
+
+    console.log('printers', printers);
 
     console.log('printers', printers);
     const newItem = await this.database.action<BillItem>(() =>
@@ -120,7 +128,7 @@ export class Bill extends Model {
       }),
     );
 
-    return newItem
+    return newItem;
   };
 
   @action close = async () =>
