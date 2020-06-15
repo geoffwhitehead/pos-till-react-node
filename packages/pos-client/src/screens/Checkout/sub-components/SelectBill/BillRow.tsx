@@ -35,7 +35,6 @@ export const WrappedBillRow: React.FC<BillRowInnerProps & BillRowOuterProps> = (
 
   useEffect(() => {
     const summary = async () => {
-      console.log('billItems', billItems)
       const summary = await billSummary(billItems, billDiscounts, billPayments, discounts);
       setSummary(summary);
     };

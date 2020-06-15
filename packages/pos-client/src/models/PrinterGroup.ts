@@ -26,11 +26,8 @@ export class PrinterGroup extends Model {
     let batched = [];
     const links = await this.printerGroupsPrinters.fetch();
 
-    console.log('name', name)
-    console.log('printers', printers)
     batched.push(...links.map(l => l.prepareDestroyPermanently()));
 
-    console.log('batched', batched)
     batched.push(
       ...printers.map(printer => {
         return printerGroupsPrintersCollection.prepareCreate(groupLink => {
@@ -39,7 +36,6 @@ export class PrinterGroup extends Model {
         });
       }),
     );
-console.log('batched', batched)
     batched.push(
       this.prepareUpdate(group => {
         Object.assign(group, { name });

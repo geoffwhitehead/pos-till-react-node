@@ -93,11 +93,9 @@ export const billSummary = async (
   billPayments: BillPayment[],
   discounts: Discount[],
 ): Promise<BillSummary> => {
-console.log('billItems', billItems)
 
   const { total, itemsBreakdown } = await _total(billItems);
 
-  console.log('itemsBreakdown', itemsBreakdown)
   const totalPayments = _totalPayments(billPayments);
   const discountBreakdown = _totalDiscount(total, billDiscounts, discounts);
   return {

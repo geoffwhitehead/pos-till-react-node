@@ -13,7 +13,7 @@ import { tableNames, Discount, PaymentType, PriceGroup, Bill, Printer } from '..
 import { Database, tableName } from '@nozbe/watermelondb';
 import { PrintStatus, BillItem } from '../../../../models/BillItem';
 import { kitchenReceipt } from '../../../../services/printer/kitchenReceipt';
-import { flatten, pickBy } from 'lodash';
+import { flatten, pickBy, groupBy } from 'lodash';
 import { database } from '../../../../database';
 import { Loading } from '../../../../components/Loading/Loading';
 import { OrganizationContext } from '../../../../contexts/OrganizationContext';
@@ -63,6 +63,9 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
 
   const { organization } = useContext(OrganizationContext);
 
+  const receiptPrinter =
+    organization && printers ? printers.find(p => p.id === organization.receiptPrinterId) : undefined;
+
   const _onStore = async () => {
     setIsStoreDisabled(true);
     const billItemsToPrint = billItemsIncPendingVoids.filter(
@@ -89,26 +92,47 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
         prepTime: dayjs().add(10, 'minute'),
       });
 
-      const updates = await Promise.all(
+      const printStatuses = await Promise.all(
         toPrint.map(async ({ billItems, printer, commands }) => {
-          let status: PrintStatus;
-          const { success } = await print(commands, printer, false);
-          if (success) {
-            status = 'success';
-          } else {
-            status = 'error';
-          }
-          return billItems.map(bI =>
-            bI.prepareUpdate(billItem => {
-              if (billItem.isVoided && status === 'error') {
-                billItem.printStatus = 'void_error';
-              } else {
-                billItem.printStatus = status;
-              }
-            }),
-          );
+          // let status: PrintStatus;
+          const res = await print(commands, printer, false);
+          return billItems.map(billItem => {
+            return {
+              billItem,
+              success: res.success,
+            };
+          });
         }),
       );
+
+      /**
+       * a single bill item can be sent to mulitple printers. If any print fails, the status
+       * will be set to failed.
+       */
+
+      // group all the print responses by bill item
+      const responses = groupBy(flatten(printStatuses), status => status.billItem.id);
+
+      // resolve the print status for each item by checking for existence of failed print
+      const reducedResponses = Object.keys(responses).map(key => {
+        const response = responses[key];
+        return {
+          billItem: responses[key][0].billItem,
+          success: !response.some(({ success }) => !success),
+        };
+      });
+
+      const updates = reducedResponses.map(({ billItem, success }) => {
+        let printStatus = 'success';
+
+        if (!success) {
+          printStatus = billItem.isVoided ? 'void_error' : 'error'
+        } 
+
+        return billItem.prepareUpdate(billItemRecord => {
+          Object.assign(billItemRecord, { printStatus });
+        });
+      });
 
       await database.action(async () => {
         await database.batch(...flatten(updates));
@@ -126,7 +150,6 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
   }, [billItemsNoComp, billDiscounts, billPayments, billModifierItems]); // keep billModifierItems
 
   const onPrint = async () => {
-    const receiptPrinter = printers.find(p => p.id === organization.receiptPrinterId);
     console.log('printers', printers);
     console.log('receiptPrinter', receiptPrinter);
     console.log('onPrint');
@@ -191,7 +214,7 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
         <Text style={Fonts.h3}>{`Balance: ${formatNumber(balance, organization.currency)}`}</Text>
       </Row>
       <Row style={styles.r4}>
-        <Button style={styles.printButton} block small info onPress={onPrint}>
+        <Button disabled={!receiptPrinter} style={styles.printButton} block small onPress={onPrint}>
           <Text>Print</Text>
         </Button>
       </Row>

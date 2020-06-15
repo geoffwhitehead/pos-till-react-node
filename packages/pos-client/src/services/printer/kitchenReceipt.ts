@@ -112,10 +112,7 @@ const generatePrintCommands = (p: {
         appendBitmapText: alignLeftRightSingle(`${billItem.itemShortName}`, quantity.toString(), printer.printWidth),
       });
     }
-    console.log('***********');
-    console.log('mods', mods);
     mods.map(mod => {
-      console.log('mod', mod);
       c.push({ appendBitmapText: MOD_PREFIX + capitalize(mod.modifierItemShortName) });
     });
   });

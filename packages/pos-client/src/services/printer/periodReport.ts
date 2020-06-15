@@ -94,7 +94,6 @@ export const periodReport = async (billPeriod: BillPeriod, database: Database, p
     ),
   });
 
-  console.log('billPeriod', billPeriod);
   c.push({
     appendBitmapText: alignLeftRight(
       `Opened: `,

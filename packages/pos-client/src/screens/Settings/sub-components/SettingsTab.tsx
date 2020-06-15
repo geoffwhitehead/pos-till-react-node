@@ -83,7 +83,6 @@ const SettingsTabInner: React.FC<SettingsTabOuterProps & SettingsTabInnerProps> 
     setLoading(false);
   };
 
-  console.log('printers', printers);
   if (!printers) {
     return <Loading />;
   }

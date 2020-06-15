@@ -14,7 +14,6 @@ export async function portDiscovery(): Promise<Printers> {
 export async function print(commands: any[], printer: Printer, openDrawer: boolean = false) {
   // await portDiscovery();
 
-  console.log('printer', printer);
   commands.push({ appendCutPaper: StarPRNT.CutPaperAction.PartialCutWithFeed });
   openDrawer && commands.push({ openCashDrawer: 1 });
   try {

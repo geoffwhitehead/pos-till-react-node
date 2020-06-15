@@ -52,7 +52,6 @@ export const ReportsInner: React.FC<ReportsOuterProps & ReportsInnerProps> = ({
   const onPrint = async (billPeriod: BillPeriod) => {
     const receiptPrinter = await organization.receiptPrinter.fetch();
     const commands = await periodReport(billPeriod, database, receiptPrinter, organization.currency);
-    console.log('commands', commands);
     print(commands, receiptPrinter);
   };
 

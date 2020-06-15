@@ -59,14 +59,10 @@ export const populate = async (database: Database) => {
   const paymentTypesCollection = database.collections.get<PaymentType>(tableNames.paymentTypes);
   const organizationCollection = database.collections.get<Organization>(tableNames.organizations);
   const printerGroupsCollection = database.collections.get<PrinterGroup>(tableNames.printerGroups);
-  console.log('--------------- START');
-
-  console.log('responses[7]', responses[7]);
 
   const paymentTypesToCreate = okResponse(responses[6]).map(({ _id, name }) =>
     paymentTypesCollection.prepareCreate(
       catchFn(paymentType => {
-        console.log('paymentType', paymentType);
         paymentType._raw = sanitizedRaw({ id: _id }, paymentTypesCollection.schema);
         Object.assign(paymentType, { name });
       }),
@@ -74,8 +70,6 @@ export const populate = async (database: Database) => {
   );
   toCreate.push(...paymentTypesToCreate);
 
-  console.log('responses[6]', responses[6]);
-  console.log('toCreate', toCreate);
   const categoriesToCreate = okResponse(responses[1]).map(({ _id, name, shortName }) =>
     categoriesCollection.prepareCreate(
       catchFn(category => {
@@ -264,10 +258,8 @@ export const populate = async (database: Database) => {
   //   try {
   //     await database.action(async () => {
   //       const cats = await database.collections.get<CategoryProps & Model>('categories');
-  //       console.log('cats', cats);
   //     });
   //   } catch (e) {
-  //     console.log('ERRROR watermelon :', e);
   //   }
 
   //   const itemsCollection = database.collections.get<ItemProps & Model>('items');

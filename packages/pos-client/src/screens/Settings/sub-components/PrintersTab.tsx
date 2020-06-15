@@ -69,14 +69,13 @@ const PrintersTabInner: React.FC<PrintersTabOuterProps & PrintersTabInnerProps> 
     if (printers) {
       setDiscoveredPrinters(printers);
     }
-    console.log('disc printers', printers);
     setLoading(false);
   };
-  console.log('selectedPrinter', selectedPrinter);
-  console.log('printers', printers);
+  
   if (!printers) {
     return <Loading />;
   }
+
   return (
     <Container>
       <Content>
@@ -107,7 +106,6 @@ const PrintersTabInner: React.FC<PrintersTabOuterProps & PrintersTabInnerProps> 
                   </Right>
                 </ListItem>
                 {discoveredPrinters.map(discPrinter => {
-                  console.log('p', discPrinter);
                   const isInstalled = printers.find(printer => printer.macAddress === discPrinter.macAddress);
                   return (
                     <ListItem key={discPrinter.macAddress}>

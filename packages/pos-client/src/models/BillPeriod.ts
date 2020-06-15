@@ -47,7 +47,6 @@ export class BillPeriod extends Model {
     .query(Q.on('bills', 'bill_period_id', this.id)) as Query<BillPayment>;
 
   @action createBill = async (params: { reference: number }): Promise<Bill> => {
-    console.log('params', params)
     const b = await this.collections.get<Bill>('bills').create(bill => {
       bill.reference = params.reference;
       bill.isClosed = false;

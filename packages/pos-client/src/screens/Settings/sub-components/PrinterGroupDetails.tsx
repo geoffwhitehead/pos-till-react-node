@@ -61,11 +61,6 @@ const PrinterGroupDetailsInner: React.FC<PrinterGroupDetailsOuterProps & Printer
   const update = async (values: any, printerGroup: PrinterGroup) => {
     // TODO: type vaalues
     setLoading(true);
-
-    console.log('values', values)
-    console.log('printerGroup', printerGroup)
-
-    console.log('selectedPrinters', selectedPrinters)
     await printerGroup.updateGroup({ ...values, printers: selectedPrinters });
     setLoading(false);
     onClose();
