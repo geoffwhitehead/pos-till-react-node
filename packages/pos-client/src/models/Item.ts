@@ -1,10 +1,10 @@
 import { Model, Q, tableSchema, Relation, Query } from '@nozbe/watermelondb';
-import { field, relation, children, lazy } from '@nozbe/watermelondb/decorators';
+import { field, relation, children, lazy, action } from '@nozbe/watermelondb/decorators';
 import { Category } from './Category';
 import { ItemPrice } from './ItemPrice';
 import { Printer } from './Printer';
 import { Modifier } from './Modifier';
-import { PrinterGroup } from '.';
+import { PrinterGroup, ModifierItem, ItemModifier, tableNames, PriceGroup } from '.';
 
 export class Item extends Model {
   static table = 'items';
@@ -22,15 +22,98 @@ export class Item extends Model {
     modifiers: { type: 'belongs_to', key: 'modifier_id' },
     categories: { type: 'belongs_to', key: 'category_id' },
     item_prices: { type: 'has_many', foreignKey: 'item_id' },
-    printer_groups: { type: 'belongs_to', key: 'printer_group_id'}
+    printer_groups: { type: 'belongs_to', key: 'printer_group_id' },
   };
 
   @children('item_prices') prices: Query<ItemPrice>;
+  @children('item_modifiers') itemModifierLinks: Query<ItemModifier>;
 
-  @lazy printers = this.collections.get('printers').query(Q.on('printer_groups_printers', 'printer_group_id', this.printerGroupId)) as Query<Printer>;
+  @lazy printers = this.collections
+    .get('printers')
+    .query(Q.on('printer_groups_printers', 'printer_group_id', this.printerGroupId)) as Query<Printer>;
   @lazy modifiers = this.collections.get('modifiers').query(Q.on('item_modifiers', 'item_id', this.id)) as Query<
     Modifier
   >;
+
+  @action updateItem = async ({
+    name,
+    shortName,
+    categoryId,
+    printerGroupId,
+    prices,
+    modifiers,
+  }: {
+    name: string;
+    shortName: string;
+    categoryId: string;
+    printerGroupId: string;
+    modifiers: Modifier[];
+    prices: { price: string; priceGroupId: string }[];
+  }) => {
+    const modifierLinksCollection = this.database.collections.get<ItemModifier>(tableNames.itemModifiers);
+    const itemPricesCollection = this.database.collections.get<ItemPrice>(tableNames.itemPrices);
+
+
+    console.log('name', name)
+    console.log('shortName', shortName)
+    console.log('categoryId', categoryId)
+    console.log('printerGroupId', printerGroupId)
+    console.log('modifiers', modifiers)
+    console.log('prices', prices)
+
+    let batched = [];
+
+    const [itemPrices, itemModifierLinks, priceGroups] = await Promise.all([
+      this.prices.fetch(),
+      this.itemModifierLinks.fetch(),
+      this.database.collections
+        .get<PriceGroup>(tableNames.priceGroups)
+        .query()
+        .fetch(),
+    ]);
+
+    batched.push(
+      this.prepareUpdate(itemRecord => {
+        Object.assign(itemRecord, { name, shortName, categoryId, printerGroupId });
+      }),
+    );
+
+    batched.push(...itemModifierLinks.map(l => l.prepareMarkAsDeleted()));
+    batched.push(
+      ...modifiers.map(modifier => {
+        return modifierLinksCollection.prepareCreate(modifierLink => {
+          modifierLink.modifier.set(modifier);
+          modifierLink.item.set(this);
+        });
+      }),
+    );
+
+    batched.push(
+      ...priceGroups.map(priceGroup => {
+        const existingRecord = itemPrices.find(iP => iP.priceGroupId === priceGroup.id);
+        const newPrice = prices.find(p => p.priceGroupId === priceGroup.id)?.price;
+
+        console.log('existingRecord', existingRecord)
+        console.log('newPrice', newPrice)
+        if (existingRecord) {
+          return existingRecord.prepareUpdate(itemPriceRecord => {
+            Object.assign(itemPriceRecord, { price: newPrice ? parseInt(newPrice) : null });
+          });
+        } else {
+          return itemPricesCollection.prepareCreate(newItemPriceRecord => {
+            newItemPriceRecord.item.set(this);
+            newItemPriceRecord.priceGroup.set(priceGroup);
+            Object.assign(newItemPriceRecord, {
+              price: newPrice ? parseInt(newPrice) : null,
+            });
+          });
+        }
+      }),
+    );
+
+    console.log('batched', batched)
+    await this.database.action(() => this.database.batch(...batched));
+  };
 }
 
 export const itemSchema = tableSchema({

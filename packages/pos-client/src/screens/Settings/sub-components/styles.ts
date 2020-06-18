@@ -1,7 +1,8 @@
 export const styles = {
   heading: {
+    marginTop: 40,
     marginBottom: 20,
-    display: 'flex', 
+    display: 'flex',
     justifyContent: 'space-between',
   },
   text: {
@@ -18,22 +19,22 @@ export const styles = {
     padding: 30,
   },
   indent: {
-    marginLeft: 30
+    marginLeft: 30,
   },
   container: {
-    margin: 30
+    margin: 30,
   },
   column: {
     marginLeft: 20,
-    marginRight: 20
+    marginRight: 20,
   },
   button: {
-    margin: 3
+    margin: 3,
   },
   row: {
     marginLeft: 30,
     marginRight: 30,
-    marginTop:10,
-    marginBottom:10
-  }
+    marginTop: 10,
+    marginBottom: 10,
+  },
 };

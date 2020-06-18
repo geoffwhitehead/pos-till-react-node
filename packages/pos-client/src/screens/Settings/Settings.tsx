@@ -64,13 +64,4 @@ const SettingsInner: React.FC<SettingsOuterProps & SettingsInnerProps> = ({ navi
   );
 };
 
-// const enhance = c =>
-//   withDatabase<any>(
-//     withObservables<SettingsOuterProps, SettingsInnerProps>([], ({ database }) => ({
-//       paymentTypes: database.collections.get<PaymentType>(tableNames.paymentTypes).query(),
-//       printers: database.collections.get<Printer>(tableNames.printers).query(),
-//       priceGroups: database.collections.get<PriceGroup>(tableNames.priceGroups).query(),
-//     }))(c),
-//   );
-
 export const Settings = SettingsInner;
