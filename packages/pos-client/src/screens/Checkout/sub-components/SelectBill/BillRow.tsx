@@ -2,17 +2,20 @@ import React, { useState, useEffect, useContext } from 'react';
 import { ListItem, Left, Text, Body, Right, Icon } from '../../../../core';
 import { formatNumber, _total, billSummary, BillSummary } from '../../../../utils';
 import withObservables from '@nozbe/with-observables';
-import { tableNames, Bill, Discount } from '../../../../models';
+import { tableNames, Bill, Discount, BillItem, BillDiscount, BillPayment } from '../../../../models';
 import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import { Database } from '@nozbe/watermelondb';
 import { OrganizationContext } from '../../../../contexts/OrganizationContext';
 
 interface BillRowInnerProps {
-  billPayments: any[];
-  billDiscounts: any[];
-  billItems: any[];
-  billItemsIncPendingVoids: any[];
-  discounts: any[];
+  billPayments: BillPayment[];
+  billDiscounts: BillDiscount[];
+  billItems: BillItem[];
+  billItemsIncPendingVoids: BillItem[]
+  discounts: Discount[];
+  billItemsVoidsStatusUnstoredCount: number
+  billItemsVoidsStatusErrorsCount: number
+  billItemsVoidsStatusPendingCount: number
 }
 
 interface BillRowOuterProps {
@@ -26,6 +29,9 @@ export const WrappedBillRow: React.FC<BillRowInnerProps & BillRowOuterProps> = (
   onSelectBill,
   billItems,
   billItemsIncPendingVoids,
+  billItemsVoidsStatusUnstoredCount,
+  billItemsVoidsStatusErrorsCount,
+  billItemsVoidsStatusPendingCount,
   billPayments,
   billDiscounts,
   discounts,
@@ -42,10 +48,9 @@ export const WrappedBillRow: React.FC<BillRowInnerProps & BillRowOuterProps> = (
   }, [billItems]);
 
   const renderPrintErrors = () => {
-    // TODO: these need to be observable queries so they will update as things error etc.
-    const hasUnstoredItems = billItemsIncPendingVoids.some(bI => ['', 'void'].includes(bI.printStatus));
-    const hasPrintErrors = billItemsIncPendingVoids.some(bI => ['error', 'void_error'].includes(bI.printStatus));
-    const hasPendingPrints = billItemsIncPendingVoids.some(bI => ['pending', 'void_pending'].includes(bI.printStatus));
+    const hasUnstoredItems = !!billItemsVoidsStatusUnstoredCount
+    const hasPrintErrors = !!billItemsVoidsStatusErrorsCount
+    const hasPendingPrints = !!billItemsVoidsStatusPendingCount
 
     if (hasPrintErrors) {
       return [
@@ -92,6 +97,9 @@ const enhance = component =>
       billDiscounts: bill.billDiscounts,
       billItems: bill.billItems,
       billItemsIncPendingVoids: bill.billItemsIncPendingVoids,
+      billItemsVoidsStatusUnstoredCount: bill.billItemsVoidsStatusUnstored.observeCount(),
+      billItemsVoidsStatusErrorsCount: bill.billItemsVoidsStatusErrors.observeCount(),
+      billItemsVoidsStatusPendingCount: bill.billItemsVoidsStatusPending.observeCount(),
       discounts: database.collections.get<Discount>(tableNames.discounts).query(),
     }))(component),
   );

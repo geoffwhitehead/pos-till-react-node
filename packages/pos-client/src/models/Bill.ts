@@ -73,6 +73,23 @@ export class Bill extends Model {
       Q.where('print_status', 'void_error'),
     ),
   );
+
+
+  /**
+   * TODO: look at refactoring these queries
+   */
+  @lazy billItemsVoidsStatusUnstored: Query<BillItem> = this.billItemsIncPendingVoids.extend(
+    Q.or(Q.where('print_status', ''), Q.where('print_status', 'void')),
+  );
+
+  @lazy billItemsVoidsStatusErrors: Query<BillItem> = this.billItemsIncPendingVoids.extend(
+    Q.or(Q.where('print_status', 'error'), Q.where('print_status', 'void_error')),
+  );
+
+  @lazy billItemsVoidsStatusPending: Query<BillItem> = this.billItemsIncPendingVoids.extend(
+    Q.or(Q.where('print_status', 'pending'), Q.where('print_status', 'void_pending')),
+  );
+
   @lazy billModifierItemVoids: Query<BillItemModifierItem> = this._billModifierItems.extend(Q.where('is_voided', true));
 
   @action addPayment = async (p: { paymentType: PaymentType; amount: number; isChange?: boolean }) => {
@@ -97,7 +114,7 @@ export class Bill extends Model {
   @action addItem = async (p: { item: Item; priceGroup: PriceGroup }): Promise<BillItem> => {
     const { item, priceGroup } = p;
 
-    const x = await item.printers.fetch()
+    const x = await item.printers.fetch();
     const [category, prices, printers] = await Promise.all([
       item.category.fetch(),
       item.prices.fetch(),
