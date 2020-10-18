@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "android": "react-native run-android",
-    "dev:ios": "react-native run-ios --simulator='iPad (7th generation)'",
+    "dev:ios": "react-native run-ios --simulator='iPad Pro (12.9-inch) (4th generation)'",
     "dev:app": "concurrently \"yarn start\" \"yarn dev:ios\"",
     "pod": "cd ./ios && pod install && cd .. ",
     "start": "react-native start",
@@ -20,7 +20,7 @@
     "reset:cache": "watchman watch-del-all && react-native start --reset-cache"
   },
   "dependencies": {
-    "@nozbe/watermelondb": "0.16.0",
+    "@nozbe/watermelondb": "^0.20.0",
     "@nozbe/with-observables": "^1.0.5",
     "@react-native-community/async-storage": "^1.8.0",
     "@react-native-community/masked-view": "^0.1.6",
