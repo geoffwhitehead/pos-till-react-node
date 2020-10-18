@@ -127,7 +127,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.settled"
+        applicationId "com.positive"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
@@ -177,9 +177,6 @@ android {
 }
 
 dependencies {
-    implementation project(':react-native-star-prnt')
-    implementation project(':realm')
-    implementation project(':react-native-vector-icons')
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation "com.facebook.react:react-native:+"  // From node_modules
 

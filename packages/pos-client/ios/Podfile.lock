@@ -18,9 +18,6 @@ PODS:
     - boost-for-react-native
     - DoubleConversion
     - glog
-  - GCDWebServer (3.5.3):
-    - GCDWebServer/Core (= 3.5.3)
-  - GCDWebServer/Core (3.5.3)
   - glog (0.3.5)
   - RCTRequired (0.61.5)
   - RCTTypeSafety (0.61.5):
@@ -222,9 +219,6 @@ PODS:
     - React-cxxreact (= 0.61.5)
     - React-jsi (= 0.61.5)
     - ReactCommon/jscallinvoker (= 0.61.5)
-  - RealmJS (3.6.4):
-    - GCDWebServer
-    - React
   - RNCAsyncStorage (1.8.0):
     - React
   - RNCMaskedView (0.1.6):
@@ -270,7 +264,6 @@ DEPENDENCIES:
   - React-RCTVibration (from `../node_modules/react-native/Libraries/Vibration`)
   - ReactCommon/jscallinvoker (from `../node_modules/react-native/ReactCommon`)
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
-  - RealmJS (from `../node_modules/realm`)
   - "RNCAsyncStorage (from `../node_modules/@react-native-community/async-storage`)"
   - "RNCMaskedView (from `../node_modules/@react-native-community/masked-view`)"
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
@@ -283,7 +276,6 @@ DEPENDENCIES:
 SPEC REPOS:
   trunk:
     - boost-for-react-native
-    - GCDWebServer
 
 EXTERNAL SOURCES:
   DoubleConversion:
@@ -336,8 +328,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/Libraries/Vibration"
   ReactCommon:
     :path: "../node_modules/react-native/ReactCommon"
-  RealmJS:
-    :path: "../node_modules/realm"
   RNCAsyncStorage:
     :path: "../node_modules/@react-native-community/async-storage"
   RNCMaskedView:
@@ -361,7 +351,6 @@ SPEC CHECKSUMS:
   FBLazyVector: aaeaf388755e4f29cd74acbc9e3b8da6d807c37f
   FBReactNativeSpec: 118d0d177724c2d67f08a59136eb29ef5943ec75
   Folly: 30e7936e1c45c08d884aa59369ed951a8e68cf51
-  GCDWebServer: c0ab22c73e1b84f358d1e2f74bf6afd1c60829f2
   glog: 1f3da668190260b06b429bb211bfbee5cd790c28
   RCTRequired: b153add4da6e7dbc44aebf93f3cf4fcae392ddf1
   RCTTypeSafety: 9aa1b91d7f9310fc6eadc3cf95126ffe818af320
@@ -383,7 +372,6 @@ SPEC CHECKSUMS:
   React-RCTText: 9ccc88273e9a3aacff5094d2175a605efa854dbe
   React-RCTVibration: a49a1f42bf8f5acf1c3e297097517c6b3af377ad
   ReactCommon: 198c7c8d3591f975e5431bec1b0b3b581aa1c5dd
-  RealmJS: efc6149c80687ae64c040148f7c2ade335a97416
   RNCAsyncStorage: 5d83b49070d41fd72906a116c5e7bdac4ea3a814
   RNCMaskedView: a88953beefbd347a29072d9eba90e42945fe291e
   RNGestureHandler: dde546180bf24af0b5f737c8ad04b6f3fa51609a
@@ -393,6 +381,6 @@ SPEC CHECKSUMS:
   RNVectorIcons: 0bb4def82230be1333ddaeee9fcba45f0b288ed4
   Yoga: f2a7cd4280bfe2cca5a7aed98ba0eb3d1310f18b
 
-PODFILE CHECKSUM: c7ec3ae9575f9f355371ad7ae3d6c1926b766d2a
+PODFILE CHECKSUM: bebc3a6086308414aca99cd6be1b5300cf2089d2
 
-COCOAPODS: 1.8.4
+COCOAPODS: 1.9.3
