@@ -16,7 +16,8 @@ export default (app: Router) => {
 
         try {
             const items = await itemService.findAll();
-            res.status(200).json({ success: true, data: items })
+
+            res.status(200).json({ success: true, data: items });
         } catch (err) {
             logger.error(`🔥 error: ${err}`);
             return next(err);
@@ -31,7 +32,7 @@ export default (app: Router) => {
 
         try {
             const item = await itemService.create(req.body);
-            res.status(200).json({ success: true, data: item })
+            res.status(200).json({ success: true, data: item });
         } catch (err) {
             logger.error(`🔥 error: ${err}`);
             return next(err);
@@ -45,9 +46,8 @@ export default (app: Router) => {
         logger.debug(`Calling update item endpoint with params: ${req.params}, body: ${JSON.stringify(req.body)}`);
 
         try {
-            const item = await itemService.findByIdAndUpdate(objectId(req.params.id), req.body);
-            res.status(200).json({ success: true, data: item })
-
+            const item = await itemService.findByIdAndUpdate(req.params.id, req.body);
+            res.status(200).json({ success: true, data: item });
         } catch (err) {
             logger.error(`🔥 error: ${err}`);
             return next(err);
@@ -61,9 +61,8 @@ export default (app: Router) => {
         logger.debug(`Calling get item endpoint with params: ${req.params}`);
 
         try {
-            const item = await itemService.findById(objectId(req.params.id));
-            res.status(200).json({ success: true, data: item })
-
+            const item = await itemService.findById(req.params.id);
+            res.status(200).json({ success: true, data: item });
         } catch (err) {
             logger.error(`🔥 error: ${err}`);
             return next(err);

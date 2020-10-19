@@ -7,18 +7,23 @@ export interface RepositoryFns<T> {
     findAll: () => Promise<T[]>;
     create: (props: T) => Promise<T>;
     findOne: (props: Partial<T>) => Promise<T>;
-    findByIdAndUpdate: (id: mongoose.Types.ObjectId, props: Partial<T>) => Promise<T>;
-    findById: (id: mongoose.Types.ObjectId) => Promise<T>;
+    findByIdAndUpdate: (id: string, props: Partial<T>) => Promise<T>;
+    findById: (id: string) => Promise<T>;
     insert: (docs: T[]) => Promise<T[]>; // TODO: fix type
+    createdSince: (timestamp: Date) => Promise<T[]>;
+    updatedSince: (timestamp: Date) => Promise<T[]>;
+    deletedSince: (timestamp: Date) => Promise<T[]>;
 }
 
-const getTenant = () => ({
-    tenantId: Container.get('organizationId') as string, // TODO: type no cast
+export const getTenant = () => ({
+    tenantId: Container.get('organizationId') as string,
 });
 
-const clean = (doc: mongoose.Document) => {
+export const clean = (doc: mongoose.Document) => {
     return omit(doc.toObject(), 'tenantId', '__v');
 };
+
+export const cleanDocs = (arr: mongoose.Document[]) => arr.map(doc => clean(doc));
 
 export const repository = <T, U>({
     model,
@@ -67,5 +72,40 @@ export const repository = <T, U>({
         return doc ? clean(doc) : doc;
     };
 
-    return fns({ findAll, create, findOne, findByIdAndUpdate, findById, insert });
+    const createdSince = async (timestamp: Date) => {
+        const created = await model(tenanted && getTenant()).find({
+            createdAt: {
+                $gt: timestamp,
+            },
+        });
+
+        return cleanDocs(created);
+    };
+    const updatedSince = async (timestamp: Date) => {
+        const updated = await model(tenanted && getTenant()).find({
+            createdAt: {
+                $lt: timestamp,
+            },
+            updatedAt: {
+                $gt: timestamp,
+            },
+        });
+
+        return cleanDocs(updated);
+    };
+
+    // implement
+    const deletedSince = async (timestamp: Date) => [];
+
+    return fns({
+        findAll,
+        create,
+        findOne,
+        findByIdAndUpdate,
+        findById,
+        insert,
+        createdSince,
+        updatedSince,
+        deletedSince,
+    });
 };

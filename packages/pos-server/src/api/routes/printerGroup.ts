@@ -39,7 +39,7 @@ export default (app: Router) => {
         const printerGroupService = Container.get('printerGroupService') as PrinterGroupService;
 
         try {
-            const printerGroup = await printerGroupService.findByIdAndUpdate(objectId(req.params.id), req.body);
+            const printerGroup = await printerGroupService.findByIdAndUpdate(req.params.id, req.body);
             res.status(200).json({ success: true, data: printerGroup });
         } catch (err) {
             logger.error(`🔥 error: ${err}`);
@@ -52,7 +52,7 @@ export default (app: Router) => {
         const printerGroupService = Container.get('printerGroupService') as PrinterGroupService;
 
         try {
-            const printerGroup = await printerGroupService.findById(objectId(req.params.id));
+            const printerGroup = await printerGroupService.findById(req.params.id);
             res.status(200).json({ success: true, data: printerGroup });
         } catch (err) {
             logger.error(`🔥 error: ${err}`);

@@ -18,11 +18,10 @@ export class Organization extends Model {
   @field('receipt_printer_id') receiptPrinterId: string;
   @field('currency') currency: string;
   @field('max_bills') maxBills: number;
-  @field('sync_id') syncId: string;
+  @field('lastPulledAt') syncId: string;
 
-
-  @relation('price_groups', "default_price_group_id") defaultPriceGroup: Relation<PriceGroup>
-  @relation('printers', "receipt_printer_id") receiptPrinter: Relation<Printer>
+  @relation('price_groups', 'default_price_group_id') defaultPriceGroup: Relation<PriceGroup>;
+  @relation('printers', 'receipt_printer_id') receiptPrinter: Relation<Printer>;
 }
 
 export const organizationSchema = tableSchema({
@@ -41,6 +40,6 @@ export const organizationSchema = tableSchema({
     { name: 'receipt_printer_id', type: 'string' },
     { name: 'currency', type: 'string' },
     { name: 'max_bills', type: 'number' },
-    { name: 'sync_id', type: 'string' },
+    { name: 'last_pulled_at', type: 'string' },
   ],
 });

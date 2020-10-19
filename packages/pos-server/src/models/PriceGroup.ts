@@ -1,15 +1,21 @@
 import mongoose, { Schema } from 'mongoose';
 import { tenantModel } from './utils/multiTenant';
+import uuid from 'uuid';
 
 export interface PriceGroupProps {
-    _id?: mongoose.Types.ObjectId;
+    _id?: string;
     name: string;
     shortName?: string;
-    isPrepTimeRequired?: boolean
+    isPrepTimeRequired?: boolean;
 }
 
 const PriceGroupSchema: Schema<PriceGroupProps> = new Schema(
     {
+        _id: {
+            type: String,
+            alias: 'id',
+            default: uuid,
+        },
         name: {
             type: String,
             required: true,
@@ -20,8 +26,8 @@ const PriceGroupSchema: Schema<PriceGroupProps> = new Schema(
         },
         isPrepTimeRequired: {
             type: Boolean,
-            default: false
-        }
+            default: false,
+        },
     },
     { timestamps: true },
 );

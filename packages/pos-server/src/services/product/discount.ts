@@ -1,8 +1,8 @@
 import { DiscountProps } from '../../models/Discount';
 import { InjectedDependencies } from '..';
-import { RepositoryFns } from '../../repositories/utils';
+import { CommonServiceFns } from '.';
 
-export type DiscountService = RepositoryFns<DiscountProps>;
+export type DiscountService = CommonServiceFns<DiscountProps>;
 
 export const discountService = ({
     repositories: { discountRepository },
@@ -15,15 +15,15 @@ export const discountService = ({
         return discount;
     };
 
-    const findByIdAndUpdate = async (id, props) => {
-        const discount = await discountRepository.findByIdAndUpdate(id, props);
+    const findByIdAndUpdate = async (_id, props) => {
+        const discount = await discountRepository.findByIdAndUpdate(_id, props);
         logger.info('Discount updated');
         return discount;
     };
 
     const findOne = async props => await discountRepository.findOne(props);
 
-    const findById = async id => discountRepository.findById(id);
+    const findById = async _id => discountRepository.findById(_id);
 
     return {
         findAll,
@@ -32,5 +32,6 @@ export const discountService = ({
         findOne,
         findById,
         insert: discountRepository.insert,
+        pullChanges: () => ({} as any),
     };
 };

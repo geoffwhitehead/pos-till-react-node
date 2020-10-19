@@ -1,16 +1,16 @@
 import { ItemProps } from '../../models/Item';
 import { InjectedDependencies } from '..';
 import { RepositoryFns } from '../../repositories/utils';
+import { CommonServiceFns } from '.';
 
 // export interface ItemService {
 //     findAll: () => Promise<ItemProps[]>;
 //     create: (userProps: ItemProps) => Promise<ItemProps>;
-//     findByIdAndUpdate: (id: string, userProps: Partial<ItemProps>) => Promise<ItemProps>;
+//     findByIdAndUpdate: (_id: string, userProps: Partial<ItemProps>) => Promise<ItemProps>;
 //     findOne: (props: ItemProps) => Promise<ItemProps>;
-//     findById: (id: string) => Promise<ItemProps>;
+//     findById: (_id: string) => Promise<ItemProps>;
 // }
-
-export type ItemService = RepositoryFns<ItemProps>;
+export type ItemService = CommonServiceFns<ItemProps>;
 
 export const itemService = ({ repositories: { itemRepository }, logger }: InjectedDependencies): ItemService => {
     const findAll = async () => await itemRepository.findAll();
@@ -20,8 +20,8 @@ export const itemService = ({ repositories: { itemRepository }, logger }: Inject
         return item;
     };
 
-    const findByIdAndUpdate = async (id, props) => {
-        const item = await itemRepository.findByIdAndUpdate(id, props);
+    const findByIdAndUpdate = async (_id, props) => {
+        const item = await itemRepository.findByIdAndUpdate(_id, props);
         logger.info('item updated');
 
         return item;
@@ -31,7 +31,7 @@ export const itemService = ({ repositories: { itemRepository }, logger }: Inject
         const item = await itemRepository.findOne(props);
         return item;
     };
-    const findById = async id => itemRepository.findById(id);
+    const findById = async _id => itemRepository.findById(_id);
 
     return {
         findAll,
@@ -40,5 +40,6 @@ export const itemService = ({ repositories: { itemRepository }, logger }: Inject
         findOne,
         findById,
         insert: itemRepository.insert,
+        pullChanges: () => ({} as any),
     };
 };

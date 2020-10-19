@@ -9,13 +9,13 @@ export type UserRepository = {
     findAll: () => Promise<UserProps[]>;
     create: (props: UserPropsFull) => Promise<UserProps>;
     findOne: (props: Partial<UserPropsFull>) => Promise<UserProps>;
-    findByIdAndUpdate: (id: mongoose.Types.ObjectId, props: Partial<UserPropsFull>) => Promise<UserProps>;
+    findByIdAndUpdate: (id: string, props: Partial<UserPropsFull>) => Promise<UserProps>;
     findOneFull: (userProps: Partial<UserProps>) => Promise<UserPropsFull | null>;
-    findById: (id: mongoose.Types.ObjectId) => Promise<UserProps>;
+    findById: (id: string) => Promise<UserProps>;
 };
 
 const clean = (userRecord: UserPropsFull): UserProps => {
-    return pick(userRecord, '_id', 'firstName', 'lastName', 'email', 'token');
+    return pick(userRecord, 'id', 'firstName', 'lastName', 'email', 'token');
 };
 
 export const userRepository = ({ models: { UserModel } }: InjectedRepositoryDependencies): UserRepository =>
@@ -34,7 +34,10 @@ export const userRepository = ({ models: { UserModel } }: InjectedRepositoryDepe
             const create = async props => clean(await _create(props));
             const findOneFull = async props => {
                 const tenantId = Container.get('organizationId') as string;
-                return (await UserModel({ tenantId }).findOne(props)).toObject();
+                const user = await UserModel({ tenantId }).findOne(props);
+                console.log('user', user);
+                console.log('props', props);
+                return user.toObject();
             };
             const findById = async id => clean(await _findById(id));
             return {

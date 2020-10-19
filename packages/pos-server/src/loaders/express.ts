@@ -5,7 +5,6 @@ import routes from '../api/routes';
 import config from '../config';
 import helmet from 'helmet';
 import extendAuthorize from '../api/middlewares/extendAuthorize';
-import { sync } from '../api/middlewares/sync';
 
 export default ({ app }: { app: express.Application }) => {
     // healthcheck
@@ -32,11 +31,6 @@ export default ({ app }: { app: express.Application }) => {
 
     // auth middleware - decodes jwt, refresh tokens, attach user to req and container
     app.use(extendAuthorize);
-
-    // update a sync field on the organization to track modifications.
-    // Hack until sync is setup :(
-    // TODO: call next on all routes so this go can after - check for success before updating
-    app.use(sync);
 
     // Load API routes
     app.use(config.api.prefix, routes());

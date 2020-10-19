@@ -39,8 +39,8 @@ export interface EnvConfig {
 export default {
     appName: 'Settled POS Server',
     environment: process.env.NODE_ENV || 'development',
-    port: process.env.PORT,
-    databaseURL: process.env.MONGODB_URI,
+    port: process.env.PORT || 5000,
+    databaseURL: process.env.MONGODB_URI || "mongodb://mongodb/positive",
     accessTokenSecret: process.env.ACCESS_TOKEN_SECRET,
     refreshTokenSecret: process.env.REFRESH_TOKEN_SECRET,
     logs: {

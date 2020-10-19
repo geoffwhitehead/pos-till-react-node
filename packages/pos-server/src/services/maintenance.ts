@@ -4,6 +4,12 @@ import { PriceGroupProps } from '../models/PriceGroup';
 import { InjectedDependencies } from '.';
 import { PrinterProps } from '../models/Printer';
 import { ItemPriceProps } from '../models/ItemPrice';
+import uuid from 'uuid';
+import { ModifierProps } from '../models/Modifier';
+import { ModifierItemProps } from '../models/ModifierItem';
+import { ModifierPriceProps } from '../models/ModifierPrice';
+import { flatten } from 'lodash';
+import { ItemProps } from '../models/Item';
 
 export interface MaintenanceService {
     seed: () => Promise<any>;
@@ -11,17 +17,42 @@ export interface MaintenanceService {
 }
 
 const ITEMS_TO_SEED = 250;
-const PRICE_GROUPS = ['Main', 'Take Away']; // TODO: fix so generate price grouips handles varuious sizes
+const PRICE_GROUPS = ['Main', 'Take Away'];
 
-const generatePriceGroups: (priceGroups: PriceGroupProps[]) => ItemPriceProps[] = priceGroups => {
+const generateItemPrices: (priceGroups: PriceGroupProps[], itemId: string) => ItemPriceProps[] = (
+    priceGroups,
+    itemId,
+) => {
     return priceGroups.map((group, i) => {
         return {
-            groupId: group._id,
-            amount:
+            _id: uuid(),
+            priceGroupId: group._id,
+            price:
                 faker.random.number({
                     min: 1,
                     max: 15,
                 }) * 100,
+            itemId,
+        };
+    });
+};
+
+const generateModifierPrices: (priceGroups: PriceGroupProps[], modifierItemId: string) => ModifierPriceProps[] = (
+    priceGroups,
+    modifierItemId,
+) => {
+    return priceGroups.map((group, i) => {
+        const _id = uuid();
+        console.log('_id', _id);
+        return {
+            _id,
+            priceGroupId: group._id,
+            price:
+                faker.random.number({
+                    min: 1,
+                    max: 15,
+                }) * 100,
+            modifierItemId,
         };
     });
 };
@@ -32,9 +63,13 @@ export const maintenanceService = ({
         discountRepository,
         priceGroupRepository,
         modifierRepository,
+        modifierItemRepository,
+        modifierPriceRepository,
         itemRepository,
+        itemPriceRepository,
+        itemModifierRepository,
         printerRepository,
-        printerGroupRepository
+        printerGroupRepository,
     },
     logger,
 }: InjectedDependencies): MaintenanceService => {
@@ -59,18 +94,19 @@ export const maintenanceService = ({
         const thermalPrinter: PrinterProps = results.find(r => r.name === 'Star TSP100');
         const kitchenPrinter: PrinterProps = results.find(r => r.name === 'Star SP700');
 
+        console.log('BEFORE INSERTING');
         const printerGroupResults = await printerGroupRepository.insert([
             {
                 name: 'Starter',
-                printers: [kitchenPrinter._id]
+                printers: [kitchenPrinter._id],
             },
             {
                 name: 'Kitchen',
-                printers: [kitchenPrinter._id]
-            }
+                printers: [kitchenPrinter._id],
+            },
         ]);
 
-        console.log('printerGroupResults', printerGroupResults)
+        console.log('printerGroupResults', printerGroupResults);
 
         const categories = [
             {
@@ -110,44 +146,60 @@ export const maintenanceService = ({
 
         const priceGroups = await priceGroupRepository.findAll();
 
-        const modifier = {
+        const modifier: ModifierProps = {
+            _id: uuid(),
             name: 'Mains',
-            items: [
-                {
-                    name: 'Chicken',
-                    shortName: 'Chicken',
-                    price: generatePriceGroups(priceGroups),
-                },
-                {
-                    name: 'Beef',
-                    shortName: 'Beef',
-                    price: generatePriceGroups(priceGroups),
-                },
-                {
-                    name: 'Pork',
-                    shortName: 'Pork',
-                    price: generatePriceGroups(priceGroups),
-                },
-            ],
+            minItems: 1,
+            maxItems: 1,
         };
 
-        const newModifier = await modifierRepository.create(modifier);
+        const modifierItems: ModifierItemProps[] = [
+            {
+                _id: uuid(),
+                modifierId: modifier._id,
+                name: 'Chicken',
+                shortName: 'Chicken',
+                // price: generatePriceGroups(priceGroups),
+            },
+            {
+                _id: uuid(),
+                modifierId: modifier._id,
+                name: 'Beef',
+                shortName: 'Beef',
+                // price: generatePriceGroups(priceGroups),
+            },
+            {
+                _id: uuid(),
+                modifierId: modifier._id,
+                name: 'Pork',
+                shortName: 'Pork',
+                // price: generatePriceGroups(priceGroups),
+            },
+        ];
 
-        const items = [...Array(ITEMS_TO_SEED)].map(() => {
+        const modifierPrices: ModifierPriceProps[] = flatten(
+            modifierItems.map(mItem => generateModifierPrices(priceGroups, mItem._id)),
+        );
+
+        const newModifier = await modifierRepository.create(modifier);
+        await modifierItemRepository.insert(modifierItems);
+        await modifierPriceRepository.insert(modifierPrices);
+
+        const items: ItemProps[] = [...Array(ITEMS_TO_SEED)].map(() => {
             const productName = faker.commerce.product();
             return {
+                _id: uuid(),
                 name: productName,
                 shortName: productName.slice(0, 9),
                 categoryId: insertedCategories[random(categories.length - 1)]._id,
-                price: generatePriceGroups(priceGroups),
-                stock: 10,
-                modifiers: faker.random.boolean() ? [newModifier._id] : [],
                 printerGroupId: printerGroupResults[random(1)]._id,
             };
         });
 
-        const insertedItems = await itemRepository.insert(items);
+        const itemPrices: ItemPriceProps[] = flatten(items.map(item => generateItemPrices(priceGroups, item._id)));
 
+        await itemRepository.insert(items);
+        await itemPriceRepository.insert(itemPrices);
         // if (!insertedItems.result.ok) {
         //     console.log('insertedItems', insertedItems);
         //     throw new Error('Error inserting items');

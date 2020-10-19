@@ -1,16 +1,31 @@
 import mongoose, { Schema } from 'mongoose';
 import { tenantModel } from './utils/multiTenant';
+import uuid from 'uuid';
 
 export interface ItemPriceProps {
-    _id?: mongoose.Types.ObjectId;
-    groupId: mongoose.Types.ObjectId;
-    amount: number;
+    _id?: string;
+    priceGroupId: string;
+    itemId: string;
+    price: number;
 }
 
-export const ItemPriceSubSchema: Schema<ItemPriceProps> = new Schema({
-    groupId: { type: Schema.Types.ObjectId, ref: 'PriceGroup' },
-    amount: {
-        type: Number,
-        required: true,
+export const ItemPriceSchema: Schema<ItemPriceProps> = new Schema(
+    {
+        _id: {
+            type: String,
+            alias: 'id',
+            default: uuid,
+        },
+        priceGroupId: { type: String, ref: 'PriceGroup' },
+        price: {
+            type: Number,
+            required: true,
+        },
+        itemId: { type: String, ref: 'Item' },
     },
-});
+    { timestamps: true },
+);
+
+const ItemPrice = tenantModel<ItemPriceProps>('ItemPrice', ItemPriceSchema);
+
+export { ItemPrice };

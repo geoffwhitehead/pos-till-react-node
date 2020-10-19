@@ -1,9 +1,10 @@
 import mongoose, { Schema } from 'mongoose';
 import { tenantModel, TenantedModel } from './utils/multiTenant';
 import { Joi } from 'celebrate';
+import uuid from 'uuid';
 
 export interface UserProps extends TenantedModel {
-    _id?: mongoose.Types.ObjectId;
+    _id?: string;
     firstName: string;
     lastName: string;
     email: string;
@@ -30,6 +31,11 @@ export const CreateUserValidation = {
 
 const UserSchema: Schema<UserPropsFull> = new Schema(
     {
+        _id: {
+            type: String,
+            alias: 'id',
+            default: uuid,
+        },
         firstName: {
             type: String,
             required: true,

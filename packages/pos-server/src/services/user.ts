@@ -29,7 +29,7 @@
 //     try {
 //         const workFactor = 12;
 //         user.password = await bcrypt.hash(req.body.password, workFactor);
-//         user.token = createToken(user.id, user.email);
+//         user.token = createToken(user._id, user.email);
 //         await user.save();
 //         res.status(200).send(user.token);
 //     } catch (err) {
@@ -42,9 +42,9 @@
 //  * @param {String} name - the name of the User to retrieve
 //  */
 // const getById = async (req: Request, res: Response): Promise<void> => {
-//     const { id } = req.params;
+//     const { _id } = req.params;
 //     try {
-//         const user = await User().findById(id, PUBLIC_FIELDS);
+//         const user = await User().findById(_id, PUBLIC_FIELDS);
 //         res.status(200).send(user);
 //     } catch (err) {
 //         res.status(400).send(err);
@@ -77,9 +77,9 @@
 //  * @param {String} name - the name of the User to update
 //  */
 // const update = async (req: Request, res: Response): Promise<void> => {
-//     const { id, ...props } = req.body;
+//     const { _id, ...props } = req.body;
 //     try {
-//         const user = await User().updateOne(id, props, { runValidators: true });
+//         const user = await User().updateOne(_id, props, { runValidators: true });
 
 //         if (user.err) {
 //             throw new Error('Errors creating user');
@@ -95,9 +95,9 @@
 //  * @param {String} name - the name of the User to remove
 //  */
 // const remove = async (req: Request, res: Response): Promise<void> => {
-//     const { id } = req.params;
+//     const { _id } = req.params;
 //     try {
-//         const deleteMsg = await User().deleteOne(id);
+//         const deleteMsg = await User().deleteOne(_id);
 //         res.send(deleteMsg);
 //     } catch (err) {
 //         res.status(400).send(err);
@@ -117,8 +117,8 @@ import { ObjectId } from '../utils/objectId';
 export interface UserService {
     findAll: () => Promise<UserProps[]>;
     create: (userProps: UserProps) => Promise<UserProps>;
-    findByIdAndUpdate: (id: ObjectId, userProps: Partial<UserProps>) => Promise<UserProps>;
-    findById: (id: ObjectId) => Promise<UserProps>;
+    findByIdAndUpdate: (_id: string, userProps: Partial<UserProps>) => Promise<UserProps>;
+    findById: (_id: string) => Promise<UserProps>;
 }
 
 export const userService = ({ repositories: { userRepository }, logger }: InjectedDependencies): UserService => {
@@ -128,12 +128,12 @@ export const userService = ({ repositories: { userRepository }, logger }: Inject
         return user;
     };
 
-    const findByIdAndUpdate = async (id, props) => {
-        const user = await userRepository.findByIdAndUpdate(id, props);
+    const findByIdAndUpdate = async (_id, props) => {
+        const user = await userRepository.findByIdAndUpdate(_id, props);
         return user;
     };
 
-    const findById = async id => userRepository.findById(id);
+    const findById = async _id => userRepository.findById(_id);
 
     return {
         findAll,

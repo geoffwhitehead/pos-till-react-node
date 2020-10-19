@@ -1,8 +1,8 @@
 import { CategoryProps } from '../../models/Category';
 import { InjectedDependencies } from '..';
-import { RepositoryFns } from '../../repositories/utils';
+import { CommonServiceFns } from '.';
 
-export type CategoryService = RepositoryFns<CategoryProps>;
+export type CategoryService = CommonServiceFns<CategoryProps>;
 
 export const categoryService = ({
     repositories: { categoryRepository },
@@ -15,8 +15,8 @@ export const categoryService = ({
         return category;
     };
 
-    const findByIdAndUpdate = async (id, props) => {
-        const category = await categoryRepository.findByIdAndUpdate(id, props);
+    const findByIdAndUpdate = async (_id, props) => {
+        const category = await categoryRepository.findByIdAndUpdate(_id, props);
         return category;
     };
 
@@ -25,11 +25,25 @@ export const categoryService = ({
         return category;
     };
 
-    const findById = async id => categoryRepository.findById(id);
+    const findById = async _id => categoryRepository.findById(_id);
     const insert = async docs => {
         const success = await categoryRepository.insert(docs);
         logger.info('Inserted categories created');
         return success;
+    };
+
+    const pullChanges = async lastPulledAt => {
+        const [created, updated, deleted] = await Promise.all([
+            categoryRepository.createdSince(lastPulledAt),
+            categoryRepository.updatedSince(lastPulledAt),
+            categoryRepository.deletedSince(lastPulledAt),
+        ]);
+
+        return {
+            created,
+            updated,
+            deleted: deleted.map(({ _id }) => _id),
+        };
     };
     return {
         findAll,
@@ -38,5 +52,6 @@ export const categoryService = ({
         findOne,
         findById,
         insert,
+        pullChanges,
     };
 };
