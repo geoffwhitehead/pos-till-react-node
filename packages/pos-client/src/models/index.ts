@@ -47,19 +47,21 @@ import { printerGroupPrinterSchema, PrinterGroupPrinter } from './PrinterGroupPr
 // };
 
 export const tableNames: Record<string, string> = {
-  modifiers: modifierSchema.name,
-  itemModifiers: itemModifierSchema.name,
-  priceGroups: priceGroupSchema.name,
-  itemPrices: itemPriceSchema.name,
-  modifierPrices: modifierPriceSchema.name,
   paymentTypes: paymentTypeSchema.name,
-  modifierItems: modifierItemSchema.name,
   discounts: discountSchema.name,
   organizations: organizationSchema.name,
-  printers: printerSchema.name,
   categories: categorySchema.name,
-  // itemPrinters: itemPrinterSchema.name,
   items: itemSchema.name,
+  itemPrices: itemPriceSchema.name,
+  itemModifiers: itemModifierSchema.name,
+  modifiers: modifierSchema.name,
+  modifierItems: modifierItemSchema.name,
+  modifierPrices: modifierPriceSchema.name,
+  priceGroups: priceGroupSchema.name,
+  printers: printerSchema.name,
+  printerGroups: printerGroupSchema.name,
+  printerGroupsPrinters: printerGroupPrinterSchema.name,
+  // itemPrinters: itemPrinterSchema.name,
   billPayments: billPaymentSchema.name,
   bills: billSchema.name,
   billDiscounts: billDiscountSchema.name,
@@ -68,8 +70,6 @@ export const tableNames: Record<string, string> = {
   billItemModifiers: billItemModifierSchema.name,
   billItemModifierItems: billItemModifierItemSchema.name,
   billItemPrintLogs: billItemPrintLogSchema.name,
-  printerGroups: printerGroupSchema.name,
-  printerGroupsPrinters: printerGroupPrinterSchema.name
 };
 
 export const schemas: Record<string, TableSchema> = {

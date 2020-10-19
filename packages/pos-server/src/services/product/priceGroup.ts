@@ -1,8 +1,9 @@
 import { PriceGroupProps } from '../../models/PriceGroup';
 import { InjectedDependencies } from '..';
 import { RepositoryFns } from '../../repositories/utils';
+import { CommonServiceFns } from '.';
 
-export type PriceGroupService = RepositoryFns<PriceGroupProps>;
+export type PriceGroupService = CommonServiceFns<PriceGroupProps>;
 
 export const priceGroupService = ({
     repositories: { priceGroupRepository },
@@ -15,8 +16,8 @@ export const priceGroupService = ({
         return priceGroup;
     };
 
-    const findByIdAndUpdate = async (id, props) => {
-        const priceGroup = await priceGroupRepository.findByIdAndUpdate(id, props);
+    const findByIdAndUpdate = async (_id, props) => {
+        const priceGroup = await priceGroupRepository.findByIdAndUpdate(_id, props);
         logger.info('price group updated');
 
         return priceGroup;
@@ -27,7 +28,7 @@ export const priceGroupService = ({
         return priceGroup;
     };
 
-    const findById = async id => priceGroupRepository.findById(id);
+    const findById = async _id => priceGroupRepository.findById(_id);
 
     return {
         findAll,
@@ -36,5 +37,6 @@ export const priceGroupService = ({
         findOne,
         findById,
         insert: priceGroupRepository.insert,
+        pullChanges: () => ({} as any),
     };
 };

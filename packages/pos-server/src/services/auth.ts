@@ -8,7 +8,7 @@ import { OrganizationProps } from '../models/Organization';
 import { UserProps, UserPropsFull } from '../models/User';
 import { createLoggerContext } from '../loaders/logger';
 import { omit } from 'lodash';
-import uuid from 'uuid'
+import uuid from 'uuid';
 
 export interface AuthService {
     signUp: (
@@ -81,6 +81,7 @@ export const authService = ({
         const organizationRecord = await organizationRepository.create({ name, email, phone, address, syncId: uuid() });
         logger.info(`Created organization: ${organizationRecord._id}`, loggerContext);
 
+        console.log('organizationRecord', organizationRecord);
         if (!organizationRecord) {
             logger.error('Organization not found', loggerContext);
             return {
@@ -113,8 +114,8 @@ export const authService = ({
         });
 
         const [accessToken, refreshToken] = await createTokens({
-            userId: userRecord._id.toHexString(),
-            organizationId: organizationRecord._id.toHexString(),
+            userId: userRecord._id,
+            organizationId: organizationRecord._id,
             accessTokenSecret: config.accessTokenSecret,
             refreshTokenSecret: constructRefreshSecret(config.refreshTokenSecret, hashedPassword),
         });
@@ -135,7 +136,7 @@ export const authService = ({
 
         return {
             success: true,
-            data: { ...omit(userRecord, 'refreshToken'), organizationId: organizationRecord._id.toHexString() },
+            data: { ...omit(userRecord, 'refreshToken'), organizationId: organizationRecord._id },
             accessToken,
             refreshToken,
         };
@@ -187,8 +188,8 @@ export const authService = ({
 
         logger.info('Generating JWT', updatedContext);
         const [accessToken, refreshToken] = await createTokens({
-            organizationId: organization._id.toHexString(),
-            userId: user._id.toHexString(),
+            organizationId: organization._id,
+            userId: user._id,
             accessTokenSecret: config.accessTokenSecret,
             refreshTokenSecret: constructRefreshSecret(config.refreshTokenSecret, user.password),
         });
@@ -201,7 +202,7 @@ export const authService = ({
             lastName: user.lastName,
             email: user.email,
             _id: user._id,
-            organizationId: organization._id.toHexString(),
+            organizationId: organization._id,
         };
 
         return { success: true, data: response, accessToken, refreshToken };
@@ -235,12 +236,12 @@ export const authService = ({
         }
 
         if (!refreshUserId) {
-            logger.error('User id not found in refresh token', loggerContext);
+            logger.error('User _id not found in refresh token', loggerContext);
             return { success: false };
         }
 
         if (!refreshOrganizationId) {
-            logger.error('Org id not found in refresh token', loggerContext);
+            logger.error('Org _id not found in refresh token', loggerContext);
             return { success: false };
         }
 

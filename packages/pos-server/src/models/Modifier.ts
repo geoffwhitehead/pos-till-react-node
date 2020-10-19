@@ -1,28 +1,36 @@
 import mongoose, { Schema } from 'mongoose';
 import { tenantModel } from './utils/multiTenant';
-import { ModifierItemSubSchema, ModifierItemProps } from './ModifierItem';
+import { ModifierItemProps } from './ModifierItem';
+import uuid from 'uuid';
 
 export interface ModifierProps {
-    _id?: mongoose.Types.ObjectId;
+    _id?: string;
     name: string;
-    items: ModifierItemProps[];
+    maxItems: number;
+    minItems: number;
+    // items: ModifierItemProps[];
 }
 
 const ModifierSchema: Schema<ModifierProps> = new Schema(
     {
+        _id: {
+            type: String,
+            alias: 'id',
+            default: uuid,
+        },
         name: {
             type: String,
             required: true,
         },
         maxItems: {
             type: Number,
-            default: 1
+            default: 1,
         },
         minItems: {
             type: Number,
-            default: 1
+            default: 1,
         },
-        items: [ModifierItemSubSchema],
+        // items: [ModifierItemSubSchema],
     },
     { timestamps: true },
 );

@@ -16,8 +16,7 @@ export default (app: Router) => {
 
         try {
             const modifiers = await modifierService.findAll();
-            res.status(200).json({ success: true, data: modifiers })
-
+            res.status(200).json({ success: true, data: modifiers });
         } catch (err) {
             logger.error(`🔥 error: ${err}`);
             return next(err);
@@ -32,8 +31,7 @@ export default (app: Router) => {
 
         try {
             const modifier = await modifierService.create(req.body);
-            res.status(200).json({ success: true, data: modifier })
-
+            res.status(200).json({ success: true, data: modifier });
         } catch (err) {
             logger.error(`🔥 error: ${err}`);
             return next(err);
@@ -47,9 +45,8 @@ export default (app: Router) => {
         logger.debug(`Calling update modifier endpoint with params: ${req.params}, body: ${JSON.stringify(req.body)}`);
 
         try {
-            const modifier = await modifierService.findByIdAndUpdate(objectId(req.params.id), req.body);
-            res.status(200).json({ success: true, data: modifier })
-
+            const modifier = await modifierService.findByIdAndUpdate(req.params.id, req.body);
+            res.status(200).json({ success: true, data: modifier });
         } catch (err) {
             logger.error(`🔥 error: ${err}`);
             return next(err);
@@ -63,9 +60,8 @@ export default (app: Router) => {
         logger.debug(`Calling get modifier endpoint with params: ${req.params}`);
 
         try {
-            const modifier = await modifierService.findById(objectId(req.params.id));
-            res.status(200).json({ success: true, data: modifier })
-
+            const modifier = await modifierService.findById(req.params.id);
+            res.status(200).json({ success: true, data: modifier });
         } catch (err) {
             logger.error(`🔥 error: ${err}`);
             return next(err);

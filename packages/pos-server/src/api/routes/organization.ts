@@ -13,9 +13,8 @@ export default (app: Router) => {
         const logger = Container.get('logger') as LoggerService;
         const organizationService = Container.get('organizationService') as OrganizationService;
         try {
-            const organization = await organizationService.findById(objectId(req.organizationId));
-            res.status(200).json({ success: true, data: organization })
-
+            const organization = await organizationService.findById(req.organizationId);
+            res.status(200).json({ success: true, data: organization });
         } catch (err) {
             logger.error(`🔥 error: ${err}`);
             return next(err);
@@ -40,9 +39,8 @@ export default (app: Router) => {
         const logger = Container.get('logger') as LoggerService;
         const organizationService = Container.get('organizationService') as OrganizationService;
         try {
-            const organization = await organizationService.findByIdAndUpdate(objectId(req.params.id), req.body);
-            res.status(200).json({ success: true, data: organization })
-
+            const organization = await organizationService.findByIdAndUpdate(req.params.id, req.body);
+            res.status(200).json({ success: true, data: organization });
         } catch (err) {
             logger.error(`🔥 error: ${err}`);
             return next(err);
@@ -55,7 +53,7 @@ export default (app: Router) => {
 
     //     console.log('req.params', req.params);
     //     try {
-    //         const organization = await organizationService.findById(objectId(req.params.id));
+    //         const organization = await organizationService.findById(req.params.id);
     //         res.status(200).json({ success: true, data: organization })
 
     //     } catch (err) {

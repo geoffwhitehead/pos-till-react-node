@@ -1,18 +1,20 @@
 import mongoose, { Schema } from 'mongoose';
 import { tenantlessModel } from './utils/multiTenant';
 import { Joi } from 'celebrate';
+import uuid from 'uuid';
+import { Timestamp } from 'mongodb';
 
 export interface OrganizationProps {
-    _id?: mongoose.Types.ObjectId;
+    _id?: string;
     name: string;
     email: string;
     phone: string;
     vat?: string;
     settings?: {
-        defaultPriceGroup?: mongoose.Types.ObjectId;
-        receiptPrinter?: mongoose.Types.ObjectId;
-        currency: string,
-        maxBills: number
+        defaultPriceGroup?: string;
+        receiptPrinter?: string;
+        currency: string;
+        maxBills: number;
     };
     address: {
         line1: string;
@@ -21,7 +23,7 @@ export interface OrganizationProps {
         county: string;
         postcode: string;
     };
-    syncId: string
+    syncId: string;
 }
 
 export const OrganizationValidation = {
@@ -33,7 +35,7 @@ export const OrganizationValidation = {
         defaultPriceGroup: Joi.string(),
         receiptPrinter: Joi.string(),
         currency: Joi.string(),
-        maxBills: Joi.number()
+        maxBills: Joi.number(),
     }),
     address: Joi.object({
         line1: Joi.string().required(),
@@ -46,6 +48,11 @@ export const OrganizationValidation = {
 
 const OrganizationSchema: Schema<OrganizationProps> = new Schema(
     {
+        _id: {
+            type: String,
+            alias: 'id',
+            default: uuid,
+        },
         name: {
             type: String,
             required: true,
@@ -64,12 +71,12 @@ const OrganizationSchema: Schema<OrganizationProps> = new Schema(
         },
         settings: {
             type: {
-                defaultPriceGroup: { type: Schema.Types.ObjectId, ref: 'PriceGroup' },
-                receiptPrinter: { type: Schema.Types.ObjectId, ref: 'Printer' },
+                defaultPriceGroup: { type: String, ref: 'PriceGroup' },
+                receiptPrinter: { type: String, ref: 'Printer' },
                 currency: String,
-                maxBills: Number
+                maxBills: Number,
             },
-            default: {}
+            default: {},
         },
         address: {
             type: {
@@ -95,9 +102,9 @@ const OrganizationSchema: Schema<OrganizationProps> = new Schema(
             },
             required: true,
         },
-        syncId: {
-            type: String,
-        }
+        lastPulledAt: {
+            type: Date,
+        },
     },
     { timestamps: true },
 );

@@ -1,16 +1,8 @@
 import { ModifierProps } from '../../models/Modifier';
 import { InjectedDependencies } from '..';
-import { RepositoryFns } from '../../repositories/utils';
+import { CommonServiceFns } from '.';
 
-// export interface ModifierService {
-//     findAll: () => Promise<ModifierProps[]>;
-//     create: (userProps: ModifierProps) => Promise<ModifierProps>;
-//     findByIdAndUpdate: (id: string, userProps: Partial<ModifierProps>) => Promise<ModifierProps>;
-//     findOne: (props: ModifierProps) => Promise<ModifierProps>;
-//     findById: (id: string) => Promise<ModifierProps>;
-// }
-
-export type ModifierService = RepositoryFns<ModifierProps>;
+export type ModifierService = CommonServiceFns<ModifierProps>;
 
 export const modifierService = ({
     repositories: { modifierRepository },
@@ -23,8 +15,8 @@ export const modifierService = ({
         return modifier;
     };
 
-    const findByIdAndUpdate = async (id, props) => {
-        const modifier = await modifierRepository.findByIdAndUpdate(id, props);
+    const findByIdAndUpdate = async (_id, props) => {
+        const modifier = await modifierRepository.findByIdAndUpdate(_id, props);
         logger.info('modifier updated');
 
         return modifier;
@@ -35,7 +27,7 @@ export const modifierService = ({
         return modifier;
     };
 
-    const findById = async id => modifierRepository.findById(id);
+    const findById = async _id => modifierRepository.findById(_id);
 
     return {
         findAll,
@@ -44,5 +36,6 @@ export const modifierService = ({
         findOne,
         findById,
         insert: modifierRepository.insert,
+        pullChanges: () => ({} as any),
     };
 };

@@ -1,20 +1,26 @@
 import mongoose, { Schema, Mongoose } from 'mongoose';
 import { tenantModel } from './utils/multiTenant';
-import { ItemPriceSubSchema, ItemPriceProps } from './ItemPrice';
+import { ItemPriceProps } from './ItemPrice';
+import uuid from 'uuid';
 
 export interface ItemProps {
-    _id?: mongoose.Types.ObjectId;
+    _id?: string;
     name: string;
     shortName: string;
-    categoryId: mongoose.Types.ObjectId;
-    price: ItemPriceProps[];
-    stock?: number;
-    modifiers?: mongoose.Types.ObjectId[];
-    printerGroupId?: mongoose.Types.ObjectId;
+    categoryId: string;
+    printerGroupId?: string;
+    // price: ItemPriceProps[];
+    // stock?: number;
+    // modifiers?: mongoose.Types.ObjectId[];
 }
 
 const ItemSchema: Schema<ItemProps> = new Schema(
     {
+        _id: {
+            type: String,
+            alias: 'id',
+            default: uuid,
+        },
         name: {
             type: String,
             required: true,
@@ -23,16 +29,16 @@ const ItemSchema: Schema<ItemProps> = new Schema(
             type: String,
             maxlength: 10,
         },
-        printerGroupId: { type: Schema.Types.ObjectId, ref: 'PrinterGroup' },
-        categoryId: { type: Schema.Types.ObjectId, ref: 'Category' },
-        price: [ItemPriceSubSchema],
-        modifiers: [
-            {
-                type: Schema.Types.ObjectId,
-                ref: 'Modifier',
-                default: [],
-            },
-        ],
+        printerGroupId: { type: String, ref: 'PrinterGroup' },
+        categoryId: { type: String, ref: 'Category' },
+        // price: [ItemPriceSubSchema],
+        // modifiers: [
+        //     {
+        //         type: Schema.Types.ObjectId,
+        //         ref: 'Modifier',
+        //         default: [],
+        //     },
+        // ],
     },
     { timestamps: true },
 );

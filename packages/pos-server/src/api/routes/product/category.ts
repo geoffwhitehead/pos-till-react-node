@@ -45,7 +45,7 @@ export default (app: Router) => {
         logger.debug(`Calling update category endpoint with body: ${JSON.stringify(req.body)}`);
 
         try {
-            const category = await categoryService.findByIdAndUpdate(objectId(req.params.id), req.body);
+            const category = await categoryService.findByIdAndUpdate(req.params.id, req.body);
             res.status(200).json({ success: true, data: category });
         } catch (err) {
             logger.error(`🔥 error: ${err}`);
@@ -60,7 +60,7 @@ export default (app: Router) => {
         logger.debug(`Calling get category endpoint with body: ${JSON.stringify(req.body)}`);
 
         try {
-            const category = await categoryService.findById(objectId(req.params.id));
+            const category = await categoryService.findById(req.params.id);
             res.status(200).json({ success: true, data: category });
         } catch (err) {
             logger.error(`🔥 error: ${err}`);
