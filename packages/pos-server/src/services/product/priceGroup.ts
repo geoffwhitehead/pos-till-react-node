@@ -1,7 +1,8 @@
 import { PriceGroupProps } from '../../models/PriceGroup';
-import { InjectedDependencies, MONGO_TO_SQL_TABLE_MAP } from '..';
+import { InjectedDependencies, MONGO_TO_SQL_TABLE_MAP, pull, push } from '..';
 import { RepositoryFns } from '../../repositories/utils';
 import { CommonServiceFns } from '.';
+import { toClientChanges } from '../../utils/sync';
 
 export type PriceGroupService = CommonServiceFns<PriceGroupProps>;
 
@@ -31,19 +32,22 @@ export const priceGroupService = ({
     const findById = async _id => priceGroupRepository.findById(_id);
 
     const pullChanges = async lastPulledAt => {
-        const [created, updated, deleted] = await Promise.all([
-            priceGroupRepository.createdSince(lastPulledAt),
-            priceGroupRepository.updatedSince(lastPulledAt),
-            priceGroupRepository.deletedSince(lastPulledAt),
-        ]);
+        const priceGroups = await pull(priceGroupRepository, lastPulledAt);
 
-        return {
-            [MONGO_TO_SQL_TABLE_MAP.priceGroups]: {
-                created,
-                updated,
-                deleted: deleted.map(({ _id }) => _id),
-            },
-        };
+        return toClientChanges({
+            [MONGO_TO_SQL_TABLE_MAP.priceGroups]: priceGroups,
+        });
+    };
+
+    const pushChanges = async (lastPulledAt, changes) => {
+        try {
+            await push(priceGroupRepository, changes, lastPulledAt);
+        } catch (err) {
+            // add logger
+            console.error(err);
+            return { success: false, error: 'Failed to push changes' };
+        }
+        return { success: true };
     };
 
     return {
@@ -54,5 +58,6 @@ export const priceGroupService = ({
         findById,
         insert: priceGroupRepository.insert,
         pullChanges,
+        pushChanges,
     };
 };

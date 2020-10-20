@@ -1,6 +1,7 @@
 import { DiscountProps } from '../../models/Discount';
-import { InjectedDependencies, MONGO_TO_SQL_TABLE_MAP } from '..';
+import { InjectedDependencies, MONGO_TO_SQL_TABLE_MAP, pull, push } from '..';
 import { CommonServiceFns } from '.';
+import { toClientChanges } from '../../utils/sync';
 
 export type DiscountService = CommonServiceFns<DiscountProps>;
 
@@ -26,15 +27,22 @@ export const discountService = ({
     const findById = async _id => discountRepository.findById(_id);
 
     const pullChanges = async lastPulledAt => {
-        const [created, updated, deleted] = await Promise.all([
-            discountRepository.createdSince(lastPulledAt),
-            discountRepository.updatedSince(lastPulledAt),
-            discountRepository.deletedSince(lastPulledAt),
-        ]);
+        const discounts = await pull(discountRepository, lastPulledAt);
 
-        return {
-            [MONGO_TO_SQL_TABLE_MAP.discounts]: { created, updated, deleted: deleted.map(({ _id }) => _id) },
-        };
+        return toClientChanges({
+            [MONGO_TO_SQL_TABLE_MAP.discounts]: discounts,
+        });
+    };
+
+    const pushChanges = async (lastPulledAt, changes) => {
+        try {
+            await push(discountRepository, changes, lastPulledAt);
+        } catch (err) {
+            // add logger
+            console.error(err);
+            return { success: false, error: 'Failed to push changes' };
+        }
+        return { success: true };
     };
 
     return {
@@ -45,5 +53,6 @@ export const discountService = ({
         findById,
         insert: discountRepository.insert,
         pullChanges,
+        pushChanges,
     };
 };

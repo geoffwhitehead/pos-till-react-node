@@ -112,7 +112,6 @@
 // import { LoggerService } from '../loaders/logger';
 import { InjectedDependencies } from '.';
 import { UserProps } from '../models/User';
-import { ObjectId } from '../utils/objectId';
 
 export interface UserService {
     findAll: () => Promise<UserProps[]>;

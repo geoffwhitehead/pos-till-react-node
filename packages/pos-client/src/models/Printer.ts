@@ -7,7 +7,7 @@ export enum Emulations {
   'StarGraphic' = 'StarGraphic',
   'StarDotImpact' = 'StarDotImpact',
   'EscPosMobile' = 'EscPosMobile',
-  'EscPos' = 'EscPos'
+  'EscPos' = 'EscPos',
 }
 
 export class Printer extends Model {
@@ -31,7 +31,7 @@ export const printerSchema = tableSchema({
     { name: 'name', type: 'string' },
     { name: 'type', type: 'string' },
     { name: 'address', type: 'string' },
-    { name: 'macAddress', type: 'string' },
+    { name: 'mac_address', type: 'string' },
     { name: 'print_width', type: 'number' },
     { name: 'emulation', type: 'string' },
   ],

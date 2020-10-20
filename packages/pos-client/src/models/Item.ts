@@ -53,13 +53,12 @@ export class Item extends Model {
     const modifierLinksCollection = this.database.collections.get<ItemModifier>(tableNames.itemModifiers);
     const itemPricesCollection = this.database.collections.get<ItemPrice>(tableNames.itemPrices);
 
-
-    console.log('name', name)
-    console.log('shortName', shortName)
-    console.log('categoryId', categoryId)
-    console.log('printerGroupId', printerGroupId)
-    console.log('modifiers', modifiers)
-    console.log('prices', prices)
+    console.log('name', name);
+    console.log('shortName', shortName);
+    console.log('categoryId', categoryId);
+    console.log('printerGroupId', printerGroupId);
+    console.log('modifiers', modifiers);
+    console.log('prices', prices);
 
     let batched = [];
 
@@ -93,8 +92,8 @@ export class Item extends Model {
         const existingRecord = itemPrices.find(iP => iP.priceGroupId === priceGroup.id);
         const newPrice = prices.find(p => p.priceGroupId === priceGroup.id)?.price;
 
-        console.log('existingRecord', existingRecord)
-        console.log('newPrice', newPrice)
+        console.log('existingRecord', existingRecord);
+        console.log('newPrice', newPrice);
         if (existingRecord) {
           return existingRecord.prepareUpdate(itemPriceRecord => {
             Object.assign(itemPriceRecord, { price: newPrice ? parseInt(newPrice) : null });
@@ -111,7 +110,7 @@ export class Item extends Model {
       }),
     );
 
-    console.log('batched', batched)
+    console.log('batched', batched);
     await this.database.action(() => this.database.batch(...batched));
   };
 }

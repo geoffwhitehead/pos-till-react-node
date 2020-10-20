@@ -1,8 +1,14 @@
 import { CategoryProps } from '../../models/Category';
-import { InjectedDependencies, MONGO_TO_SQL_TABLE_MAP } from '..';
+import { InjectedDependencies, MONGO_TO_SQL_TABLE_MAP, pull, push } from '..';
 import { CommonServiceFns } from '.';
+import { toClientChanges } from '../../utils/sync';
 
 export type CategoryService = CommonServiceFns<CategoryProps>;
+
+export type CategoryClientProps = {
+    name: string;
+    short_name: string;
+};
 
 export const categoryService = ({
     repositories: { categoryRepository },
@@ -33,16 +39,24 @@ export const categoryService = ({
     };
 
     const pullChanges = async lastPulledAt => {
-        const [created, updated, deleted] = await Promise.all([
-            categoryRepository.createdSince(lastPulledAt),
-            categoryRepository.updatedSince(lastPulledAt),
-            categoryRepository.deletedSince(lastPulledAt),
-        ]);
+        const categories = await pull(categoryRepository, lastPulledAt);
 
-        return {
-            [MONGO_TO_SQL_TABLE_MAP.categories]: { created, updated, deleted: deleted.map(({ _id }) => _id) },
-        };
+        return toClientChanges({
+            [MONGO_TO_SQL_TABLE_MAP.categories]: categories,
+        });
     };
+
+    const pushChanges = async (lastPulledAt, changes) => {
+        try {
+            await push(categoryRepository, changes, lastPulledAt);
+        } catch (err) {
+            // add logger
+            console.error(err);
+            return { success: false, error: 'Failed to push changes' };
+        }
+        return { success: true };
+    };
+
     return {
         findAll,
         create,
@@ -51,5 +65,6 @@ export const categoryService = ({
         findById,
         insert,
         pullChanges,
+        pushChanges,
     };
 };

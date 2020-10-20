@@ -1,6 +1,7 @@
 import { ModifierProps } from '../../models/Modifier';
-import { InjectedDependencies, MONGO_TO_SQL_TABLE_MAP } from '..';
+import { InjectedDependencies, MONGO_TO_SQL_TABLE_MAP, pull, push } from '..';
 import { CommonServiceFns } from '.';
+import { toClientChanges } from '../../utils/sync';
 
 export type ModifierService = CommonServiceFns<ModifierProps>;
 
@@ -30,45 +31,32 @@ export const modifierService = ({
     const findById = async _id => modifierRepository.findById(_id);
 
     const pullChanges = async lastPulledAt => {
-        const [
-            modifierCreated,
-            modifierUpdated,
-            modifierDeleted,
-            modifierItemCreated,
-            modifierItemUpdated,
-            modifierItemDeleted,
-            modifierPriceCreated,
-            modifierPriceUpdated,
-            modifierPriceDeleted,
-        ] = await Promise.all([
-            modifierRepository.createdSince(lastPulledAt),
-            modifierRepository.updatedSince(lastPulledAt),
-            modifierRepository.deletedSince(lastPulledAt),
-            modifierItemRepository.createdSince(lastPulledAt),
-            modifierItemRepository.updatedSince(lastPulledAt),
-            modifierItemRepository.deletedSince(lastPulledAt),
-            modifierPriceRepository.createdSince(lastPulledAt),
-            modifierPriceRepository.updatedSince(lastPulledAt),
-            modifierPriceRepository.deletedSince(lastPulledAt),
+        const [modifiers, modifierItems, modifierPrices] = await Promise.all([
+            pull(modifierRepository, lastPulledAt),
+            pull(modifierItemRepository, lastPulledAt),
+            pull(modifierPriceRepository, lastPulledAt),
         ]);
 
-        return {
-            [MONGO_TO_SQL_TABLE_MAP.modifiers]: {
-                created: modifierCreated,
-                updated: modifierUpdated,
-                deleted: modifierDeleted.map(({ _id }) => _id),
-            },
-            [MONGO_TO_SQL_TABLE_MAP.modifierItems]: {
-                created: modifierItemCreated,
-                updated: modifierItemUpdated,
-                deleted: modifierItemDeleted.map(({ _id }) => _id),
-            },
-            [MONGO_TO_SQL_TABLE_MAP.modifierPrices]: {
-                created: modifierPriceCreated,
-                updated: modifierPriceUpdated,
-                deleted: modifierPriceDeleted.map(({ _id }) => _id),
-            },
-        };
+        return toClientChanges({
+            [MONGO_TO_SQL_TABLE_MAP.modifiers]: modifiers,
+            [MONGO_TO_SQL_TABLE_MAP.modifierItems]: modifierItems,
+            [MONGO_TO_SQL_TABLE_MAP.modifierPrices]: modifierPrices,
+        });
+    };
+
+    const pushChanges = async (lastPulledAt, changes) => {
+        try {
+            await Promise.all([
+                push(modifierRepository, changes, lastPulledAt),
+                push(modifierItemRepository, changes, lastPulledAt),
+                push(modifierPriceRepository, changes, lastPulledAt),
+            ]);
+        } catch (err) {
+            // add logger
+            console.error(err);
+            return { success: false, error: 'Failed to push changes' };
+        }
+        return { success: true };
     };
 
     return {
@@ -79,5 +67,6 @@ export const modifierService = ({
         findById,
         insert: modifierRepository.insert,
         pullChanges,
+        pushChanges,
     };
 };
