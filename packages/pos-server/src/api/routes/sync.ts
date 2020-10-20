@@ -3,7 +3,6 @@ import { PrinterService } from '../../services/printer';
 import { Container } from 'typedi';
 import { LoggerService } from '../../loaders/logger';
 import { ProductService } from '../../services/product';
-import category from './product/category';
 
 export default (app: Router) => {
     const route = Router();
@@ -11,20 +10,33 @@ export default (app: Router) => {
 
     route.get('/', async (req: Request, res: Response, next: NextFunction) => {
         const logger = Container.get('logger') as LoggerService;
-        const { item: itemService } = Container.get('productService') as ProductService;
-        const { category: categoryService } = Container.get('productService') as ProductService;
+        const {
+            item: itemService,
+            modifier: modifierService,
+            category: categoryService,
+            discount: discountService,
+            priceGroup: priceGroupService,
+        } = Container.get('productService') as ProductService;
 
-        console.log('req.body', req.body);
-        categoryService.pullChanges(req.body.lastPulledAt);
-        console.log('SYNC');
+        const { lastPulledAt } = req.query;
 
-        // {
-        //     lastPulledAt: Ti]mestamp,
-        //     schemaVersion: int,
-        //     migration: null | { from: int, tables: string[], columns: { table: string, columns: string[] }[] }
-        //   }
+        const [itemChanges, modifierChanges, categoryChanges, discountChanges, priceGroupChanges] = await Promise.all([
+            itemService.pullChanges(lastPulledAt),
+            modifierService.pullChanges(lastPulledAt),
+            categoryService.pullChanges(lastPulledAt),
+            discountService.pullChanges(lastPulledAt),
+            priceGroupService.pullChanges(lastPulledAt),
+        ]);
 
-        // { changes: Changes, timestamp: Timestamp }
+        const changes = {
+            ...itemChanges,
+            ...modifierChanges,
+            ...categoryChanges,
+            ...discountChanges,
+            ...priceGroupChanges,
+        };
+
+        return res.status(200).json(changes);
     });
 
     route.post('/', async (req: Request, res: Response, next: NextFunction) => {});

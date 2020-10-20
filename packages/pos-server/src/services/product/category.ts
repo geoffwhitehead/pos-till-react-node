@@ -1,5 +1,5 @@
 import { CategoryProps } from '../../models/Category';
-import { InjectedDependencies } from '..';
+import { InjectedDependencies, MONGO_TO_SQL_TABLE_MAP } from '..';
 import { CommonServiceFns } from '.';
 
 export type CategoryService = CommonServiceFns<CategoryProps>;
@@ -40,9 +40,7 @@ export const categoryService = ({
         ]);
 
         return {
-            created,
-            updated,
-            deleted: deleted.map(({ _id }) => _id),
+            [MONGO_TO_SQL_TABLE_MAP.categories]: { created, updated, deleted: deleted.map(({ _id }) => _id) },
         };
     };
     return {
