@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import { Container } from 'typedi';
 import { omit } from 'lodash';
 import { ServiceFns } from '../../services';
+import { GenericResponseNoData } from '../../utils/types';
 
 export interface RepositoryFns<T> {
     findAll: () => Promise<T[]>;
@@ -11,6 +12,7 @@ export interface RepositoryFns<T> {
     findByIdAndUpdate: (id: string, props: Partial<T>) => Promise<T>;
     findById: (id: string) => Promise<T>;
     insert: (docs: T[]) => Promise<T[]>; // TODO: fix type
+    deleteOneById: (id: string) => Promise<GenericResponseNoData>;
     createdSince: (timestamp: Date) => Promise<T[]>;
     updatedSince: (timestamp: Date) => Promise<T[]>;
     deletedSince: (timestamp: Date) => Promise<T[]>;
@@ -60,6 +62,13 @@ export const repository = <T, U>({
         return doc ? clean(doc) : doc;
     };
 
+    // TODO: implement soft delete function
+    const deleteOneById = async id => {
+        return {
+            success: true,
+        };
+    };
+
     const findByIdAndUpdate = async (id, props) => {
         const filteredProps = omit(props, 'tenantId');
         const updatedDoc = await model(tenanted && getTenant()).findByIdAndUpdate(id, filteredProps, { new: true });
@@ -95,7 +104,7 @@ export const repository = <T, U>({
         return cleanDocs(updated);
     };
 
-    // implement
+    // implement soft delete and query soft deleted records
     const deletedSince = async (timestamp: Date) => [];
 
     return fns({
@@ -105,6 +114,7 @@ export const repository = <T, U>({
         findByIdAndUpdate,
         findById,
         insert,
+        deleteOneById,
         createdSince,
         updatedSince,
         deletedSince,
