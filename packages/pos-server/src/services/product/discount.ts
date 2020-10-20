@@ -1,5 +1,5 @@
 import { DiscountProps } from '../../models/Discount';
-import { InjectedDependencies } from '..';
+import { InjectedDependencies, MONGO_TO_SQL_TABLE_MAP } from '..';
 import { CommonServiceFns } from '.';
 
 export type DiscountService = CommonServiceFns<DiscountProps>;
@@ -25,6 +25,18 @@ export const discountService = ({
 
     const findById = async _id => discountRepository.findById(_id);
 
+    const pullChanges = async lastPulledAt => {
+        const [created, updated, deleted] = await Promise.all([
+            discountRepository.createdSince(lastPulledAt),
+            discountRepository.updatedSince(lastPulledAt),
+            discountRepository.deletedSince(lastPulledAt),
+        ]);
+
+        return {
+            [MONGO_TO_SQL_TABLE_MAP.discounts]: { created, updated, deleted: deleted.map(({ _id }) => _id) },
+        };
+    };
+
     return {
         findAll,
         create,
@@ -32,6 +44,6 @@ export const discountService = ({
         findOne,
         findById,
         insert: discountRepository.insert,
-        pullChanges: () => ({} as any),
+        pullChanges,
     };
 };

@@ -4,10 +4,6 @@ import { ModifierService, modifierService } from './modifer';
 import { ItemService, itemService } from './item';
 import { PriceGroupService, priceGroupService } from './priceGroup';
 import { DiscountService, discountService } from './discount';
-import { itemModifierService, ItemModifierService } from './itemModifier';
-import { itemPriceService, ItemPriceService } from './itemPrice';
-import { modifierItemService, ModifierItemService } from './modifierItem';
-import { modifierPriceService, ModifierPriceService } from './modifierPrice';
 import { RepositoryFns } from '../../repositories/utils';
 
 export type CommonServiceFns<T> = {
@@ -17,16 +13,12 @@ export type CommonServiceFns<T> = {
     findById: RepositoryFns<T>['findById'];
     insert: RepositoryFns<T>['insert'];
     create: RepositoryFns<T>['create'];
-} & SyncFns<T>;
+} & SyncFns;
 
 export interface ProductService {
     category: CategoryService;
     modifier: ModifierService;
-    modifierItem: ModifierItemService;
-    modifierPrice: ModifierPriceService;
     item: ItemService;
-    itemModifier: ItemModifierService;
-    itemPrice: ItemPriceService;
     priceGroup: PriceGroupService;
     discount: DiscountService;
 }
@@ -42,24 +34,8 @@ export const productService = (dependencies: InjectedDependencies): ProductServi
             service: modifierService,
         },
         {
-            name: 'modifierItem',
-            service: modifierItemService,
-        },
-        {
-            name: 'modifierPrice',
-            service: modifierPriceService,
-        },
-        {
             name: 'item',
             service: itemService,
-        },
-        {
-            name: 'itemModifier',
-            service: itemModifierService,
-        },
-        {
-            name: 'itemPrice',
-            service: itemPriceService,
         },
         {
             name: 'priceGroup',

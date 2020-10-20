@@ -1,5 +1,5 @@
 import { PriceGroupProps } from '../../models/PriceGroup';
-import { InjectedDependencies } from '..';
+import { InjectedDependencies, MONGO_TO_SQL_TABLE_MAP } from '..';
 import { RepositoryFns } from '../../repositories/utils';
 import { CommonServiceFns } from '.';
 
@@ -30,6 +30,22 @@ export const priceGroupService = ({
 
     const findById = async _id => priceGroupRepository.findById(_id);
 
+    const pullChanges = async lastPulledAt => {
+        const [created, updated, deleted] = await Promise.all([
+            priceGroupRepository.createdSince(lastPulledAt),
+            priceGroupRepository.updatedSince(lastPulledAt),
+            priceGroupRepository.deletedSince(lastPulledAt),
+        ]);
+
+        return {
+            [MONGO_TO_SQL_TABLE_MAP.priceGroups]: {
+                created,
+                updated,
+                deleted: deleted.map(({ _id }) => _id),
+            },
+        };
+    };
+
     return {
         findAll,
         create,
@@ -37,6 +53,6 @@ export const priceGroupService = ({
         findOne,
         findById,
         insert: priceGroupRepository.insert,
-        pullChanges: () => ({} as any),
+        pullChanges,
     };
 };
