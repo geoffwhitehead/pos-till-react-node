@@ -109,7 +109,7 @@ export const pull = async <T extends RepositoryFns<any>>(repo: T, lastPulledAt: 
 export const push = async <T extends RepositoryFns<any>>(repo: T, changes: ChangesObject, lastPulledAt: Date) => {
     await repo.insert(changes.created);
     await Promise.all(changes.updated.map(({ id, ...update }) => repo.findByIdAndUpdate(id, update)));
-    // await Promise.all(changes.deleted.map(id => ))
+    await Promise.all(changes.deleted.map(id => repo.deleteOneById(id)));
 };
 
 type Service = { name: string; service: any }; // TODO: figure out how to tpye thiss
