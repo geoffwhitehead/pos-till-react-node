@@ -21,6 +21,8 @@ import { OrganizationProps } from '../models/Organization';
 import { PriceGroupProps } from '../models/PriceGroup';
 import { PrinterProps } from '../models/Printer';
 import { PrinterGroupProps } from '../models/PrinterGroup';
+import { RepositoryFns } from '../repositories/utils';
+import { loggers } from 'winston';
 
 export interface InjectedDependencies {
     mailer: MailerService;
@@ -46,7 +48,8 @@ export interface ServiceResponse<T> {
 //     }
 //   }
 
-type Changes = Record<string, { created: any; updated: any; deleted: any }>;
+export type ChangesObject = { created: any; updated: any; deleted: any };
+export type Changes = Record<string, ChangesObject>;
 
 export enum MONGO_TO_SQL_TABLE_MAP {
     categories = 'categories',
@@ -84,8 +87,31 @@ export enum MONGO_TO_SQL_TABLE_MAP {
 
 export type ServiceFns = RepositoryService;
 export type SyncFns = {
-    pullChanges: (lastPulledAt: Date) => Promise<Changes>;
+    pullChanges: (lastPulledAt: Date, schemaVersion: number, migration: null) => Promise<Changes>;
+    pushChanges: (lastPulledAt: Date, changes: Changes) => Promise<{ success: boolean; error?: string }>;
 };
+
+export const pull = async <T extends RepositoryFns<any>>(repo: T, lastPulledAt: Date) => {
+    const [created, updated, deleted] = await Promise.all([
+        repo.createdSince(lastPulledAt),
+        repo.updatedSince(lastPulledAt),
+        repo.deletedSince(lastPulledAt),
+    ]);
+
+    return {
+        created,
+        updated,
+        deleted: deleted.map(({ _id }) => _id),
+    };
+};
+
+// client wins
+export const push = async <T extends RepositoryFns<any>>(repo: T, changes: ChangesObject, lastPulledAt: Date) => {
+    await repo.insert(changes.created);
+    await Promise.all(changes.updated.map(({ id, ...update }) => repo.findByIdAndUpdate(id, update)));
+    // await Promise.all(changes.deleted.map(id => ))
+};
+
 type Service = { name: string; service: any }; // TODO: figure out how to tpye thiss
 const services = [
     {

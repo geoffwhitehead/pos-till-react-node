@@ -2,6 +2,7 @@ import { TenantModel } from '../../models/utils/multiTenant';
 import mongoose from 'mongoose';
 import { Container } from 'typedi';
 import { omit } from 'lodash';
+import { ServiceFns } from '../../services';
 
 export interface RepositoryFns<T> {
     findAll: () => Promise<T[]>;
