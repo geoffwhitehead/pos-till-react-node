@@ -23,6 +23,8 @@ import { PrinterProps } from '../models/Printer';
 import { PrinterGroupProps } from '../models/PrinterGroup';
 import { RepositoryFns } from '../repositories/utils';
 import { loggers } from 'winston';
+import { GenericResponseNoData } from '../utils/types';
+import { fromClientChanges } from '../utils/sync';
 
 export interface InjectedDependencies {
     mailer: MailerService;
@@ -48,24 +50,23 @@ export interface ServiceResponse<T> {
 //     }
 //   }
 
-export type ChangesObject = { created: any; updated: any; deleted: any };
+export type ChangesObject = {
+    created: Record<string, any>[];
+    updated: Record<string, any>[];
+    deleted: string[];
+};
 export type Changes = Record<string, ChangesObject>;
 
-export enum MONGO_TO_SQL_TABLE_MAP {
-    categories = 'categories',
-    discounts = 'discounts',
-    items = 'items',
-    itemModifiers = 'item_modifiers',
-    itemPrices = 'item_prices',
-    modifiers = 'modifiers',
-    modifierItems = 'modifierItems',
-    modifierPrices = 'modifierPrices',
-    organizations = 'organizations',
-    priceGroups = 'price_groups',
-    printers = 'printers',
-    printerGroups = 'printer_groups',
-    printersGroupsPrinters = 'printer_groups_printers',
-}
+export const tablesFromClient = (changes: Changes) => {
+    return Object.keys(changes).reduce(
+        (out, key) => ({
+            ...out,
+            [key]: changes[key],
+        }),
+        {} as Record<string, Changes>,
+    );
+};
+
 // type PullChangesResponse = {
 //     changes: {
 //         categorys: ChangeResponse<CategoryProps>;
@@ -86,9 +87,21 @@ export enum MONGO_TO_SQL_TABLE_MAP {
 // };
 
 export type ServiceFns = RepositoryService;
+
+type PullChangesRequestParams = {
+    lastPulledAt: Date;
+    schemaVersion: number;
+    migration: null;
+};
+
+type PushChangesRequestParams = {
+    lastPulledAt: Date;
+    changes: Changes;
+};
+
 export type SyncFns = {
-    pullChanges: (lastPulledAt: Date, schemaVersion: number, migration: null) => Promise<Changes>;
-    pushChanges: (lastPulledAt: Date, changes: Changes) => Promise<{ success: boolean; error?: string }>;
+    pullChanges: (params: PullChangesRequestParams) => Promise<Changes>;
+    pushChanges: (params: PushChangesRequestParams) => Promise<void>;
 };
 
 export const pull = async <T extends RepositoryFns<any>>(repo: T, lastPulledAt: Date) => {
@@ -107,9 +120,9 @@ export const pull = async <T extends RepositoryFns<any>>(repo: T, lastPulledAt: 
 
 // client wins
 export const push = async <T extends RepositoryFns<any>>(repo: T, changes: ChangesObject, lastPulledAt: Date) => {
-    await repo.insert(changes.created);
-    await Promise.all(changes.updated.map(({ id, ...update }) => repo.findByIdAndUpdate(id, update)));
-    await Promise.all(changes.deleted.map(id => repo.deleteOneById(id)));
+    await Promise.all(changes.created.map(props => repo.upsert(props)));
+    await Promise.all(changes.updated.map(props => repo.upsert(props)));
+    await Promise.all(changes.deleted.map(repo.deleteOneById));
 };
 
 type Service = { name: string; service: any }; // TODO: figure out how to tpye thiss

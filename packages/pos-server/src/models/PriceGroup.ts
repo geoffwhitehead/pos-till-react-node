@@ -9,6 +9,8 @@ export interface PriceGroupProps {
     isPrepTimeRequired?: boolean;
 }
 
+export const PRICE_GROUP_COLLECTION_NAME = 'price_groups';
+
 const PriceGroupSchema: Schema<PriceGroupProps> = new Schema(
     {
         _id: {
@@ -29,7 +31,7 @@ const PriceGroupSchema: Schema<PriceGroupProps> = new Schema(
             default: false,
         },
     },
-    { timestamps: true },
+    { timestamps: true, collection: PRICE_GROUP_COLLECTION_NAME },
 );
 
 const PriceGroup = tenantModel<PriceGroupProps>('PriceGroup', PriceGroupSchema);

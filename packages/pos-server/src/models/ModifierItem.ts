@@ -12,6 +12,8 @@ export interface ModifierItemProps {
     // price: ItemPriceProps[];
 }
 
+export const MODIFIER_ITEM_COLLECTION_NAME = 'modifier_items';
+
 export const ModifierItemSchema: Schema<ModifierItemProps> = new Schema(
     {
         _id: {
@@ -30,7 +32,7 @@ export const ModifierItemSchema: Schema<ModifierItemProps> = new Schema(
         },
         // price: [ItemPriceSubSchema],
     },
-    { timestamps: true },
+    { timestamps: true, collection: MODIFIER_ITEM_COLLECTION_NAME },
 );
 
 const ModifierItem = tenantModel<ModifierItemProps>('ModifierItem', ModifierItemSchema);

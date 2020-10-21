@@ -1,12 +1,15 @@
 import mongoose, { Schema } from 'mongoose';
 import { tenantModel } from './utils/multiTenant';
 import uuid from 'uuid';
+import { ITEM_COLLECTION_NAME } from './Item';
 
 export interface ItemModifierProps {
     _id?: string;
     modifierId: string;
     itemId: string;
 }
+
+export const ITEM_MODIFIER_COLLECTION_NAME = 'item_modifiers';
 
 export const ItemModifierSchema: Schema<ItemModifierProps> = new Schema(
     {
@@ -18,7 +21,7 @@ export const ItemModifierSchema: Schema<ItemModifierProps> = new Schema(
         modifierId: { type: String, ref: 'Modifier' },
         itemId: { type: String, ref: 'Item' },
     },
-    { timestamps: true },
+    { timestamps: true, collection: ITEM_MODIFIER_COLLECTION_NAME },
 );
 
 const ItemModifier = tenantModel<ItemModifierProps>('ItemModifier', ItemModifierSchema);

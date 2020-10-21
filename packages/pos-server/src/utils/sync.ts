@@ -7,15 +7,18 @@ export const toClient = (changes: Record<string, any>[]) =>
 export const fromClient = (changes: Record<string, any>[]) =>
     changes.map(change => Object.keys(change).reduce((out, key) => ({ ...out, [camelcase(key)]: change[key] }), {}));
 
-export const toClientChanges = (changes: Changes) =>
+export const parseChanges = (changes: Changes, mapper: typeof toClient | typeof fromClient) =>
     Object.keys(changes).reduce(
         (out, key) => ({
             ...out,
-            key: {
+            [key]: {
                 ...changes[key], // deleted
-                created: toClient(changes[key].created),
-                updated: toClient(changes[key].updated),
+                created: mapper(changes[key].created),
+                updated: mapper(changes[key].updated),
             },
         }),
         {} as Changes,
     );
+
+export const fromClientChanges = (changes: Changes) => parseChanges(changes, fromClient);
+export const toClientChanges = (changes: Changes) => parseChanges(changes, toClient);

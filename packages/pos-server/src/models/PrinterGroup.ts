@@ -9,6 +9,8 @@ export interface PrinterGroupProps {
     printers: string[];
 }
 
+export const PRINTER_GROUP_COLLECTION_NAME = 'printer_groups';
+
 const PrinterGroupSchema: Schema<PrinterGroupProps> = new Schema(
     {
         _id: {
@@ -22,7 +24,7 @@ const PrinterGroupSchema: Schema<PrinterGroupProps> = new Schema(
         },
         printers: [{ type: String, ref: 'Printer' }],
     },
-    { timestamps: true },
+    { timestamps: true, collection: PRINTER_GROUP_COLLECTION_NAME },
 );
 
 const PrinterGroup = tenantModel<PrinterGroupProps>('PrinterGroup', PrinterGroupSchema);
