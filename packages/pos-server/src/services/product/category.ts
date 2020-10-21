@@ -41,6 +41,7 @@ export const categoryService = ({
     const pullChanges = async ({ lastPulledAt }) => {
         const categories = await pull(categoryRepository, lastPulledAt);
 
+        console.log('categories', categories);
         return toClientChanges({
             [CATEGORY_COLLECTION_NAME]: categories,
         });

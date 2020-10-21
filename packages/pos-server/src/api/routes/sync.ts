@@ -32,9 +32,9 @@ export default (app: Router) => {
         const { lastPulledAt, schemaVersion, migration = null } = req.query;
 
         const [itemChanges, modifierChanges, categoryChanges, discountChanges, priceGroupChanges] = await Promise.all([
+            categoryService.pullChanges({ lastPulledAt, schemaVersion, migration }),
             itemService.pullChanges({ lastPulledAt, schemaVersion, migration }),
             modifierService.pullChanges({ lastPulledAt, schemaVersion, migration }),
-            categoryService.pullChanges({ lastPulledAt, schemaVersion, migration }),
             discountService.pullChanges({ lastPulledAt, schemaVersion, migration }),
             priceGroupService.pullChanges({ lastPulledAt, schemaVersion, migration }),
         ]);
