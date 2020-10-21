@@ -57,16 +57,6 @@ export type ChangesObject = {
 };
 export type Changes = Record<string, ChangesObject>;
 
-export const tablesFromClient = (changes: Changes) => {
-    return Object.keys(changes).reduce(
-        (out, key) => ({
-            ...out,
-            [key]: changes[key],
-        }),
-        {} as Record<string, Changes>,
-    );
-};
-
 // type PullChangesResponse = {
 //     changes: {
 //         categorys: ChangeResponse<CategoryProps>;
