@@ -12,6 +12,7 @@ export interface RepositoryFns<T> {
     findByIdAndUpdate: (id: string, props: Partial<T>) => Promise<T>;
     findById: (id: string) => Promise<T>;
     insert: (docs: T[]) => Promise<T[]>; // TODO: fix type
+    upsert: (docs: T) => Promise<T>; // TODO: fix type
     deleteOneById: (id: string) => Promise<GenericResponseNoData>;
     createdSince: (timestamp: Date) => Promise<T[]>;
     updatedSince: (timestamp: Date) => Promise<T[]>;
@@ -45,8 +46,12 @@ export const repository = <T, U>({
     };
 
     const create = async props => {
-        const filteredProps = omit(props, 'tenantId');
-        const doc = await model(tenanted && getTenant()).create(filteredProps);
+        const doc = await model(tenanted && getTenant()).create(props);
+        return clean(doc);
+    };
+
+    const upsert = async (_id, ...props) => {
+        const doc = await model(tenanted && getTenant()).findByIdAndUpdate(_id, props, { upsert: true });
         return clean(doc);
     };
 
@@ -114,6 +119,7 @@ export const repository = <T, U>({
         findByIdAndUpdate,
         findById,
         insert,
+        upsert,
         deleteOneById,
         createdSince,
         updatedSince,

@@ -11,6 +11,8 @@ export interface ModifierProps {
     // items: ModifierItemProps[];
 }
 
+export const MODIFIER_COLLECTION_NAME = 'modifiers';
+
 const ModifierSchema: Schema<ModifierProps> = new Schema(
     {
         _id: {
@@ -32,7 +34,7 @@ const ModifierSchema: Schema<ModifierProps> = new Schema(
         },
         // items: [ModifierItemSubSchema],
     },
-    { timestamps: true },
+    { timestamps: true, collection: MODIFIER_COLLECTION_NAME },
 );
 
 const Modifier = tenantModel<ModifierProps>('Modifier', ModifierSchema);

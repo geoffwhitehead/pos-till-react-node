@@ -12,6 +12,8 @@ export interface UserProps extends TenantedModel {
 
 export type UserPropsFull = UserProps & PrivateUserProps;
 
+export const USER_COLLECTION_NAME = 'users';
+
 interface PrivateUserProps {
     password: string;
     refreshToken?: string;
@@ -61,6 +63,7 @@ const UserSchema: Schema<UserPropsFull> = new Schema(
     },
     {
         timestamps: true,
+        collection: USER_COLLECTION_NAME,
     },
 );
 

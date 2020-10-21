@@ -13,6 +13,7 @@ export interface ItemProps {
     // stock?: number;
     // modifiers?: mongoose.Types.ObjectId[];
 }
+export const ITEM_COLLECTION_NAME = 'items';
 
 const ItemSchema: Schema<ItemProps> = new Schema(
     {
@@ -40,7 +41,7 @@ const ItemSchema: Schema<ItemProps> = new Schema(
         //     },
         // ],
     },
-    { timestamps: true },
+    { timestamps: true, collection: ITEM_COLLECTION_NAME },
 );
 
 const Item = tenantModel<ItemProps>('Item', ItemSchema);

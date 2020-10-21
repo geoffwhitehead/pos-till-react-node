@@ -9,6 +9,8 @@ export interface DiscountProps {
     isPercent: boolean;
 }
 
+export const DISCOUNT_COLLECTION_NAME = 'discounts';
+
 const DiscountSchema: Schema<DiscountProps> = new Schema(
     {
         _id: {
@@ -28,7 +30,7 @@ const DiscountSchema: Schema<DiscountProps> = new Schema(
             default: true,
         },
     },
-    { timestamps: true },
+    { timestamps: true, collection: DISCOUNT_COLLECTION_NAME },
 );
 
 const Discount = tenantModel<DiscountProps>('Discount', DiscountSchema);

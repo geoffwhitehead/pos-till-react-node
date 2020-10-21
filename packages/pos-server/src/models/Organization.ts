@@ -26,6 +26,8 @@ export interface OrganizationProps {
     syncId: string;
 }
 
+export const ORGANIZATION_COLLECTION_NAME = 'organizations';
+
 export const OrganizationValidation = {
     name: Joi.string().required(),
     email: Joi.string().required(),
@@ -106,7 +108,7 @@ const OrganizationSchema: Schema<OrganizationProps> = new Schema(
             type: Date,
         },
     },
-    { timestamps: true },
+    { timestamps: true, collection: ORGANIZATION_COLLECTION_NAME },
 );
 
 const Organization = tenantlessModel<OrganizationProps>('Organization', OrganizationSchema);

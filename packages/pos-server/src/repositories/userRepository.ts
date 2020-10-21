@@ -72,11 +72,6 @@ export const userRepository = ({ models: { UserModel } }: InjectedRepositoryDepe
 //     return clean(await UserModel({ tenantId }).findOne(props));
 // };
 
-/**
- * TODO: currently this is retunring full props including password because its needed
- * for auth. Look at creating a mapper layer to abstract this away.
- */
-
 // return {
 //     findAll,
 //     create,

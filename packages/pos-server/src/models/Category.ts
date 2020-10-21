@@ -8,6 +8,8 @@ export interface CategoryProps {
     shortName: string;
 }
 
+export const CATEGORY_COLLECTION_NAME = 'categories';
+
 const CategorySchema: Schema<CategoryProps> = new Schema(
     {
         _id: {
@@ -24,7 +26,7 @@ const CategorySchema: Schema<CategoryProps> = new Schema(
             maxlength: 10,
         },
     },
-    { timestamps: true },
+    { timestamps: true, collection: CATEGORY_COLLECTION_NAME },
 );
 
 const Category = tenantModel<CategoryProps>('Category', CategorySchema);

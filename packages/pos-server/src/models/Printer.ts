@@ -1,4 +1,4 @@
-import mongoose, { Schema } from 'mongoose';
+import { Schema } from 'mongoose';
 import { tenantModel } from './utils/multiTenant';
 import uuid from 'uuid';
 
@@ -11,6 +11,8 @@ export interface PrinterProps {
     printWidth: number;
     emulation: 'StarPRNT' | 'StarLine' | 'StarGraphic' | 'StarDotImpact' | 'EscPosMobile' | 'EscPos';
 }
+
+export const PRINTER_COLLECTION_NAME = 'printers';
 
 const PrinterSchema: Schema<PrinterProps> = new Schema(
     {
@@ -39,7 +41,7 @@ const PrinterSchema: Schema<PrinterProps> = new Schema(
             type: Number,
         },
     },
-    { timestamps: true },
+    { timestamps: true, collection: PRINTER_COLLECTION_NAME },
 );
 
 const Printer = tenantModel<PrinterProps>('Printer', PrinterSchema);

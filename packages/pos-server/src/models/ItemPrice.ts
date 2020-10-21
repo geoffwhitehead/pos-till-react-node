@@ -9,6 +9,8 @@ export interface ItemPriceProps {
     price: number;
 }
 
+export const ITEM_PRICE_COLLECTION_NAME = 'item_prices';
+
 export const ItemPriceSchema: Schema<ItemPriceProps> = new Schema(
     {
         _id: {
@@ -23,7 +25,7 @@ export const ItemPriceSchema: Schema<ItemPriceProps> = new Schema(
         },
         itemId: { type: String, ref: 'Item' },
     },
-    { timestamps: true },
+    { timestamps: true, collection: ITEM_PRICE_COLLECTION_NAME },
 );
 
 const ItemPrice = tenantModel<ItemPriceProps>('ItemPrice', ItemPriceSchema);

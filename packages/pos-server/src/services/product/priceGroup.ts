@@ -1,6 +1,5 @@
-import { PriceGroupProps } from '../../models/PriceGroup';
-import { InjectedDependencies, MONGO_TO_SQL_TABLE_MAP, pull, push } from '..';
-import { RepositoryFns } from '../../repositories/utils';
+import { PriceGroupProps, PRICE_GROUP_COLLECTION_NAME } from '../../models/PriceGroup';
+import { InjectedDependencies, pull, push } from '..';
 import { CommonServiceFns } from '.';
 import { toClientChanges } from '../../utils/sync';
 
@@ -31,23 +30,16 @@ export const priceGroupService = ({
 
     const findById = async _id => priceGroupRepository.findById(_id);
 
-    const pullChanges = async lastPulledAt => {
+    const pullChanges = async ({ lastPulledAt }) => {
         const priceGroups = await pull(priceGroupRepository, lastPulledAt);
 
         return toClientChanges({
-            [MONGO_TO_SQL_TABLE_MAP.priceGroups]: priceGroups,
+            [PRICE_GROUP_COLLECTION_NAME]: priceGroups,
         });
     };
 
-    const pushChanges = async (lastPulledAt, changes) => {
-        try {
-            await push(priceGroupRepository, changes, lastPulledAt);
-        } catch (err) {
-            // add logger
-            console.error(err);
-            return { success: false, error: 'Failed to push changes' };
-        }
-        return { success: true };
+    const pushChanges = async ({ lastPulledAt, changes }) => {
+        await push(priceGroupRepository, changes[PRICE_GROUP_COLLECTION_NAME], lastPulledAt);
     };
 
     return {
