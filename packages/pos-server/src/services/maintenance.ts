@@ -70,43 +70,54 @@ export const maintenanceService = ({
         itemModifierRepository,
         printerRepository,
         printerGroupRepository,
+        printerGroupPrinterRepository,
     },
     logger,
 }: InjectedDependencies): MaintenanceService => {
     const seed = async () => {
-        const results = await printerRepository.insert([
+        const printers = [
             {
+                _id: uuid(),
                 name: 'Star SP700',
                 type: 'ethernet',
                 address: 'TCP:192.168.1.84',
                 emulation: 'StarDotImpact',
                 printWidth: 14,
-            },
+            } as const,
             {
+                id: uuid(),
                 name: 'Star TSP100',
                 type: 'wifi',
                 address: 'TCP:192.168.1.78',
                 emulation: 'StarGraphic',
                 printWidth: 39,
-            },
-        ]);
+            } as const,
+        ];
 
-        const thermalPrinter: PrinterProps = results.find(r => r.name === 'Star TSP100');
-        const kitchenPrinter: PrinterProps = results.find(r => r.name === 'Star SP700');
+        const results = await printerRepository.insert(printers);
+
+        const thermalPrinter = printers[1];
+        const kitchenPrinter = printers[0];
 
         console.log('BEFORE INSERTING');
-        const printerGroupResults = await printerGroupRepository.insert([
+        const printerGroups = [
             {
+                _id: uuid(),
                 name: 'Starter',
-                printers: [kitchenPrinter._id],
             },
             {
+                _id: uuid(),
                 name: 'Kitchen',
-                printers: [kitchenPrinter._id],
             },
-        ]);
+        ];
+        await printerGroupRepository.insert(printerGroups);
 
-        console.log('printerGroupResults', printerGroupResults);
+        await printerGroupPrinterRepository.insert(
+            printerGroups.map(group => ({
+                printerGroupId: group._id,
+                printerId: kitchenPrinter._id,
+            })),
+        );
 
         const categories = [
             {
@@ -192,7 +203,7 @@ export const maintenanceService = ({
                 name: productName,
                 shortName: productName.slice(0, 9),
                 categoryId: insertedCategories[random(categories.length - 1)]._id,
-                printerGroupId: printerGroupResults[random(1)]._id,
+                printerGroupId: printerGroups[random(1)]._id,
             };
         });
 

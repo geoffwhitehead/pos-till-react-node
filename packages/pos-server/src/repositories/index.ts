@@ -12,6 +12,7 @@ import { ItemModifierRepository, itemModifierRepository } from './itemModifierRe
 import { ItemPriceRepository, itemPriceRepository } from './itemPriceRepository';
 import { printerRepository, PrinterRepository } from './printerRepository';
 import { PrinterGroupRepository, printerGroupRepository } from './printerGroupRepository';
+import { printerGroupPrinterRepository, PrinterGroupPrinterRepository } from './printerGroupPrinterRepository';
 
 export interface RepositoryService {
     userRepository: UserRepository;
@@ -27,6 +28,7 @@ export interface RepositoryService {
     itemPriceRepository: ItemPriceRepository;
     printerRepository: PrinterRepository;
     printerGroupRepository: PrinterGroupRepository;
+    printerGroupPrinterRepository: PrinterGroupPrinterRepository;
 }
 
 export interface InjectedRepositoryDependencies {
@@ -44,6 +46,7 @@ export interface InjectedRepositoryDependencies {
         ItemPriceModel: typeof Models.ItemPrice;
         PrinterModel: typeof Models.Printer;
         PrinterGroupModel: typeof Models.PrinterGroup;
+        PrinterGroupPrinterModel: typeof Models.PrinterGroupPrinter;
     };
 }
 
@@ -62,6 +65,7 @@ export const registerRepositories = (): RepositoryService => {
         ItemModifierModel: Models.ItemModifier,
         PrinterModel: Models.Printer,
         PrinterGroupModel: Models.PrinterGroup,
+        PrinterGroupPrinterModel: Models.PrinterGroupPrinter,
     };
 
     const repositories = [
@@ -116,6 +120,10 @@ export const registerRepositories = (): RepositoryService => {
         {
             name: 'printerGroupRepository',
             repo: printerGroupRepository,
+        },
+        {
+            name: 'printerGroupPrinterRepository',
+            repo: printerGroupPrinterRepository,
         },
     ];
 
