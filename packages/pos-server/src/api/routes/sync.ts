@@ -14,6 +14,9 @@ import { MODIFIER_ITEM_COLLECTION_NAME } from '../../models/ModifierItem';
 import { MODIFIER_PRICE_COLLECTION_NAME } from '../../models/ModifierPrice';
 import { PRICE_GROUP_COLLECTION_NAME } from '../../models/PriceGroup';
 import { fromClientChanges } from '../../utils/sync';
+import { PRINTER_COLLECTION_NAME } from '../../models/Printer';
+import { PRINTER_GROUP_COLLECTION_NAME } from '../../models/PrinterGroup';
+import { PRINTER_GROUP_PRINTER_COLLECTION_NAME } from '../../models/PrinterGroupPrinter';
 
 export default (app: Router) => {
     const route = Router();
@@ -28,15 +31,27 @@ export default (app: Router) => {
             discount: discountService,
             priceGroup: priceGroupService,
         } = Container.get('productService') as ProductService;
+        const printerService = Container.get('printerService') as PrinterService;
+        const printerGroupService = Container.get('printerGroupService') as PrinterService;
 
         const { lastPulledAt, schemaVersion, migration = null } = req.query;
 
-        const [itemChanges, modifierChanges, categoryChanges, discountChanges, priceGroupChanges] = await Promise.all([
+        const [
+            itemChanges,
+            modifierChanges,
+            categoryChanges,
+            discountChanges,
+            priceGroupChanges,
+            printerChanges,
+            printerGroupChanges,
+        ] = await Promise.all([
             categoryService.pullChanges({ lastPulledAt, schemaVersion, migration }),
             itemService.pullChanges({ lastPulledAt, schemaVersion, migration }),
             modifierService.pullChanges({ lastPulledAt, schemaVersion, migration }),
             discountService.pullChanges({ lastPulledAt, schemaVersion, migration }),
             priceGroupService.pullChanges({ lastPulledAt, schemaVersion, migration }),
+            printerService.pullChanges({ lastPulledAt, schemaVersion, migration }),
+            printerGroupService.pullChanges({ lastPulledAt, schemaVersion, migration }),
         ]);
 
         const changes = {
@@ -45,6 +60,8 @@ export default (app: Router) => {
             ...categoryChanges,
             ...discountChanges,
             ...priceGroupChanges,
+            ...printerChanges,
+            ...printerGroupChanges,
         };
 
         return res.status(200).json(changes);
@@ -59,6 +76,8 @@ export default (app: Router) => {
             discount: discountService,
             priceGroup: priceGroupService,
         } = Container.get('productService') as ProductService;
+        const printerService = Container.get('printerService') as PrinterService;
+        const printerGroupService = Container.get('printerGroupService') as PrinterService;
 
         const { lastPulledAt, changes: unmappedChanges } = req.body;
 
@@ -96,6 +115,18 @@ export default (app: Router) => {
                 priceGroupService.pushChanges({
                     lastPulledAt,
                     changes: deconstructChanges(changes, PRICE_GROUP_COLLECTION_NAME),
+                }),
+                ,
+                printerService.pushChanges({
+                    lastPulledAt,
+                    changes: deconstructChanges(changes, PRINTER_COLLECTION_NAME),
+                }),
+                printerGroupService.pushChanges({
+                    lastPulledAt,
+                    changes: {
+                        ...deconstructChanges(changes, PRINTER_GROUP_COLLECTION_NAME),
+                        ...deconstructChanges(changes, PRINTER_GROUP_PRINTER_COLLECTION_NAME),
+                    },
                 }),
             ]);
 

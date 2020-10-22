@@ -11,6 +11,7 @@ import { ItemPrice } from './ItemPrice';
 import { ItemModifier } from './ItemModifier';
 import { ModifierItem } from './ModifierItem';
 import { ModifierPrice } from './ModifierPrice';
+import { PrinterGroupPrinter } from './PrinterGroupPrinter';
 
 export default {
     User,
@@ -26,19 +27,5 @@ export default {
     PriceGroup,
     Printer,
     PrinterGroup,
+    PrinterGroupPrinter,
 };
-
-// paymentTypes: paymentTypeSchema.name,
-//   discounts: discountSchema.name,
-//   organizations: organizationSchema.name,
-//   categories: categorySchema.name,
-//   items: itemSchema.name,
-//   itemPrices: itemPriceSchema.name,
-//   itemModifiers: itemModifierSchema.name,
-//   modifiers: modifierSchema.name,
-//   modifierItems: modifierItemSchema.name,
-//   modifierPrices: modifierPriceSchema.name,
-//   priceGroups: priceGroupSchema.name,
-//   printers: printerSchema.name,
-//   printerGroups: printerGroupSchema.name,
-//   printerGroupsPrinters: printerGroupPrinterSchema.name,
