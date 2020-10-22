@@ -2,7 +2,7 @@ import { TenantModel } from '../../models/utils/multiTenant';
 import mongoose from 'mongoose';
 import { Container } from 'typedi';
 import { omit } from 'lodash';
-import { ServiceFns } from '../../services';
+import { ChangeDocument, ServiceFns } from '../../services';
 import { GenericResponseNoData } from '../../utils/types';
 
 export interface RepositoryFns<T> {
@@ -12,7 +12,7 @@ export interface RepositoryFns<T> {
     findByIdAndUpdate: (id: string, props: Partial<T>) => Promise<T>;
     findById: (id: string) => Promise<T>;
     insert: (docs: T[]) => Promise<T[]>; // TODO: fix type
-    upsert: (docs: T) => Promise<T>; // TODO: fix type
+    upsert: <T>(doc: T & ChangeDocument) => Promise<T>; // TODO: fix type
     deleteOneById: (id: string) => Promise<GenericResponseNoData>;
     createdSince: (timestamp: Date) => Promise<T[]>;
     updatedSince: (timestamp: Date) => Promise<T[]>;
@@ -50,9 +50,12 @@ export const repository = <T, U>({
         return clean(doc);
     };
 
-    const upsert = async (_id, ...props) => {
-        const doc = await model(tenanted && getTenant()).findByIdAndUpdate(_id, props, { upsert: true });
-        return clean(doc);
+    const upsert = async ({ id, ...props }) => {
+        console.log('id, props', id, props);
+
+        const doc = await model(tenanted && getTenant()).findByIdAndUpdate(id, props, { upsert: true, new: true });
+        console.log('doc', doc);
+        return clean(doc as mongoose.Document);
     };
 
     const insert = async docs => {

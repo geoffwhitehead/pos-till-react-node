@@ -3,7 +3,7 @@ import { PrinterService } from '../../services/printer';
 import { Container } from 'typedi';
 import { LoggerService } from '../../loaders/logger';
 import { ProductService } from '../../services/product';
-import { Changes, tablesFromClient } from '../../services';
+import { Changes } from '../../services';
 import { CATEGORY_COLLECTION_NAME } from '../../models/Category';
 import { DISCOUNT_COLLECTION_NAME } from '../../models/Discount';
 import { ITEM_COLLECTION_NAME } from '../../models/Item';
@@ -62,7 +62,10 @@ export default (app: Router) => {
 
         const { lastPulledAt, changes: unmappedChanges } = req.body;
 
+        console.log('unmappedChanges', unmappedChanges);
         const changes = fromClientChanges(unmappedChanges);
+
+        console.log('JSON.stringify(changes, null, 4)', JSON.stringify(changes, null, 4));
 
         try {
             await Promise.all([
@@ -98,6 +101,7 @@ export default (app: Router) => {
 
             return res.status(200).json({ success: true });
         } catch (error) {
+            console.error('ERROR: ', error);
             return res.status(500).json({ success: false, error });
         }
     });
