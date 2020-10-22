@@ -10,6 +10,7 @@ import { ModifierItemProps } from '../models/ModifierItem';
 import { ModifierPriceProps } from '../models/ModifierPrice';
 import { flatten } from 'lodash';
 import { ItemProps } from '../models/Item';
+import { ItemModifierProps } from '../models/ItemModifier';
 
 export interface MaintenanceService {
     seed: () => Promise<any>;
@@ -42,10 +43,8 @@ const generateModifierPrices: (priceGroups: PriceGroupProps[], modifierItemId: s
     modifierItemId,
 ) => {
     return priceGroups.map((group, i) => {
-        const _id = uuid();
-        console.log('_id', _id);
         return {
-            _id,
+            _id: uuid(),
             priceGroupId: group._id,
             price:
                 faker.random.number({
@@ -192,7 +191,7 @@ export const maintenanceService = ({
             modifierItems.map(mItem => generateModifierPrices(priceGroups, mItem._id)),
         );
 
-        const newModifier = await modifierRepository.create(modifier);
+        await modifierRepository.create(modifier);
         await modifierItemRepository.insert(modifierItems);
         await modifierPriceRepository.insert(modifierPrices);
 
@@ -209,14 +208,24 @@ export const maintenanceService = ({
 
         const itemPrices: ItemPriceProps[] = flatten(items.map(item => generateItemPrices(priceGroups, item._id)));
 
+        const itemModifiers = items
+            .map(item => {
+                const hasMod = random(1);
+                if (hasMod) {
+                    return {
+                        itemId: item._id,
+                        modifierId: modifier._id,
+                    };
+                }
+                return null;
+            })
+            .filter(i => i != null);
+
         await itemRepository.insert(items);
         await itemPriceRepository.insert(itemPrices);
-        // if (!insertedItems.result.ok) {
-        //     console.log('insertedItems', insertedItems);
-        //     throw new Error('Error inserting items');
-        // }
+        await itemModifierRepository.insert(itemModifiers);
 
-        const insertedDiscounts = await discountRepository.insert([
+        await discountRepository.insert([
             {
                 name: 'Student',
                 amount: 10,
