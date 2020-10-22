@@ -50,9 +50,10 @@ export interface ServiceResponse<T> {
 //     }
 //   }
 
+export type ChangeDocument = Record<string, any> & { id: string };
 export type ChangesObject = {
-    created: Record<string, any>[];
-    updated: Record<string, any>[];
+    created: ChangeDocument[];
+    updated: ChangeDocument[];
     deleted: string[];
 };
 export type Changes = Record<string, ChangesObject>;
