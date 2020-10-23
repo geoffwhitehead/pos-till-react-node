@@ -242,10 +242,6 @@ export const maintenanceService = ({
                 isPercent: false,
             },
         ]);
-        // if (!insertedDiscounts.result.ok) {
-        //     console.log('insertedDiscounts', insertedDiscounts);
-        //     throw new Error('Error inserting discounts');
-        // }
 
         logger.info('Sucessfully seeded');
         return {

@@ -13,7 +13,6 @@ export const fromClient = (changes: ChangeDocument[]) => {
 };
 
 export const parseChanges = (changes: Changes, mapper: typeof toClient | typeof fromClient) => {
-    console.log('changes---------', changes);
     return Object.keys(changes).reduce(
         (out, key) => ({
             ...out,
