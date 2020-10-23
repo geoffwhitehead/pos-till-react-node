@@ -12,6 +12,7 @@ import { Loading } from '../../components/Loading/Loading';
 import { OrganizationContext } from '../../contexts/OrganizationContext';
 import { getOrganization } from '../../api/organization';
 import { okResponse } from '../../api';
+import { sync } from '../../services/sync';
 
 interface MainInnerProps {
   priceGroups: PriceGroup[]; // TODO: fix type
@@ -44,17 +45,7 @@ export const MainWrapped: React.FC<MainOuterProps & MainInnerProps> = ({
           .query()
           .fetch();
 
-        if (organizations.length === 0) {
-          await populate(database);
-        } else {
-          const dbOrg = organizations[0];
-          const serverOrg = okResponse(await getOrganization());
-          if (serverOrg && serverOrg.syncId !== dbOrg.syncId) {
-            await populate(database);
-          } else {
-            console.log('matching sync id');
-          }
-        }
+        await sync();
       } catch (e) {
         console.error(e);
       }
