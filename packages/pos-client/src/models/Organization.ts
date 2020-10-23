@@ -18,7 +18,7 @@ export class Organization extends Model {
   @field('receipt_printer_id') receiptPrinterId: string;
   @field('currency') currency: string;
   @field('max_bills') maxBills: number;
-  @field('lastPulledAt') syncId: string;
+  @field('last_pulled_at') lastPulledAt: string;
 
   @relation('price_groups', 'default_price_group_id') defaultPriceGroup: Relation<PriceGroup>;
   @relation('printers', 'receipt_printer_id') receiptPrinter: Relation<Printer>;

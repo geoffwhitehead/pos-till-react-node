@@ -78,7 +78,7 @@ export const organizationService = ({
 
         return {
             [ORGANIZATION_COLLECTION_NAME]: {
-                created: [], // n/a
+                created: organizations.created.map(organizationToClient), // n/a
                 updated: organizations.updated.map(organizationToClient),
                 deleted: [], // n/a
             },
@@ -87,7 +87,7 @@ export const organizationService = ({
 
     const pushChanges = async ({ lastPulledAt, changes }) => {
         const _changes = {
-            created: [],
+            created: changes[ORGANIZATION_COLLECTION_NAME].created.map(organizationFromClient),
             updated: changes[ORGANIZATION_COLLECTION_NAME].updated.map(organizationFromClient),
             deleted: [],
         };
