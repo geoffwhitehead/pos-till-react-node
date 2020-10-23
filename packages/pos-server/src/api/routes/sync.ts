@@ -17,6 +17,8 @@ import { fromClientChanges } from '../../utils/sync';
 import { PRINTER_COLLECTION_NAME } from '../../models/Printer';
 import { PRINTER_GROUP_COLLECTION_NAME } from '../../models/PrinterGroup';
 import { PRINTER_GROUP_PRINTER_COLLECTION_NAME } from '../../models/PrinterGroupPrinter';
+import { OrganizationService } from '../../services/organization';
+import { ORGANIZATION_COLLECTION_NAME } from '../../models/Organization';
 
 export default (app: Router) => {
     const route = Router();
@@ -33,6 +35,7 @@ export default (app: Router) => {
         } = Container.get('productService') as ProductService;
         const printerService = Container.get('printerService') as PrinterService;
         const printerGroupService = Container.get('printerGroupService') as PrinterService;
+        const organizationService = Container.get('organizationService') as OrganizationService;
 
         const { lastPulledAt, schemaVersion, migration = null } = req.query;
 
@@ -44,6 +47,7 @@ export default (app: Router) => {
             priceGroupChanges,
             printerChanges,
             printerGroupChanges,
+            organizationChanges,
         ] = await Promise.all([
             categoryService.pullChanges({ lastPulledAt, schemaVersion, migration }),
             itemService.pullChanges({ lastPulledAt, schemaVersion, migration }),
@@ -52,6 +56,7 @@ export default (app: Router) => {
             priceGroupService.pullChanges({ lastPulledAt, schemaVersion, migration }),
             printerService.pullChanges({ lastPulledAt, schemaVersion, migration }),
             printerGroupService.pullChanges({ lastPulledAt, schemaVersion, migration }),
+            organizationService.pullChanges({ lastPulledAt, schemaVersion, migration }),
         ]);
 
         const changes = {
@@ -62,6 +67,7 @@ export default (app: Router) => {
             ...priceGroupChanges,
             ...printerChanges,
             ...printerGroupChanges,
+            ...organizationChanges,
         };
 
         return res.status(200).json(changes);
@@ -78,13 +84,14 @@ export default (app: Router) => {
         } = Container.get('productService') as ProductService;
         const printerService = Container.get('printerService') as PrinterService;
         const printerGroupService = Container.get('printerGroupService') as PrinterService;
+        const organizationService = Container.get('organizationService') as OrganizationService;
 
         const { lastPulledAt, changes: unmappedChanges } = req.body;
 
         console.log('unmappedChanges', unmappedChanges);
         const changes = fromClientChanges(unmappedChanges);
 
-        console.log('JSON.stringify(changes, null, 4)', JSON.stringify(changes, null, 4));
+        // console.log('JSON.stringify(changes, null, 4)', JSON.stringify(changes, null, 4));
 
         try {
             await Promise.all([
@@ -128,6 +135,10 @@ export default (app: Router) => {
                         ...deconstructChanges(changes, PRINTER_GROUP_PRINTER_COLLECTION_NAME),
                     },
                 }),
+                organizationService.pushChanges({
+                    lastPulledAt,
+                    changes: deconstructChanges(changes, ORGANIZATION_COLLECTION_NAME),
+                }),
             ]);
 
             return res.status(200).json({ success: true });
@@ -138,4 +149,6 @@ export default (app: Router) => {
     });
 };
 
-export const deconstructChanges = (changes: Changes, key: string) => ({ [key]: changes[key] });
+export const deconstructChanges = (changes: Changes, key: string) => ({
+    [key]: changes[key] ? changes[key] : { created: [], updated: [], deleted: [] },
+});

@@ -10,9 +10,9 @@ export interface OrganizationProps {
     email: string;
     phone: string;
     vat?: string;
-    settings?: {
-        defaultPriceGroup?: string;
-        receiptPrinter?: string;
+    settings: {
+        defaultPriceGroupId?: string;
+        receiptPrinterId?: string;
         currency: string;
         maxBills: number;
     };
@@ -23,7 +23,6 @@ export interface OrganizationProps {
         county: string;
         postcode: string;
     };
-    syncId: string;
 }
 
 export const ORGANIZATION_COLLECTION_NAME = 'organizations';
@@ -34,8 +33,8 @@ export const OrganizationValidation = {
     phone: Joi.string().required(),
     vat: Joi.string(),
     settings: Joi.object({
-        defaultPriceGroup: Joi.string(),
-        receiptPrinter: Joi.string(),
+        defaultPriceGroupId: Joi.string(),
+        receiptPrinterId: Joi.string(),
         currency: Joi.string(),
         maxBills: Joi.number(),
     }),
@@ -73,8 +72,8 @@ const OrganizationSchema: Schema<OrganizationProps> = new Schema(
         },
         settings: {
             type: {
-                defaultPriceGroup: { type: String, ref: 'PriceGroup' },
-                receiptPrinter: { type: String, ref: 'Printer' },
+                defaultPriceGroupId: { type: String, ref: 'PriceGroup' },
+                receiptPrinterId: { type: String, ref: 'Printer' },
                 currency: String,
                 maxBills: Number,
             },
