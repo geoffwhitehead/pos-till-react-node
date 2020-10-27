@@ -17,7 +17,6 @@ import { Loading } from '../../../../components/Loading/Loading';
 import { groupBy } from 'lodash';
 import { resolvePrice } from '../../../../helpers';
 import { OrganizationContext } from '../../../../contexts/OrganizationContext';
-import { getSymbol } from '../../../../utils';
 
 interface CategoryItemsListOuterProps {
   database?: Database;
@@ -43,7 +42,9 @@ const CategoryItemsInner: React.FC<CategoryItemsListOuterProps & CategoryItemsLi
   const [selectedItem, setSelectedItem] = useState<Item>();
   const [groupedPrices, setGroupedPrices] = useState<Record<string, PriceGroup[]>>();
 
-  const { organization } = useContext(OrganizationContext);
+  const {
+    organization: { currency },
+  } = useContext(OrganizationContext);
   const { priceGroup } = useContext(PriceGroupContext);
   const { currentBill } = useContext(CurrentBillContext);
 
@@ -118,7 +119,7 @@ const CategoryItemsInner: React.FC<CategoryItemsListOuterProps & CategoryItemsLi
                 price={resolvePrice(priceGroup, groupedPrices[item.id])}
                 isActive={selectedItem === item}
                 onPressItem={onSelectItem}
-                currency={getSymbol(organization.currency)}
+                currency={currency}
               />
             );
           })}

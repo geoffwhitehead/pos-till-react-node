@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { formatNumber, getSymbol } from '../../../../../utils';
+import { formatNumber } from '../../../../../utils';
 import { Separator, Text, ListItem, Left, Right } from 'native-base';
 import { OrganizationContext } from '../../../../../contexts/OrganizationContext';
 
@@ -9,8 +9,9 @@ interface DiscountBreakdownProps {
   onSelect: (billDiscountId: string) => void;
 }
 export const DiscountsBreakdown: React.FC<DiscountBreakdownProps> = ({ discountBreakdown, readonly, onSelect }) => {
-  const { organization } = useContext(OrganizationContext);
-  const currencySymbol = getSymbol(organization.currency);
+  const {
+    organization: { currency },
+  } = useContext(OrganizationContext);
 
   if (!discountBreakdown || !discountBreakdown.length) {
     return null;
@@ -19,7 +20,7 @@ export const DiscountsBreakdown: React.FC<DiscountBreakdownProps> = ({ discountB
   const discountText = discount =>
     discount.isPercent
       ? `Discount: ${discount.name} ${discount.amount}%`
-      : `Discount: ${discount.name} ${formatNumber(discount.amount, currencySymbol)}`;
+      : `Discount: ${discount.name} ${formatNumber(discount.amount, currency)}`;
 
   return (
     <>
@@ -37,7 +38,7 @@ export const DiscountsBreakdown: React.FC<DiscountBreakdownProps> = ({ discountB
               <Text>{discountText(breakdown)}</Text>
             </Left>
             <Right>
-              <Text>{`${formatNumber(breakdown.calculatedDiscount, currencySymbol)}`}</Text>
+              <Text>{`${formatNumber(breakdown.calculatedDiscount, currency)}`}</Text>
             </Right>
           </ListItem>
         );

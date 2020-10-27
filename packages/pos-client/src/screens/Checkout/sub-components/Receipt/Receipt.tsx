@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { Text, Col, Grid, Row, Button } from '../../../../core';
 import { StyleSheet } from 'react-native';
-import { formatNumber, billSummary, BillSummary, getSymbol } from '../../../../utils';
+import { formatNumber, billSummary, BillSummary } from '../../../../utils';
 import { Fonts } from '../../../../theme';
 import { ReceiptItems } from './ReceiptItems';
 import dayjs from 'dayjs';
@@ -10,11 +10,10 @@ import { receiptBill } from '../../../../services/printer/receiptBill';
 import withObservables from '@nozbe/with-observables';
 import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import { tableNames, Discount, PaymentType, PriceGroup, Bill, Printer } from '../../../../models';
-import { Database, tableName } from '@nozbe/watermelondb';
-import { PrintStatus, BillItem } from '../../../../models/BillItem';
+import { Database } from '@nozbe/watermelondb';
+import { BillItem } from '../../../../models/BillItem';
 import { kitchenReceipt } from '../../../../services/printer/kitchenReceipt';
-import { flatten, pickBy, groupBy } from 'lodash';
-import { database } from '../../../../database';
+import { flatten, groupBy } from 'lodash';
 import { Loading } from '../../../../components/Loading/Loading';
 import { OrganizationContext } from '../../../../contexts/OrganizationContext';
 
@@ -62,8 +61,8 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
   const [isStoreDisabled, setIsStoreDisabled] = useState(false);
 
   const { organization } = useContext(OrganizationContext);
+  const { currency } = organization;
 
-  const currencySymbol = getSymbol(organization.currency);
   const receiptPrinter =
     organization && printers ? printers.find(p => p.id === organization.receiptPrinterId) : undefined;
 
@@ -163,6 +162,7 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
       priceGroups,
       paymentTypes,
       receiptPrinter,
+      currency,
     );
     console.log('commands', commands);
 
@@ -203,16 +203,16 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
         />
       </Row>
       <Row style={styles.r3}>
-        {<Text>{`Discount: ${formatNumber(totalDiscount, currencySymbol)}`}</Text>}
+        {<Text>{`Discount: ${formatNumber(totalDiscount, currency)}`}</Text>}
 
-        <Text>{`Total: ${formatNumber(totalPayable, currencySymbol)}`}</Text>
+        <Text>{`Total: ${formatNumber(totalPayable, currency)}`}</Text>
         {complete && (
           <Text>{`Change Due: ${formatNumber(
             Math.abs(billPayments.find(payment => payment.isChange).amount),
-            currencySymbol,
+            currency,
           )}`}</Text>
         )}
-        <Text style={Fonts.h3}>{`Balance: ${formatNumber(balance, currencySymbol)}`}</Text>
+        <Text style={Fonts.h3}>{`Balance: ${formatNumber(balance, currency)}`}</Text>
       </Row>
       <Row style={styles.r4}>
         <Button disabled={!receiptPrinter} style={styles.printButton} block small onPress={onPrint}>

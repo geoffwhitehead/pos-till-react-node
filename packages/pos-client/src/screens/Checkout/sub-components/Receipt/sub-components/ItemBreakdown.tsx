@@ -1,7 +1,7 @@
 import { ListItem, Left, Content, Text, Right } from '../../../../../core';
 import { capitalize } from 'lodash';
-import React, { useContext, Fragment } from 'react';
-import { formatNumber, getSymbol } from '../../../../../utils';
+import React, { useContext } from 'react';
+import { formatNumber } from '../../../../../utils';
 import withObservables from '@nozbe/with-observables';
 import { BillItem, BillItemModifierItem } from '../../../../../models';
 import { OrganizationContext } from '../../../../../contexts/OrganizationContext';
@@ -22,8 +22,9 @@ const ItemBreakdownInner: React.FC<ItemBreakdownOuterProps & ItemBreakdownInnerP
   readonly,
   onSelect,
 }) => {
-  const { organization } = useContext(OrganizationContext);
-  const currencySymbol = getSymbol(organization.currency);
+  const {
+    organization: { currency },
+  } = useContext(OrganizationContext);
 
   const prefix = item.isVoided ? 'VOID ' : item.isComp ? 'COMP ' : '';
   const style = item.isVoided ? styles.void : item.isComp ? styles.comp : {};
@@ -45,10 +46,10 @@ const ItemBreakdownInner: React.FC<ItemBreakdownOuterProps & ItemBreakdownInnerP
         </Content>
       </Left>
       <Right>
-        <Text style={style}>{`${formatNumber(item.isComp ? 0 : item.itemPrice, currencySymbol)}`}</Text>
+        <Text style={style}>{`${formatNumber(item.isComp ? 0 : item.itemPrice, currency)}`}</Text>
         {modifierItems.map(m => (
           <Text style={style} key={`${m.id}-price`}>
-            {formatNumber(item.isComp ? 0 : m.modifierItemPrice, currencySymbol)}
+            {formatNumber(item.isComp ? 0 : m.modifierItemPrice, currency)}
           </Text>
         ))}
       </Right>
