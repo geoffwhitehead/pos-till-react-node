@@ -179,7 +179,7 @@ export class BillItem extends Model {
     const toCreate = [];
 
     const billItemModifierToCreate = this.collections
-      .get<BillItemModifier>('bill_item_modifiers')
+      .get<BillItemModifier>(tableNames.billItemModifiers)
       .prepareCreate(billItemModifier => {
         billItemModifier.modifier.set(modifier);
         billItemModifier.billItem.set(this);
@@ -193,7 +193,7 @@ export class BillItem extends Model {
         const prices = await modifierItem.prices.fetch();
         const modifier = await modifierItem.modifier.fetch();
         const mItem = this.collections
-          .get<BillItemModifierItem>('bill_item_modifier_items')
+          .get<BillItemModifierItem>(tableNames.billItemModifierItems)
           .prepareCreate(billItemModifierItem => {
             billItemModifierItem.billItem.set(this);
             billItemModifierItem.modifierItem.set(modifierItem);

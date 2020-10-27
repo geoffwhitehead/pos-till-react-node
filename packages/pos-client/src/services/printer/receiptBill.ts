@@ -4,7 +4,6 @@ import { receiptTempate } from './template';
 import { capitalize, groupBy } from 'lodash';
 import { BillItem, BillDiscount, BillPayment, Discount, PriceGroup, PaymentType, Printer } from '../../models';
 
-const symbol = '£';
 const modPrefix = ' -';
 
 const org = {
@@ -25,13 +24,14 @@ export const receiptBill = async (
   priceGroups: PriceGroup[],
   paymentTypes: PaymentType[],
   printer: Printer,
+  currency: string,
 ) => {
   const printItemsGroup = (group: BillSummary['itemsBreakdown']) => {
     group.map(({ item, mods, total }) => {
       c.push({
         appendBitmapText: alignLeftRight(
           capitalize(item.itemName),
-          formatNumber(getItemPrice(item), symbol),
+          formatNumber(getItemPrice(item), currency),
           printer.printWidth,
         ),
       });
@@ -39,7 +39,7 @@ export const receiptBill = async (
         c.push({
           appendBitmapText: alignLeftRight(
             `${modPrefix} ${capitalize(mod.modifierItemName)}`,
-            formatNumber(getModifierItemPrice(mod), symbol),
+            formatNumber(getModifierItemPrice(mod), currency),
             printer.printWidth,
           ),
         });
@@ -75,9 +75,9 @@ export const receiptBill = async (
     printItemsGroup(stdGroup);
   });
 
-  c.push({ appendBitmapText: alignRight(`Total: ${formatNumber(summary.total, symbol)}`, printer.printWidth) });
+  c.push({ appendBitmapText: alignRight(`Total: ${formatNumber(summary.total, currency)}`, printer.printWidth) });
 
-  const compItems = summary.itemsBreakdown.filter(({ item }) => item.isComp)
+  const compItems = summary.itemsBreakdown.filter(({ item }) => item.isComp);
   compItems.length && addHeader(c, 'Complimentary Items', printer.printWidth);
   printItemsGroup(compItems);
 
@@ -87,7 +87,7 @@ export const receiptBill = async (
     c.push({
       appendBitmapText: alignLeftRight(
         capitalize(discount.name),
-        `-${formatNumber(discount.calculatedDiscount, symbol)}`,
+        `-${formatNumber(discount.calculatedDiscount, currency)}`,
         printer.printWidth,
       ),
     });
@@ -99,21 +99,25 @@ export const receiptBill = async (
     .map(payment => {
       const pT = lookupPaymentType(payment.paymentTypeId);
       c.push({
-        appendBitmapText: alignLeftRight(capitalize(pT.name), formatNumber(payment.amount, symbol), printer.printWidth),
+        appendBitmapText: alignLeftRight(
+          capitalize(pT.name),
+          formatNumber(payment.amount, currency),
+          printer.printWidth,
+        ),
       });
     });
 
   addHeader(c, 'Totals', printer.printWidth);
   c.push({
-    appendBitmapText: alignLeftRight('Net total: ', formatNumber(summary.totalPayable, symbol), printer.printWidth),
+    appendBitmapText: alignLeftRight('Net total: ', formatNumber(summary.totalPayable, currency), printer.printWidth),
   });
   c.push({
-    appendBitmapText: alignLeftRight('Paid: ', formatNumber(summary.totalPayments, symbol), printer.printWidth),
+    appendBitmapText: alignLeftRight('Paid: ', formatNumber(summary.totalPayments, currency), printer.printWidth),
   });
   c.push({
     appendBitmapText: alignLeftRight(
       'Balance: ',
-      formatNumber(Math.max(0, summary.balance), symbol),
+      formatNumber(Math.max(0, summary.balance), currency),
       printer.printWidth,
     ),
   });
@@ -122,7 +126,7 @@ export const receiptBill = async (
     c.push({
       appendBitmapText: alignLeftRight(
         'Change: ',
-        formatNumber(Math.abs(changePayment.amount), symbol),
+        formatNumber(Math.abs(changePayment.amount), currency),
         printer.printWidth,
       ),
     });

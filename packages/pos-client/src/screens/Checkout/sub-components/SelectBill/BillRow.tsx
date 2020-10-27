@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { ListItem, Left, Text, Body, Right, Icon } from '../../../../core';
-import { formatNumber, _total, billSummary, BillSummary, getSymbol } from '../../../../utils';
+import { formatNumber, _total, billSummary, BillSummary } from '../../../../utils';
 import withObservables from '@nozbe/with-observables';
 import { tableNames, Bill, Discount, BillItem, BillDiscount, BillPayment } from '../../../../models';
 import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
@@ -37,8 +37,9 @@ export const WrappedBillRow: React.FC<BillRowInnerProps & BillRowOuterProps> = (
   discounts,
 }) => {
   const [summary, setSummary] = useState<BillSummary>();
-  const { organization } = useContext(OrganizationContext);
-  const currencySymbol = getSymbol(organization.currency);
+  const {
+    organization: { currency },
+  } = useContext(OrganizationContext);
 
   useEffect(() => {
     const summary = async () => {
@@ -81,10 +82,10 @@ export const WrappedBillRow: React.FC<BillRowInnerProps & BillRowOuterProps> = (
       </Left>
 
       <Body>
-        <Text style={{ color: 'grey' }}>{summary ? formatNumber(summary.balance, currencySymbol) : '...'}</Text>
+        <Text style={{ color: 'grey' }}>{summary ? formatNumber(summary.balance, currency) : '...'}</Text>
       </Body>
       <Right>
-        <Text style={{ color: 'grey' }}>{summary ? formatNumber(summary.total, currencySymbol) : '...'}</Text>
+        <Text style={{ color: 'grey' }}>{summary ? formatNumber(summary.total, currency) : '...'}</Text>
       </Right>
     </ListItem>
   );

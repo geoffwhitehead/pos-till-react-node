@@ -1,26 +1,27 @@
 import { flatten, uniq, groupBy, sumBy } from 'lodash';
 import { BillItem, BillItemModifierItem, BillDiscount, BillPayment, Discount, PriceGroup } from '../models';
 
-export const getSymbol = (currency: string) => {
-  const map = {
-    gbp: '£',
-    usd: '$',
-    eur: '€',
-  };
-
-  return map[currency] || map.gbp;
-};
-
-export const getDefaultCashDenominations = (currency: string) => {
+export const getDefaultCashDenominations = (currency: string): number[] => {
   const map = {
     gbp: [500, 1000, 2000, 3000, 5000],
     usd: [500, 1000, 2000, 3000, 5000],
     eur: [500, 1000, 2000, 3000, 5000],
   };
+
+  return map[currency];
 };
 
-export const formatNumber: (value: number, symbol?: string) => string = (value, symbol = getSymbol('gbp')) =>
-  `${symbol}${(value ? value / 100 : 0).toFixed(2)}`;
+export const formatNumber = (value: number, currency = 'gbp'): string => {
+  const map = {
+    gbp: 'en-GB',
+    usd: 'en-US',
+  };
+
+  const format = map[currency] || map.gbp;
+
+  return new Intl.NumberFormat(format, { style: 'currency', currency }).format(value / 100);
+};
+// `${symbol}${(value ? value / 100 : 0).toFixed(2)}`;
 
 export const _totalDiscount = (
   total,

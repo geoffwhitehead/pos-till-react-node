@@ -15,7 +15,7 @@ import {
   Right,
   Label,
 } from '../../../../core';
-import { formatNumber, billSummary, BillSummary, getSymbol, getDefaultCashDenominations } from '../../../../utils';
+import { formatNumber, billSummary, BillSummary, getDefaultCashDenominations } from '../../../../utils';
 import { StyleSheet } from 'react-native';
 import { paymentTypeNames } from '../../../../api/paymentType';
 import { capitalize } from 'lodash';
@@ -54,10 +54,11 @@ const PaymentsInner: React.FC<PaymentOuterProps & PaymentInnerProps> = ({
   // TODO: this / payment types will need refactoring so not having to use find
   const cashType: PaymentType = paymentTypes.find(pt => pt.name === paymentTypeNames.CASH);
 
-  const { organization } = useContext(OrganizationContext);
+  const {
+    organization: { currency },
+  } = useContext(OrganizationContext);
 
-  const denominations = getDefaultCashDenominations(organization.currency);
-  const currencySymbol = getSymbol(organization.currency);
+  const denominations = getDefaultCashDenominations(currency);
 
   const [summary, setSummary] = useState<BillSummary>(null);
 
@@ -123,7 +124,7 @@ const PaymentsInner: React.FC<PaymentOuterProps & PaymentInnerProps> = ({
                     </Left>
                     <Right>
                       <Text>
-                        {discount.isPercent ? discount.amount + '%' : formatNumber(discount.amount, currencySymbol)}
+                        {discount.isPercent ? discount.amount + '%' : formatNumber(discount.amount, currency)}
                       </Text>
                     </Right>
                   </ListItem>
@@ -147,7 +148,7 @@ const PaymentsInner: React.FC<PaymentOuterProps & PaymentInnerProps> = ({
           {denominations.map(amt => {
             return (
               <Button key={amt} bordered style={styles.paymentButtons} onPress={addPayment(cashType, amt)}>
-                <Text>{`${formatNumber(amt, currencySymbol)}`}</Text>
+                <Text>{`${formatNumber(amt, currency)}`}</Text>
               </Button>
             );
           })}
