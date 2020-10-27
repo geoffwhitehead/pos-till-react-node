@@ -46,7 +46,33 @@ import { printerGroupPrinterSchema, PrinterGroupPrinter } from './PrinterGroupPr
 //   billItemModifierItems: 'bill_item_modifier_items',
 // };
 
-export const tableNames: Record<string, string> = {
+type TableNames = {
+  paymentTypes: string;
+  discounts: string;
+  organizations: string;
+  categories: string;
+  items: string;
+  itemPrices: string;
+  itemModifiers: string;
+  modifiers: string;
+  modifierItems: string;
+  modifierPrices: string;
+  priceGroups: string;
+  printers: string;
+  printerGroups: string;
+  printerGroupsPrinters: string;
+  // itemPrinters: itemPrinterSchema.name,
+  billPayments: string;
+  bills: string;
+  billDiscounts: string;
+  billPeriods: string;
+  billItems: string;
+  billItemModifiers: string;
+  billItemModifierItems: string;
+  billItemPrintLogs: string;
+};
+
+export const tableNames: TableNames = {
   paymentTypes: paymentTypeSchema.name,
   discounts: discountSchema.name,
   organizations: organizationSchema.name,
@@ -95,7 +121,7 @@ export const schemas: Record<string, TableSchema> = {
   printerSchema,
   billItemPrintLogSchema,
   printerGroupSchema,
-  printerGroupPrinterSchema
+  printerGroupPrinterSchema,
 };
 
 export const models: Record<string, typeof Model> = {
@@ -121,7 +147,7 @@ export const models: Record<string, typeof Model> = {
   BillItemModifier,
   BillItemPrintLog,
   PrinterGroup,
-  PrinterGroupPrinter
+  PrinterGroupPrinter,
 };
 
 export {
@@ -147,5 +173,5 @@ export {
   BillItemModifier,
   BillItemPrintLog,
   PrinterGroup,
-  PrinterGroupPrinter
+  PrinterGroupPrinter,
 };

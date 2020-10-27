@@ -12,11 +12,11 @@ export interface RepositoryFns<T> {
     findByIdAndUpdate: (id: string, props: Partial<T>) => Promise<T>;
     findById: (id: string) => Promise<T>;
     insert: (docs: T[]) => Promise<T[]>; // TODO: fix type
-    upsert: <T>(doc: T & ChangeDocument) => Promise<T>; // TODO: fix type
+    upsert: <T>(id: string, doc: Omit<T & ChangeDocument, '_id' | 'id'>) => Promise<T>; // TODO: fix type
     deleteOneById: (id: string) => Promise<GenericResponseNoData>;
-    createdSince: (timestamp: Date) => Promise<T[]>;
-    updatedSince: (timestamp: Date) => Promise<T[]>;
-    deletedSince: (timestamp: Date) => Promise<T[]>;
+    createdSince: (timestamp: Date | null) => Promise<T[]>;
+    updatedSince: (timestamp: Date | null) => Promise<T[]>;
+    deletedSince: (timestamp: Date | null) => Promise<T[]>;
 }
 
 export const getTenant = () => ({
@@ -50,11 +50,10 @@ export const repository = <T, U>({
         return clean(doc);
     };
 
-    const upsert = async ({ id, ...props }) => {
-        console.log('id, props', id, props);
-
+    const upsert = async (id, props) => {
+        console.log('id', id);
+        console.log('props', props);
         const doc = await model(tenanted && getTenant()).findByIdAndUpdate(id, props, { upsert: true, new: true });
-        console.log('doc', doc);
         return clean(doc as mongoose.Document);
     };
 
@@ -80,13 +79,11 @@ export const repository = <T, U>({
     const findByIdAndUpdate = async (id, props) => {
         const filteredProps = omit(props, 'tenantId');
         const updatedDoc = await model(tenanted && getTenant()).findByIdAndUpdate(id, filteredProps, { new: true });
-        // console.log('*************** updatedDoc', JSON.stringify(updatedDoc, null, 4));
         return updatedDoc ? clean(updatedDoc) : updatedDoc;
     };
 
     const findById = async id => {
         const doc = await model(tenanted && getTenant()).findById(id);
-        // console.log('*************** doc', JSON.stringify(doc, null, 4));
         return doc ? clean(doc) : doc;
     };
 

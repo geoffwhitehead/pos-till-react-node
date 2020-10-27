@@ -1,6 +1,5 @@
-import mongoose, { Schema } from 'mongoose';
+import { Schema } from 'mongoose';
 import { tenantModel } from './utils/multiTenant';
-import { PrinterProps } from './Printer';
 import uuid from 'uuid';
 
 export interface PrinterGroupProps {

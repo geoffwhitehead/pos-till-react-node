@@ -12,6 +12,7 @@ import {
   ListItem,
   Left,
   Right,
+  Spinner,
 } from '../../../core';
 import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import withObservables from '@nozbe/with-observables';
@@ -36,7 +37,7 @@ interface PrintersTabInnerProps {
 const PrintersTabInner: React.FC<PrintersTabOuterProps & PrintersTabInnerProps> = ({ printers, database }) => {
   const [selectedPrinter, setSelectedPrinter] = useState<Printer>();
   const [discoveredPrinters, setDiscoveredPrinters] = useState<Printers>([]);
-  const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const onCancelHandler = () => {
     setSelectedPrinter(null);
@@ -64,17 +65,13 @@ const PrintersTabInner: React.FC<PrintersTabOuterProps & PrintersTabInnerProps> 
   };
 
   const discoverPrinters = async () => {
-    setLoading(true);
+    setIsLoading(true);
     const printers = await portDiscovery();
     if (printers) {
       setDiscoveredPrinters(printers);
     }
-    setLoading(false);
+    setIsLoading(false);
   };
-  
-  if (!printers) {
-    return <Loading />;
-  }
 
   return (
     <Container>
@@ -100,36 +97,43 @@ const PrintersTabInner: React.FC<PrintersTabOuterProps & PrintersTabInnerProps> 
                     <Text>Discover Printers</Text>
                   </Left>
                   <Right>
-                    <Button small disabled={loading} onPress={() => discoverPrinters()}>
+                    <Button small disabled={isLoading} onPress={() => discoverPrinters()}>
                       <Text>Discover Printers</Text>
                     </Button>
                   </Right>
                 </ListItem>
-                {discoveredPrinters.map(discPrinter => {
-                  const isInstalled = printers.find(printer => printer.macAddress === discPrinter.macAddress);
-                  return (
-                    <ListItem key={discPrinter.macAddress}>
-                      <Left>
-                        <Text>{discPrinter.modelName}</Text>
-                      </Left>
-                      <Body>
-                        <Text note>{capitalize(discPrinter.portName)}</Text>
-                        <Text note>{discPrinter.macAddress}</Text>
-                      </Body>
-                      <Right>
-                        {isInstalled ? (
-                          <Button small onPress={() => updatePrinter(discPrinter)}>
-                            <Text>Update</Text>
-                          </Button>
-                        ) : (
-                          <Button small onPress={() => addPrinter(discPrinter)}>
-                            <Text>Add</Text>
-                          </Button>
-                        )}
-                      </Right>
-                    </ListItem>
-                  );
-                })}
+                {isLoading ? (
+                  <Spinner />
+                ) : discoveredPrinters.length === 0 ? (
+                  <Text style={{ padding: 10 }}> No printers found</Text>
+                ) : (
+                  discoveredPrinters.map(discPrinter => {
+                    const isInstalled = printers.find(printer => printer.macAddress === discPrinter.macAddress);
+
+                    return (
+                      <ListItem key={discPrinter.macAddress}>
+                        <Left>
+                          <Text>{discPrinter.modelName}</Text>
+                        </Left>
+                        <Body>
+                          <Text note>{capitalize(discPrinter.portName)}</Text>
+                          <Text note>{discPrinter.macAddress}</Text>
+                        </Body>
+                        <Right>
+                          {isInstalled ? (
+                            <Button small onPress={() => updatePrinter(discPrinter)}>
+                              <Text>Update</Text>
+                            </Button>
+                          ) : (
+                            <Button small onPress={() => addPrinter(discPrinter)}>
+                              <Text>Add</Text>
+                            </Button>
+                          )}
+                        </Right>
+                      </ListItem>
+                    );
+                  })
+                )}
               </List>
             </Col>
           </Row>

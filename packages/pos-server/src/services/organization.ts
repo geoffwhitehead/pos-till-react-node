@@ -1,4 +1,5 @@
 import { max } from 'date-fns';
+import { id } from 'date-fns/locale';
 import { InjectedDependencies, pull, push, SyncFns } from '.';
 import organization from '../api/routes/organization';
 import { OrganizationProps, ORGANIZATION_COLLECTION_NAME } from '../models/Organization';
@@ -27,8 +28,9 @@ export type OrganizationClientProps = {
 export const organizationFromClient = (organization: OrganizationClientProps): OrganizationProps => {
     const { id, name, email, phone, vat } = organization;
 
+    console.log('organizationFromClient', organization);
     return {
-        _id: id,
+        id,
         name,
         email,
         phone,
@@ -51,6 +53,8 @@ export const organizationFromClient = (organization: OrganizationClientProps): O
 
 export const organizationToClient = (organization: OrganizationProps): OrganizationClientProps => {
     const { _id, name, email, phone, vat, address, settings } = organization;
+
+    console.log('organization', organization);
     return {
         id: _id,
         name,

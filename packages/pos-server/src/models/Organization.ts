@@ -1,11 +1,11 @@
-import mongoose, { Schema } from 'mongoose';
+import { Schema } from 'mongoose';
 import { tenantlessModel } from './utils/multiTenant';
 import { Joi } from 'celebrate';
 import uuid from 'uuid';
-import { Timestamp } from 'mongodb';
 
 export interface OrganizationProps {
     _id?: string;
+    id?: string;
     name: string;
     email: string;
     phone: string;
@@ -13,8 +13,8 @@ export interface OrganizationProps {
     settings: {
         defaultPriceGroupId?: string;
         receiptPrinterId?: string;
-        currency: string;
-        maxBills: number;
+        currency?: string;
+        maxBills?: number;
     };
     address: {
         line1: string;
@@ -47,6 +47,10 @@ export const OrganizationValidation = {
     }).required(),
 };
 
+export enum CurrencyEnum {
+    gbp = 'gbp',
+}
+
 const OrganizationSchema: Schema<OrganizationProps> = new Schema(
     {
         _id: {
@@ -74,8 +78,15 @@ const OrganizationSchema: Schema<OrganizationProps> = new Schema(
             type: {
                 defaultPriceGroupId: { type: String, ref: 'PriceGroup' },
                 receiptPrinterId: { type: String, ref: 'Printer' },
-                currency: String,
-                maxBills: Number,
+                currency: {
+                    type: String,
+                    enum: CurrencyEnum,
+                    default: CurrencyEnum.gbp,
+                },
+                maxBills: {
+                    type: String,
+                    default: 10,
+                },
             },
             default: {},
         },

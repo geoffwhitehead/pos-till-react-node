@@ -25,7 +25,11 @@ export const SignIn: React.FC<SignInProps> = ({ navigation, route }) => {
           <Form style={styles.form}>
             <Item stackedLabel>
               <Label>Email</Label>
-              {organization ? <Label>{organization.name}</Label> : <Input onChangeText={setEmail} value={email} />}
+              {organization ? (
+                <Label>{organization.name}</Label>
+              ) : (
+                <Input autoCapitalize="none" onChangeText={setEmail} value={email} />
+              )}
             </Item>
             <Item stackedLabel>
               <Label>Password</Label>

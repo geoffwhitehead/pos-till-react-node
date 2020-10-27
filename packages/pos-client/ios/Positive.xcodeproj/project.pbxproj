@@ -22,7 +22,6 @@
 		4DAB87E83FB0F8E413EA3C28 /* libPods-Positive-tvOSTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 262FB68990FABB4B74A57DD9 /* libPods-Positive-tvOSTests.a */; };
 		63C37E8B2AC542F6BC4A8877 /* libRNGestureHandler-tvOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EB604BAD56CE40729982F1CB /* libRNGestureHandler-tvOS.a */; };
 		6FE3EA19253BA06A00F0FF22 /* File.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FE3EA18253BA06A00F0FF22 /* File.swift */; };
-		6FE3EA53253BA0F000F0FF22 /* libWatermelonDB.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6FE3EA4D253BA0E800F0FF22 /* libWatermelonDB.a */; };
 		9B5170A1E2968F671F086D1D /* libPods-PositiveTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5329D520C5178EF1D2E66068 /* libPods-PositiveTests.a */; };
 		BEDAA4C29F2A455594DDC00A /* libRNGestureHandler.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7ECFD547ABDD40A8941F8AC8 /* libRNGestureHandler.a */; };
 		ED297163215061F000B7C4FE /* JavaScriptCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ED297162215061F000B7C4FE /* JavaScriptCore.framework */; };
@@ -43,13 +42,6 @@
 			proxyType = 1;
 			remoteGlobalIDString = 2D02E47A1E0B4A5D006451C7;
 			remoteInfo = "Positive-tvOS";
-		};
-		6FE3EA4C253BA0E800F0FF22 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 6FE3EA48253BA0E800F0FF22 /* WatermelonDB.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 6E660D5E213BCCD300189354;
-			remoteInfo = WatermelonDB;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -77,7 +69,6 @@
 		5C3EFA04EABA7989E628AC64 /* Pods-Positive-tvOSTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Positive-tvOSTests.debug.xcconfig"; path = "Target Support Files/Pods-Positive-tvOSTests/Pods-Positive-tvOSTests.debug.xcconfig"; sourceTree = "<group>"; };
 		6FE3EA17253BA06A00F0FF22 /* Positive-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Positive-Bridging-Header.h"; sourceTree = "<group>"; };
 		6FE3EA18253BA06A00F0FF22 /* File.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = File.swift; sourceTree = "<group>"; };
-		6FE3EA48253BA0E800F0FF22 /* WatermelonDB.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = WatermelonDB.xcodeproj; path = "../node_modules/@nozbe/watermelondb/native/ios/WatermelonDB.xcodeproj"; sourceTree = "<group>"; };
 		75E936EB1A3002F6A9AB4156 /* Pods-Positive.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Positive.release.xcconfig"; path = "Target Support Files/Pods-Positive/Pods-Positive.release.xcconfig"; sourceTree = "<group>"; };
 		764AD50AC6F939E0A1C08B00 /* Pods-PositiveTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PositiveTests.debug.xcconfig"; path = "Target Support Files/Pods-PositiveTests/Pods-PositiveTests.debug.xcconfig"; sourceTree = "<group>"; };
 		7ECFD547ABDD40A8941F8AC8 /* libRNGestureHandler.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNGestureHandler.a; sourceTree = "<group>"; };
@@ -102,7 +93,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6FE3EA53253BA0F000F0FF22 /* libWatermelonDB.a in Frameworks */,
 				ED297163215061F000B7C4FE /* JavaScriptCore.framework in Frameworks */,
 				BEDAA4C29F2A455594DDC00A /* libRNGestureHandler.a in Frameworks */,
 				298566B4182437FDC9416AAA /* libPods-Positive.a in Frameworks */,
@@ -200,18 +190,9 @@
 			path = Pods;
 			sourceTree = "<group>";
 		};
-		6FE3EA49253BA0E800F0FF22 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				6FE3EA4D253BA0E800F0FF22 /* libWatermelonDB.a */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
-				6FE3EA48253BA0E800F0FF22 /* WatermelonDB.xcodeproj */,
 			);
 			name = Libraries;
 			sourceTree = "<group>";
@@ -365,10 +346,6 @@
 			productRefGroup = 83CBBA001A601CBA00E9B192 /* Products */;
 			projectDirPath = "";
 			projectReferences = (
-				{
-					ProductGroup = 6FE3EA49253BA0E800F0FF22 /* Products */;
-					ProjectRef = 6FE3EA48253BA0E800F0FF22 /* WatermelonDB.xcodeproj */;
-				},
 			);
 			projectRoot = "";
 			targets = (
@@ -381,13 +358,6 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
-		6FE3EA4D253BA0E800F0FF22 /* libWatermelonDB.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libWatermelonDB.a;
-			remoteRef = 6FE3EA4C253BA0E800F0FF22 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
 /* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
@@ -674,8 +644,6 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				OTHER_LDFLAGS = (
 					"-ObjC",
@@ -703,8 +671,6 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				OTHER_LDFLAGS = (
 					"-ObjC",
@@ -795,8 +761,6 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				OTHER_LDFLAGS = (
 					"-ObjC",
@@ -831,8 +795,6 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				OTHER_LDFLAGS = (
 					"-ObjC",
@@ -866,8 +828,6 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				OTHER_LDFLAGS = (
 					"-ObjC",
@@ -901,8 +861,6 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				OTHER_LDFLAGS = (
 					"-ObjC",

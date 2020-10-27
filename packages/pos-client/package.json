@@ -52,7 +52,7 @@
     "redux-persist": "^5.10.0",
     "redux-saga": "^1.0.2",
     "reduxsauce": "^1.0.1",
-    "rxjs": "^6.5.5",
+    "rxjs-compat": "^6.6.3",
     "uuid": "^8.3.1",
     "yup": "^0.28.1"
   },

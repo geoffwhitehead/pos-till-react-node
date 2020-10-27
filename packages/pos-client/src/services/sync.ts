@@ -1,9 +1,9 @@
-import { useDatabase } from '@nozbe/watermelondb/hooks';
+import { Database } from '@nozbe/watermelondb';
 import { synchronize } from '@nozbe/watermelondb/sync';
 import { pullChanges, pushChanges } from '../api/sync';
 
-export const sync = async () => {
-  const database = useDatabase();
+export const sync = async (database: Database) => {
+  //   const database = useDatabase();
   await synchronize({
     database,
     pullChanges: async ({ lastPulledAt }) => {
@@ -18,7 +18,6 @@ export const sync = async () => {
     },
     pushChanges: async ({ changes, lastPulledAt }) => {
       const response = await pushChanges({ lastPulledAt, changes: JSON.stringify(changes) });
-
       if (!response.ok) {
         throw new Error('Sync push failed');
       }

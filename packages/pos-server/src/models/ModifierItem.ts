@@ -1,6 +1,4 @@
 import { Schema } from 'mongoose';
-import mongoose from 'mongoose';
-import { ItemPriceProps } from './ItemPrice';
 import { tenantModel } from './utils/multiTenant';
 import uuid from 'uuid';
 
