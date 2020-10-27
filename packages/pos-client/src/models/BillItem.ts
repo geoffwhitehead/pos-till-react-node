@@ -43,7 +43,15 @@ export const billItemSchema = tableSchema({
   ],
 });
 
-export type PrintStatus = 'success' | 'error' | 'pending' | '' | 'void' | 'void_pending' | 'void_error' | 'void_no_print';
+export type PrintStatus =
+  | 'success'
+  | 'error'
+  | 'pending'
+  | ''
+  | 'void'
+  | 'void_pending'
+  | 'void_error'
+  | 'void_no_print';
 export class BillItem extends Model {
   static table = 'bill_items';
 
@@ -158,7 +166,7 @@ export class BillItem extends Model {
   };
 
   @action createPrintLog = async (printer: Printer, status: BillItemPrintLogStatus) => {
-    const log = this.database.collections.get<BillItemPrintLog>(tableNames.BillItemPrintLog).create(log => {
+    const log = this.database.collections.get<BillItemPrintLog>(tableNames.billItemPrintLogs).create(log => {
       log.billItem.set(this);
       log.printer.set(printer);
       log.status = status;
