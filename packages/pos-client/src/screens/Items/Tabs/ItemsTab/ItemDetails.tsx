@@ -52,20 +52,16 @@ const ItemSchema = Yup.object().shape({
     .min(2, 'Too Short')
     .max(50, 'Too Long')
     .required('Required'),
-  prices: Yup.array()
-    .of(
-      Yup.object().shape({
-        id: Yup.string().required('Required'), 
-        priceGroupId: Yup.string().required('Required'), 
-        price: Yup.number()
-      })
-    )
+  prices: Yup.array().of(
+    Yup.object().shape({
+      id: Yup.string().required('Required'),
+      priceGroupId: Yup.string().required('Required'),
+      price: Yup.number(),
+    }),
+  ),
 });
 
-
 // TODO: really need to refaactor some of these components and styles.
-
-
 
 const ItemDetailsInner: React.FC<ItemDetailsOuterProps & ItemDetailsInnerProps> = ({
   item,
@@ -98,10 +94,10 @@ const ItemDetailsInner: React.FC<ItemDetailsOuterProps & ItemDetailsInnerProps> 
   };
 
   const updateItem = async values => {
-    setLoading(true)
+    setLoading(true);
     await item.updateItem({ ...values, modifiers: selectedModifiers });
-    setLoading(false)
-    
+    setLoading(false);
+    onClose();
   };
 
   const resolvePrice = (priceGroup: PriceGroup, prices: ItemPrice[]): string => {
@@ -144,7 +140,7 @@ const ItemDetailsInner: React.FC<ItemDetailsOuterProps & ItemDetailsInnerProps> 
                       <Input onChangeText={handleChange('name')} onBlur={handleBlur('name')} value={name} />
                     </Item>
                     <Text style={styles.text} note>
-                      A shortname will be used on linked printers where space is restricted
+                      A shortname will be used on printers where space is restricted
                     </Text>
                     <Item stackedLabel error={err.shortName}>
                       <Label>ShortName</Label>
@@ -199,17 +195,15 @@ const ItemDetailsInner: React.FC<ItemDetailsOuterProps & ItemDetailsInnerProps> 
                     <H2 style={styles.heading}>Price Groups</H2>
                     <Text style={styles.text} note>
                       You can specify a price for all available price groups. If you leave a price group blank, the item
-                      won't appear when that price group is selected.
+                      won't exist within that price group.
                     </Text>
                     <FieldArray
                       name="prices"
                       render={arrayHelpers => {
-                        console.log('err', errors);
                         return (
-                          prices &&
-                          prices.length > 0 &&
+                          prices?.length > 0 &&
                           prices.map((price, i) => (
-                            <Item stackedLabel error={err.prices[i] && err.prices[i].price}>
+                            <Item key={price.id} stackedLabel error={err?.prices[i]?.price}>
                               <Label>{resolvePriceGroup(price.priceGroupId).name}</Label>
                               <Input
                                 onChangeText={handleChange(`prices[${i}].price`)}
@@ -295,4 +289,3 @@ const s = {
     // borderLeft: 'none'
   },
 };
-

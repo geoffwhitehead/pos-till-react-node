@@ -78,7 +78,7 @@ export const authService = ({
         logger.info('Hashing password', loggerContext);
         const hashedPassword = await argon2.hash(password, { salt: randomBytes(32) });
 
-        const organizationRecord = await organizationRepository.create({ name, email, phone, address, syncId: uuid() });
+        const organizationRecord = await organizationRepository.create({ name, email, phone, address, settings: {} });
         logger.info(`Created organization: ${organizationRecord._id}`, loggerContext);
 
         console.log('organizationRecord', organizationRecord);

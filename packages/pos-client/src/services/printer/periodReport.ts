@@ -7,6 +7,7 @@ import {
   priceGroupSummmary,
   getItemPrice,
   getModifierItemPrice,
+  getSymbol,
 } from '../../utils';
 import { addHeader, alignLeftRight, divider, starDivider, alignCenter } from './helpers';
 import { receiptTempate } from './template';
@@ -43,6 +44,8 @@ const org = {
 
 export const periodReport = async (billPeriod: BillPeriod, database: Database, printer: Printer, currency: string) => {
   let c = [];
+
+  const currencySymbol = getSymbol(currency);
 
   const [
     periodItems,
@@ -119,7 +122,7 @@ export const periodReport = async (billPeriod: BillPeriod, database: Database, p
       return {
         appendBitmapText: alignLeftRight(
           capitalize(categories.find(c => c.id === categoryTotal.categoryId).name),
-          `${categoryTotal.count} / ${formatNumber(categoryTotal.total, currency)}`,
+          `${categoryTotal.count} / ${formatNumber(categoryTotal.total, currencySymbol)}`,
           printer.printWidth,
         ),
       };
@@ -128,7 +131,7 @@ export const periodReport = async (billPeriod: BillPeriod, database: Database, p
   c.push({
     appendBitmapText: alignLeftRight(
       'Total: ',
-      `${categoryTotals.count} / ${formatNumber(categoryTotals.total, currency)}`,
+      `${categoryTotals.count} / ${formatNumber(categoryTotals.total, currencySymbol)}`,
       printer.printWidth,
     ),
   });
@@ -143,7 +146,7 @@ export const periodReport = async (billPeriod: BillPeriod, database: Database, p
         return {
           appendBitmapText: alignLeftRight(
             capitalize(modifierItemGroup.modifierItemName),
-            `${modifierItemGroup.count} / ${formatNumber(modifierItemGroup.total, currency)}`,
+            `${modifierItemGroup.count} / ${formatNumber(modifierItemGroup.total, currencySymbol)}`,
             printer.printWidth,
           ),
         };
@@ -153,7 +156,7 @@ export const periodReport = async (billPeriod: BillPeriod, database: Database, p
   c.push({
     appendBitmapText: alignLeftRight(
       'Total: ',
-      `${modifierTotals.count} / ${formatNumber(modifierTotals.total, currency)}`,
+      `${modifierTotals.count} / ${formatNumber(modifierTotals.total, currencySymbol)}`,
       printer.printWidth,
     ),
   });
@@ -164,7 +167,7 @@ export const periodReport = async (billPeriod: BillPeriod, database: Database, p
     ...discountTotals.breakdown.map(discountTotal => ({
       appendBitmapText: alignLeftRight(
         capitalize(discountTotal.name),
-        `${discountTotal.count} / ${formatNumber(discountTotal.total, currency)}`,
+        `${discountTotal.count} / ${formatNumber(discountTotal.total, currencySymbol)}`,
         printer.printWidth,
       ),
     })),
@@ -172,7 +175,7 @@ export const periodReport = async (billPeriod: BillPeriod, database: Database, p
   c.push({
     appendBitmapText: alignLeftRight(
       'Total: ',
-      `${discountTotals.count} / ${formatNumber(discountTotals.total, currency)}`,
+      `${discountTotals.count} / ${formatNumber(discountTotals.total, currencySymbol)}`,
       printer.printWidth,
     ),
   });
@@ -184,7 +187,7 @@ export const periodReport = async (billPeriod: BillPeriod, database: Database, p
     ...paymentTotals.breakdown.map(paymentTotal => ({
       appendBitmapText: alignLeftRight(
         capitalize(paymentTotal.name),
-        `${paymentTotal.count} / ${formatNumber(paymentTotal.total, currency)}`,
+        `${paymentTotal.count} / ${formatNumber(paymentTotal.total, currencySymbol)}`,
         printer.printWidth,
       ),
     })),
@@ -192,7 +195,7 @@ export const periodReport = async (billPeriod: BillPeriod, database: Database, p
   c.push({
     appendBitmapText: alignLeftRight(
       'Total: ',
-      `${paymentTotals.count} / ${formatNumber(paymentTotals.total, currency)}`,
+      `${paymentTotals.count} / ${formatNumber(paymentTotals.total, currencySymbol)}`,
       printer.printWidth,
     ),
   });
@@ -204,7 +207,7 @@ export const periodReport = async (billPeriod: BillPeriod, database: Database, p
   c.push({
     appendBitmapText: alignLeftRight(
       'Total: ',
-      `${voidCount} / ${formatNumber(voidTotal, currency)}`,
+      `${voidCount} / ${formatNumber(voidTotal, currencySymbol)}`,
       printer.printWidth,
     ),
   });
@@ -216,14 +219,14 @@ export const periodReport = async (billPeriod: BillPeriod, database: Database, p
   c.push({
     appendBitmapText: alignLeftRight(
       'Items',
-      `${compItems.length} / ${formatNumber(sumBy(compItems, 'itemPrice'), currency)}`,
+      `${compItems.length} / ${formatNumber(sumBy(compItems, 'itemPrice'), currencySymbol)}`,
       printer.printWidth,
     ),
   });
   c.push({
     appendBitmapText: alignLeftRight(
       'Modifiers',
-      `${compMods.length} / ${formatNumber(sumBy(compMods, 'modifierItemPrice'), currency)}`,
+      `${compMods.length} / ${formatNumber(sumBy(compMods, 'modifierItemPrice'), currencySymbol)}`,
       printer.printWidth,
     ),
   });
@@ -237,7 +240,7 @@ export const periodReport = async (billPeriod: BillPeriod, database: Database, p
       return {
         appendBitmapText: alignLeftRight(
           priceGroupTotal.name,
-          `${priceGroupTotal.count} / ${formatNumber(priceGroupTotal.total, currency)}`,
+          `${priceGroupTotal.count} / ${formatNumber(priceGroupTotal.total, currencySymbol)}`,
           printer.printWidth,
         ),
       };
@@ -246,7 +249,9 @@ export const periodReport = async (billPeriod: BillPeriod, database: Database, p
   const billItemsTotal = sumBy(periodItems, item => getItemPrice(item));
   const billModifierItemsTotal = sumBy(billModifierItems, mod => getModifierItemPrice(mod));
   const salesTotal = billItemsTotal + billModifierItemsTotal - discountTotals.total;
-  c.push({ appendBitmapText: alignLeftRight('Sales Total: ', formatNumber(salesTotal, currency), printer.printWidth) });
+  c.push({
+    appendBitmapText: alignLeftRight('Sales Total: ', formatNumber(salesTotal, currencySymbol), printer.printWidth),
+  });
 
   return receiptTempate(c, org, printer.printWidth);
 };

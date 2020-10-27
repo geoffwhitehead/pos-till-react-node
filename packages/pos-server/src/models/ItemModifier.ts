@@ -1,7 +1,6 @@
-import mongoose, { Schema } from 'mongoose';
+import { Schema } from 'mongoose';
 import { tenantModel } from './utils/multiTenant';
 import uuid from 'uuid';
-import { ITEM_COLLECTION_NAME } from './Item';
 
 export interface ItemModifierProps {
     _id?: string;

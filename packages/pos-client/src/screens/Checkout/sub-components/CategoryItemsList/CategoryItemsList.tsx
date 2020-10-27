@@ -17,6 +17,7 @@ import { Loading } from '../../../../components/Loading/Loading';
 import { groupBy } from 'lodash';
 import { resolvePrice } from '../../../../helpers';
 import { OrganizationContext } from '../../../../contexts/OrganizationContext';
+import { getSymbol } from '../../../../utils';
 
 interface CategoryItemsListOuterProps {
   database?: Database;
@@ -117,7 +118,7 @@ const CategoryItemsInner: React.FC<CategoryItemsListOuterProps & CategoryItemsLi
                 price={resolvePrice(priceGroup, groupedPrices[item.id])}
                 isActive={selectedItem === item}
                 onPressItem={onSelectItem}
-                currency={organization.currency}
+                currency={getSymbol(organization.currency)}
               />
             );
           })}

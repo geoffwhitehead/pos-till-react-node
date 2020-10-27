@@ -51,7 +51,7 @@ export interface ServiceResponse<T> {
 //     }
 //   }
 
-export type ChangeDocument = Record<string, any> & { id: string };
+export type ChangeDocument = Record<string, any> & { id: string }; // TODO: fix this
 export type ChangesObject = {
     created: ChangeDocument[];
     updated: ChangeDocument[];
@@ -112,8 +112,9 @@ export const pull = async <T extends RepositoryFns<any>>(repo: T, lastPulledAt: 
 
 // client wins
 export const push = async <T extends RepositoryFns<any>>(repo: T, changes: ChangesObject, lastPulledAt: Date) => {
-    await Promise.all(changes.created.map(props => repo.upsert(props)));
-    await Promise.all(changes.updated.map(props => repo.upsert(props)));
+    // TODO: use bulk writes
+    await Promise.all(changes.created.map(({ id, ...props }) => repo.upsert(id, props)));
+    await Promise.all(changes.updated.map(({ id, ...props }) => repo.upsert(id, props)));
     await Promise.all(changes.deleted.map(repo.deleteOneById));
 };
 

@@ -26,6 +26,8 @@ import { Loading } from '../../../components/Loading/Loading';
 import { styles } from './styles';
 import { useDatabase } from '@nozbe/watermelondb/hooks';
 import { AuthContext } from '../../../contexts/AuthContext';
+import { sync } from '../../../services/sync';
+import { clockRunning } from 'react-native-reanimated';
 
 interface SettingsTabOuterProps {
   database: Database;
@@ -40,10 +42,7 @@ const settingsSchema = Yup.object().shape({
     .min(1, 'Too Short')
     .max(40, 'Too Long')
     .required('Required'),
-  currency: Yup.string()
-    .min(1, 'Too Short')
-    .max(2, 'Too Long')
-    .required('Required'),
+  currency: Yup.string().required('Required'),
   maxBills: Yup.number()
     .min(1, 'Too Low')
     .max(100, 'Too High')
@@ -68,6 +67,7 @@ const SettingsTabInner: React.FC<SettingsTabOuterProps & SettingsTabInnerProps> 
   };
 
   const updateOrganization = async values => {
+    console.log('values', values);
     setLoading(true);
     const priceGroup = priceGroups.find(pG => pG.id === values.defaultPriceGroupId);
     const receiptPrinter = printers.find(p => p.id === values.receiptPrinterId);
@@ -82,8 +82,22 @@ const SettingsTabInner: React.FC<SettingsTabOuterProps & SettingsTabInnerProps> 
         org.maxBills = parseInt(values.maxBills);
       }),
     );
+
+    await sync(database);
+
     setLoading(false);
   };
+
+  const currencies = [
+    {
+      id: 'gbp',
+      name: 'GBP',
+    },
+    {
+      id: 'eur',
+      name: 'EUR',
+    },
+  ];
 
   if (!printers) {
     return <Loading />;
@@ -128,9 +142,6 @@ const SettingsTabInner: React.FC<SettingsTabOuterProps & SettingsTabInnerProps> 
                 <Row>
                   <Col style={styles.column}>
                     <Form>
-                      <Text style={styles.text} note>
-                        Select a thermal printer used to print standard customer receipts.
-                      </Text>
                       <Item picker stackedLabel>
                         <Label>Receipt Printer</Label>
                         <Picker
@@ -148,9 +159,6 @@ const SettingsTabInner: React.FC<SettingsTabOuterProps & SettingsTabInnerProps> 
                           ))}
                         </Picker>
                       </Item>
-                      <Text style={styles.text} note>
-                        Which price group will be activated by default when opening a new bill.
-                      </Text>
                       <Item picker stackedLabel>
                         <Label>Default Price Group</Label>
                         <Picker
@@ -172,12 +180,8 @@ const SettingsTabInner: React.FC<SettingsTabOuterProps & SettingsTabInnerProps> 
                   </Col>
                   <Col style={styles.column}>
                     <Form>
-                      <Text style={styles.text} note>
-                        This is the maximum number of simultaneous bills you can have open and the range of bill
-                        references.
-                      </Text>
                       <Item stackedLabel error={err.maxBills}>
-                        <Label>Bills Range</Label>
+                        <Label>Max open bills</Label>
                         <Input
                           onChangeText={handleChange('maxBills')}
                           onBlur={handleBlur('maxBills')}
@@ -185,12 +189,20 @@ const SettingsTabInner: React.FC<SettingsTabOuterProps & SettingsTabInnerProps> 
                         />
                       </Item>
                       <Item stackedLabel error={err.currency}>
-                        <Label>Currency Symbol</Label>
-                        <Input
-                          onChangeText={handleChange('currency')}
-                          onBlur={handleBlur('currency')}
-                          value={currency}
-                        />
+                        <Label>Currency</Label>
+                        <Picker
+                          mode="dropdown"
+                          iosIcon={<Icon name="arrow-down" />}
+                          placeholder="Select currency"
+                          placeholderStyle={{ color: '#bfc6ea' }}
+                          placeholderIconColor="#007aff"
+                          selectedValue={currency}
+                          onValueChange={handleChange('currency')}
+                        >
+                          {currencies.map(currency => (
+                            <Picker.Item key={currency.id} label={currency.name} value={currency.id} />
+                          ))}
+                        </Picker>
                       </Item>
                     </Form>
                   </Col>
@@ -200,19 +212,15 @@ const SettingsTabInner: React.FC<SettingsTabOuterProps & SettingsTabInnerProps> 
                     <Text>Save</Text>
                   </Button>
                 </Row>
-                <Row style={{ ...styles.row, borderWidth: 1, borderColor: 'lightgrey', padding: 10 }}>
-                  <Button danger style={styles.button} onPress={() => areYouSure(signOut)}>
+                <Row style={styles.row}>
+                  <Button style={styles.button} onPress={() => areYouSure(signOut)}>
                     <Text>Sign out</Text>
-                  </Button>
-                  <Button danger style={styles.button} onPress={() => areYouSure(unlink)}>
-                    <Text>Unlink account</Text>
                   </Button>
                 </Row>
                 <Row style={styles.row}>
-                  <Text note>
-                    * unlinking an account will completely remove the account, erasing all product and transactional
-                    data.
-                  </Text>
+                  <Button danger style={styles.button} onPress={() => areYouSure(unlink)}>
+                    <Text>Delete account</Text>
+                  </Button>
                 </Row>
               </Grid>
             </Content>

@@ -4,12 +4,13 @@ export const styles = {
     marginBottom: 20,
     display: 'flex',
     justifyContent: 'space-between',
-  },
+  } as const,
   text: {
     margin: 10,
     marginTop: 20,
     marginBottom: 2,
-  },
+    textAlign: 'left',
+  } as const,
   form: { width: 400, margin: 30 },
   selectedRow: { backgroundColor: '#cde1f9' },
   modal: {

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { ListItem, Left, Text, Body, Right, Icon } from '../../../../core';
-import { formatNumber, _total, billSummary, BillSummary } from '../../../../utils';
+import { formatNumber, _total, billSummary, BillSummary, getSymbol } from '../../../../utils';
 import withObservables from '@nozbe/with-observables';
 import { tableNames, Bill, Discount, BillItem, BillDiscount, BillPayment } from '../../../../models';
 import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
@@ -11,11 +11,11 @@ interface BillRowInnerProps {
   billPayments: BillPayment[];
   billDiscounts: BillDiscount[];
   billItems: BillItem[];
-  billItemsIncPendingVoids: BillItem[]
+  billItemsIncPendingVoids: BillItem[];
   discounts: Discount[];
-  billItemsVoidsStatusUnstoredCount: number
-  billItemsVoidsStatusErrorsCount: number
-  billItemsVoidsStatusPendingCount: number
+  billItemsVoidsStatusUnstoredCount: number;
+  billItemsVoidsStatusErrorsCount: number;
+  billItemsVoidsStatusPendingCount: number;
 }
 
 interface BillRowOuterProps {
@@ -37,7 +37,8 @@ export const WrappedBillRow: React.FC<BillRowInnerProps & BillRowOuterProps> = (
   discounts,
 }) => {
   const [summary, setSummary] = useState<BillSummary>();
-  const { organization } = useContext(OrganizationContext)
+  const { organization } = useContext(OrganizationContext);
+  const currencySymbol = getSymbol(organization.currency);
 
   useEffect(() => {
     const summary = async () => {
@@ -48,9 +49,9 @@ export const WrappedBillRow: React.FC<BillRowInnerProps & BillRowOuterProps> = (
   }, [billItems]);
 
   const renderPrintErrors = () => {
-    const hasUnstoredItems = !!billItemsVoidsStatusUnstoredCount
-    const hasPrintErrors = !!billItemsVoidsStatusErrorsCount
-    const hasPendingPrints = !!billItemsVoidsStatusPendingCount
+    const hasUnstoredItems = !!billItemsVoidsStatusUnstoredCount;
+    const hasPrintErrors = !!billItemsVoidsStatusErrorsCount;
+    const hasPendingPrints = !!billItemsVoidsStatusPendingCount;
 
     if (hasPrintErrors) {
       return [
@@ -80,10 +81,10 @@ export const WrappedBillRow: React.FC<BillRowInnerProps & BillRowOuterProps> = (
       </Left>
 
       <Body>
-        <Text style={{ color: 'grey' }}>{summary ? formatNumber(summary.balance, organization.currency) : '...'}</Text>
+        <Text style={{ color: 'grey' }}>{summary ? formatNumber(summary.balance, currencySymbol) : '...'}</Text>
       </Body>
       <Right>
-        <Text style={{ color: 'grey' }}>{summary ? formatNumber(summary.total, organization.currency) : '...'}</Text>
+        <Text style={{ color: 'grey' }}>{summary ? formatNumber(summary.total, currencySymbol) : '...'}</Text>
       </Right>
     </ListItem>
   );

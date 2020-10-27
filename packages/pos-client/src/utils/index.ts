@@ -1,7 +1,25 @@
 import { flatten, uniq, groupBy, sumBy } from 'lodash';
 import { BillItem, BillItemModifierItem, BillDiscount, BillPayment, Discount, PriceGroup } from '../models';
 
-export const formatNumber: (value: number, symbol?: string) => string = (value, symbol = '') =>
+export const getSymbol = (currency: string) => {
+  const map = {
+    gbp: '£',
+    usd: '$',
+    eur: '€',
+  };
+
+  return map[currency] || map.gbp;
+};
+
+export const getDefaultCashDenominations = (currency: string) => {
+  const map = {
+    gbp: [500, 1000, 2000, 3000, 5000],
+    usd: [500, 1000, 2000, 3000, 5000],
+    eur: [500, 1000, 2000, 3000, 5000],
+  };
+};
+
+export const formatNumber: (value: number, symbol?: string) => string = (value, symbol = getSymbol('gbp')) =>
   `${symbol}${(value ? value / 100 : 0).toFixed(2)}`;
 
 export const _totalDiscount = (
@@ -93,7 +111,6 @@ export const billSummary = async (
   billPayments: BillPayment[],
   discounts: Discount[],
 ): Promise<BillSummary> => {
-
   const { total, itemsBreakdown } = await _total(billItems);
 
   const totalPayments = _totalPayments(billPayments);
@@ -108,7 +125,6 @@ export const billSummary = async (
     balance: total - discountBreakdown.total - totalPayments,
   };
 };
-
 
 type TransactionSummary = {
   total: number;

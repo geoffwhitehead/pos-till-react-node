@@ -1,11 +1,9 @@
 import React from 'react';
-import withObservables, { ExtractedObservables, ObservableConvertible } from '@nozbe/with-observables';
+import withObservables from '@nozbe/with-observables';
 import { Text } from '../../../../../../core';
 import { View } from 'native-base';
 import { ModifierItemRow } from './ModifierItemRow';
 import { ModifierItem, Modifier, PriceGroup } from '../../../../../../models';
-import { Query } from '@nozbe/watermelondb';
-import { Observable } from 'rxjs';
 
 interface ModifierGroupOuterProps {
   modifier: Modifier;
@@ -45,8 +43,9 @@ const WrappedModifierGroup: React.FC<ModifierGroupInnerProps & ModifierGroupOute
   );
 };
 
-
-
-export const ModifierGroup = withObservables<ModifierGroupOuterProps, ModifierGroupInnerProps>(['modifier'], ({ modifier }) => ({
-  modifierItems: modifier.modifierItems,
-}))(WrappedModifierGroup);
+export const ModifierGroup = withObservables<ModifierGroupOuterProps, ModifierGroupInnerProps>(
+  ['modifier'],
+  ({ modifier }) => ({
+    modifierItems: modifier.modifierItems,
+  }),
+)(WrappedModifierGroup);

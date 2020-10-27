@@ -19,6 +19,7 @@ import { PRINTER_GROUP_COLLECTION_NAME } from '../../models/PrinterGroup';
 import { PRINTER_GROUP_PRINTER_COLLECTION_NAME } from '../../models/PrinterGroupPrinter';
 import { OrganizationService } from '../../services/organization';
 import { ORGANIZATION_COLLECTION_NAME } from '../../models/Organization';
+import { fromUnixTime, getUnixTime, startOfSecond } from 'date-fns';
 
 export default (app: Router) => {
     const route = Router();
@@ -37,7 +38,9 @@ export default (app: Router) => {
         const printerGroupService = Container.get('printerGroupService') as PrinterService;
         const organizationService = Container.get('organizationService') as OrganizationService;
 
-        const { lastPulledAt, schemaVersion, migration = null } = req.query;
+        const { lastPulledAt: lastPulledAtUnix, schemaVersion, migration = null } = req.query;
+
+        const lastPulledAt = lastPulledAtUnix ? fromUnixTime(lastPulledAtUnix) : null;
 
         const [
             itemChanges,
@@ -69,8 +72,10 @@ export default (app: Router) => {
             ...printerGroupChanges,
             ...organizationChanges,
         };
-
-        return res.status(200).json(changes);
+        // console.log('getUnixTime(new Date())', );
+        console.log('lastPulledAt', lastPulledAt);
+        const timestamp = getUnixTime(new Date());
+        return res.status(200).json({ changes, timestamp });
     });
 
     type SyncRequest = Request & { body: { lastPulledAt: Date; changes: Changes } };
@@ -86,12 +91,11 @@ export default (app: Router) => {
         const printerGroupService = Container.get('printerGroupService') as PrinterService;
         const organizationService = Container.get('organizationService') as OrganizationService;
 
-        const { lastPulledAt, changes: unmappedChanges } = req.body;
+        const { lastPulledAt: lastPulledAtUnix, changes: unparsedChanges } = req.body;
 
-        console.log('unmappedChanges', unmappedChanges);
+        const unmappedChanges = JSON.parse(unparsedChanges);
         const changes = fromClientChanges(unmappedChanges);
-
-        // console.log('JSON.stringify(changes, null, 4)', JSON.stringify(changes, null, 4));
+        const lastPulledAt = lastPulledAtUnix ? fromUnixTime(lastPulledAtUnix) : null;
 
         try {
             await Promise.all([

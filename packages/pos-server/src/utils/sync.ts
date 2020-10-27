@@ -1,29 +1,31 @@
 import { snakeCase, camelCase } from 'lodash';
 import { ChangeDocument, Changes } from '../services';
 
-export const toClient = (changes: ChangeDocument[]) =>
-    changes.map(change =>
+const toClient = (changes: ChangeDocument[]) => {
+    return changes.map(change =>
         Object.keys(change).reduce((out, key) => ({ ...out, [snakeCase(key)]: change[key] }), {} as ChangeDocument),
     );
+};
 
-export const fromClient = (changes: ChangeDocument[]) => {
+const fromClient = (changes: ChangeDocument[]) => {
     return changes.map(change =>
         Object.keys(change).reduce((out, key) => ({ ...out, [camelCase(key)]: change[key] }), {} as ChangeDocument),
     );
 };
 
-export const parseChanges = (changes: Changes, mapper: typeof toClient | typeof fromClient) => {
-    return Object.keys(changes).reduce(
-        (out, key) => ({
+const parseChanges = (changes: Changes, mapper: typeof toClient | typeof fromClient) => {
+    // Dont need to remap anymore
+    return changes;
+    return Object.keys(changes).reduce((out, key) => {
+        return {
             ...out,
             [key]: {
                 deleted: changes[key].deleted, // deleted
                 created: mapper(changes[key].created),
                 updated: mapper(changes[key].updated),
             },
-        }),
-        {} as Changes,
-    );
+        };
+    }, {} as Changes);
 };
 
 export const fromClientChanges = (changes: Changes): Changes => parseChanges(changes, fromClient);

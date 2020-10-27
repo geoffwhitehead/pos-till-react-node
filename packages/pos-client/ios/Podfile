@@ -2,6 +2,8 @@ platform :ios, '9.0'
 require_relative '../node_modules/@react-native-community/cli-platform-ios/native_modules'
 
 target 'Positive' do
+  use_native_modules!
+
   # Pods for Positive
   pod 'FBLazyVector', :path => "../node_modules/react-native/Libraries/FBLazyVector"
   pod 'FBReactNativeSpec', :path => "../node_modules/react-native/Libraries/FBReactNativeSpec"
@@ -23,7 +25,7 @@ target 'Positive' do
   pod 'React-Core/RCTWebSocket', :path => '../node_modules/react-native/'
 
   pod 'React-cxxreact', :path => '../node_modules/react-native/ReactCommon/cxxreact'
-  pod 'React-jsi', :path => '../node_modules/react-native/ReactCommon/jsi'
+  pod 'React-jsi', :modular_headers => true, :path => '../node_modules/react-native/ReactCommon/jsi'
   pod 'React-jsiexecutor', :path => '../node_modules/react-native/ReactCommon/jsiexecutor'
   pod 'React-jsinspector', :path => '../node_modules/react-native/ReactCommon/jsinspector'
   pod 'ReactCommon/jscallinvoker', :path => "../node_modules/react-native/ReactCommon"
@@ -33,7 +35,8 @@ target 'Positive' do
   pod 'DoubleConversion', :podspec => '../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec'
   pod 'glog', :podspec => '../node_modules/react-native/third-party-podspecs/glog.podspec'
   pod 'Folly', :podspec => '../node_modules/react-native/third-party-podspecs/Folly.podspec'
-  
+  pod 'WatermelonDB', :path => '../node_modules/@nozbe/watermelondb'
+
   
   pod 'RNVectorIcons', :path => '../node_modules/react-native-vector-icons'
 

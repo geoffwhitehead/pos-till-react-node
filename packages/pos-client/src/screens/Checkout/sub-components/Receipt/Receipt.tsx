@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { Text, Col, Grid, Row, Button } from '../../../../core';
 import { StyleSheet } from 'react-native';
-import { formatNumber, billSummary, BillSummary } from '../../../../utils';
+import { formatNumber, billSummary, BillSummary, getSymbol } from '../../../../utils';
 import { Fonts } from '../../../../theme';
 import { ReceiptItems } from './ReceiptItems';
 import dayjs from 'dayjs';
@@ -63,12 +63,13 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
 
   const { organization } = useContext(OrganizationContext);
 
+  const currencySymbol = getSymbol(organization.currency);
   const receiptPrinter =
     organization && printers ? printers.find(p => p.id === organization.receiptPrinterId) : undefined;
 
   const _onStore = async () => {
     // setIsStoreDisabled(true);
-    onStore()
+    onStore();
     const billItemsToPrint = billItemsIncPendingVoids.filter(
       ({ printStatus }) => !(printStatus === 'success' || printStatus === 'pending' || printStatus === 'void_pending'),
     ) as BillItem[];
@@ -126,8 +127,8 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
         let printStatus = 'success';
 
         if (!success) {
-          printStatus = billItem.isVoided ? 'void_error' : 'error'
-        } 
+          printStatus = billItem.isVoided ? 'void_error' : 'error';
+        }
 
         return billItem.prepareUpdate(billItemRecord => {
           Object.assign(billItemRecord, { printStatus });
@@ -202,16 +203,16 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
         />
       </Row>
       <Row style={styles.r3}>
-        {<Text>{`Discount: ${formatNumber(totalDiscount, organization.currency)}`}</Text>}
+        {<Text>{`Discount: ${formatNumber(totalDiscount, currencySymbol)}`}</Text>}
 
-        <Text>{`Total: ${formatNumber(totalPayable, organization.currency)}`}</Text>
+        <Text>{`Total: ${formatNumber(totalPayable, currencySymbol)}`}</Text>
         {complete && (
           <Text>{`Change Due: ${formatNumber(
             Math.abs(billPayments.find(payment => payment.isChange).amount),
-            organization.currency,
+            currencySymbol,
           )}`}</Text>
         )}
-        <Text style={Fonts.h3}>{`Balance: ${formatNumber(balance, organization.currency)}`}</Text>
+        <Text style={Fonts.h3}>{`Balance: ${formatNumber(balance, currencySymbol)}`}</Text>
       </Row>
       <Row style={styles.r4}>
         <Button disabled={!receiptPrinter} style={styles.printButton} block small onPress={onPrint}>

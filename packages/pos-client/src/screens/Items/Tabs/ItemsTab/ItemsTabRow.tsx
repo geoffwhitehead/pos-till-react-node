@@ -1,4 +1,4 @@
-import { ListItem, Left, Text, Icon, Body, Right } from '../../../../core';
+import { ListItem, Left, Text, Icon, Body, Right, Button } from '../../../../core';
 import React from 'react';
 import withObservables from '@nozbe/with-observables';
 import { StyleSheet } from 'react-native';
@@ -8,20 +8,34 @@ interface ItemsTabRowOuterProps {
   item: Item;
   isActive: boolean;
   onPressItem: (i: Item) => void;
+  title: string;
+  subtitle: string;
 }
 
 interface ItemsTabRowInnerProps {
   item: Item;
 }
 
-const ItemsTabRowInner: React.FC<ItemsTabRowOuterProps & ItemsTabRowInnerProps> = ({ isActive, item, onPressItem }) => {
+const ItemsTabRowInner: React.FC<ItemsTabRowOuterProps & ItemsTabRowInnerProps> = ({
+  children,
+  isActive,
+  item,
+  title,
+  subtitle,
+  onPressItem,
+}) => {
   return (
-    <ListItem style={isActive && styles.activeRow} icon  onPress={() => onPressItem(item)}>
-      <Left>
-        <Text>{item.name}</Text>
-      </Left>
-      <Body/>
-      <Right/>
+    <ListItem thumbnail>
+      <Left></Left>
+      <Body>
+        <Text>{title}</Text>
+        <Text note>{subtitle}</Text>
+      </Body>
+      <Right>
+        <Button onPress={() => onPressItem(item)} transparent>
+          <Text>View</Text>
+        </Button>
+      </Right>
     </ListItem>
   );
 };

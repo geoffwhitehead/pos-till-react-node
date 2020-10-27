@@ -17,5 +17,5 @@ export type PullChangesResponse = {
   timestamp: number;
 };
 
-export const pushChanges = (body: PushChangesRequest) => api.get('/sync', body);
-export const pullChanges = (body: PullChangesRequest) => api.post<PullChangesResponse>('/sync', body);
+export const pushChanges = (body: PushChangesRequest) => api.post('/sync', body);
+export const pullChanges = (params: PullChangesRequest) => api.get<PullChangesResponse>('/sync', params);

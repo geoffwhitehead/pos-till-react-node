@@ -1,4 +1,4 @@
-import mongoose, { Schema } from 'mongoose';
+import { Schema } from 'mongoose';
 import { tenantModel, TenantedModel } from './utils/multiTenant';
 import { Joi } from 'celebrate';
 import uuid from 'uuid';

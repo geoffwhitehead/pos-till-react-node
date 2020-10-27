@@ -45,7 +45,9 @@ export const MainWrapped: React.FC<MainOuterProps & MainInnerProps> = ({
           .query()
           .fetch();
 
-        await sync();
+        // if (database) {
+        //   await sync(database);
+        // }
       } catch (e) {
         console.error(e);
       }
@@ -53,7 +55,7 @@ export const MainWrapped: React.FC<MainOuterProps & MainInnerProps> = ({
     };
 
     checkSync();
-  }, []);
+  }, [database]);
 
   useEffect(() => {
     if (organizations.length > 0) {

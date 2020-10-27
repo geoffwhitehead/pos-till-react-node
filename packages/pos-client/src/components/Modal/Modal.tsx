@@ -1,7 +1,11 @@
 import React from 'react';
 import NativeModal from 'react-native-modal';
 
-export const Modal: React.FC = ({ children, isOpen, onClose }) => {
+type ModalProps = {
+  isOpen: boolean;
+  onClose: () => void;
+};
+export const Modal: React.FC<ModalProps> = ({ children, isOpen, onClose }) => {
   return (
     <NativeModal
       propagateSwipe
@@ -14,8 +18,7 @@ export const Modal: React.FC = ({ children, isOpen, onClose }) => {
       backdropTransitionInTiming={50}
       backdropTransitionOutTiming={50}
     >
-      {isOpen && children }
+      {isOpen && children}
     </NativeModal>
   );
 };
-

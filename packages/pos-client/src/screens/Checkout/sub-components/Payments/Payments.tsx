@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import {
   Text,
   Content,
@@ -15,14 +15,15 @@ import {
   Right,
   Label,
 } from '../../../../core';
-import { formatNumber, billSummary, BillSummary } from '../../../../utils';
+import { formatNumber, billSummary, BillSummary, getSymbol, getDefaultCashDenominations } from '../../../../utils';
 import { StyleSheet } from 'react-native';
 import { paymentTypeNames } from '../../../../api/paymentType';
 import { capitalize } from 'lodash';
 import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import withObservables from '@nozbe/with-observables';
-import { tableNames, Bill, Discount, PaymentType } from '../../../../models';
+import { tableNames, Bill, Discount, PaymentType, BillItem, BillPayment, BillDiscount } from '../../../../models';
 import { Database } from '@nozbe/watermelondb';
+import { OrganizationContext } from '../../../../contexts/OrganizationContext';
 
 interface PaymentOuterProps {
   bill: Bill;
@@ -32,11 +33,11 @@ interface PaymentOuterProps {
 
 interface PaymentInnerProps {
   // TODO: tpye
-  discounts: any;
-  paymentTypes: any;
-  billDiscounts: any;
-  billPayments: any;
-  billItems: any;
+  discounts: Discount[];
+  paymentTypes: PaymentType[];
+  billDiscounts: BillDiscount[];
+  billPayments: BillPayment[];
+  billItems: BillItem[];
 }
 
 const PaymentsInner: React.FC<PaymentOuterProps & PaymentInnerProps> = ({
@@ -50,12 +51,14 @@ const PaymentsInner: React.FC<PaymentOuterProps & PaymentInnerProps> = ({
   database,
 }) => {
   const [value, setValue] = useState<string>('');
-  // TODO: this / payment types will need refactoring so were not having to use find
+  // TODO: this / payment types will need refactoring so not having to use find
   const cashType: PaymentType = paymentTypes.find(pt => pt.name === paymentTypeNames.CASH);
-  const denominations = [500, 1000, 2000, 3000, 5000]; // TODO: grab from org settings or create new table, will vary based on currency
-  // TODO: refactor to grab currency from org
-  const currencySymbol = '£';
-  
+
+  const { organization } = useContext(OrganizationContext);
+
+  const denominations = getDefaultCashDenominations(organization.currency);
+  const currencySymbol = getSymbol(organization.currency);
+
   const [summary, setSummary] = useState<BillSummary>(null);
 
   // const checkComplete = async () => balance(currentBill) <= 0 && (await onCompleteBill(currentBill));

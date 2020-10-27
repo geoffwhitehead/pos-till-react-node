@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { Separator, Text, ListItem, Left, Right } from '../../../../../core';
-import { formatNumber } from '../../../../../utils';
+import { formatNumber, getSymbol } from '../../../../../utils';
 import { capitalize } from 'lodash';
 import { BillPayment, PaymentType } from '../../../../../models';
 import { OrganizationContext } from '../../../../../contexts/OrganizationContext';
@@ -14,6 +14,7 @@ interface PaymentsBreakdownProps {
 
 const PaymentsBreakdown: React.FC<PaymentsBreakdownProps> = ({ payments, readonly, onSelect, paymentTypes }) => {
   const { organization } = useContext(OrganizationContext);
+  const currencySymbol = getSymbol(organization.currency);
 
   if (!payments || !payments.length) {
     return null;
@@ -37,7 +38,7 @@ const PaymentsBreakdown: React.FC<PaymentsBreakdownProps> = ({ payments, readonl
                   <Text>{`Payment: ${capitalize(paymentType.name)}`}</Text>
                 </Left>
                 <Right>
-                  <Text>{`${formatNumber(payment.amount, organization.currency)}`}</Text>
+                  <Text>{`${formatNumber(payment.amount, currencySymbol)}`}</Text>
                 </Right>
               </ListItem>
             </>
