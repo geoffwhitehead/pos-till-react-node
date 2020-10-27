@@ -7,6 +7,7 @@ import { keyBy, times } from 'lodash';
 import { View } from 'native-base';
 import { NumberPicker } from '../../../../../../components/NumberPicker/NumberPicker';
 import { Item, Bill, PriceGroup, Modifier, ModifierItem } from '../../../../../../models';
+import { billDiscountSchema } from '../../../../../../models/BillDiscount';
 
 interface ModifierListOuterProps {
   item: Item;
@@ -43,17 +44,20 @@ export const ModifierListInner: React.FC<ModifierListOuterProps & ModifierListIn
   });
 
   const createItemWithModifiers = async () => {
-    const create = async () => {
-      const billItem = await currentBill.addItem({ item, priceGroup });
-      await Promise.all(
-        Object.values(selectedModifiers).map(async ({ modifier, items }) => {
-          await billItem.addModifierChoices(modifier, items, priceGroup);
-        }),
-      );
-    };
+    // const create = async () => {
+    //   const billItems = await currentBill.addItems({ quantity: 1, item, priceGroup, selectedModifiers });
 
-    await times(quantity, create);
+    //   const billItem = await currentBill.addItem({ item, priceGroup });
+    //   await Promise.all(
+    //     Object.values(selectedModifiers).map(async ({ modifier, items }) => {
+    //       await billItem.addModifierChoices(modifier, items, priceGroup);
+    //     }),
+    //   );
+    // };
 
+    // await times(quantity, create);
+
+    await currentBill.addItems({ item, priceGroup, quantity, selectedModifiers: Object.values(selectedModifiers) });
     onClose();
   };
 
