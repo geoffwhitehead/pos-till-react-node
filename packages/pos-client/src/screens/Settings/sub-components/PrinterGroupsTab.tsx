@@ -1,38 +1,11 @@
-import React, { useContext, useState } from 'react';
-import {
-  Container,
-  Content,
-  Text,
-  Body,
-  Grid,
-  Col,
-  Row,
-  Button,
-  List,
-  ListItem,
-  Left,
-  Right,
-  Item,
-  Label,
-  Input,
-  Picker,
-  Icon,
-  Form,
-} from '../../../core';
+import React, { useState } from 'react';
+import { Container, Content, Text, Body, Grid, Col, Row, Button, List, ListItem, Left, Right } from '../../../core';
 import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import withObservables from '@nozbe/with-observables';
-import { tableNames, Printer, PrinterGroup } from '../../../models';
-import { Database, Query } from '@nozbe/watermelondb';
+import { tableNames, PrinterGroup } from '../../../models';
+import { Database } from '@nozbe/watermelondb';
 import { Loading } from '../../../components/Loading/Loading';
-import { capitalize } from 'lodash';
-import { PrinterDetails } from './PrinterDetails';
-import { portDiscovery } from '../../../services/printer/printer';
-import { Printers, Printer as IPrinter } from 'react-native-star-prnt';
 import Modal from 'react-native-modal';
-import { PrinterRow } from './PrinterRow';
-import { styles } from './styles';
-import { Formik } from 'formik';
-import * as Yup from 'yup';
 import { PrinterGroupRow } from './PrinterGroupRow';
 import { PrinterGroupDetails } from './PrinterGroupDetails';
 
@@ -55,23 +28,14 @@ const PrinterGroupsTabInner: React.FC<PrinterGroupsTabOuterProps & PrinterGroups
     setSelectedPrinterGroup(null);
   };
 
-  // const updatePrinter = async ({ macAddress, modelName, portName }: IPrinter) => {
-  //   const savedPrinter = printers.find(p => p.macAddress === macAddress);
-  //   await database.action(() =>
-  //     savedPrinter.update(printerRecord => {
-  //       printerRecord.macAddress = macAddress;
-  //       printerRecord.name = modelName;
-  //       printerRecord.address = portName;
-  //     }),
-  //   );
-  // };
-
   const addPrinterGroup = async () => {
+    setLoading(true);
     await database.action(() =>
       database.collections.get<PrinterGroup>(tableNames.printerGroups).create(printerGroupRecord => {
         printerGroupRecord.name = '';
       }),
     );
+    setLoading(false);
   };
 
   if (!printerGroups) {
@@ -114,7 +78,7 @@ const PrinterGroupsTabInner: React.FC<PrinterGroupsTabOuterProps & PrinterGroups
             hideModalContentWhileAnimating={true}
             backdropTransitionInTiming={50}
             backdropTransitionOutTiming={50}
-            width={600}
+            style={{ margin: 'auto', width: 600 }}
           >
             {selectedPrinterGroup && (
               <PrinterGroupDetails printerGroup={selectedPrinterGroup} onClose={onCancelHandler} />
