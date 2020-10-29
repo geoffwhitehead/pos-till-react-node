@@ -22,9 +22,11 @@ import { Loading } from '../../../components/Loading/Loading';
 import { capitalize } from 'lodash';
 import { PrinterDetails } from './PrinterDetails';
 import { portDiscovery } from '../../../services/printer/printer';
-import { Printers, Printer as IPrinter } from 'react-native-star-prnt';
+import { Printers, Printer as PrinterProps } from 'react-native-star-prnt';
 import Modal from 'react-native-modal';
 import { PrinterRow } from './PrinterRow';
+import { Emulations } from '../../../models/Printer';
+import { ModalContentButton } from '../../../components/Modal/ModalContentButton';
 
 interface PrintersTabOuterProps {
   database: Database;
@@ -43,7 +45,7 @@ const PrintersTabInner: React.FC<PrintersTabOuterProps & PrintersTabInnerProps> 
     setSelectedPrinter(null);
   };
 
-  const updatePrinter = async ({ macAddress, modelName, portName }: IPrinter) => {
+  const updatePrinter = async ({ macAddress, modelName, portName }: PrinterProps) => {
     const savedPrinter = printers.find(p => p.macAddress === macAddress);
     await database.action(() =>
       savedPrinter.update(printerRecord => {
@@ -54,14 +56,18 @@ const PrintersTabInner: React.FC<PrintersTabOuterProps & PrintersTabInnerProps> 
     );
   };
 
-  const addPrinter = async ({ macAddress, modelName, portName }: IPrinter) => {
-    await database.action(() =>
-      database.collections.get<Printer>(tableNames.printers).create(printerRecord => {
-        printerRecord.macAddress = macAddress;
-        printerRecord.name = modelName;
-        printerRecord.address = portName;
-      }),
-    );
+  const addPrinter = async (printer: PrinterProps) => {
+    const { macAddress, modelName, portName } = printer;
+    await database.action(async () => {
+      const collection = database.collections.get<Printer>(tableNames.printers);
+      const p = await collection.create(printerRecord => {
+        Object.assign(printerRecord, {
+          macAddress: macAddress,
+          name: modelName,
+          address: portName,
+        });
+      });
+    });
   };
 
   const discoverPrinters = async () => {
@@ -107,25 +113,25 @@ const PrintersTabInner: React.FC<PrintersTabOuterProps & PrintersTabInnerProps> 
                 ) : discoveredPrinters.length === 0 ? (
                   <Text style={{ padding: 10 }}> No printers found</Text>
                 ) : (
-                  discoveredPrinters.map(discPrinter => {
-                    const isInstalled = printers.find(printer => printer.macAddress === discPrinter.macAddress);
+                  discoveredPrinters.map(discoveredPrinter => {
+                    const isInstalled = printers.find(printer => printer.macAddress === discoveredPrinter.macAddress);
 
                     return (
-                      <ListItem key={discPrinter.macAddress}>
+                      <ListItem key={discoveredPrinter.macAddress}>
                         <Left>
-                          <Text>{discPrinter.modelName}</Text>
+                          <Text>{discoveredPrinter.modelName}</Text>
                         </Left>
                         <Body>
-                          <Text note>{capitalize(discPrinter.portName)}</Text>
-                          <Text note>{discPrinter.macAddress}</Text>
+                          <Text note>{capitalize(discoveredPrinter.portName)}</Text>
+                          <Text note>{discoveredPrinter.macAddress}</Text>
                         </Body>
                         <Right>
                           {isInstalled ? (
-                            <Button small onPress={() => updatePrinter(discPrinter)}>
+                            <Button small onPress={() => updatePrinter(discoveredPrinter)}>
                               <Text>Update</Text>
                             </Button>
                           ) : (
-                            <Button small onPress={() => addPrinter(discPrinter)}>
+                            <Button small onPress={() => addPrinter(discoveredPrinter)}>
                               <Text>Add</Text>
                             </Button>
                           )}
@@ -148,6 +154,7 @@ const PrintersTabInner: React.FC<PrintersTabOuterProps & PrintersTabInnerProps> 
             hideModalContentWhileAnimating={true}
             backdropTransitionInTiming={50}
             backdropTransitionOutTiming={50}
+            style={{ width: 600 }}
           >
             {selectedPrinter && <PrinterDetails printer={selectedPrinter} onClose={onCancelHandler} />}
           </Modal>

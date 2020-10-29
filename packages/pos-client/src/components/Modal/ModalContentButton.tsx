@@ -4,20 +4,37 @@ import { Content, Text, Button, H3 } from '../../core';
 import { View } from 'react-native';
 
 interface ModalContentButtonProps {
-  title: string,
-  onPressButton: () => void,
-  buttonText: string
-  disabled: boolean
+  title: string;
+  onPressPrimaryButton: () => void;
+  onPressSecondaryButton: () => void;
+  primaryButtonText: string;
+  secondaryButtonText: string;
+  isPrimaryDisabled?: boolean;
+  isSecondaryDisabled?: boolean;
 }
 
-export const ModalContentButton: React.FC<ModalContentButtonProps> = ({ children, disabled, title, onPressButton, buttonText }) => {
+export const ModalContentButton: React.FC<ModalContentButtonProps> = ({
+  children,
+  isPrimaryDisabled,
+  isSecondaryDisabled,
+  title,
+  onPressPrimaryButton,
+  onPressSecondaryButton,
+  primaryButtonText,
+  secondaryButtonText,
+}) => {
   return (
     <Content style={cStyles.modal}>
       <View style={cStyles.heading}>
         <H3>{title}</H3>
-        <Button disabled={disabled} onPress={onPressButton}>
-          <Text>{buttonText}</Text>
-        </Button>
+        <View style={cStyles.buttons}>
+          <Button style={cStyles.button} light disabled={isSecondaryDisabled} onPress={onPressSecondaryButton}>
+            <Text>{secondaryButtonText}</Text>
+          </Button>
+          <Button success disabled={isPrimaryDisabled} onPress={onPressPrimaryButton}>
+            <Text>{primaryButtonText}</Text>
+          </Button>
+        </View>
       </View>
       <Content style={cStyles.content}>{children}</Content>
     </Content>
@@ -36,7 +53,7 @@ const cStyles = {
     paddingRight: 20,
     backgroundColor: 'lightgrey',
     borderBottom: 'grey',
-    borderBottomWidth: 1
+    borderBottomWidth: 1,
   },
   content: {
     padding: 20,
@@ -45,5 +62,13 @@ const cStyles = {
     backgroundColor: 'white',
 
     borderRadius: 2,
-  }
+  },
+  buttons: {
+    display: 'flex',
+    justifyContent: 'flex-end',
+    flexDirection: 'row',
+  },
+  button: {
+    marginRight: 10,
+  },
 };

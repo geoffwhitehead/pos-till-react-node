@@ -1,25 +1,9 @@
 import React from 'react';
-import {
-  Text,
-  Col,
-  List,
-  Row,
-  Button,
-  Content,
-  Separator,
-  ListItem,
-  Left,
-  Right,
-} from '../../../../core';
+import { Text, Col, List, Row, Button, Content, Separator, ListItem, Left, Right } from '../../../../core';
 import { StyleSheet } from 'react-native';
-import {
-  formatNumber,
-} from '../../../../utils';
+import { formatNumber } from '../../../../utils';
 import { capitalize } from 'lodash';
 import { Collection } from 'realm';
-
-// TODO: move into org and fetch from db or something
-const currencySymbol = '£';
 
 const sumObject: (obj: Record<string, number>) => number = obj =>
   Object.keys(obj).reduce((acc, id) => acc + obj[id], 0);
@@ -44,18 +28,14 @@ export const ReportReceipt: React.FC<ReportReceiptProps> = ({
   // const categoryTotals = billItemsCategoryTotals(bills, categories);
   // const paymentTotals = totalBillsPaymentBreakdown(bills, paymentTypes);
   // const discountTotals = discountBreakdownTotals(bills, discounts);
-
   // const categoryTotals = useMemo(() => billItemsCategoryTotals(bills, categories), [bills, categories]);
   // const paymentTotals = useMemo(() => totalBillsPaymentBreakdown(bills, paymentTypes), [bills, paymentTypes]);
   // const discountTotals = useMemo(() => discountBreakdownTotals(bills, discounts), [bills, discounts]);
-
   // const grossSalesTotal = sumObject(categoryTotals);
   // const discountTotal = sumObject(discountTotals);
   // const netSalesTotal = grossSalesTotal - discountTotal;
-
   // const resolveName: (id: string, collection: Collection<{ _id: string; name: string }>) => string = (id, collection) =>
   //   collection.find(({ _id }) => _id === id).name;
-
   // const mapGroup: (
   //   group: Record<string, number>,
   //   nameResolver: (id: string) => string,
@@ -73,7 +53,6 @@ export const ReportReceipt: React.FC<ReportReceiptProps> = ({
   //       </ListItem>
   //     );
   //   });
-
   // return (
   //   billPeriod && (
   //     <Col style={styles.rightColumn}>
@@ -106,7 +85,6 @@ export const ReportReceipt: React.FC<ReportReceiptProps> = ({
   //             <Separator bordered>
   //               <Text>Totals</Text>
   //             </Separator>
-
   //             <ListItem>
   //               <Left>
   //                 <Text>Gross Sales Total: </Text>

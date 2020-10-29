@@ -2,7 +2,7 @@ import { Printer } from '../../../models';
 import { ListItem, Left, Text, Body, Right, Icon } from 'native-base';
 import { styles } from './styles';
 import React from 'react';
-import { capitalize } from 'lodash';
+// import { capitalize } from 'lodash';
 import withObservables from '@nozbe/with-observables';
 
 interface PrinterRowInnerProps {}
@@ -20,7 +20,7 @@ const PrinterRowInner: React.FC<PrinterRowOuterProps & PrinterRowInnerProps> = (
         <Text>{printer.name}</Text>
       </Left>
       <Body>
-        <Text note>{capitalize(printer.type)}</Text>
+        {/* <Text note>{capitalize(printer)}</Text> */}
         <Text note>{printer.address}</Text>
       </Body>
       <Right>

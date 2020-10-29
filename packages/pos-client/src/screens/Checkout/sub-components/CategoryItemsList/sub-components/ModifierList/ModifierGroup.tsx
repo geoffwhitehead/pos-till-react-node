@@ -13,7 +13,7 @@ interface ModifierGroupOuterProps {
 }
 
 interface ModifierGroupInnerProps {
-  modifierItems: any; // TODO: type
+  modifierItems: ModifierItem[];
 }
 
 const WrappedModifierGroup: React.FC<ModifierGroupInnerProps & ModifierGroupOuterProps> = ({

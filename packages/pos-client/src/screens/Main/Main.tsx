@@ -40,14 +40,9 @@ export const MainWrapped: React.FC<MainOuterProps & MainInnerProps> = ({
   useEffect(() => {
     const checkSync = async () => {
       try {
-        const organizations = await database.collections
-          .get<Organization>(tableNames.organizations)
-          .query()
-          .fetch();
-
-        // if (database) {
-        //   await sync(database);
-        // }
+        if (database) {
+          await sync(database);
+        }
       } catch (e) {
         console.error(e);
       }

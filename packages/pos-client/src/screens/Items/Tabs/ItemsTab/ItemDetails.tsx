@@ -130,7 +130,14 @@ const ItemDetailsInner: React.FC<ItemDetailsOuterProps & ItemDetailsInnerProps> 
         };
 
         return (
-          <ModalContentButton title="Item details" onPressButton={handleSubmit} buttonText="Save" disabled={loading}>
+          <ModalContentButton
+            title="Item details"
+            onPressPrimaryButton={handleSubmit}
+            primaryButtonText="Save"
+            isPrimaryDisabled={loading}
+            onPressSecondaryButton={onClose}
+            secondaryButtonText="Cancel"
+          >
             <Grid>
               <Row>
                 <Col style={styles.column}>

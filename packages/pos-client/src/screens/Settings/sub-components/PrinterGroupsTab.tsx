@@ -114,8 +114,11 @@ const PrinterGroupsTabInner: React.FC<PrinterGroupsTabOuterProps & PrinterGroups
             hideModalContentWhileAnimating={true}
             backdropTransitionInTiming={50}
             backdropTransitionOutTiming={50}
+            width={600}
           >
-            {selectedPrinterGroup && <PrinterGroupDetails printerGroup={selectedPrinterGroup} onClose={onCancelHandler} />}
+            {selectedPrinterGroup && (
+              <PrinterGroupDetails printerGroup={selectedPrinterGroup} onClose={onCancelHandler} />
+            )}
           </Modal>
         </Grid>
       </Content>

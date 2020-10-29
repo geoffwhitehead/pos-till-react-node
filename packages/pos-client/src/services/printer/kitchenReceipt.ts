@@ -15,15 +15,16 @@ export const kitchenReceipt = async (p: {
 }): Promise<{ billItems: BillItem[]; printer: Printer; commands: any[] }[]> => {
   const { billItems, printers, priceGroups, reference, prepTime } = p;
 
+  // TODO: fix
   const populatedItems = await Promise.all(
     billItems.map(async billItem => {
       const [mods, printers] = await Promise.all([
         await billItem.modifierItemsIncVoids.fetch(),
         await new Promise(async (res, rej) => {
-          const item = await billItem.item.fetch()
-          const printers = await item.printers.fetch()
-          res(printers)
-        })
+          const item = await billItem.item.fetch();
+          const printers = await item.printers.fetch();
+          res(printers);
+        }),
       ]);
       return {
         billItem,
@@ -77,7 +78,7 @@ const generatePrintCommands = (p: {
 
   const c = [];
 
-  const pGName = priceGroup.shortName || priceGroup.name
+  const pGName = priceGroup.shortName || priceGroup.name;
   c.push({ appendBitmapText: alignCenter(pGName.toUpperCase(), printer.printWidth) });
   c.push({ appendBitmapText: alignCenter('IN: ' + dayjs().format('HH:mm'), printer.printWidth) });
   c.push({ appendBitmapText: alignCenter('PREP: ' + prepTime.format('HH:mm'), printer.printWidth) });

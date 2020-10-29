@@ -162,7 +162,7 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
       priceGroups,
       paymentTypes,
       receiptPrinter,
-      currency,
+      organization,
     );
     console.log('commands', commands);
 

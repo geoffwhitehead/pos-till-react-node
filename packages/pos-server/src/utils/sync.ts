@@ -14,8 +14,7 @@ const fromClient = (changes: ChangeDocument[]) => {
 };
 
 const parseChanges = (changes: Changes, mapper: typeof toClient | typeof fromClient) => {
-    // Dont need to remap anymore
-    return changes;
+    // TODO: Dont think its necessary to remap most fields now except id. Front end required id ... not _id/.
     return Object.keys(changes).reduce((out, key) => {
         return {
             ...out,

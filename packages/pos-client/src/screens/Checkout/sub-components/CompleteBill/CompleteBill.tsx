@@ -8,28 +8,35 @@ import { useFocusEffect } from '@react-navigation/native';
 import { receiptBill } from '../../../../services/printer/receiptBill';
 import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import withObservables from '@nozbe/with-observables';
-import { tableNames, Discount, Bill, PaymentType, PriceGroup, Printer } from '../../../../models';
+import {
+  tableNames,
+  Discount,
+  Bill,
+  PaymentType,
+  PriceGroup,
+  Printer,
+  BillDiscount,
+  BillItem,
+  BillPayment,
+} from '../../../../models';
 import { Database } from '@nozbe/watermelondb';
 import { OrganizationContext } from '../../../../contexts/OrganizationContext';
 
 interface CompleteBillOuterProps {
   bill: Bill;
   onCloseBill: () => void;
-  database: Database
+  database: Database;
 }
 
 interface CompleteBillInnerProps {
-  billPayments: any;
-  billItems: any;
-  billDiscounts: any;
-  discounts: any;
-  priceGroups: any;
-  paymentTypes: any;
-  printers: any
+  billPayments: BillPayment[];
+  billItems: BillItem[];
+  billDiscounts: BillDiscount[];
+  discounts: Discount[];
+  priceGroups: PriceGroup[];
+  paymentTypes: PaymentType[];
+  printers: Printer[];
 }
-
-// TODO : move this
-const currencySymbol = '£';
 
 const CompleteBillInner: React.FC<CompleteBillOuterProps & CompleteBillInnerProps> = ({
   onCloseBill,
@@ -39,14 +46,24 @@ const CompleteBillInner: React.FC<CompleteBillOuterProps & CompleteBillInnerProp
   discounts,
   priceGroups,
   paymentTypes,
-  printers
+  printers,
 }) => {
-  const { organization } = useContext(OrganizationContext)
+  const { organization } = useContext(OrganizationContext);
+  const { currency } = organization;
 
   const onPrint = async () => {
-    const receiptPrinter = printers.find(p => p.id === organization.receiptPrinterId)
+    const receiptPrinter = printers.find(p => p.id === organization.receiptPrinterId);
 
-    const commands = await receiptBill(billItems, billDiscounts, billPayments, discounts, priceGroups, paymentTypes, receiptPrinter);
+    const commands = await receiptBill(
+      billItems,
+      billDiscounts,
+      billPayments,
+      discounts,
+      priceGroups,
+      paymentTypes,
+      receiptPrinter,
+      organization,
+    );
     await print(commands, receiptPrinter, true);
   };
   useFocusEffect(
@@ -65,7 +82,7 @@ const CompleteBillInner: React.FC<CompleteBillOuterProps & CompleteBillInnerProp
 
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>{`Change due: ${formatNumber(Math.abs(changePayment), currencySymbol)}`}</Text>
+      <Text style={styles.text}>{`Change due: ${formatNumber(Math.abs(changePayment), currency)}`}</Text>
       <Button style={styles.button} large onPress={onPrint}>
         <Text>Print Receipt</Text>
       </Button>
@@ -86,7 +103,7 @@ const enhance = component =>
       discounts: database.collections.get<Discount>(tableNames.discounts).query(),
       paymentTypes: database.collections.get<PaymentType>(tableNames.paymentTypes).query(),
       priceGroups: database.collections.get<PriceGroup>(tableNames.priceGroups).query(),
-      printers: database.collections.get<Printer>(tableNames.printers).query()
+      printers: database.collections.get<Printer>(tableNames.printers).query(),
     }))(component),
   );
 
