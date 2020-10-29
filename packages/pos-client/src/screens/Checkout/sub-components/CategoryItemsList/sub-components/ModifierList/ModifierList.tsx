@@ -3,11 +3,10 @@ import { StyleSheet } from 'react-native';
 import { Content, Text, List, ListItem, Left, Icon, Body, Right, Button } from '../../../../../../core';
 import withObservables from '@nozbe/with-observables';
 import { ModifierGroup } from './ModifierGroup';
-import { keyBy, times } from 'lodash';
+import { keyBy } from 'lodash';
 import { View } from 'native-base';
 import { NumberPicker } from '../../../../../../components/NumberPicker/NumberPicker';
 import { Item, Bill, PriceGroup, Modifier, ModifierItem } from '../../../../../../models';
-import { billDiscountSchema } from '../../../../../../models/BillDiscount';
 
 interface ModifierListOuterProps {
   item: Item;
@@ -17,7 +16,7 @@ interface ModifierListOuterProps {
 }
 
 interface ModifierListInnerProps {
-  modifiers: any; // TODO:
+  modifiers: Modifier[];
 }
 
 export const ModifierListInner: React.FC<ModifierListOuterProps & ModifierListInnerProps> = ({
@@ -44,19 +43,6 @@ export const ModifierListInner: React.FC<ModifierListOuterProps & ModifierListIn
   });
 
   const createItemWithModifiers = async () => {
-    // const create = async () => {
-    //   const billItems = await currentBill.addItems({ quantity: 1, item, priceGroup, selectedModifiers });
-
-    //   const billItem = await currentBill.addItem({ item, priceGroup });
-    //   await Promise.all(
-    //     Object.values(selectedModifiers).map(async ({ modifier, items }) => {
-    //       await billItem.addModifierChoices(modifier, items, priceGroup);
-    //     }),
-    //   );
-    // };
-
-    // await times(quantity, create);
-
     await currentBill.addItems({ item, priceGroup, quantity, selectedModifiers: Object.values(selectedModifiers) });
     onClose();
   };

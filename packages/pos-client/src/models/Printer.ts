@@ -14,9 +14,8 @@ export class Printer extends Model {
   static table = 'printers';
 
   @field('name') name: string;
-  @field('type') type: 'wifi' | 'ethernet';
   @field('address') address: string;
-  @field('macAddress') macAddress: string;
+  @field('mac_address') macAddress: string;
   @field('print_width') printWidth: number;
   @field('emulation') emulation: Emulations;
 
@@ -29,7 +28,6 @@ export const printerSchema = tableSchema({
   name: 'printers',
   columns: [
     { name: 'name', type: 'string' },
-    { name: 'type', type: 'string' },
     { name: 'address', type: 'string' },
     { name: 'mac_address', type: 'string' },
     { name: 'print_width', type: 'number' },

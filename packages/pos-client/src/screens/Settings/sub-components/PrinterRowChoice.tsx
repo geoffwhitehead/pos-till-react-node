@@ -2,7 +2,7 @@ import { Printer } from '../../../models';
 import { ListItem, Left, Text, Body, Right, Icon } from 'native-base';
 import { styles } from './styles';
 import React from 'react';
-import { capitalize } from 'lodash';
+// import { capitalize } from 'lodash';
 import withObservables from '@nozbe/with-observables';
 
 interface PrinterRowChoiceInnerProps {}
@@ -21,11 +21,10 @@ const PrinterRowChoiceInner: React.FC<PrinterRowChoiceOuterProps & PrinterRowCho
   return (
     <ListItem key={printer.id} noIndent style={isSelected && styles.selectedRow} onPress={() => onSelect(printer)}>
       <Left>
-        <Icon name="arrow-back" style={{color: 'grey'}}/>
+        <Icon name="arrow-back" style={{ color: 'grey' }} />
         <Text>{printer.name}</Text>
       </Left>
       <Body>
-        <Text note>{capitalize(printer.type)}</Text>
         <Text note>{printer.address}</Text>
       </Body>
       <Right></Right>

@@ -32,7 +32,6 @@ interface PaymentOuterProps {
 }
 
 interface PaymentInnerProps {
-  // TODO: tpye
   discounts: Discount[];
   paymentTypes: PaymentType[];
   billDiscounts: BillDiscount[];

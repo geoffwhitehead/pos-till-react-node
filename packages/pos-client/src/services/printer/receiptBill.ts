@@ -2,7 +2,16 @@ import { formatNumber, billSummary, BillSummary, getItemPrice, getModifierItemPr
 import { alignCenter, alignLeftRight, addHeader, divider, alignRight } from './helpers';
 import { receiptTempate } from './template';
 import { capitalize, groupBy } from 'lodash';
-import { BillItem, BillDiscount, BillPayment, Discount, PriceGroup, PaymentType, Printer } from '../../models';
+import {
+  BillItem,
+  BillDiscount,
+  BillPayment,
+  Discount,
+  PriceGroup,
+  PaymentType,
+  Printer,
+  Organization,
+} from '../../models';
 
 const modPrefix = ' -';
 
@@ -24,8 +33,10 @@ export const receiptBill = async (
   priceGroups: PriceGroup[],
   paymentTypes: PaymentType[],
   printer: Printer,
-  currency: string,
+  organization: Organization,
 ) => {
+  const { currency } = organization;
+
   const printItemsGroup = (group: BillSummary['itemsBreakdown']) => {
     group.map(({ item, mods, total }) => {
       c.push({
