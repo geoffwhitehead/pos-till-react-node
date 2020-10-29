@@ -1,5 +1,6 @@
 import { Model, tableSchema, Query, Q } from '@nozbe/watermelondb';
-import { field } from '@nozbe/watermelondb/decorators';
+import { action, children, field } from '@nozbe/watermelondb/decorators';
+import { PrinterGroupPrinter } from '.';
 
 export enum Emulations {
   'StarPRNT' = 'StarPRNT',
@@ -9,6 +10,14 @@ export enum Emulations {
   'EscPosMobile' = 'EscPosMobile',
   'EscPos' = 'EscPos',
 }
+
+export type PrinterProps = {
+  name: string;
+  address: string;
+  macAddress: string;
+  printWidth: number;
+  emulation: Emulations;
+};
 
 export class Printer extends Model {
   static table = 'printers';
@@ -21,6 +30,14 @@ export class Printer extends Model {
 
   static associations = {
     printer_groups_printers: { type: 'has_many', foreignKey: 'printer_id' },
+  };
+
+  @children('printer_groups_printers') printerGroupsPrinters: Query<PrinterGroupPrinter>;
+
+  @action removeWithChildrenSync = async () => {
+    await this.database.action(async () => {
+      await this.experimentalMarkAsDeleted();
+    });
   };
 }
 

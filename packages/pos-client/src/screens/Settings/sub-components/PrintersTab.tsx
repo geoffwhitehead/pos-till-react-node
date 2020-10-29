@@ -13,6 +13,7 @@ import {
   Left,
   Right,
   Spinner,
+  ActionSheet,
 } from '../../../core';
 import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import withObservables from '@nozbe/with-observables';
@@ -22,10 +23,10 @@ import { Loading } from '../../../components/Loading/Loading';
 import { capitalize } from 'lodash';
 import { PrinterDetails } from './PrinterDetails';
 import { portDiscovery } from '../../../services/printer/printer';
-import { Printers, Printer as PrinterProps } from 'react-native-star-prnt';
+import { Printers, Printer as StarPrinterProps } from 'react-native-star-prnt';
 import Modal from 'react-native-modal';
 import { PrinterRow } from './PrinterRow';
-import { Emulations } from '../../../models/Printer';
+import { Emulations, PrinterProps } from '../../../models/Printer';
 import { ModalContentButton } from '../../../components/Modal/ModalContentButton';
 
 interface PrintersTabOuterProps {
@@ -37,15 +38,16 @@ interface PrintersTabInnerProps {
 }
 
 const PrintersTabInner: React.FC<PrintersTabOuterProps & PrintersTabInnerProps> = ({ printers, database }) => {
-  const [selectedPrinter, setSelectedPrinter] = useState<Printer>();
+  const [selectedPrinter, setSelectedPrinter] = useState<Partial<Printer>>();
   const [discoveredPrinters, setDiscoveredPrinters] = useState<Printers>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   const onCancelHandler = () => {
     setSelectedPrinter(null);
   };
 
-  const updatePrinter = async ({ macAddress, modelName, portName }: PrinterProps) => {
+  const updatePrinter = async ({ macAddress, modelName, portName }: StarPrinterProps) => {
     const savedPrinter = printers.find(p => p.macAddress === macAddress);
     await database.action(() =>
       savedPrinter.update(printerRecord => {
@@ -56,18 +58,76 @@ const PrintersTabInner: React.FC<PrintersTabOuterProps & PrintersTabInnerProps> 
     );
   };
 
-  const addPrinter = async (printer: PrinterProps) => {
+  const addPrinter = async (printer: StarPrinterProps) => {
     const { macAddress, modelName, portName } = printer;
-    await database.action(async () => {
-      const collection = database.collections.get<Printer>(tableNames.printers);
-      const p = await collection.create(printerRecord => {
-        Object.assign(printerRecord, {
-          macAddress: macAddress,
-          name: modelName,
-          address: portName,
+    const selectedPrinterDetails = {
+      macAddress: macAddress,
+      name: modelName,
+      address: portName,
+    };
+    setSelectedPrinter(selectedPrinterDetails);
+    // await database.action(async () => {
+    //   const collection = database.collections.get<Printer>(tableNames.printers);
+    //   await collection.create(printerRecord => {
+    //     Object.assign(printerRecord, {
+    //       macAddress: macAddress,
+    //       name: modelName,
+    //       address: portName,
+    //     });
+    //   });
+    // });
+  };
+
+  const onSave = async (values: PrinterProps) => {
+    // TODO: type vaalues
+    setIsSaving(true);
+
+    console.log('SAVING', values);
+    if (selectedPrinter.id) {
+      await database.action(() =>
+        selectedPrinter.update(printerRecord => {
+          printerRecord.macAddress = values.macAddress;
+          printerRecord.name = values.name;
+          printerRecord.address = values.address;
+          printerRecord.printWidth = parseInt(values.printWidth);
+          printerRecord.emulation = Emulations[values.emulation];
+        }),
+      );
+    } else {
+      await database.action(async () => {
+        const collection = database.collections.get<Printer>(tableNames.printers);
+        await collection.create(printerRecord => {
+          Object.assign(printerRecord, {
+            macAddress: values.macAddress,
+            name: values.name,
+            address: values.address,
+            printWidth: parseInt(values.printWidth),
+            emulation: Emulations[values.emulation],
+          });
         });
       });
-    });
+    }
+    setIsSaving(false);
+    onCancelHandler();
+  };
+
+  const onDelete = async (printer: Printer) => {
+    await printer.removeWithChildrenSync();
+  };
+
+  const areYouSure = (fn, p: Printer) => {
+    const options = ['Yes', 'Cancel'];
+    ActionSheet.show(
+      {
+        options,
+        cancelButtonIndex: options.length,
+        title:
+          'This will permanently remove this printer and remove it from all printer groups you have defined. Are you sure?',
+      },
+      index => {
+        index === 0 && fn(p);
+      },
+    );
   };
 
   const discoverPrinters = async () => {
@@ -81,6 +141,9 @@ const PrintersTabInner: React.FC<PrintersTabOuterProps & PrintersTabInnerProps> 
 
   return (
     <Container>
+      <Button small onPress={() => addPrinter({ modelName: 'test', macAddress: 'mac', portName: 'port' })}>
+        <Text>Add</Text>
+      </Button>
       <Content>
         <Grid>
           <Row>
@@ -90,7 +153,13 @@ const PrintersTabInner: React.FC<PrintersTabOuterProps & PrintersTabInnerProps> 
                   <Text>Installed Printers</Text>
                 </ListItem>
                 {printers.map(p => (
-                  <PrinterRow isSelected={p === selectedPrinter} printer={p} onSelect={setSelectedPrinter} />
+                  <PrinterRow
+                    key={p.id}
+                    isSelected={p === selectedPrinter}
+                    printer={p}
+                    onSelect={setSelectedPrinter}
+                    onDelete={() => areYouSure(onDelete, p)}
+                  />
                 ))}
               </List>
             </Col>
@@ -156,7 +225,14 @@ const PrintersTabInner: React.FC<PrintersTabOuterProps & PrintersTabInnerProps> 
             backdropTransitionOutTiming={50}
             style={{ width: 600 }}
           >
-            {selectedPrinter && <PrinterDetails printer={selectedPrinter} onClose={onCancelHandler} />}
+            {selectedPrinter && (
+              <PrinterDetails
+                printer={selectedPrinter}
+                onSave={onSave}
+                onClose={onCancelHandler}
+                isLoading={isSaving}
+              />
+            )}
           </Modal>
         </Grid>
       </Content>

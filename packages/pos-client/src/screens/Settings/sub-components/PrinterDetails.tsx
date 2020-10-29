@@ -1,17 +1,20 @@
 import React, { useState } from 'react';
 import withObservables from '@nozbe/with-observables';
-import { Printer } from '../../../models';
+import { Printer, tableNames } from '../../../models';
 import { Form, Label, H2, Input, Item, Button, Text, Col, Row, Picker, Icon, Content } from '../../../core';
 import { styles } from './styles';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 import { useDatabase } from '@nozbe/watermelondb/hooks';
-import { Emulations } from '../../../models/Printer';
+import { Emulations, PrinterProps } from '../../../models/Printer';
 import { ModalContentButton } from '../../../components/Modal/ModalContentButton';
+import { openAsync } from 'realm';
 
 interface PrinterDetailsOuterProps {
   onClose: () => void;
-  printer: Printer;
+  printer: Partial<Printer>;
+  onSave: (values: PrinterProps) => void;
+  isLoading: boolean;
 }
 
 const printerDetailsSchema = Yup.object().shape({
@@ -36,42 +39,19 @@ const printerDetailsSchema = Yup.object().shape({
     .required('Required'),
 });
 
-const PrinterDetailsInner: React.FC<PrinterDetailsOuterProps> = ({ printer, onClose }) => {
-  const database = useDatabase();
+const PrinterDetailsInner: React.FC<PrinterDetailsOuterProps> = ({ printer, onClose, onSave, isLoading }) => {
   const { name, address, macAddress, emulation, printWidth } = printer;
-  const [loading, setLoading] = useState(false);
-
-  const update = async (v: any, printer: Printer) => {
-    // TODO: type vaalues
-    setLoading(true);
-
-    await database.action(() =>
-      printer.update(printerRecord => {
-        printerRecord.macAddress = v.macAddress;
-        printerRecord.name = v.name;
-        printerRecord.address = v.address;
-        printerRecord.printWidth = parseInt(v.printWidth);
-        printerRecord.emulation = Emulations[v.emulation];
-      }),
-    );
-    setLoading(false);
-    onClose();
-  };
 
   const initialValues = {
-    name,
-    address,
-    printWidth,
+    name: name || '',
+    address: address || '',
+    printWidth: printWidth || 80,
     emulation,
-    macAddress,
+    macAddress: macAddress || '',
   };
 
   return (
-    <Formik
-      initialValues={initialValues}
-      validationSchema={printerDetailsSchema}
-      onSubmit={values => update(values, printer)}
-    >
+    <Formik initialValues={initialValues} validationSchema={printerDetailsSchema} onSubmit={onSave}>
       {({ handleChange, handleBlur, handleSubmit, errors, touched, values }) => {
         const { name, address, macAddress, printWidth, emulation } = values;
         const err = {
@@ -89,6 +69,7 @@ const PrinterDetailsInner: React.FC<PrinterDetailsOuterProps> = ({ printer, onCl
             onPressSecondaryButton={onClose}
             secondaryButtonText="Cancel"
             title="Printer details"
+            isPrimaryDisabled={isLoading}
           >
             <Content style={styles.modal}>
               <Row>
@@ -149,8 +130,9 @@ const PrinterDetailsInner: React.FC<PrinterDetailsOuterProps> = ({ printer, onCl
   );
 };
 
-const enhance = withObservables(['printer'], ({ printer }) => ({
-  printer,
-}));
+// const enhance = withObservables<PrinterDetailsOuterProps, PrinterDetailsOuterProps>(['printer'], ({ printer }) => ({
+//   printer,
+// }));
 
-export const PrinterDetails = enhance(PrinterDetailsInner);
+// export const PrinterDetails = enhance(PrinterDetailsInner);
+export const PrinterDetails = PrinterDetailsInner;

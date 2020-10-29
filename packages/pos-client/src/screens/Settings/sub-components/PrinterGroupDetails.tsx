@@ -61,15 +61,27 @@ const PrinterGroupDetailsInner: React.FC<PrinterGroupDetailsOuterProps & Printer
     setSelectedPrinters(assignedPrinters);
   }, [assignedPrinters]);
 
-  const setAssignedPrinters = (printer: Printer) => {
+  const togglePrinter = (printer: Printer) => {
     const alreadyAssigned = selectedPrinters.includes(printer);
 
+    console.log('printer', printer);
+    console.log('selectedPrinters', selectedPrinters);
     if (alreadyAssigned) {
       setSelectedPrinters(selectedPrinters.filter(sP => sP !== printer));
     } else {
       setSelectedPrinters([...selectedPrinters, printer]);
     }
   };
+
+  // const setAssignedPrinters = (printer: Printer) => {
+  //   const alreadyAssigned = selectedPrinters.includes(printer);
+
+  //   if (alreadyAssigned) {
+  //     setSelectedPrinters(selectedPrinters.filter(sP => sP !== printer));
+  //   } else {
+  //     setSelectedPrinters([...selectedPrinters, printer]);
+  //   }
+  // };
 
   return (
     <Formik
@@ -111,7 +123,7 @@ const PrinterGroupDetailsInner: React.FC<PrinterGroupDetailsOuterProps & Printer
                       <Text>Assigned</Text>
                     </ListItem>
                     {selectedPrinters.map(p => (
-                      <PrinterRow printer={p} onSelect={p => setAssignedPrinters(p)} />
+                      <PrinterRowChoice arrowDir="right" printer={p} onSelect={() => togglePrinter(p)} />
                     ))}
                   </List>
                 </Col>
@@ -123,7 +135,7 @@ const PrinterGroupDetailsInner: React.FC<PrinterGroupDetailsOuterProps & Printer
                     {printers
                       .filter(p => !selectedPrinters.includes(p))
                       .map(p => (
-                        <PrinterRowChoice printer={p} onSelect={p => setSelectedPrinters([...selectedPrinters, p])} />
+                        <PrinterRowChoice arrowDir="left" printer={p} onSelect={() => togglePrinter(p)} />
                       ))}
                   </List>
                 </Col>
