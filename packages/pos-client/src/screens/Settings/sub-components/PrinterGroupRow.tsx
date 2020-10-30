@@ -1,5 +1,5 @@
 import { Printer, PrinterGroup } from '../../../models';
-import { ListItem, Left, Text, Body, Right, Icon } from 'native-base';
+import { ListItem, Left, Text, Body, Right, Icon, Button } from '../../../core';
 import { styles } from './styles';
 import React from 'react';
 import { capitalize } from 'lodash';
@@ -8,34 +8,47 @@ import { printerSchema } from '../../../models/Printer';
 
 interface PrinterGroupRowInnerProps {
   printers: Printer[];
-
 }
 
 interface PrinterGroupRowOuterProps {
   onSelect: (pG: PrinterGroup) => void;
+  onDelete: (pG: PrinterGroup) => void;
   isSelected: boolean;
-  printerGroup: PrinterGroup
+  printerGroup: PrinterGroup;
 }
 
-const PrinterGroupRowInner: React.FC<PrinterGroupRowOuterProps & PrinterGroupRowInnerProps> = ({ isSelected, printers, onSelect, printerGroup }) => {
+const PrinterGroupRowInner: React.FC<PrinterGroupRowOuterProps & PrinterGroupRowInnerProps> = ({
+  isSelected,
+  printers,
+  onSelect,
+  onDelete,
+  printerGroup,
+}) => {
   return (
-    <ListItem key={printerGroup.id} noIndent style={isSelected && styles.selectedRow} onPress={() => onSelect(printerGroup)}>
+    <ListItem key={printerGroup.id} noIndent style={isSelected ? styles.selectedRow : {}}>
       <Left>
         <Text>{printerGroup.name}</Text>
       </Left>
       <Body>
         <Text note>{printers.map(p => p.name).join(', ')}</Text>
       </Body>
-      <Right>
-        <Icon name="arrow-forward" />
-      </Right>
+
+      <Button style={{ marginRight: 10 }} bordered danger small onPress={() => onDelete(printerGroup)}>
+        <Text>Delete</Text>
+      </Button>
+      <Button bordered info small onPress={() => onSelect(printerGroup)}>
+        <Text>View</Text>
+      </Button>
     </ListItem>
   );
 };
 
-const enhance = withObservables<PrinterGroupRowOuterProps, PrinterGroupRowInnerProps>(['printerGroup'], ({ printerGroup }) => ({
-  printerGroup,
-  printers: printerGroup.printers
-}));
+const enhance = withObservables<PrinterGroupRowOuterProps, PrinterGroupRowInnerProps>(
+  ['printerGroup'],
+  ({ printerGroup }) => ({
+    printerGroup,
+    printers: printerGroup.printers,
+  }),
+);
 
 export const PrinterGroupRow = enhance(PrinterGroupRowInner);

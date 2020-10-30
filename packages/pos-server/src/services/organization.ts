@@ -14,21 +14,20 @@ export type OrganizationClientProps = {
     email: string;
     phone: string;
     vat: string;
-    address_line1: string;
-    address_line2: string;
-    address_city: string;
-    address_county: string;
-    address_postcode: string;
-    default_price_group_id: string;
-    receipt_printer_id: string;
+    addressLine1: string;
+    addressLine2: string;
+    addressCity: string;
+    addressCounty: string;
+    addressPostcode: string;
+    defaultPriceGroupId: string;
+    receiptPrinterId: string;
     currency: string;
-    max_bills: number;
+    maxBills: number;
 };
 
 export const organizationFromClient = (organization: OrganizationClientProps): OrganizationProps => {
     const { id, name, email, phone, vat } = organization;
 
-    console.log('organizationFromClient', organization);
     return {
         id,
         name,
@@ -36,40 +35,38 @@ export const organizationFromClient = (organization: OrganizationClientProps): O
         phone,
         vat,
         settings: {
-            defaultPriceGroupId: organization.default_price_group_id,
-            receiptPrinterId: organization.receipt_printer_id,
+            defaultPriceGroupId: organization.defaultPriceGroupId,
+            receiptPrinterId: organization.receiptPrinterId,
             currency: organization.currency,
-            maxBills: organization.max_bills,
+            maxBills: organization.maxBills,
         },
         address: {
-            line1: organization.address_line1,
-            line2: organization.address_line2,
-            city: organization.address_city,
-            county: organization.address_county,
-            postcode: organization.address_postcode,
+            line1: organization.addressLine1,
+            line2: organization.addressLine2,
+            city: organization.addressCity,
+            county: organization.addressCounty,
+            postcode: organization.addressPostcode,
         },
     };
 };
 
 export const organizationToClient = (organization: OrganizationProps): OrganizationClientProps => {
     const { _id, name, email, phone, vat, address, settings } = organization;
-
-    console.log('organization', organization);
     return {
         id: _id,
         name,
         email,
         phone,
         vat,
-        default_price_group_id: settings.defaultPriceGroupId,
-        receipt_printer_id: settings.receiptPrinterId,
+        defaultPriceGroupId: settings.defaultPriceGroupId,
+        receiptPrinterId: settings.receiptPrinterId,
         currency: settings.currency,
-        max_bills: settings.maxBills,
-        address_line1: address.line1,
-        address_line2: address.line2,
-        address_city: address.city,
-        address_county: address.county,
-        address_postcode: address.postcode,
+        maxBills: settings.maxBills,
+        addressLine1: address.line1,
+        addressLine2: address.line2,
+        addressCity: address.city,
+        addressCounty: address.county,
+        addressPostcode: address.postcode,
     };
 };
 

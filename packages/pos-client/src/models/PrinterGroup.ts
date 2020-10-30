@@ -1,6 +1,6 @@
 import { Model, tableSchema, Query, Q } from '@nozbe/watermelondb';
 import { field, lazy, action, children } from '@nozbe/watermelondb/decorators';
-import { Printer, tableNames } from '.';
+import { Item, Printer, tableNames } from '.';
 import { PrinterGroupPrinter } from './PrinterGroupPrinter';
 
 export class PrinterGroup extends Model {
@@ -14,6 +14,7 @@ export class PrinterGroup extends Model {
   };
 
   @children('printer_groups_printers') printerGroupsPrinters: Query<PrinterGroupPrinter>;
+  @children('items') items: Query<Item>;
 
   @lazy printers = this.collections
     .get('printers')
@@ -43,6 +44,20 @@ export class PrinterGroup extends Model {
     );
 
     await this.database.action(() => this.database.batch(...batched));
+  };
+
+  @action remove = async () => {
+    const [printerGroupLinks, items] = await Promise.all([this.printerGroupsPrinters.fetch(), this.items.fetch()]);
+    const printerGroupPrintersToDelete = printerGroupLinks.map(pGP => pGP.prepareMarkAsDeleted());
+    const itemsToUpdate = items.map(item =>
+      item.prepareUpdate(itemRecord => {
+        itemRecord.printerGroup.set(null);
+      }),
+    );
+
+    await this.database.action(async () => {
+      await this.database.batch(...printerGroupPrintersToDelete, ...itemsToUpdate, this.prepareMarkAsDeleted());
+    });
   };
 }
 

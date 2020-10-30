@@ -96,7 +96,6 @@ export const OrganizationTab: React.FC<OrganizationTabProps> = () => {
           } = values;
           const err = {
             name: !!(touched.name && errors.name),
-            email: !!(touched.email && errors.email),
             phone: !!(touched.phone && errors.phone),
             vat: !!(touched.vat && errors.vat),
             addressLine1: !!(touched.addressLine1 && errors.addressLine1),
@@ -106,6 +105,7 @@ export const OrganizationTab: React.FC<OrganizationTabProps> = () => {
             addressPostcode: !!(touched.addressPostcode && errors.addressPostcode),
           };
 
+          console.log('err', err);
           return (
             <Content style={styles.container}>
               <Grid>
@@ -181,10 +181,9 @@ export const OrganizationTab: React.FC<OrganizationTabProps> = () => {
                   </Col>
                 </Row>
                 <Row>
-                <Button style={styles.indent} disabled={loading} onPress={handleSubmit}>
-                  <Text>Save</Text>
-                </Button>
-
+                  <Button style={styles.indent} disabled={loading} onPress={handleSubmit}>
+                    <Text>Save</Text>
+                  </Button>
                 </Row>
               </Grid>
             </Content>

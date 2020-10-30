@@ -1,14 +1,11 @@
 import React, { useState } from 'react';
-import withObservables from '@nozbe/with-observables';
 import { Printer, tableNames } from '../../../models';
 import { Form, Label, H2, Input, Item, Button, Text, Col, Row, Picker, Icon, Content } from '../../../core';
 import { styles } from './styles';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
-import { useDatabase } from '@nozbe/watermelondb/hooks';
 import { Emulations, PrinterProps } from '../../../models/Printer';
 import { ModalContentButton } from '../../../components/Modal/ModalContentButton';
-import { openAsync } from 'realm';
 
 interface PrinterDetailsOuterProps {
   onClose: () => void;

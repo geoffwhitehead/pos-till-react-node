@@ -71,9 +71,8 @@ export const repository = <T, U>({
 
     // TODO: implement soft delete function
     const deleteOneById = async id => {
-        return {
-            success: true,
-        };
+        await model(tenanted && getTenant()).findByIdAndDelete(id); // soft delete
+        return { success: true };
     };
 
     const findByIdAndUpdate = async (id, props) => {
