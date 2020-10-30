@@ -17,7 +17,7 @@ export interface MaintenanceService {
     // seed: () => Promise<{ success: boolean }>;
 }
 
-const ITEMS_TO_SEED = 250;
+const ITEMS_TO_SEED = 20;
 const PRICE_GROUPS = ['Main', 'Take Away'];
 
 const generateItemPrices: (priceGroups: PriceGroupProps[], itemId: string) => ItemPriceProps[] = (

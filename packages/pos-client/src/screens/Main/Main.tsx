@@ -40,7 +40,7 @@ export const MainWrapped: React.FC<MainOuterProps & MainInnerProps> = ({
   useEffect(() => {
     const checkSync = async () => {
       try {
-        if (database) {
+        if (!organization && database) {
           await sync(database);
         }
       } catch (e) {
@@ -50,7 +50,7 @@ export const MainWrapped: React.FC<MainOuterProps & MainInnerProps> = ({
     };
 
     checkSync();
-  }, [database]);
+  }, [database, organization]);
 
   useEffect(() => {
     if (organizations.length > 0) {

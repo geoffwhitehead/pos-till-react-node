@@ -1,5 +1,6 @@
 import { Model, tableSchema, Query, Q } from '@nozbe/watermelondb';
 import { action, children, field } from '@nozbe/watermelondb/decorators';
+import { Clock } from 'react-native-reanimated';
 import { PrinterGroupPrinter } from '.';
 
 export enum Emulations {
@@ -34,9 +35,15 @@ export class Printer extends Model {
 
   @children('printer_groups_printers') printerGroupsPrinters: Query<PrinterGroupPrinter>;
 
-  @action removeWithChildrenSync = async () => {
+  @action remove = async () => {
+    const printerGroupLinks = await this.printerGroupsPrinters.fetch();
+    console.log('printerGroupLinks', printerGroupLinks);
+    const printerGroupPrintersToDelete = printerGroupLinks.map(pGP => pGP.prepareMarkAsDeleted());
+
+    const toDelete = [...printerGroupPrintersToDelete, this.prepareMarkAsDeleted()];
+
     await this.database.action(async () => {
-      await this.experimentalMarkAsDeleted();
+      await this.database.batch(...toDelete);
     });
   };
 }

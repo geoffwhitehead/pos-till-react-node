@@ -1,5 +1,19 @@
 import React, { useState } from 'react';
-import { Container, Content, Text, Body, Grid, Col, Row, Button, List, ListItem, Left, Right } from '../../../core';
+import {
+  Container,
+  Content,
+  Text,
+  Body,
+  Grid,
+  Col,
+  Row,
+  Button,
+  List,
+  ListItem,
+  Left,
+  Right,
+  ActionSheet,
+} from '../../../core';
 import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import withObservables from '@nozbe/with-observables';
 import { tableNames, PrinterGroup } from '../../../models';
@@ -38,6 +52,25 @@ const PrinterGroupsTabInner: React.FC<PrinterGroupsTabOuterProps & PrinterGroups
     setLoading(false);
   };
 
+  const onDelete = async (printerGroup: PrinterGroup) => {
+    await printerGroup.remove();
+  };
+
+  const areYouSure = (fn, printerGroup: PrinterGroup) => {
+    const options = ['Yes', 'Cancel'];
+    ActionSheet.show(
+      {
+        options,
+        cancelButtonIndex: options.length,
+        title:
+          'This will permanently remove this printer group and remove this group from any items its assigned to. Are you sure?',
+      },
+      index => {
+        index === 0 && fn(printerGroup);
+      },
+    );
+  };
+
   if (!printerGroups) {
     return <Loading />;
   }
@@ -63,6 +96,7 @@ const PrinterGroupsTabInner: React.FC<PrinterGroupsTabOuterProps & PrinterGroups
                     isSelected={printerGroup === selectedPrinterGroup}
                     printerGroup={printerGroup}
                     onSelect={setSelectedPrinterGroup}
+                    onDelete={() => areYouSure(onDelete, printerGroup)}
                   />
                 ))}
               </List>
@@ -78,7 +112,6 @@ const PrinterGroupsTabInner: React.FC<PrinterGroupsTabOuterProps & PrinterGroups
             hideModalContentWhileAnimating={true}
             backdropTransitionInTiming={50}
             backdropTransitionOutTiming={50}
-            style={{ margin: 'auto', width: 600 }}
           >
             {selectedPrinterGroup && (
               <PrinterGroupDetails printerGroup={selectedPrinterGroup} onClose={onCancelHandler} />

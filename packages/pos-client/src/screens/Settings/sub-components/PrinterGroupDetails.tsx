@@ -101,7 +101,7 @@ const PrinterGroupDetailsInner: React.FC<PrinterGroupDetailsOuterProps & Printer
             onPressPrimaryButton={handleSubmit}
             onPressSecondaryButton={onClose}
             secondaryButtonText="Cancel"
-            title="Printer Group details"
+            title="Printer Group Details"
             isPrimaryDisabled={loading}
           >
             <Content>

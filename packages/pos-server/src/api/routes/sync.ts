@@ -20,6 +20,7 @@ import { PRINTER_GROUP_PRINTER_COLLECTION_NAME } from '../../models/PrinterGroup
 import { OrganizationService } from '../../services/organization';
 import { ORGANIZATION_COLLECTION_NAME } from '../../models/Organization';
 import { fromUnixTime, getUnixTime, startOfSecond } from 'date-fns';
+import { stringify } from 'querystring';
 
 export default (app: Router) => {
     const route = Router();
@@ -72,8 +73,6 @@ export default (app: Router) => {
             ...printerGroupChanges,
             ...organizationChanges,
         };
-        // console.log('getUnixTime(new Date())', );
-        console.log('lastPulledAt', lastPulledAt);
         const timestamp = getUnixTime(new Date());
         return res.status(200).json({ changes, timestamp });
     });
@@ -97,6 +96,7 @@ export default (app: Router) => {
         const changes = fromClientChanges(unmappedChanges);
         const lastPulledAt = lastPulledAtUnix ? fromUnixTime(lastPulledAtUnix) : null;
 
+        console.log('JSON.stringify(changes, null, 4)', JSON.stringify(changes, null, 4));
         try {
             await Promise.all([
                 itemService.pushChanges({

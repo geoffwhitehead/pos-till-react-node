@@ -112,7 +112,7 @@ const PrintersTabInner: React.FC<PrintersTabOuterProps & PrintersTabInnerProps> 
   };
 
   const onDelete = async (printer: Printer) => {
-    await printer.removeWithChildrenSync();
+    await printer.remove();
   };
 
   const areYouSure = (fn, p: Printer) => {
@@ -141,16 +141,20 @@ const PrintersTabInner: React.FC<PrintersTabOuterProps & PrintersTabInnerProps> 
 
   return (
     <Container>
-      <Button small onPress={() => addPrinter({ modelName: 'test', macAddress: 'mac', portName: 'port' })}>
-        <Text>Add</Text>
-      </Button>
       <Content>
         <Grid>
           <Row>
             <Col>
               <List>
                 <ListItem itemDivider>
-                  <Text>Installed Printers</Text>
+                  <Left>
+                    <Text>Installed Printers</Text>
+                  </Left>
+                  <Right>
+                    <Button small onPress={() => addPrinter({})}>
+                      <Text>Add</Text>
+                    </Button>
+                  </Right>
                 </ListItem>
                 {printers.map(p => (
                   <PrinterRow
