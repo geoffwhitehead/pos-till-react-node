@@ -32,7 +32,7 @@ const ItemsTabRowInner: React.FC<ItemsTabRowOuterProps & ItemsTabRowInnerProps> 
         <Text note>{subtitle}</Text>
       </Body>
       <Right>
-        <Button onPress={() => onPressItem(item)} transparent>
+        <Button bordered info small onPress={() => onPressItem(item)} transparent>
           <Text>View</Text>
         </Button>
       </Right>

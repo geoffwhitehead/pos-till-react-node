@@ -14,6 +14,7 @@ import {
   Right,
   Spinner,
   ActionSheet,
+  Icon,
 } from '../../../core';
 import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import withObservables from '@nozbe/with-observables';
@@ -24,10 +25,10 @@ import { capitalize } from 'lodash';
 import { PrinterDetails } from './PrinterDetails';
 import { portDiscovery } from '../../../services/printer/printer';
 import { Printers, Printer as StarPrinterProps } from 'react-native-star-prnt';
-import Modal from 'react-native-modal';
 import { PrinterRow } from './PrinterRow';
 import { Emulations, PrinterProps } from '../../../models/Printer';
 import { ModalContentButton } from '../../../components/Modal/ModalContentButton';
+import { Modal } from '../../../components/Modal/Modal';
 
 interface PrintersTabOuterProps {
   database: Database;
@@ -151,7 +152,8 @@ const PrintersTabInner: React.FC<PrintersTabOuterProps & PrintersTabInnerProps> 
                     <Text>Installed Printers</Text>
                   </Left>
                   <Right>
-                    <Button small onPress={() => addPrinter({})}>
+                    <Button iconLeft success small onPress={() => addPrinter({})}>
+                      <Icon name="ios-add-circle-outline" />
                       <Text>Add</Text>
                     </Button>
                   </Right>
@@ -217,26 +219,8 @@ const PrintersTabInner: React.FC<PrintersTabOuterProps & PrintersTabInnerProps> 
             </Col>
           </Row>
 
-          <Modal
-            propagateSwipe
-            isVisible={!!selectedPrinter}
-            onBackButtonPress={onCancelHandler}
-            onBackdropPress={onCancelHandler}
-            animationInTiming={50}
-            animationOutTiming={50}
-            hideModalContentWhileAnimating={true}
-            backdropTransitionInTiming={50}
-            backdropTransitionOutTiming={50}
-            style={{ width: 600 }}
-          >
-            {selectedPrinter && (
-              <PrinterDetails
-                printer={selectedPrinter}
-                onSave={onSave}
-                onClose={onCancelHandler}
-                isLoading={isSaving}
-              />
-            )}
+          <Modal isOpen={!!selectedPrinter} onClose={onCancelHandler} style={{ maxWidth: 800 }}>
+            <PrinterDetails printer={selectedPrinter} onSave={onSave} onClose={onCancelHandler} isLoading={isSaving} />
           </Modal>
         </Grid>
       </Content>

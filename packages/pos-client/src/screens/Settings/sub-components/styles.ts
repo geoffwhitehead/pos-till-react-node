@@ -11,14 +11,8 @@ export const styles = {
     marginBottom: 2,
     textAlign: 'left',
   } as const,
-  form: { width: 400, margin: 30 },
+  form: { width: 400 },
   selectedRow: { backgroundColor: '#cde1f9' },
-  modal: {
-    borderRadius: 5,
-    backgroundColor: 'white',
-    // width: 400,
-    padding: 30,
-  },
   indent: {
     marginLeft: 30,
   },

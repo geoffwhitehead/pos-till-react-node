@@ -35,6 +35,15 @@ export class Item extends Model {
     Modifier
   >;
 
+  @action remove = async () => {
+    const [prices, modifierRefs] = await Promise.all([this.prices.fetch(), this.itemModifierLinks.fetch()]);
+
+    const pricesToDelete = prices.map(price => price.prepareMarkAsDeleted());
+    const modifierRefsToDelete = modifierRefs.map(modifierRef => modifierRef.prepareMarkAsDeleted());
+    const toRemove = [this.prepareMarkAsDeleted(), ...pricesToDelete, ...modifierRefsToDelete];
+    await this.database.action(() => this.database.batch(...toRemove));
+  };
+
   @action updateItem = async ({
     name,
     shortName,
@@ -48,17 +57,10 @@ export class Item extends Model {
     categoryId: string;
     printerGroupId: string;
     modifiers: Modifier[];
-    prices: { price: string; priceGroupId: string }[];
+    prices: { price: string; priceGroup: PriceGroup }[];
   }) => {
     const modifierLinksCollection = this.database.collections.get<ItemModifier>(tableNames.itemModifiers);
     const itemPricesCollection = this.database.collections.get<ItemPrice>(tableNames.itemPrices);
-
-    console.log('name', name);
-    console.log('shortName', shortName);
-    console.log('categoryId', categoryId);
-    console.log('printerGroupId', printerGroupId);
-    console.log('modifiers', modifiers);
-    console.log('prices', prices);
 
     let batched = [];
 
@@ -90,7 +92,7 @@ export class Item extends Model {
     batched.push(
       ...priceGroups.map(priceGroup => {
         const existingRecord = itemPrices.find(iP => iP.priceGroupId === priceGroup.id);
-        const newPrice = prices.find(p => p.priceGroupId === priceGroup.id)?.price;
+        const newPrice = prices.find(p => p.priceGroup.id === priceGroup.id)?.price;
 
         console.log('existingRecord', existingRecord);
         console.log('newPrice', newPrice);
@@ -111,7 +113,7 @@ export class Item extends Model {
     );
 
     console.log('batched', batched);
-    await this.database.action(() => this.database.batch(...batched));
+    await this.database.action(async () => await this.database.batch(...batched));
   };
 }
 

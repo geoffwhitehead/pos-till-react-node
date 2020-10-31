@@ -13,15 +13,16 @@ import {
   Left,
   Right,
   ActionSheet,
+  Icon,
 } from '../../../core';
 import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import withObservables from '@nozbe/with-observables';
 import { tableNames, PrinterGroup } from '../../../models';
 import { Database } from '@nozbe/watermelondb';
 import { Loading } from '../../../components/Loading/Loading';
-import Modal from 'react-native-modal';
 import { PrinterGroupRow } from './PrinterGroupRow';
 import { PrinterGroupDetails } from './PrinterGroupDetails';
+import { Modal } from '../../../components/Modal/Modal';
 
 interface PrinterGroupsTabOuterProps {
   database: Database;
@@ -32,24 +33,19 @@ interface PrinterGroupsTabInnerProps {
 }
 
 const PrinterGroupsTabInner: React.FC<PrinterGroupsTabOuterProps & PrinterGroupsTabInnerProps> = ({
-  database,
   printerGroups,
 }) => {
   const [selectedPrinterGroup, setSelectedPrinterGroup] = useState<PrinterGroup>();
-  const [loading, setLoading] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const onCancelHandler = () => {
     setSelectedPrinterGroup(null);
+    setIsModalOpen(false);
   };
 
-  const addPrinterGroup = async () => {
-    setLoading(true);
-    await database.action(() =>
-      database.collections.get<PrinterGroup>(tableNames.printerGroups).create(printerGroupRecord => {
-        printerGroupRecord.name = '';
-      }),
-    );
-    setLoading(false);
+  const onSelect = (printerGroup: PrinterGroup) => {
+    setSelectedPrinterGroup(printerGroup);
+    setIsModalOpen(true);
   };
 
   const onDelete = async (printerGroup: PrinterGroup) => {
@@ -86,36 +82,26 @@ const PrinterGroupsTabInner: React.FC<PrinterGroupsTabOuterProps & PrinterGroups
                     <Text>Printer Groups</Text>
                   </Left>
                   <Right>
-                    <Button small disabled={loading} onPress={() => addPrinterGroup()}>
+                    <Button iconLeft success small onPress={() => setIsModalOpen(true)}>
+                      <Icon name="ios-add-circle-outline" />
                       <Text>Create</Text>
                     </Button>
                   </Right>
                 </ListItem>
                 {printerGroups.map(printerGroup => (
                   <PrinterGroupRow
+                    key={printerGroup.id}
                     isSelected={printerGroup === selectedPrinterGroup}
                     printerGroup={printerGroup}
-                    onSelect={setSelectedPrinterGroup}
+                    onSelect={onSelect}
                     onDelete={() => areYouSure(onDelete, printerGroup)}
                   />
                 ))}
               </List>
             </Col>
           </Row>
-          <Modal
-            propagateSwipe
-            isVisible={!!selectedPrinterGroup}
-            onBackButtonPress={onCancelHandler}
-            onBackdropPress={onCancelHandler}
-            animationInTiming={50}
-            animationOutTiming={50}
-            hideModalContentWhileAnimating={true}
-            backdropTransitionInTiming={50}
-            backdropTransitionOutTiming={50}
-          >
-            {selectedPrinterGroup && (
-              <PrinterGroupDetails printerGroup={selectedPrinterGroup} onClose={onCancelHandler} />
-            )}
+          <Modal isOpen={isModalOpen} onClose={onCancelHandler} style={{ maxWidth: 800 }}>
+            <PrinterGroupDetails printerGroup={selectedPrinterGroup} onClose={onCancelHandler} />
           </Modal>
         </Grid>
       </Content>

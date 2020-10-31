@@ -1,4 +1,19 @@
-import { ListItem, Item, Text, Icon, Grid, Row, Col, Form, Label, Input, H2, Picker, List } from '../../../../core';
+import {
+  ListItem,
+  Item,
+  Text,
+  Icon,
+  Grid,
+  Row,
+  Col,
+  Form,
+  Label,
+  Input,
+  H2,
+  Picker,
+  List,
+  ActionSheet,
+} from '../../../../core';
 import React, { useState, useEffect } from 'react';
 import withObservables from '@nozbe/with-observables';
 import {
@@ -9,6 +24,7 @@ import {
   Modifier,
   PriceGroup,
   ItemPrice,
+  ItemModifier,
 } from '../../../../models';
 import { styles } from '../../../../styles';
 import * as Yup from 'yup';
@@ -18,15 +34,18 @@ import { Database } from '@nozbe/watermelondb';
 import { Loading } from '../../../../components/Loading/Loading';
 import { ModalContentButton } from '../../../../components/Modal/ModalContentButton';
 import { ModifierRow } from './ModifierRow';
+import { useDatabase } from '@nozbe/watermelondb/hooks';
+import { isPlainObject } from 'lodash';
 
 interface ItemDetailsOuterProps {
-  item: ItemModel;
+  item?: ItemModel;
   onClose: () => void;
   database: Database;
+  categories: Category[];
 }
 
 interface ItemDetailsInnerProps {
-  item: ItemModel;
+  item?: ItemModel;
   categories: Category[];
   printerGroups: PrinterGroup[];
   prices: ItemPrice[];
@@ -50,13 +69,11 @@ const ItemSchema = Yup.object().shape({
     .required('Required'),
   printerGroupId: Yup.string()
     .min(2, 'Too Short')
-    .max(50, 'Too Long')
-    .required('Required'),
+    .max(50, 'Too Long'),
   prices: Yup.array().of(
     Yup.object().shape({
-      id: Yup.string().required('Required'),
-      priceGroupId: Yup.string().required('Required'),
-      price: Yup.number(),
+      priceGroup: Yup.object(),
+      price: Yup.string(),
     }),
   ),
 });
@@ -68,19 +85,22 @@ const ItemDetailsInner: React.FC<ItemDetailsOuterProps & ItemDetailsInnerProps> 
   onClose,
   categories,
   printerGroups,
-  prices,
+  prices = [],
   priceGroups,
-  modifiers,
+  modifiers = [],
   itemModifiers,
+  database,
 }) => {
-  if (!categories || !item || !prices) {
+  console.log('item', item);
+  console.log('priceGroups', priceGroups);
+  if (!priceGroups) {
     return <Loading />;
   }
   const [selectedModifiers, setSelectedModifiers] = useState<Modifier[]>([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    setSelectedModifiers(itemModifiers);
+    itemModifiers && setSelectedModifiers(itemModifiers);
   }, [itemModifiers]);
 
   const setAssignedModifiers = (modifier: Modifier) => {
@@ -93,10 +113,64 @@ const ItemDetailsInner: React.FC<ItemDetailsOuterProps & ItemDetailsInnerProps> 
     }
   };
 
-  const updateItem = async values => {
+  const areYouSure = (fn, item: ItemModel) => {
+    const options = ['Yes', 'Cancel'];
+    ActionSheet.show(
+      {
+        options,
+        cancelButtonIndex: options.length,
+        title: 'Remove this item. Are you sure?',
+      },
+      index => {
+        index === 0 && fn(item);
+      },
+    );
+  };
+
+  const updateItem = async (values: FormValues) => {
     setLoading(true);
-    await item.updateItem({ ...values, modifiers: selectedModifiers });
+    console.log('values', values);
+    console.log('item', item);
+    if (item) {
+      await item.updateItem({ ...values, modifiers: selectedModifiers });
+      onClose();
+    } else {
+      const itemCollection = database.collections.get<ItemModel>(tableNames.items);
+      const itemModifierCollection = database.collections.get<ItemModifier>(tableNames.itemModifiers);
+      const itemPriceCollection = database.collections.get<ItemPrice>(tableNames.itemPrices);
+      const itemToCreate = itemCollection.prepareCreate(newItem => {
+        Object.assign(newItem, {
+          name: values.name,
+          shortName: values.shortName,
+          categoryId: values.categoryId,
+          printerGroupId: values.printerGroupId,
+        });
+      });
+
+      const itemModifersToCreate = selectedModifiers.map(modifier =>
+        itemModifierCollection.prepareCreate(newItemModifier => {
+          newItemModifier.item.set(itemToCreate);
+          newItemModifier.modifier.set(modifier);
+        }),
+      );
+
+      const pricesToCreate = values.prices.map(price =>
+        itemPriceCollection.prepareCreate(newPrice => {
+          newPrice.priceGroup.set(price.priceGroup);
+          newPrice.item.set(itemToCreate);
+          newPrice.price = parseInt(price.price);
+        }),
+      );
+
+      const toCreate = [itemToCreate, ...itemModifersToCreate, ...pricesToCreate];
+      await database.action(() => database.batch(...toCreate));
+    }
     setLoading(false);
+    onClose();
+  };
+
+  const handleDelete = async (item: ItemModel) => {
+    await item.remove();
     onClose();
   };
 
@@ -106,16 +180,22 @@ const ItemDetailsInner: React.FC<ItemDetailsOuterProps & ItemDetailsInnerProps> 
   };
 
   const initialValues = {
-    name: item.name,
-    shortName: item.shortName,
-    categoryId: item.categoryId,
-    printerGroupId: item.printerGroupId,
+    name: item?.name || '',
+    shortName: item?.shortName || '',
+    categoryId: item?.categoryId || '',
+    printerGroupId: item?.printerGroupId || '',
     prices: priceGroups.map(pG => {
-      return { id: pG.id, priceGroupId: pG.id, price: resolvePrice(pG, prices) };
+      return { priceGroup: pG, price: resolvePrice(pG, prices) };
     }),
   };
 
-  const resolvePriceGroup = id => priceGroups.find(pg => pg.id === id);
+  type FormValues = {
+    name: string;
+    shortName: string;
+    categoryId: string;
+    printerGroupId: string;
+    prices: { priceGroup: PriceGroup; price: string }[];
+  };
 
   return (
     <Formik initialValues={initialValues} validationSchema={ItemSchema} onSubmit={values => updateItem(values)}>
@@ -137,10 +217,11 @@ const ItemDetailsInner: React.FC<ItemDetailsOuterProps & ItemDetailsInnerProps> 
             isPrimaryDisabled={loading}
             onPressSecondaryButton={onClose}
             secondaryButtonText="Cancel"
+            onPressDelete={() => areYouSure(handleDelete, item)}
           >
             <Grid>
               <Row>
-                <Col style={styles.column}>
+                <Col style={styles.columnLeft}>
                   <Form>
                     <Item stackedLabel error={err.name}>
                       <Label>Name</Label>
@@ -197,38 +278,39 @@ const ItemDetailsInner: React.FC<ItemDetailsOuterProps & ItemDetailsInnerProps> 
                     </Item>
                   </Form>
                 </Col>
-                <Col style={styles.column}>
+                <Col style={styles.columnRight}>
                   <Form>
-                    <H2 style={styles.heading}>Price Groups</H2>
+                    <H2>Price Groups</H2>
                     <Text style={styles.text} note>
                       You can specify a price for all available price groups. If you leave a price group blank, the item
                       won't exist within that price group.
                     </Text>
                     <FieldArray
                       name="prices"
-                      render={arrayHelpers => {
-                        return (
-                          prices?.length > 0 &&
-                          prices.map((price, i) => (
-                            <Item key={price.id} stackedLabel error={err?.prices[i]?.price}>
-                              <Label>{resolvePriceGroup(price.priceGroupId).name}</Label>
+                      render={() => {
+                        return priceGroups.map((priceGroup, i) => {
+                          return (
+                            <Item key={priceGroup.id} stackedLabel error={err?.prices[i]?.price}>
+                              <Label>{priceGroup.name}</Label>
                               <Input
                                 onChangeText={handleChange(`prices[${i}].price`)}
                                 onBlur={handleBlur(`prices[${i}]`)}
-                                value={price.price.toString()}
+                                value={prices[i].price.toString()}
                               />
                             </Item>
-                          ))
-                        );
+                          );
+                        });
                       }}
                     />
                   </Form>
                 </Col>
               </Row>
-              <H2 style={{ ...styles.indent, paddingTop: 30 }}>Modifiers</H2>
 
               <Row style={styles.row}>
-                <Col style={s.pl}>
+                <H2 style={{ paddingTop: 20, ...styles.heading }}>Modifiers</H2>
+              </Row>
+              <Row style={styles.row}>
+                <Col>
                   <List>
                     <ListItem itemDivider>
                       <Text>Assigned</Text>
@@ -238,7 +320,7 @@ const ItemDetailsInner: React.FC<ItemDetailsOuterProps & ItemDetailsInnerProps> 
                     ))}
                   </List>
                 </Col>
-                <Col style={s.pr}>
+                <Col>
                   <List>
                     <ListItem itemDivider>
                       <Text>Available</Text>
@@ -265,34 +347,26 @@ const ItemDetailsInner: React.FC<ItemDetailsOuterProps & ItemDetailsInnerProps> 
 
 const enhance = c =>
   withDatabase<any>(
-    withObservables<ItemDetailsOuterProps, ItemDetailsInnerProps>(['item'], ({ item, database }) => ({
-      item,
-      categories: database.collections.get<Category>(tableNames.categories).query(),
-      printerGroups: database.collections.get<PrinterGroup>(tableNames.printerGroups).query(),
-      prices: item.prices,
-      itemModifiers: item.modifiers,
-      modifiers: database.collections.get<Modifier>(tableNames.modifiers).query(),
-      priceGroups: database.collections.get<PriceGroup>(tableNames.priceGroups).query(),
-    }))(c),
+    withObservables<ItemDetailsOuterProps, ItemDetailsInnerProps>(['item'], ({ item, database }) => {
+      console.log('observable');
+      console.log('item', item);
+      if (item) {
+        return {
+          item,
+          printerGroups: database.collections.get<PrinterGroup>(tableNames.printerGroups).query(),
+          prices: item.prices,
+          itemModifiers: item.modifiers,
+          modifiers: database.collections.get<Modifier>(tableNames.modifiers).query(),
+          priceGroups: database.collections.get<PriceGroup>(tableNames.priceGroups).query(),
+        };
+      } else {
+        return {
+          printerGroups: database.collections.get<PrinterGroup>(tableNames.printerGroups).query(),
+          modifiers: database.collections.get<Modifier>(tableNames.modifiers).query(),
+          priceGroups: database.collections.get<PriceGroup>(tableNames.priceGroups).query(),
+        };
+      }
+    })(c),
   );
 
 export const ItemDetails = enhance(ItemDetailsInner);
-
-const s = {
-  pl: {
-    margin: 5,
-    marginRight: 0,
-    // borderColor: 'lightgrey',
-    // borderWidth: 1,
-    // borderRadius: 2,
-    // borderRight: 'none'
-  },
-  pr: {
-    margin: 5,
-    // borderColor: 'lightgrey',
-    // borderWidth: 1,
-    // borderRadius: 2,
-    // marginLeft: 0,
-    // borderLeft: 'none'
-  },
-};

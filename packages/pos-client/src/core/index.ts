@@ -32,5 +32,7 @@ export {
   Tabs,
   H1,
   H2,
-  H3
+  H3,
+  View,
+  CheckBox,
 } from 'native-base';
