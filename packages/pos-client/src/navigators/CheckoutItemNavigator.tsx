@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 import { CategoryItems, AllItems } from '../screens/Checkout/sub-components/CategoryItemsList/CategoryItemsList';
 import { ItemModifierList } from '../screens/Checkout/sub-components/ItemModifierList/ItemModifierList';
 import { Categories } from '../screens/Checkout/sub-components/CategoryList/CategoryList';
-import { Category, Modifier } from '../models';
+import { Category, Modifier, PriceGroup } from '../models';
 
 const Stack = createStackNavigator();
 
@@ -16,9 +16,9 @@ export const routes = {
 
 export type CheckoutItemStackParamList = {
   CategoryList: undefined;
-  CategoryItemsList: { category: Category };
+  CategoryItemsList: { category: Category; priceGroup: PriceGroup };
   ItemModifierList: { modifier: Modifier };
-  AllItemsList: undefined;
+  AllItemsList: { priceGroup: PriceGroup };
 };
 
 export const CheckoutItemNavigator: React.FC = () => {

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import {
   Container,
   Content,
@@ -23,6 +23,7 @@ import { Loading } from '../../../components/Loading/Loading';
 import { Modal } from '../../../components/Modal/Modal';
 import { styles } from './styles';
 import { PriceGroupDetails } from './PriceGroupDetails';
+import { OrganizationContext } from '../../../contexts/OrganizationContext';
 
 interface PriceGroupsTabOuterProps {
   database: Database;
@@ -38,6 +39,7 @@ const PriceGroupsTabInner: React.FC<PriceGroupsTabOuterProps & PriceGroupsTabInn
 }) => {
   const [selectedPriceGroup, setSelectedPriceGroup] = useState<PriceGroup>();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const { organization } = useContext(OrganizationContext);
 
   const onCancelHandler = () => {
     setSelectedPriceGroup(null);
@@ -45,7 +47,7 @@ const PriceGroupsTabInner: React.FC<PriceGroupsTabOuterProps & PriceGroupsTabInn
   };
 
   const onDelete = async (priceGroup: PriceGroup) => {
-    await priceGroup.remove();
+    await priceGroup.remove(organization);
   };
 
   const areYouSure = (fn, priceGroup: PriceGroup) => {
@@ -101,6 +103,7 @@ const PriceGroupsTabInner: React.FC<PriceGroupsTabOuterProps & PriceGroupsTabInn
                         bordered
                         danger
                         small
+                        disabled={priceGroups.length === 1}
                         onPress={() => areYouSure(onDelete, priceGroup)}
                       >
                         <Text>Delete</Text>

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { SplashScreen } from './screens/SplashScreen/SplashScreen';
 import AsyncStorage from '@react-native-community/async-storage';
 import { AuthContext } from './contexts/AuthContext';
@@ -11,7 +11,7 @@ import { Root } from 'native-base';
 import decode from 'jwt-decode';
 import DatabaseProvider from '@nozbe/watermelondb/DatabaseProvider';
 import { database, resetDatabase } from './database';
-import { models } from './models';
+import { Sync } from './components/Sync/Sync';
 
 export const App = () => {
   const [state, dispatch] = React.useReducer(
@@ -215,7 +215,9 @@ export const App = () => {
             ) : (
               // user is authenticated
               // <AuthContext.Provider value={authContext}>
-              <Main organizationId={organizationId} userId={userId} />
+              <Sync database={database}>
+                <Main organizationId={organizationId} userId={userId} />
+              </Sync>
               // </AuthContext.Provider>
             )}
           </AuthContext.Provider>

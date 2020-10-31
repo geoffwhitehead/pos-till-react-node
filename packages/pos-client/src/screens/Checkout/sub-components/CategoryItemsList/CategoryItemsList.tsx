@@ -12,9 +12,9 @@ import { Category, Item, Modifier, ItemPrice, tableNames, PriceGroup } from '../
 import { StackNavigationProp } from '@react-navigation/stack';
 import { CheckoutItemStackParamList } from '../../../../navigators/CheckoutItemNavigator';
 import { RouteProp } from '@react-navigation/native';
-import { Database } from '@nozbe/watermelondb';
+import { Database, Q } from '@nozbe/watermelondb';
 import { Loading } from '../../../../components/Loading/Loading';
-import { groupBy } from 'lodash';
+import { groupBy, keyBy, sortBy } from 'lodash';
 import { resolvePrice } from '../../../../helpers';
 import { OrganizationContext } from '../../../../contexts/OrganizationContext';
 
@@ -23,12 +23,13 @@ interface CategoryItemsListOuterProps {
   category?: Category;
   modifiers: Modifier[];
   route: RouteProp<CheckoutItemStackParamList, 'CategoryItemsList'>;
-  navigation: StackNavigationProp<CheckoutItemStackParamList, 'CategoryItemsList'>; // TODO: type this
+  navigation: StackNavigationProp<CheckoutItemStackParamList, 'CategoryItemsList'>;
+  priceGroup: PriceGroup;
 }
 
 interface CategoryItemsListInnerProps {
-  items: any; // TODO: type
-  prices: any;
+  items: Item[];
+  prices: ItemPrice[];
 }
 
 const CategoryItemsInner: React.FC<CategoryItemsListOuterProps & CategoryItemsListInnerProps> = ({
@@ -36,16 +37,18 @@ const CategoryItemsInner: React.FC<CategoryItemsListOuterProps & CategoryItemsLi
   items,
   navigation,
   prices,
+  route: {
+    params: { priceGroup },
+  },
 }) => {
   const [searchValue, setSearchValue] = useState<string>('');
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [selectedItem, setSelectedItem] = useState<Item>();
-  const [groupedPrices, setGroupedPrices] = useState<Record<string, PriceGroup[]>>();
-
+  const [sortedItems, setSortedItems] = useState<Record<string, Item[]>>();
+  const [keyedPrices, setKeyedPrices] = useState<Record<string, ItemPrice>>();
   const {
     organization: { currency },
   } = useContext(OrganizationContext);
-  const { priceGroup } = useContext(PriceGroupContext);
   const { currentBill } = useContext(CurrentBillContext);
 
   const goBack = () => navigation.goBack();
@@ -58,21 +61,26 @@ const CategoryItemsInner: React.FC<CategoryItemsListOuterProps & CategoryItemsLi
     setSelectedItem(null);
   };
 
-  useEffect(() => {
-    setGroupedPrices(groupBy(prices, 'itemId'));
-  }, [prices, items]);
-
   const onSelectItem = async (item: Item, modifierCount: number) => {
     if (modifierCount > 0) {
       setSelectedItem(item);
       setModalOpen(true);
     } else {
-      console.log('currentBill', currentBill);
       await currentBill.addItem({ item, priceGroup });
     }
   };
 
-  if (!groupedPrices) {
+  useEffect(() => {
+    const keyedPrices = keyBy(prices, price => price.itemId);
+    const searchedItems = items.filter(item => searchFilter(item, searchValue));
+    const filteredItems = searchedItems.filter(item => !!keyedPrices[item.id]);
+    const filteredSortedItems = sortBy(filteredItems, item => item.name);
+    const groupedSorteditems = groupBy(filteredSortedItems, item => item.name[0]);
+    setSortedItems(groupedSorteditems);
+    setKeyedPrices(keyedPrices);
+  }, [items, prices, setKeyedPrices, setSortedItems, searchValue]);
+
+  if (!keyedPrices || !sortedItems) {
     return <Loading />;
   }
 
@@ -109,20 +117,29 @@ const CategoryItemsInner: React.FC<CategoryItemsListOuterProps & CategoryItemsLi
           <Body></Body>
           <Right />
         </ListItem>
-        {items
-          .filter(item => searchFilter(item, searchValue))
-          .map(item => {
-            return (
-              <CategoryItemRow
-                key={item.id}
-                item={item}
-                price={resolvePrice(priceGroup, groupedPrices[item.id])}
-                isActive={selectedItem === item}
-                onPressItem={onSelectItem}
-                currency={currency}
-              />
-            );
-          })}
+        {Object.keys(sortedItems).map(key => {
+          const elements = [
+            <ListItem itemDivider style={{ backgroundColor: 'lightgrey' }}>
+              <Text>{key}</Text>
+            </ListItem>,
+            ...sortedItems[key].map(item => {
+              // this should always succeed
+              const { price } = keyedPrices[item.id];
+              return (
+                <CategoryItemRow
+                  key={item.id}
+                  item={item}
+                  price={price}
+                  isActive={selectedItem === item}
+                  onPressItem={onSelectItem}
+                  currency={currency}
+                />
+              );
+            }),
+          ];
+
+          return elements;
+        })}
       </List>
     </Content>
   );
@@ -130,18 +147,30 @@ const CategoryItemsInner: React.FC<CategoryItemsListOuterProps & CategoryItemsLi
 
 export const CategoryItems = withDatabase<any>(
   withObservables<CategoryItemsListOuterProps, CategoryItemsListInnerProps>(['route'], ({ route, database }) => {
-    const { category } = route.params;
+    const { category, priceGroup } = route.params;
     return {
       category,
-      items: category.items,
-      prices: database.collections.get<ItemPrice>(tableNames.itemPrices).query(),
+      items: category.items.observeWithColumns(['name']),
+      prices: database.collections
+        .get<ItemPrice>(tableNames.itemPrices)
+        .query(Q.where('price_group_id', priceGroup.id))
+        .observeWithColumns(['price']),
     };
   })(CategoryItemsInner),
 );
 
 export const AllItems = withDatabase<any>( // TODO: type
-  withObservables<CategoryItemsListOuterProps, CategoryItemsListInnerProps>([], ({ database }) => ({
-    items: database.collections.get<Item>('items').query(),
-    prices: database.collections.get<ItemPrice>(tableNames.itemPrices).query(),
-  }))(CategoryItemsInner),
+  withObservables<CategoryItemsListOuterProps, CategoryItemsListInnerProps>([], ({ database, route }) => {
+    const { priceGroup } = route.params;
+    return {
+      items: database.collections
+        .get<Item>(tableNames.items)
+        .query()
+        .observeWithColumns(['name']),
+      prices: database.collections
+        .get<ItemPrice>(tableNames.itemPrices)
+        .query(Q.where('price_group_id', priceGroup.id))
+        .observeWithColumns(['price']),
+    };
+  })(CategoryItemsInner),
 );

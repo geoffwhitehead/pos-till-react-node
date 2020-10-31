@@ -16,7 +16,7 @@ import {
 } from '../../../core';
 import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import withObservables from '@nozbe/with-observables';
-import { tableNames, Printer, PriceGroup } from '../../../models';
+import { tableNames, Printer, PriceGroup, BillPeriod, Bill } from '../../../models';
 import { Database } from '@nozbe/watermelondb';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
@@ -30,6 +30,13 @@ import { sync } from '../../../services/sync';
 
 interface SettingsTabOuterProps {
   database: Database;
+  billPeriod: BillPeriod;
+}
+
+interface SettingsTabInnerProps {
+  printers: Printer[];
+  priceGroups: PriceGroup[];
+  openBills: Bill[];
 }
 
 const settingsSchema = Yup.object().shape({
@@ -48,15 +55,44 @@ const settingsSchema = Yup.object().shape({
     .required('Required'),
 });
 
-interface SettingsTabInnerProps {
-  printers: any[];
-  priceGroups: any[];
-}
-const SettingsTabInner: React.FC<SettingsTabOuterProps & SettingsTabInnerProps> = ({ printers, priceGroups }) => {
-  const { organization } = useContext(OrganizationContext);
+const currencies = [
+  {
+    id: 'gbp',
+    name: 'GBP',
+  },
+  {
+    id: 'eur',
+    name: 'EUR',
+  },
+];
+
+const areYouSure = fn => {
+  const options = ['Yes', 'Cancel'];
+  ActionSheet.show(
+    {
+      options,
+      cancelButtonIndex: options.length - 1,
+      title: 'Are you sure?',
+    },
+    index => {
+      index === 0 && fn();
+    },
+  );
+};
+
+const SettingsTabInner: React.FC<SettingsTabOuterProps & SettingsTabInnerProps> = ({
+  printers,
+  openBills,
+  priceGroups,
+}) => {
+  const { organization, setOrganization } = useContext(OrganizationContext);
   const [loading, setLoading] = useState(false);
   const database = useDatabase();
   const { signOut, unlink } = useContext(AuthContext);
+
+  if (!printers || !openBills) {
+    return <Loading />;
+  }
 
   const initialValues = {
     defaultPriceGroupId: organization.defaultPriceGroupId,
@@ -82,38 +118,9 @@ const SettingsTabInner: React.FC<SettingsTabOuterProps & SettingsTabInnerProps> 
       }),
     );
 
+    // debug remove
     await sync(database);
-
     setLoading(false);
-  };
-
-  const currencies = [
-    {
-      id: 'gbp',
-      name: 'GBP',
-    },
-    {
-      id: 'eur',
-      name: 'EUR',
-    },
-  ];
-
-  if (!printers) {
-    return <Loading />;
-  }
-
-  const areYouSure = fn => {
-    const options = ['Yes', 'Cancel'];
-    ActionSheet.show(
-      {
-        options,
-        cancelButtonIndex: options.length - 1,
-        title: 'Are you sure?',
-      },
-      index => {
-        index === 0 && fn();
-      },
-    );
   };
 
   return (
@@ -132,6 +139,8 @@ const SettingsTabInner: React.FC<SettingsTabOuterProps & SettingsTabInnerProps> 
             maxBills: !!(touched.maxBills && errors.maxBills),
           };
 
+          const hasOpenBills = openBills.length > 0;
+
           return (
             <Content style={styles.container}>
               <Grid>
@@ -142,7 +151,7 @@ const SettingsTabInner: React.FC<SettingsTabOuterProps & SettingsTabInnerProps> 
                   <Col style={styles.column}>
                     <Form>
                       <Item picker stackedLabel>
-                        <Label>Receipt Printer</Label>
+                        <Label style={err.receiptPrinterId && formStyles.errorLabel}>Receipt Printer</Label>
                         <Picker
                           mode="dropdown"
                           iosIcon={<Icon name="arrow-down" />}
@@ -159,7 +168,7 @@ const SettingsTabInner: React.FC<SettingsTabOuterProps & SettingsTabInnerProps> 
                         </Picker>
                       </Item>
                       <Item picker stackedLabel>
-                        <Label>Default Price Group</Label>
+                        <Label style={err.defaultPriceGroupId && formStyles.errorLabel}>Default Price Group</Label>
                         <Picker
                           mode="dropdown"
                           iosIcon={<Icon name="arrow-down" />}
@@ -179,12 +188,14 @@ const SettingsTabInner: React.FC<SettingsTabOuterProps & SettingsTabInnerProps> 
                   </Col>
                   <Col style={styles.column}>
                     <Form>
-                      <Item stackedLabel error={err.maxBills}>
+                      <Item disabled={hasOpenBills} stackedLabel error={err.maxBills}>
                         <Label>Max open bills</Label>
+                        <Label>Note: Can only be changed when there are no active bills</Label>
                         <Input
                           onChangeText={handleChange('maxBills')}
                           onBlur={handleBlur('maxBills')}
                           value={maxBills.toString()}
+                          disabled={hasOpenBills}
                         />
                       </Item>
                       <Item picker stackedLabel error={err.currency}>
@@ -232,10 +243,18 @@ const SettingsTabInner: React.FC<SettingsTabOuterProps & SettingsTabInnerProps> 
 
 const enhance = c =>
   withDatabase<any>(
-    withObservables<SettingsTabOuterProps, SettingsTabInnerProps>([], ({ database }) => ({
+    withObservables<SettingsTabOuterProps, SettingsTabInnerProps>([], ({ database, billPeriod }) => ({
+      billPeriod,
+      openBills: billPeriod.openBills,
       printers: database.collections.get<Printer>(tableNames.printers).query(),
       priceGroups: database.collections.get<PriceGroup>(tableNames.priceGroups).query(),
     }))(c),
   );
 
 export const SettingsTab = enhance(SettingsTabInner);
+
+const formStyles = {
+  errorLabel: {
+    color: 'red',
+  },
+};

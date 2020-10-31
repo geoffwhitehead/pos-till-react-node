@@ -9,8 +9,8 @@ interface CategoryItemRowOuterProps {
   item: Item;
   isActive: boolean;
   onPressItem: (i: Item, mCount: number) => void;
-  price: number
-  currency: string
+  price: number;
+  currency: string;
 }
 
 interface CategoryItemRowInnerProps {
@@ -23,12 +23,12 @@ const CategoryItemRowInner: React.FC<CategoryItemRowOuterProps & CategoryItemRow
   modifierCount,
   onPressItem,
   price,
-  currency
+  currency,
 }) => {
   const onPress = () => onPressItem(item, modifierCount);
 
   return (
-    <ListItem style={isActive && styles.activeRow} icon key={item.id} onPress={onPress}>
+    <ListItem style={isActive ? styles.activeRow : { backgroundColor: 'white' }} icon key={item.id} onPress={onPress}>
       <Left>
         <Text>{item.name}</Text>
       </Left>
@@ -40,9 +40,12 @@ const CategoryItemRowInner: React.FC<CategoryItemRowOuterProps & CategoryItemRow
   );
 };
 
-export const CategoryItemRow = withObservables<CategoryItemRowOuterProps, CategoryItemRowInnerProps>(['item'], ({ item }) => ({
-  modifierCount: item.modifiers.observeCount(),
-}))(CategoryItemRowInner);
+export const CategoryItemRow = withObservables<CategoryItemRowOuterProps, CategoryItemRowInnerProps>(
+  ['item'],
+  ({ item }) => ({
+    modifierCount: item.modifiers.observeCount(),
+  }),
+)(CategoryItemRowInner);
 
 const styles = StyleSheet.create({
   activeRow: {

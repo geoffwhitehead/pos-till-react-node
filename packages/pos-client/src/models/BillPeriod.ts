@@ -5,6 +5,7 @@ import { Bill } from './Bill';
 import { BillItem } from './BillItem';
 import { Discount } from './Discount';
 import { BillPayment } from './BillPayment';
+import { Organization, tableNames } from '.';
 
 export const billPeriodSchema = tableSchema({
   name: 'bill_periods',
@@ -34,30 +35,41 @@ export class BillPeriod extends Model {
    * currently pending in a sale.
    */
 
-  @lazy _periodItems = this.collections
-    .get('bill_items')
-    .query(Q.on('bills', 'bill_period_id', this.id)) as Query<BillItem>;
+  @lazy _periodItems = this.collections.get('bill_items').query(Q.on('bills', 'bill_period_id', this.id)) as Query<
+    BillItem
+  >;
   @lazy periodItems: Query<BillItem> = this._periodItems.extend(Q.where('is_voided', Q.notEq(true)));
   @lazy periodItemVoids: Query<BillItem> = this._periodItems.extend(Q.where('is_voided', Q.eq(true)));
   @lazy periodDiscounts = this.collections
     .get('bill_discounts')
     .query(Q.on('bills', 'bill_period_id', this.id)) as Query<Discount>;
-  @lazy periodPayments = this.collections
-    .get('bill_payments')
-    .query(Q.on('bills', 'bill_period_id', this.id)) as Query<BillPayment>;
+  @lazy periodPayments = this.collections.get('bill_payments').query(Q.on('bills', 'bill_period_id', this.id)) as Query<
+    BillPayment
+  >;
 
   @action createBill = async (params: { reference: number }): Promise<Bill> => {
-    const b = await this.collections.get<Bill>('bills').create(bill => {
-      bill.reference = params.reference;
-      bill.isClosed = false;
-      bill.billPeriodId = this.id;
+    return this.database.action<Bill>(async () => {
+      const bill = await this.collections.get<Bill>('bills').create(bill => {
+        bill.reference = params.reference;
+        bill.isClosed = false;
+        bill.billPeriodId = this.id;
+      });
+      return bill;
     });
-    return b;
   };
 
-  @action closePeriod = async () => {
-    this.update(billPeriod => {
+  @action closePeriod = async (organization: Organization) => {
+    const updateBillPeriod = this.prepareUpdate(billPeriod => {
       billPeriod.closedAt = dayjs().toDate();
+    });
+
+    const newBillPeriod = this.database.collections.get<BillPeriod>(tableNames.billPeriods).prepareCreate();
+    const orgUpdate = organization.prepareUpdate(org => {
+      org.currentBillPeriod.set(newBillPeriod);
+    });
+    const updates = [updateBillPeriod, newBillPeriod, orgUpdate];
+    await this.database.action(async () => {
+      await this.database.batch(...updates);
     });
   };
 }
