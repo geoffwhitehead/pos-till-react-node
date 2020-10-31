@@ -1,10 +1,8 @@
 import { Printer, PrinterGroup } from '../../../models';
-import { ListItem, Left, Text, Body, Right, Icon, Button } from '../../../core';
+import { ListItem, Left, Text, Body, Button } from '../../../core';
 import { styles } from './styles';
 import React from 'react';
-import { capitalize } from 'lodash';
 import withObservables from '@nozbe/with-observables';
-import { printerSchema } from '../../../models/Printer';
 
 interface PrinterGroupRowInnerProps {
   printers: Printer[];
@@ -23,9 +21,10 @@ const PrinterGroupRowInner: React.FC<PrinterGroupRowOuterProps & PrinterGroupRow
   onSelect,
   onDelete,
   printerGroup,
+  ...props
 }) => {
   return (
-    <ListItem key={printerGroup.id} noIndent style={isSelected ? styles.selectedRow : {}}>
+    <ListItem {...props} noIndent style={isSelected ? styles.selectedRow : {}}>
       <Left>
         <Text>{printerGroup.name}</Text>
       </Left>

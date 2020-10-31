@@ -68,7 +68,7 @@ const PrinterDetailsInner: React.FC<PrinterDetailsOuterProps> = ({ printer, onCl
             title="Printer details"
             isPrimaryDisabled={isLoading}
           >
-            <Content style={styles.modal}>
+            <Content>
               <Row>
                 <Col>
                   <Form>

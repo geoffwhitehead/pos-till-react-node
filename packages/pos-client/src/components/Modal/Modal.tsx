@@ -4,10 +4,14 @@ import NativeModal from 'react-native-modal';
 type ModalProps = {
   isOpen: boolean;
   onClose: () => void;
+  style?: Record<string, string | number>;
 };
-export const Modal: React.FC<ModalProps> = ({ children, isOpen, onClose }) => {
+export const Modal: React.FC<ModalProps> = ({ children, isOpen, onClose, ...props }) => {
+  console.log('children', children);
+  console.log('isOpen', isOpen);
   return (
     <NativeModal
+      {...props}
       propagateSwipe
       isVisible={isOpen}
       onBackButtonPress={onClose}

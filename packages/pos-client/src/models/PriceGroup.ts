@@ -1,12 +1,24 @@
 import { Model, tableSchema } from '@nozbe/watermelondb';
-import { field } from '@nozbe/watermelondb/decorators';
+import { action, field } from '@nozbe/watermelondb/decorators';
 
 export class PriceGroup extends Model {
   static table = 'price_groups';
 
   @field('name') name: string;
   @field('short_name') shortName: string;
-  @field('is_prep_time_required') isPrepTimeRequired: string;
+  @field('is_prep_time_required') isPrepTimeRequired: boolean;
+
+  @action updatePriceGroup = (values: { name: string; shortName: string; isPrepTimeRequired: boolean }) => {
+    console.log('values', values);
+    this.database.action(async () => {
+      await this.update(record => Object.assign(record, values));
+    });
+  };
+
+  @action remove = async () =>
+    this.database.action(async () => {
+      await this.markAsDeleted();
+    });
 }
 
 export const priceGroupSchema = tableSchema({
@@ -14,6 +26,6 @@ export const priceGroupSchema = tableSchema({
   columns: [
     { name: 'name', type: 'string' },
     { name: 'short_name', type: 'string' },
-    { name: 'is_prep_time_required', type: 'string' },
+    { name: 'is_prep_time_required', type: 'boolean' },
   ],
 });

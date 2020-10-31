@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import withObservables from '@nozbe/with-observables';
-import { PrinterGroup, tableNames } from '../../../models';
+import { PrinterGroup, PrinterGroupPrinter, tableNames } from '../../../models';
 import { Form, Label, H2, Input, Item, Button, Text, Col, Row, Content, List, ListItem } from '../../../core';
 import { styles } from './styles';
 import { Formik } from 'formik';
@@ -8,20 +8,19 @@ import * as Yup from 'yup';
 import { Printer } from '../../../models/Printer';
 import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import { Database } from '@nozbe/watermelondb';
-import { PrinterRow } from './PrinterRow';
 import { PrinterRowChoice } from './PrinterRowChoice';
 import { Loading } from '../../../components/Loading/Loading';
 import { ModalContentButton } from '../../../components/Modal/ModalContentButton';
 
 interface PrinterGroupDetailsOuterProps {
   onClose: () => void;
-  printerGroup: PrinterGroup;
+  printerGroup?: PrinterGroup;
   database: Database;
 }
 
 interface PrinterGroupDetailsInnerProps {
   printers: Printer[];
-  assignedPrinters: Printer[];
+  assignedPrinters?: Printer[];
 }
 
 const printerGroupDetailsSchema = Yup.object().shape({
@@ -31,57 +30,69 @@ const printerGroupDetailsSchema = Yup.object().shape({
     .required('Required'),
 });
 
+type FormValues = {
+  name: string;
+};
+
 const PrinterGroupDetailsInner: React.FC<PrinterGroupDetailsOuterProps & PrinterGroupDetailsInnerProps> = ({
   printerGroup,
   onClose,
   assignedPrinters,
   printers,
+  database,
 }) => {
-  const { name } = printerGroup;
   const [loading, setLoading] = useState(false);
   const [selectedPrinters, setSelectedPrinters] = useState<Printer[]>([]);
 
-  const update = async (values: any, printerGroup: PrinterGroup) => {
-    // TODO: type vaalues
+  const update = async (values: FormValues, printerGroup: PrinterGroup) => {
     setLoading(true);
-    await printerGroup.updateGroup({ ...values, printers: selectedPrinters });
+    if (printerGroup) {
+      await printerGroup.updateGroup({ ...values, printers: selectedPrinters });
+    } else {
+      const printerGroupRefsCollection = database.collections.get<PrinterGroupPrinter>(
+        tableNames.printerGroupsPrinters,
+      );
+      const printerGroupCollection = database.collections.get<PrinterGroup>(tableNames.printerGroups);
+
+      const pGToCreate = printerGroupCollection.prepareCreate(printerGroupRecord => {
+        printerGroupRecord.name = values.name;
+      });
+
+      const pGRefsToCreate = selectedPrinters.map(printer =>
+        printerGroupRefsCollection.prepareCreate(refRecord => {
+          refRecord.printerGroup.set(pGToCreate);
+          refRecord.printer.set(printer);
+        }),
+      );
+
+      const toCreate = [pGToCreate, ...pGRefsToCreate];
+
+      await database.action(async () => await database.batch(...toCreate));
+    }
     setLoading(false);
     onClose();
   };
 
   const initialValues = {
-    name,
+    name: printerGroup?.name || '',
   };
 
-  if (!printers || !assignedPrinters) {
+  if (!printers || (printerGroup && !assignedPrinters)) {
     return <Loading />;
   }
 
   useEffect(() => {
-    setSelectedPrinters(assignedPrinters);
+    assignedPrinters && setSelectedPrinters(assignedPrinters);
   }, [assignedPrinters]);
 
   const togglePrinter = (printer: Printer) => {
     const alreadyAssigned = selectedPrinters.includes(printer);
-
-    console.log('printer', printer);
-    console.log('selectedPrinters', selectedPrinters);
     if (alreadyAssigned) {
       setSelectedPrinters(selectedPrinters.filter(sP => sP !== printer));
     } else {
       setSelectedPrinters([...selectedPrinters, printer]);
     }
   };
-
-  // const setAssignedPrinters = (printer: Printer) => {
-  //   const alreadyAssigned = selectedPrinters.includes(printer);
-
-  //   if (alreadyAssigned) {
-  //     setSelectedPrinters(selectedPrinters.filter(sP => sP !== printer));
-  //   } else {
-  //     setSelectedPrinters([...selectedPrinters, printer]);
-  //   }
-  // };
 
   return (
     <Formik
@@ -116,7 +127,7 @@ const PrinterGroupDetailsInner: React.FC<PrinterGroupDetailsOuterProps & Printer
                 </Col>
                 <Col />
               </Row>
-              <Row style={{ margin: 30 }}>
+              <Row>
                 <Col style={s.pl}>
                   <List>
                     <ListItem itemDivider>
@@ -151,11 +162,21 @@ const PrinterGroupDetailsInner: React.FC<PrinterGroupDetailsOuterProps & Printer
 
 const enhance = c =>
   withDatabase<any>(
-    withObservables(['printerGroup'], ({ printerGroup, database }) => ({
-      printerGroup,
-      printers: database.collections.get<Printer>(tableNames.printers).query(),
-      assignedPrinters: printerGroup.printers,
-    }))(c),
+    withObservables<PrinterGroupDetailsOuterProps, PrinterGroupDetailsInnerProps>(
+      ['printerGroup'],
+      ({ printerGroup, database }) => {
+        if (printerGroup) {
+          return {
+            printerGroup,
+            printers: database.collections.get<Printer>(tableNames.printers).query(),
+            assignedPrinters: printerGroup.printers,
+          };
+        }
+        return {
+          printers: database.collections.get<Printer>(tableNames.printers).query(),
+        };
+      },
+    )(c),
   );
 
 export const PrinterGroupDetails = enhance(PrinterGroupDetailsInner);

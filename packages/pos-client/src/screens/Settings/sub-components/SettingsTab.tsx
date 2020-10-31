@@ -27,7 +27,6 @@ import { styles } from './styles';
 import { useDatabase } from '@nozbe/watermelondb/hooks';
 import { AuthContext } from '../../../contexts/AuthContext';
 import { sync } from '../../../services/sync';
-import { clockRunning } from 'react-native-reanimated';
 
 interface SettingsTabOuterProps {
   database: Database;
@@ -188,7 +187,7 @@ const SettingsTabInner: React.FC<SettingsTabOuterProps & SettingsTabInnerProps> 
                           value={maxBills.toString()}
                         />
                       </Item>
-                      <Item stackedLabel error={err.currency}>
+                      <Item picker stackedLabel error={err.currency}>
                         <Label>Currency</Label>
                         <Picker
                           mode="dropdown"

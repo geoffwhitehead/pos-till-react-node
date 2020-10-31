@@ -1,12 +1,7 @@
 import { Database, Query } from '@nozbe/watermelondb';
-import { Content, List, Item as ItemComponent, Input, ListItem, Left, Icon, Text, Body, Right } from '../../../../core';
-import React, { useState, useContext, useMemo, useEffect } from 'react';
-import { OrganizationContext } from '../../../../contexts/OrganizationContext';
-import { SearchHeader } from '../../../../components/SearchHeader/SearchHeader';
+import { Content, List, Item as ItemComponent, Input, Icon, Text, View, Button } from '../../../../core';
+import React, { useState, useEffect } from 'react';
 import { Modal } from '../../../../components/Modal/Modal';
-import { ModifierList } from '../../../Checkout/sub-components/CategoryItemsList/sub-components/ModifierList/ModifierList';
-import { CategoryItemRow } from '../../../Checkout/sub-components/CategoryItemsList/sub-components/CategoryItemRow';
-import { resolvePrice } from '../../../../helpers';
 import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import withObservables from '@nozbe/with-observables';
 import { Category, Item, Modifier, PrinterGroup, tableNames } from '../../../../models';
@@ -55,37 +50,40 @@ const ItemsTabInner: React.FC<ItemsTabOuterProps & ItemsTabInnerProps> = ({ item
   }
 
   return (
-    <Content>
-      <ItemComponent>
+    <View>
+      <ItemComponent style={{ marginLeft: 10, marginRight: 10 }}>
         <Icon name="ios-search" />
         <Input placeholder="Search" onChangeText={onSearchHandler} value={searchValue} />
+        <Button iconLeft small success onPress={() => setModalOpen(true)}>
+          <Icon name="ios-add-circle-outline" />
+          <Text>Create</Text>
+        </Button>
       </ItemComponent>
+      <Content>
+        <List>
+          {items
+            .filter(item => searchFilter(item, searchValue))
+            .map(item => {
+              const categoryName = keyedCategories[item.categoryId].name;
+              const subtitle = `Category: ${categoryName}`;
+
+              return (
+                <ItemsTabRow
+                  key={item.id}
+                  item={item}
+                  isActive={selectedItem === item}
+                  onPressItem={onSelectItem}
+                  title={item.name}
+                  subtitle={subtitle}
+                />
+              );
+            })}
+        </List>
+      </Content>
       <Modal isOpen={modalOpen} onClose={onCloseHandler}>
-        <ItemDetails item={selectedItem} onClose={onCloseHandler} />
+        <ItemDetails item={selectedItem} onClose={onCloseHandler} categories={categories} />
       </Modal>
-
-      <List>
-        {items
-          .filter(item => searchFilter(item, searchValue))
-          .map(item => {
-            const categoryName = keyedCategories[item.categoryId].name;
-
-            const title = item.name;
-            const subtitle = `Category: ${categoryName}`;
-
-            return (
-              <ItemsTabRow
-                key={item.id}
-                item={item}
-                isActive={selectedItem === item}
-                onPressItem={onSelectItem}
-                title={item.name}
-                subtitle={subtitle}
-              />
-            );
-          })}
-      </List>
-    </Content>
+    </View>
   );
 };
 
