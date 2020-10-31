@@ -1,5 +1,6 @@
 import { Model, tableSchema } from '@nozbe/watermelondb';
 import { action, field } from '@nozbe/watermelondb/decorators';
+import { Organization } from '.';
 
 export class PriceGroup extends Model {
   static table = 'price_groups';
@@ -15,10 +16,14 @@ export class PriceGroup extends Model {
     });
   };
 
-  @action remove = async () =>
+  @action remove = async (organization: Organization) => {
     this.database.action(async () => {
       await this.markAsDeleted();
+      if (organization.defaultPriceGroupId === this.id) {
+        await organization.defaultPriceGroup.set(null);
+      }
     });
+  };
 }
 
 export const priceGroupSchema = tableSchema({

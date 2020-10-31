@@ -10,10 +10,8 @@ interface BillRowEmptyProps {
 }
 
 export const BillRowEmpty: React.FC<BillRowEmptyProps> = ({ onSelectBill, reference, billPeriod }) => {
-  const database = useDatabase();
-
   const createBill = async () => {
-    const bill = await database.action<Bill>(async () => await billPeriod.createBill({ reference }));
+    const bill = await billPeriod.createBill({ reference });
     onSelectBill(bill);
   };
 

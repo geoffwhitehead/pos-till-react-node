@@ -21,7 +21,7 @@ import { periodReport } from '../../services/printer/periodReport';
 import { print } from '../../services/printer/printer';
 import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import withObservables from '@nozbe/with-observables';
-import { tableNames, BillPeriod, PaymentType, Printer } from '../../models';
+import { tableNames, BillPeriod, PaymentType, Printer, Organization } from '../../models';
 import dayjs from 'dayjs';
 import { View } from 'react-native';
 import { Database } from '@nozbe/watermelondb';
@@ -55,12 +55,12 @@ export const ReportsInner: React.FC<ReportsOuterProps & ReportsInnerProps> = ({
     print(commands, receiptPrinter);
   };
 
-  const closePeriod = async (billPeriod: BillPeriod) => {
-    await database.action(async () => await billPeriod.closePeriod());
+  const closePeriod = async (billPeriod: BillPeriod, organization: Organization) => {
+    await billPeriod.closePeriod(organization);
     onPrint(billPeriod);
   };
 
-  const confirmClosePeriod = async (billPeriod: BillPeriod) => {
+  const confirmClosePeriod = async (billPeriod: BillPeriod, organization: Organization) => {
     const openBills = await billPeriod.openBills.fetch();
     if (openBills.length > 0) {
       Toast.show({
@@ -77,7 +77,7 @@ export const ReportsInner: React.FC<ReportsOuterProps & ReportsInnerProps> = ({
           title: 'Close current billing period and print report?',
         },
         async index => {
-          index === 0 && (await closePeriod(billPeriod));
+          index === 0 && (await closePeriod(billPeriod, organization));
         },
       );
     }
@@ -120,7 +120,7 @@ export const ReportsInner: React.FC<ReportsOuterProps & ReportsInnerProps> = ({
                           <Button small info style={{ marginRight: 2 }} onPress={() => onPrint(bP)}>
                             <Text>Print Status Report</Text>
                           </Button>
-                          <Button small danger onPress={() => confirmClosePeriod(bP)}>
+                          <Button small danger onPress={() => confirmClosePeriod(bP, organization)}>
                             <Text>Close Period</Text>
                           </Button>
                         </View>

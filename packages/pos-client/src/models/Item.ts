@@ -94,21 +94,24 @@ export class Item extends Model {
         const existingRecord = itemPrices.find(iP => iP.priceGroupId === priceGroup.id);
         const newPrice = prices.find(p => p.priceGroup.id === priceGroup.id)?.price;
 
-        console.log('existingRecord', existingRecord);
-        console.log('newPrice', newPrice);
-        if (existingRecord) {
-          return existingRecord.prepareUpdate(itemPriceRecord => {
-            Object.assign(itemPriceRecord, { price: newPrice ? parseInt(newPrice) : null });
-          });
-        } else {
-          return itemPricesCollection.prepareCreate(newItemPriceRecord => {
-            newItemPriceRecord.item.set(this);
-            newItemPriceRecord.priceGroup.set(priceGroup);
-            Object.assign(newItemPriceRecord, {
-              price: newPrice ? parseInt(newPrice) : null,
+        if (newPrice) {
+          if (existingRecord) {
+            return existingRecord.prepareUpdate(itemPriceRecord => {
+              Object.assign(itemPriceRecord, { price: newPrice ? parseInt(newPrice) : null });
             });
-          });
+          } else {
+            return itemPricesCollection.prepareCreate(newItemPriceRecord => {
+              newItemPriceRecord.item.set(this);
+              newItemPriceRecord.priceGroup.set(priceGroup);
+              Object.assign(newItemPriceRecord, {
+                price: newPrice ? parseInt(newPrice) : null,
+              });
+            });
+          }
+        } else if (existingRecord) {
+          return existingRecord.prepareMarkAsDeleted();
         }
+        return null;
       }),
     );
 

@@ -105,7 +105,6 @@ export const OrganizationTab: React.FC<OrganizationTabProps> = () => {
             addressPostcode: !!(touched.addressPostcode && errors.addressPostcode),
           };
 
-          console.log('err', err);
           return (
             <Content style={styles.container}>
               <Grid>

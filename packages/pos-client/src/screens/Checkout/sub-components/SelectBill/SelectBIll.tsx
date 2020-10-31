@@ -24,6 +24,7 @@ export const WrappedSelectBill: React.FC<SelectBillOuterProps & SelectBillInnerP
   const { setCurrentBill } = useContext(CurrentBillContext);
   const { organization } = useContext(OrganizationContext);
 
+  console.log('organization', organization);
   const [showOpen, setShowOpen] = useState<boolean>(false);
 
   const bills: (Bill | null)[] = openBills.reduce((acc, bill) => {
@@ -39,6 +40,7 @@ export const WrappedSelectBill: React.FC<SelectBillOuterProps & SelectBillInnerP
   const toggleOpenOnlyFilter = () => setShowOpen(!showOpen);
   const filterOpenOnly = bill => (showOpen ? bill : true);
 
+  console.log('bills', bills);
   return (
     <Content>
       <List>
@@ -67,7 +69,12 @@ export const WrappedSelectBill: React.FC<SelectBillOuterProps & SelectBillInnerP
           return bill ? (
             <BillRow key={bill.id} bill={bill} onSelectBill={_onSelectBill} />
           ) : (
-            <BillRowEmpty key={"k" + index + 1} billPeriod={billPeriod} reference={index + 1} onSelectBill={_onSelectBill} />
+            <BillRowEmpty
+              key={'k' + index + 1}
+              billPeriod={billPeriod}
+              reference={index + 1}
+              onSelectBill={_onSelectBill}
+            />
           );
         })}
       </List>

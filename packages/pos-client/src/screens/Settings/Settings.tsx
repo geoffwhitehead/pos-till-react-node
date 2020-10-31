@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Container, Content } from '../../core';
 import { SidebarHeader } from '../../components/SidebarHeader/SidebarHeader';
 import { DrawerNavigationProp } from '@react-navigation/drawer';
@@ -9,6 +9,7 @@ import { SettingsTab } from './sub-components/SettingsTab';
 import { PrintersTab } from './sub-components/PrintersTab';
 import { PrinterGroupsTab } from './sub-components/PrinterGroupsTab';
 import { PriceGroupsTab } from './sub-components/PriceGroupsTab';
+import { BillPeriodContext } from '../../contexts/BillPeriodContext';
 
 interface SettingsOuterProps {
   navigation: DrawerNavigationProp<SidebarDrawerStackParamList, 'Settings'>;
@@ -16,13 +17,14 @@ interface SettingsOuterProps {
 
 interface SettingsInnerProps {}
 const SettingsInner: React.FC<SettingsOuterProps & SettingsInnerProps> = ({ navigation }) => {
+  const { billPeriod } = useContext(BillPeriodContext);
   return (
     <Container>
       <SidebarHeader title="Settings" onOpen={() => navigation.openDrawer()} />
       <Content>
         <Tabs>
           <Tab heading="Settings">
-            <SettingsTab />
+            <SettingsTab billPeriod={billPeriod} />
           </Tab>
           <Tab heading="Organization Details">
             <OrganizationTab />

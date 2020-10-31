@@ -1,6 +1,6 @@
 import { Model, tableSchema, Relation } from '@nozbe/watermelondb';
-import { field, relation } from '@nozbe/watermelondb/decorators';
-import { Printer, PriceGroup } from '.';
+import { action, field, relation } from '@nozbe/watermelondb/decorators';
+import { Printer, PriceGroup, BillPeriod, tableNames } from '.';
 
 export class Organization extends Model {
   static table = 'organizations';
@@ -19,9 +19,22 @@ export class Organization extends Model {
   @field('currency') currency: string;
   @field('max_bills') maxBills: number;
   @field('last_pulled_at') lastPulledAt: string;
+  @field('current_bill_period_id') currentBillPeriodId: string;
 
   @relation('price_groups', 'default_price_group_id') defaultPriceGroup: Relation<PriceGroup>;
   @relation('printers', 'receipt_printer_id') receiptPrinter: Relation<Printer>;
+  @relation('bill_periods', 'current_bill_period_id') currentBillPeriod: Relation<BillPeriod>;
+
+  @action createNewBillPeriod = async () => {
+    const newBillPeriod = this.database.collections.get<BillPeriod>(tableNames.billPeriods).prepareCreate();
+    const orgUpdate = this.prepareUpdate(record => {
+      record.currentBillPeriod.set(newBillPeriod);
+    });
+
+    await this.database.action<BillPeriod>(async () => {
+      await this.database.batch(newBillPeriod, orgUpdate);
+    });
+  };
 }
 
 export const organizationSchema = tableSchema({
@@ -41,5 +54,6 @@ export const organizationSchema = tableSchema({
     { name: 'currency', type: 'string' },
     { name: 'max_bills', type: 'number' },
     { name: 'last_pulled_at', type: 'string' },
+    { name: 'current_bill_period_id', type: 'string' },
   ],
 });

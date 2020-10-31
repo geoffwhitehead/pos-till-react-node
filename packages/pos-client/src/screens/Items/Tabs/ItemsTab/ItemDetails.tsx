@@ -91,8 +91,6 @@ const ItemDetailsInner: React.FC<ItemDetailsOuterProps & ItemDetailsInnerProps> 
   itemModifiers,
   database,
 }) => {
-  console.log('item', item);
-  console.log('priceGroups', priceGroups);
   if (!priceGroups) {
     return <Loading />;
   }
@@ -127,12 +125,16 @@ const ItemDetailsInner: React.FC<ItemDetailsOuterProps & ItemDetailsInnerProps> 
     );
   };
 
-  const updateItem = async (values: FormValues) => {
+  const updateItem = async ({ prices, ...values }: FormValues) => {
     setLoading(true);
     console.log('values', values);
     console.log('item', item);
+
+    const filteredPrices = prices.filter(price => price.price !== '');
+
+    console.log('filteredPrices', filteredPrices);
     if (item) {
-      await item.updateItem({ ...values, modifiers: selectedModifiers });
+      await item.updateItem({ ...values, prices: filteredPrices, modifiers: selectedModifiers });
       onClose();
     } else {
       const itemCollection = database.collections.get<ItemModel>(tableNames.items);
@@ -154,7 +156,7 @@ const ItemDetailsInner: React.FC<ItemDetailsOuterProps & ItemDetailsInnerProps> 
         }),
       );
 
-      const pricesToCreate = values.prices.map(price =>
+      const pricesToCreate = filteredPrices.map(price =>
         itemPriceCollection.prepareCreate(newPrice => {
           newPrice.priceGroup.set(price.priceGroup);
           newPrice.item.set(itemToCreate);
@@ -228,7 +230,7 @@ const ItemDetailsInner: React.FC<ItemDetailsOuterProps & ItemDetailsInnerProps> 
                       <Input onChangeText={handleChange('name')} onBlur={handleBlur('name')} value={name} />
                     </Item>
                     <Text style={styles.text} note>
-                      A shortname will be used on printers where space is restricted
+                      A shortname will be used on printers where space is restricted.
                     </Text>
                     <Item stackedLabel error={err.shortName}>
                       <Label>ShortName</Label>
@@ -256,8 +258,7 @@ const ItemDetailsInner: React.FC<ItemDetailsOuterProps & ItemDetailsInnerProps> 
                       </Picker>
                     </Item>
                     <Text style={styles.text} note>
-                      On storing a bill, this item will be printed to all printers assigned to the selected printer
-                      group. You can edit printer groups in the settings page.
+                      On storing a bill, this item will be sent to all printers associated with this printer group.
                     </Text>
                     <Item picker stackedLabel>
                       <Label>Printer Group</Label>
@@ -282,8 +283,7 @@ const ItemDetailsInner: React.FC<ItemDetailsOuterProps & ItemDetailsInnerProps> 
                   <Form>
                     <H2>Price Groups</H2>
                     <Text style={styles.text} note>
-                      You can specify a price for all available price groups. If you leave a price group blank, the item
-                      won't exist within that price group.
+                      Note: If you leave a price group blank, the item won't exist within that price group.
                     </Text>
                     <FieldArray
                       name="prices"
@@ -348,8 +348,6 @@ const ItemDetailsInner: React.FC<ItemDetailsOuterProps & ItemDetailsInnerProps> 
 const enhance = c =>
   withDatabase<any>(
     withObservables<ItemDetailsOuterProps, ItemDetailsInnerProps>(['item'], ({ item, database }) => {
-      console.log('observable');
-      console.log('item', item);
       if (item) {
         return {
           item,
