@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { Separator, Text, ListItem, Left, Right } from '../../../../../core';
 import { formatNumber } from '../../../../../utils';
-import { capitalize } from 'lodash';
+import { capitalize, keyBy } from 'lodash';
 import { BillPayment, PaymentType } from '../../../../../models';
 import { OrganizationContext } from '../../../../../contexts/OrganizationContext';
 
@@ -21,7 +21,7 @@ const PaymentsBreakdown: React.FC<PaymentsBreakdownProps> = ({ payments, readonl
     return null;
   }
 
-  const lookupPaymentType = paymentTypeId => paymentTypes.find(({ id }) => id === paymentTypeId);
+  const keyedPaymentTypes = keyBy(paymentTypes, ({ id }) => id);
 
   return (
     <>
@@ -31,7 +31,7 @@ const PaymentsBreakdown: React.FC<PaymentsBreakdownProps> = ({ payments, readonl
       {payments
         .filter(payment => !payment.isChange)
         .map(payment => {
-          const paymentType = lookupPaymentType(payment.paymentTypeId);
+          const paymentType = keyedPaymentTypes[payment.paymentTypeId];
           return (
             <>
               <ListItem key={payment.id} onPress={() => onSelect(!readonly && payment)}>

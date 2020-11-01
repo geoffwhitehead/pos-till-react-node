@@ -70,10 +70,27 @@ export const maintenanceService = ({
         printerRepository,
         printerGroupRepository,
         printerGroupPrinterRepository,
+        paymentTypeRepository,
     },
     logger,
 }: InjectedDependencies): MaintenanceService => {
     const seed = async () => {
+        const paymentTypesToCreate = [
+            {
+                _id: uuid(),
+                name: 'cash',
+            },
+            {
+                _id: uuid(),
+                name: 'card',
+            },
+            {
+                _id: uuid(),
+                name: 'voucher',
+            },
+        ];
+        await paymentTypeRepository.insert(paymentTypesToCreate);
+
         const printers = [
             {
                 _id: uuid(),
@@ -84,7 +101,7 @@ export const maintenanceService = ({
                 printWidth: 14,
             } as const,
             {
-                id: uuid(),
+                _id: uuid(),
                 name: 'Star TSP100',
                 type: 'wifi',
                 address: 'TCP:192.168.1.78',

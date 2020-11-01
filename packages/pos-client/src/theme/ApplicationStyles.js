@@ -3,10 +3,10 @@
  *
  * Use it to define generic component styles (e.g. the default text styles, default button styles...).
  */
-import { colors } from './Colors'
+import { colors } from './colors';
 
 export default {
   button: {
     backgroundColor: colors.primary,
   },
-}
+};

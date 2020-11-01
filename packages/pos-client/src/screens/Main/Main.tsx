@@ -55,9 +55,10 @@ export const MainWrapped: React.FC<MainOuterProps & MainInnerProps> = ({ priceGr
     }
   }, [priceGroups, organization]);
 
-  return !billPeriod || !priceGroup || !organization ? (
-    <Loading />
-  ) : (
+  if (!billPeriod || !priceGroup || !organization) {
+    return <Loading />;
+  }
+  return (
     <OrganizationContext.Provider value={{ organization, setOrganization }}>
       <BillPeriodContext.Provider value={{ billPeriod, setBillPeriod }}>
         <PriceGroupContext.Provider value={{ priceGroup, setPriceGroup }}>
@@ -69,7 +70,6 @@ export const MainWrapped: React.FC<MainOuterProps & MainInnerProps> = ({ priceGr
     </OrganizationContext.Provider>
   );
 };
-
 export const Main = withDatabase<any>(
   withObservables<MainOuterProps, MainInnerProps>([], ({ database, organizationId }) => ({
     priceGroups: database.collections.get<PriceGroup>(tableNames.priceGroups).query(),

@@ -12,7 +12,7 @@ import { ItemModifier } from './ItemModifier';
 import { ModifierItem } from './ModifierItem';
 import { ModifierPrice } from './ModifierPrice';
 import { PrinterGroupPrinter } from './PrinterGroupPrinter';
-
+import { PaymentType } from './PaymentType';
 export default {
     User,
     Discount,
@@ -28,4 +28,5 @@ export default {
     Printer,
     PrinterGroup,
     PrinterGroupPrinter,
+    PaymentType,
 };
