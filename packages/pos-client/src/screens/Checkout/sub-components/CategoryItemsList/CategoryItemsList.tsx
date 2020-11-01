@@ -1,11 +1,9 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { Text, Content, List, ListItem, Left, Icon, Body, Right } from '../../../../core';
 import { SearchHeader } from '../../../../components/SearchHeader/SearchHeader';
-import Modal from 'react-native-modal';
 import { ModifierList } from './sub-components/ModifierList/ModifierList';
 import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import withObservables from '@nozbe/with-observables';
-import { PriceGroupContext } from '../../../../contexts/PriceGroupContext';
 import { CurrentBillContext } from '../../../../contexts/CurrentBillContext';
 import { CategoryItemRow } from './sub-components/CategoryItemRow';
 import { Category, Item, Modifier, ItemPrice, tableNames, PriceGroup } from '../../../../models';
@@ -15,8 +13,8 @@ import { RouteProp } from '@react-navigation/native';
 import { Database, Q } from '@nozbe/watermelondb';
 import { Loading } from '../../../../components/Loading/Loading';
 import { groupBy, keyBy, sortBy } from 'lodash';
-import { resolvePrice } from '../../../../helpers';
 import { OrganizationContext } from '../../../../contexts/OrganizationContext';
+import { Modal } from '../../../../components/Modal/Modal';
 
 interface CategoryItemsListOuterProps {
   database?: Database;
@@ -87,26 +85,6 @@ const CategoryItemsInner: React.FC<CategoryItemsListOuterProps & CategoryItemsLi
   return (
     <Content>
       <SearchHeader onChangeText={onSearchHandler} value={searchValue} />
-      <Modal
-        propagateSwipe
-        isVisible={modalOpen}
-        onBackButtonPress={onCancelHandler}
-        onBackdropPress={onCancelHandler}
-        animationInTiming={50}
-        animationOutTiming={50}
-        hideModalContentWhileAnimating={true}
-        backdropTransitionInTiming={50}
-        backdropTransitionOutTiming={50}
-      >
-        {modalOpen && (
-          <ModifierList
-            priceGroup={priceGroup}
-            currentBill={currentBill}
-            onClose={onCancelHandler}
-            item={selectedItem}
-          />
-        )}
-      </Modal>
 
       <List>
         <ListItem itemHeader first>
@@ -141,6 +119,9 @@ const CategoryItemsInner: React.FC<CategoryItemsListOuterProps & CategoryItemsLi
           return elements;
         })}
       </List>
+      <Modal onClose={onCancelHandler} isOpen={modalOpen}>
+        <ModifierList priceGroup={priceGroup} currentBill={currentBill} onClose={onCancelHandler} item={selectedItem} />
+      </Modal>
     </Content>
   );
 };
@@ -160,7 +141,7 @@ export const CategoryItems = withDatabase<any>(
 );
 
 export const AllItems = withDatabase<any>( // TODO: type
-  withObservables<CategoryItemsListOuterProps, CategoryItemsListInnerProps>([], ({ database, route }) => {
+  withObservables<CategoryItemsListOuterProps, CategoryItemsListInnerProps>(['route'], ({ database, route }) => {
     const { priceGroup } = route.params;
     return {
       items: database.collections

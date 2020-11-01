@@ -49,9 +49,10 @@ const PaymentsInner: React.FC<PaymentOuterProps & PaymentInnerProps> = ({
   onCompleteBill,
   database,
 }) => {
+  console.log('paymentTypes', paymentTypes);
   const [value, setValue] = useState<string>('');
   // TODO: this / payment types will need refactoring so not having to use find
-  const cashType: PaymentType = paymentTypes.find(pt => pt.name === paymentTypeNames.CASH);
+  const cashType: PaymentType = paymentTypes.find(pt => pt.name.toLowerCase() === paymentTypeNames.CASH);
 
   const {
     organization: { currency },

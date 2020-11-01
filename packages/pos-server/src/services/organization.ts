@@ -1,8 +1,6 @@
-import { max } from 'date-fns';
-import { id } from 'date-fns/locale';
 import { InjectedDependencies, pull, push, SyncFns } from '.';
-import organization from '../api/routes/organization';
 import { OrganizationProps, ORGANIZATION_COLLECTION_NAME } from '../models/Organization';
+import { PAYMENT_TYPE_COLLECTION_NAME } from '../models/PaymentType';
 import { toClientChanges } from '../utils/sync';
 import { CommonServiceFns } from './product';
 
@@ -51,7 +49,7 @@ export const organizationFromClient = (organization: OrganizationClientProps): O
 };
 
 export const organizationToClient = (organization: OrganizationProps): OrganizationClientProps => {
-    const { _id, name, email, phone, vat, address, settings } = organization;
+    const { _id, name, email, phone, vat, address, settings = {} } = organization;
     return {
         id: _id,
         name,
@@ -71,11 +69,14 @@ export const organizationToClient = (organization: OrganizationProps): Organizat
 };
 
 export const organizationService = ({
-    repositories: { organizationRepository },
+    repositories: { organizationRepository, paymentTypeRepository },
     logger,
 }: InjectedDependencies): OrganizationService => {
     const pullChanges = async ({ lastPulledAt }) => {
-        const organizations = await pull(organizationRepository, lastPulledAt);
+        const [organizations, paymentTypes] = await Promise.all([
+            pull(organizationRepository, lastPulledAt),
+            pull(paymentTypeRepository, lastPulledAt),
+        ]);
 
         return {
             [ORGANIZATION_COLLECTION_NAME]: {
@@ -83,6 +84,7 @@ export const organizationService = ({
                 updated: organizations.updated.map(organizationToClient),
                 deleted: [], // n/a
             },
+            ...toClientChanges({ [PAYMENT_TYPE_COLLECTION_NAME]: paymentTypes }),
         };
     };
 
@@ -92,6 +94,9 @@ export const organizationService = ({
             updated: changes[ORGANIZATION_COLLECTION_NAME].updated.map(organizationFromClient),
             deleted: [],
         };
+
+        // dont push payment type changes
+
         await push(organizationRepository, _changes, lastPulledAt);
     };
 

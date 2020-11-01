@@ -57,6 +57,7 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
   printers,
   database,
 }) => {
+  console.log('paymentTypes receipt', paymentTypes);
   const [summary, setSummary] = useState<BillSummary>();
   const [isStoreDisabled, setIsStoreDisabled] = useState(false);
 

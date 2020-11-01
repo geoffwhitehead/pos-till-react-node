@@ -64,7 +64,8 @@ export const App = () => {
       let refreshToken;
       let organizationId;
       let userId;
-
+      // await resetDatabase();
+      // await unsetAuth();
       try {
         const [aToken, rToken] = await AsyncStorage.multiGet(['accessToken', 'refreshToken']);
         accessToken = aToken[1];
@@ -215,7 +216,7 @@ export const App = () => {
             ) : (
               // user is authenticated
               // <AuthContext.Provider value={authContext}>
-              <Sync database={database}>
+              <Sync database={database} organizationId={organizationId}>
                 <Main organizationId={organizationId} userId={userId} />
               </Sync>
               // </AuthContext.Provider>

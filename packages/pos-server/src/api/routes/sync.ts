@@ -19,8 +19,9 @@ import { PRINTER_GROUP_COLLECTION_NAME } from '../../models/PrinterGroup';
 import { PRINTER_GROUP_PRINTER_COLLECTION_NAME } from '../../models/PrinterGroupPrinter';
 import { OrganizationService } from '../../services/organization';
 import { ORGANIZATION_COLLECTION_NAME } from '../../models/Organization';
-import { fromUnixTime, getUnixTime, startOfSecond } from 'date-fns';
-import { stringify } from 'querystring';
+import { fromUnixTime, getUnixTime } from 'date-fns';
+
+type SyncRequest = Request & { body: { lastPulledAt: Date; changes: Changes } };
 
 export default (app: Router) => {
     const route = Router();
@@ -77,7 +78,6 @@ export default (app: Router) => {
         return res.status(200).json({ changes, timestamp });
     });
 
-    type SyncRequest = Request & { body: { lastPulledAt: Date; changes: Changes } };
     route.post('/', async (req: SyncRequest, res: Response, next: NextFunction) => {
         const {
             item: itemService,

@@ -1,5 +1,5 @@
-import { StyleSheet } from 'react-native'
-import { colors } from './Colors'
+import { StyleSheet } from 'react-native';
+import { colors } from './colors';
 
 export default StyleSheet.create({
   backgroundReset: {
@@ -169,4 +169,4 @@ export default StyleSheet.create({
   textRight: {
     textAlign: 'right',
   },
-})
+});

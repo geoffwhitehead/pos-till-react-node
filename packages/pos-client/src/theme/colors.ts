@@ -13,4 +13,8 @@ export const colors = {
   primary: '#007bff',
   success: '#28a745',
   error: '#dc3545',
-}
+
+  background: {
+    darkBlue: '#3B4656',
+  },
+};

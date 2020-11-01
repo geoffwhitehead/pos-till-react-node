@@ -1,10 +1,10 @@
 import React, { useContext } from 'react';
 import withObservables from '@nozbe/with-observables';
 import { ListItem, Left, Body, Text, Right } from 'native-base';
-import { resolvePrice } from '../../../../../../helpers';
 import { formatNumber } from '../../../../../../utils';
 import { PriceGroup, ModifierItem, ModifierPrice } from '../../../../../../models';
 import { OrganizationContext } from '../../../../../../contexts/OrganizationContext';
+import { Q } from '@nozbe/watermelondb';
 
 interface ModifierItemRowOuterProps {
   priceGroup: PriceGroup;
@@ -20,7 +20,6 @@ interface ModifierItemRowInnerProps {
 const ModifierItemRowInner: React.FC<ModifierItemRowOuterProps & ModifierItemRowInnerProps> = ({
   selected,
   modifierItem,
-  priceGroup,
   prices,
   onPress,
 }) => {
@@ -36,7 +35,7 @@ const ModifierItemRowInner: React.FC<ModifierItemRowOuterProps & ModifierItemRow
         <Text>{modifierItem.name}</Text>
         <Body />
         <Right>
-          <Text style={{ color: 'grey' }}>{formatNumber(resolvePrice(priceGroup, prices), currency)}</Text>
+          <Text style={{ color: 'grey' }}>{formatNumber(prices[0].price, currency)}</Text>
         </Right>
       </Left>
     </ListItem>
@@ -44,8 +43,8 @@ const ModifierItemRowInner: React.FC<ModifierItemRowOuterProps & ModifierItemRow
 };
 
 export const ModifierItemRow = withObservables<ModifierItemRowOuterProps, ModifierItemRowInnerProps>(
-  ['modifierItem'],
-  ({ modifierItem }) => ({
-    prices: modifierItem.prices,
+  ['modifierItem', 'priceGroup'],
+  ({ modifierItem, priceGroup }) => ({
+    prices: modifierItem.prices.extend(Q.where('price_group_id', priceGroup.id)),
   }),
 )(ModifierItemRowInner);
