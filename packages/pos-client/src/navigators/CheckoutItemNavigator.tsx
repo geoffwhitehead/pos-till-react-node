@@ -16,9 +16,9 @@ export const routes = {
 
 export type CheckoutItemStackParamList = {
   CategoryList: undefined;
-  CategoryItemsList: { category: Category; priceGroup: PriceGroup };
+  CategoryItemsList: { category: Category; priceGroupId: string };
   ItemModifierList: { modifier: Modifier };
-  AllItemsList: { priceGroup: PriceGroup };
+  AllItemsList: { priceGroupId: string };
 };
 
 export const CheckoutItemNavigator: React.FC = () => {

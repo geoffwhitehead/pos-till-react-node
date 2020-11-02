@@ -39,6 +39,10 @@ export const billItemSchema = tableSchema({
     { name: 'updated_at', type: 'number' },
     { name: 'is_comp', type: 'boolean' },
     { name: 'is_voided', type: 'boolean' },
+    /**
+     * Ideally print_status would be computed from the print logs and void logs but im not sure how performant this
+     * will be using the watermelon query builder.
+     */
     { name: 'print_status', type: 'string' },
   ],
 });

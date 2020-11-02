@@ -272,7 +272,7 @@ const ItemDetailsInner: React.FC<ItemDetailsOuterProps & ItemDetailsInnerProps> 
                         selectedValue={printerGroupId}
                         onValueChange={handleChange('printerGroupId')}
                       >
-                        {printerGroups.map(({ id, name }) => (
+                        {[...printerGroups, { id: '', name: 'None' }].map(({ id, name }) => (
                           <Picker.Item key={id} label={name} value={id} />
                         ))}
                       </Picker>

@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { Text, Content, List, ListItem, Left, Icon, Body, Right } from '../../../../core';
+import { Text, Content, List, ListItem, Left, Icon, Body, Right, Button } from '../../../../core';
 import { SearchHeader } from '../../../../components/SearchHeader/SearchHeader';
 import { ModifierList } from './sub-components/ModifierList/ModifierList';
 import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
@@ -22,12 +22,13 @@ interface CategoryItemsListOuterProps {
   modifiers: Modifier[];
   route: RouteProp<CheckoutItemStackParamList, 'CategoryItemsList'>;
   navigation: StackNavigationProp<CheckoutItemStackParamList, 'CategoryItemsList'>;
-  priceGroup: PriceGroup;
+  priceGroupId: PriceGroup;
 }
 
 interface CategoryItemsListInnerProps {
   items: Item[];
   prices: ItemPrice[];
+  priceGroup: PriceGroup;
 }
 
 const CategoryItemsInner: React.FC<CategoryItemsListOuterProps & CategoryItemsListInnerProps> = ({
@@ -35,9 +36,7 @@ const CategoryItemsInner: React.FC<CategoryItemsListOuterProps & CategoryItemsLi
   items,
   navigation,
   prices,
-  route: {
-    params: { priceGroup },
-  },
+  priceGroup,
 }) => {
   const [searchValue, setSearchValue] = useState<string>('');
   const [modalOpen, setModalOpen] = useState<boolean>(false);
@@ -89,8 +88,10 @@ const CategoryItemsInner: React.FC<CategoryItemsListOuterProps & CategoryItemsLi
       <List>
         <ListItem itemHeader first>
           <Left>
-            <Icon onPress={goBack} name="ios-arrow-back" />
-            <Text style={{ fontWeight: 'bold' }}>{`${category ? category.name : 'All'} / Items`}</Text>
+            <Button bordered info onPress={goBack} iconLeft>
+              <Icon name="ios-arrow-back" />
+              <Text style={{ fontWeight: 'bold' }}>{`${category ? category.name : 'All'} / Items`}</Text>
+            </Button>
           </Left>
           <Body></Body>
           <Right />
@@ -128,13 +129,13 @@ const CategoryItemsInner: React.FC<CategoryItemsListOuterProps & CategoryItemsLi
 
 export const CategoryItems = withDatabase<any>(
   withObservables<CategoryItemsListOuterProps, CategoryItemsListInnerProps>(['route'], ({ route, database }) => {
-    const { category, priceGroup } = route.params;
+    const { category, priceGroupId } = route.params;
     return {
-      category,
+      priceGroup: database.collections.get<PriceGroup>(tableNames.priceGroups).findAndObserve(priceGroupId),
       items: category.items.observeWithColumns(['name']),
       prices: database.collections
         .get<ItemPrice>(tableNames.itemPrices)
-        .query(Q.where('price_group_id', priceGroup.id))
+        .query(Q.where('price_group_id', priceGroupId))
         .observeWithColumns(['price']),
     };
   })(CategoryItemsInner),
@@ -142,15 +143,16 @@ export const CategoryItems = withDatabase<any>(
 
 export const AllItems = withDatabase<any>( // TODO: type
   withObservables<CategoryItemsListOuterProps, CategoryItemsListInnerProps>(['route'], ({ database, route }) => {
-    const { priceGroup } = route.params;
+    const { priceGroupId } = route.params;
     return {
+      priceGroup: database.collections.get<PriceGroup>(tableNames.priceGroups).findAndObserve(priceGroupId),
       items: database.collections
         .get<Item>(tableNames.items)
         .query()
         .observeWithColumns(['name']),
       prices: database.collections
         .get<ItemPrice>(tableNames.itemPrices)
-        .query(Q.where('price_group_id', priceGroup.id))
+        .query(Q.where('price_group_id', priceGroupId))
         .observeWithColumns(['price']),
     };
   })(CategoryItemsInner),

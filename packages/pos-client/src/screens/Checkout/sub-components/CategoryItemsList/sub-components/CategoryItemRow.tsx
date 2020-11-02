@@ -32,7 +32,7 @@ const CategoryItemRowInner: React.FC<CategoryItemRowOuterProps & CategoryItemRow
       <Left>
         <Text>{item.name}</Text>
       </Left>
-      <Body>{modifierCount > 0 ? <Icon name="ios-arrow-forward" /> : null}</Body>
+      <Body>{modifierCount > 0 ? <Icon style={{ color: 'lightgrey' }} name="ios-arrow-forward" /> : null}</Body>
       <Right>
         <Text style={{ color: 'grey' }}>{formatNumber(price, currency)}</Text>
       </Right>

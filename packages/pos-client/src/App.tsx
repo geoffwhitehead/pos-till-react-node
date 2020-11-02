@@ -12,6 +12,7 @@ import decode from 'jwt-decode';
 import DatabaseProvider from '@nozbe/watermelondb/DatabaseProvider';
 import { database, resetDatabase } from './database';
 import { Sync } from './components/Sync/Sync';
+import { defaultTheme } from './theme/drawer';
 
 export const App = () => {
   const [state, dispatch] = React.useReducer(
@@ -208,7 +209,7 @@ export const App = () => {
     <Root>
       {/*  react-navigation wrapper */}
       <DatabaseProvider database={database}>
-        <NavigationContainer>
+        <NavigationContainer theme={defaultTheme}>
           <AuthContext.Provider value={authContext}>
             {!accessToken || !refreshToken || !organizationId || !userId ? (
               // login etc
