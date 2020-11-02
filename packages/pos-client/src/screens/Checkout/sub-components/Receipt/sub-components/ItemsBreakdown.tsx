@@ -1,5 +1,5 @@
 import { groupBy } from 'lodash';
-import { Separator, Text, ListItem } from '../../../../../core';
+import { Separator, Text, ListItem, Left, Right } from '../../../../../core';
 import React from 'react';
 import { capitalize } from 'lodash';
 import { ItemBreakdown } from './ItemBreakdown';
@@ -23,12 +23,15 @@ export const ItemsBreakdown: React.FC<{
       </Separator>
       {Object.values(billItemGroups).map(itemGroup => {
         return [
-          <ListItem itemHeader first key={itemGroup[0].priceGroupId}>
-            <Text>{capitalize(itemGroup[0].priceGroupName)}</Text>
+          <ListItem itemDivider first key={itemGroup[0].priceGroupId}>
+            <Left>
+              <Text>{itemGroup[0].priceGroupName}</Text>
+            </Left>
+            <Right>
+              <Text>{`${itemGroup.length} items`}</Text>
+            </Right>
           </ListItem>,
-          ...itemGroup.map(item => (
-            <ItemBreakdown key={item.id} item={item} readonly={readonly} onSelect={onSelect} />
-          )),
+          ...itemGroup.map(item => <ItemBreakdown key={item.id} item={item} readonly={readonly} onSelect={onSelect} />),
         ];
       })}
     </>

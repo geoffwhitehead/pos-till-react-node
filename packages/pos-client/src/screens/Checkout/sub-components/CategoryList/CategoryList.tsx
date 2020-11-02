@@ -28,12 +28,12 @@ export const CategoriesInner: React.FC<CategoriesOuterProps & CategoriesInnerPro
     const { category, priceGroup } = params;
     if (!category) {
       navigation.navigate('AllItemsList', {
-        priceGroup,
+        priceGroupId: priceGroup.id,
       });
     } else {
       navigation.navigate('CategoryItemsList', {
         category,
-        priceGroup,
+        priceGroupId: priceGroup.id,
       });
     }
   };

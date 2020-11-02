@@ -49,38 +49,35 @@ export const WrappedBillRow: React.FC<BillRowInnerProps & BillRowOuterProps> = (
     summary();
   }, [billItems]);
 
-  const renderPrintErrors = () => {
-    const hasUnstoredItems = !!billItemsVoidsStatusUnstoredCount;
-    const hasPrintErrors = !!billItemsVoidsStatusErrorsCount;
-    const hasPendingPrints = !!billItemsVoidsStatusPendingCount;
+  const hasUnstoredItems = !!billItemsVoidsStatusUnstoredCount;
+  const hasPrintErrors = !!billItemsVoidsStatusErrorsCount;
+  const hasPendingPrints = !!billItemsVoidsStatusPendingCount;
 
-    if (hasPrintErrors) {
-      return [
-        <Icon active name="ios-warning" style={{ marginLeft: 20, marginRight: 2, color: 'grey' }} />,
-        <Text note>Print Error</Text>,
-      ];
-    }
-    if (hasUnstoredItems) {
-      return [
-        <Icon active name="ios-warning" style={{ marginLeft: 20, marginRight: 2, color: 'grey' }} />,
-        <Text note>Unsent Items</Text>,
-      ];
-    }
-    if (hasPendingPrints) {
-      return [
-        <Icon active name="ios-print" style={{ marginLeft: 20, marginRight: 2, color: 'grey' }} />,
-        <Text note>Printing</Text>,
-      ];
-    }
-    return null;
-  };
   return (
     <ListItem key={bill.id} onPress={() => onSelectBill(bill)}>
-      <Left>
-        <Text style={{ color: 'green' }}>{`${bill.reference}: Open`}</Text>
-        {renderPrintErrors()}
-      </Left>
+      {hasPrintErrors && (
+        <Left>
+          <Text style={{ color: 'green' }}>{`${bill.reference}: Open`}</Text>
+          <Icon active name="ios-warning" style={{ marginLeft: 20, marginRight: 2, color: 'grey' }} />
+          <Text note>Print Error</Text>
+        </Left>
+      )}
 
+      {hasUnstoredItems && (
+        <Left>
+          <Text style={{ color: 'green' }}>{`${bill.reference}: Open`}</Text>
+          <Icon active name="ios-warning" style={{ marginLeft: 20, marginRight: 2, color: 'grey' }} />
+          <Text note>Unsent Items</Text>
+        </Left>
+      )}
+
+      {hasPendingPrints && (
+        <Left>
+          <Text style={{ color: 'green' }}>{`${bill.reference}: Open`}</Text>
+          <Icon active name="ios-print" style={{ marginLeft: 20, marginRight: 2, color: 'grey' }} />
+          <Text note>Printing</Text>
+        </Left>
+      )}
       <Body>
         <Text style={{ color: 'grey' }}>{summary ? formatNumber(summary.balance, currency) : '...'}</Text>
       </Body>

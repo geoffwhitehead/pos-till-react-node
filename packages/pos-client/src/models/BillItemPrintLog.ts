@@ -1,4 +1,4 @@
-import { field, relation } from '@nozbe/watermelondb/decorators';
+import { field, immutableRelation, relation } from '@nozbe/watermelondb/decorators';
 import { BillItem, Printer } from '.';
 import { Relation, tableSchema, Model } from '@nozbe/watermelondb';
 
@@ -11,8 +11,8 @@ export class BillItemPrintLog extends Model {
   @field('printer_id') printerId: string;
   @field('status') status: BillItemPrintLogStatus;
 
-  @relation('bill_items', 'bill_item_id') billItem: Relation<BillItem>;
-  @relation('printers', 'printer_id') printer: Relation<Printer>;
+  @immutableRelation('bill_items', 'bill_item_id') billItem: Relation<BillItem>;
+  @immutableRelation('printers', 'printer_id') printer: Relation<Printer>;
 
   static associations = {
     bill_items: { type: 'belongs_to', key: 'bill_item_id' },
