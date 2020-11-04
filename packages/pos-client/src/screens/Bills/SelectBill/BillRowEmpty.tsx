@@ -1,7 +1,6 @@
 import React from 'react';
-import { ListItem, Left, Text, Body, Right } from '../../../../core';
-import { useDatabase } from '@nozbe/watermelondb/hooks';
-import { Bill, BillPeriod } from '../../../../models';
+import { ListItem, Left, Text, Body, Right } from '../../../core';
+import { Bill, BillPeriod } from '../../../models';
 
 interface BillRowEmptyProps {
   reference: number;
@@ -16,12 +15,22 @@ export const BillRowEmpty: React.FC<BillRowEmptyProps> = ({ onSelectBill, refere
   };
 
   return (
-    <ListItem key={reference} onPress={createBill}>
+    <ListItem noIndent style={styles.closedBill} key={reference} onPress={createBill}>
       <Left>
-        <Text style={{ color: 'red' }}>{`${reference}: Closed`}</Text>
+        <Text style={styles.rowText}>{reference}</Text>
       </Left>
       <Body />
       <Right />
     </ListItem>
   );
 };
+
+const styles = {
+  closedBill: {
+    borderLeftColor: 'red',
+    borderLeftWidth: 8,
+  },
+  rowText: {
+    fontSize: 18,
+  },
+} as const;

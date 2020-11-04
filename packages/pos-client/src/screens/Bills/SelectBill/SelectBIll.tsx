@@ -1,19 +1,23 @@
 import React, { useState, useContext } from 'react';
-import { Text, Content, List, ListItem, Left, Body, Right, Button } from '../../../../core';
+import { Text, Content, List, ListItem, Left, Body, Right, Button } from '../../../core';
 import withObservables from '@nozbe/with-observables';
-import { CurrentBillContext } from '../../../../contexts/CurrentBillContext';
+import { CurrentBillContext } from '../../../contexts/CurrentBillContext';
 import { BillRowEmpty } from './BillRowEmpty';
 import { BillRow } from './BillRow';
-import { Bill, BillPeriod } from '../../../../models';
-import { OrganizationContext } from '../../../../contexts/OrganizationContext';
+import { Bill, BillPeriod } from '../../../models';
+import { OrganizationContext } from '../../../contexts/OrganizationContext';
 
 interface SelectBillInnerProps {
-  openBills: any; // TODO: fix types
+  openBills: Bill[];
 }
 
 interface SelectBillOuterProps {
   billPeriod: BillPeriod;
-  onSelectBill?: (bill: Bill) => void; // Created from 2 places
+  /**
+   * Optional hook in to select bill on change.
+   * This is used when navigated to from the sidebar to redirect the user to the checkout page.
+   */
+  onSelectBill?: (bill: Bill) => void;
 }
 
 export const WrappedSelectBill: React.FC<SelectBillOuterProps & SelectBillInnerProps> = ({

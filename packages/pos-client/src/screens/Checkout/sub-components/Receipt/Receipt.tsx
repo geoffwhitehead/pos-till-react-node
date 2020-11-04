@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { Text, Col, Grid, Row, Button } from '../../../../core';
+import { Text, Col, Grid, Row, Button, Icon } from '../../../../core';
 import { StyleSheet } from 'react-native';
 import { formatNumber, billSummary, BillSummary, minimalBillSummary, MinimalBillSummary } from '../../../../utils';
 import { Fonts } from '../../../../theme';
@@ -196,9 +196,9 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
   return (
     <Grid style={styles.grid}>
       <Row style={styles.r1}>
-        <Col>
-          <Button style={styles.buttons} light onPress={onStore}>
-            <Text>Bill / Table: {bill.reference || '-'}</Text>
+        <Col style={{ backgroundColor: 'whitesmoke' }}>
+          <Button style={{ margin: 5, alignSelf: 'flex-start' }} small bordered info onPress={onStore}>
+            <Text style={{ fontWeight: 'bold' }}>Bill / Table: {bill.reference || '-'}</Text>
           </Button>
         </Col>
         <Col>
@@ -210,7 +210,7 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
         </Col>
       </Row>
 
-      <Row>
+      <Row style={styles.r2}>
         <ReceiptItems
           bill={bill}
           readonly={complete}
@@ -232,19 +232,22 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
         <Text style={Fonts.h3}>{`Balance: ${formatNumber(balance, currency)}`}</Text>
       </Row>
       <Row style={styles.r4}>
-        <Button disabled={!receiptPrinter} style={styles.printButton} block small onPress={onPrint}>
+        <Button disabled={!receiptPrinter} info iconLeft full style={{ flexGrow: 1 }} onPress={onPrint}>
+          <Icon name="ios-print" />
           <Text>Print</Text>
         </Button>
       </Row>
       {!complete && (
         <Row style={styles.r5}>
           <Col>
-            <Button style={styles.buttons} block small onPress={_onStore}>
+            <Button block iconLeft onPress={_onStore} full style={{ height: '100%' }}>
+              <Icon name="ios-save" />
               <Text>Store</Text>
             </Button>
           </Col>
           <Col>
-            <Button style={styles.buttons} block small success onPress={onCheckout}>
+            <Button full success onPress={onCheckout} iconLeft style={{ height: '100%' }}>
+              <Icon name="ios-cart" />
               <Text>Checkout</Text>
             </Button>
           </Col>
@@ -278,7 +281,10 @@ const styles = StyleSheet.create({
     borderLeftColor: 'lightgrey',
   },
   r1: {
-    height: 45,
+    height: 40,
+  },
+  r2: {
+    // flexGrow: 1,
   },
   r3: {
     borderTopColor: 'lightgrey',
@@ -286,13 +292,13 @@ const styles = StyleSheet.create({
     height: 110,
     flexDirection: 'column',
     padding: 10,
+    // flexGrow: 1,
   },
   r4: {
-    height: 50,
+    height: 45,
   },
-  r5: { height: 50 },
-  buttons: {
-    height: '100%',
+  r5: {
+    height: 60,
   },
   printButton: {
     height: '100%',
