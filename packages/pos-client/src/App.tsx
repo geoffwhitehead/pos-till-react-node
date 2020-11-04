@@ -116,7 +116,6 @@ export const App = () => {
     organizationId: string;
     userId: string;
   }) => {
-    console.log('setting auth');
     const { accessToken, refreshToken, organizationId, userId } = params;
     api.setHeader('authorization', accessToken);
     api.setHeader('x-refresh-token', refreshToken);
@@ -132,8 +131,6 @@ export const App = () => {
   const authContext = React.useMemo(
     () => ({
       signIn: async params => {
-        console.log('signing in', params);
-        // TODO: handle errors
         try {
           const response = await signIn(params);
 

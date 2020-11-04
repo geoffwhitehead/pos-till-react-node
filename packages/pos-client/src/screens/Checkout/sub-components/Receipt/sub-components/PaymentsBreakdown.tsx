@@ -9,7 +9,7 @@ interface PaymentsBreakdownProps {
   payments: BillPayment[];
   paymentTypes: PaymentType[];
   readonly: boolean;
-  onSelect: (bP: BillPayment) => void;
+  onSelect: (BillPayment: BillPayment) => void;
 }
 
 const PaymentsBreakdown: React.FC<PaymentsBreakdownProps> = ({ payments, readonly, onSelect, paymentTypes }) => {
@@ -25,7 +25,7 @@ const PaymentsBreakdown: React.FC<PaymentsBreakdownProps> = ({ payments, readonl
 
   return (
     <>
-      <Separator bordered>
+      <Separator bordered key="payment-separator">
         <Text>Payments</Text>
       </Separator>
       {payments
@@ -33,16 +33,14 @@ const PaymentsBreakdown: React.FC<PaymentsBreakdownProps> = ({ payments, readonl
         .map(payment => {
           const paymentType = keyedPaymentTypes[payment.paymentTypeId];
           return (
-            <>
-              <ListItem key={payment.id} onPress={() => onSelect(!readonly && payment)}>
-                <Left>
-                  <Text>{`Payment: ${capitalize(paymentType.name)}`}</Text>
-                </Left>
-                <Right>
-                  <Text>{`${formatNumber(payment.amount, currency)}`}</Text>
-                </Right>
-              </ListItem>
-            </>
+            <ListItem key={payment.id} onPress={() => !readonly && onSelect(payment)}>
+              <Left>
+                <Text>{`Payment: ${capitalize(paymentType.name)}`}</Text>
+              </Left>
+              <Right>
+                <Text>{`${formatNumber(payment.amount, currency)}`}</Text>
+              </Right>
+            </ListItem>
           );
         })}
     </>

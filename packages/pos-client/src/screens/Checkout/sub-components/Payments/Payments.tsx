@@ -15,7 +15,14 @@ import {
   Right,
   Label,
 } from '../../../../core';
-import { formatNumber, billSummary, BillSummary, getDefaultCashDenominations } from '../../../../utils';
+import {
+  formatNumber,
+  billSummary,
+  BillSummary,
+  getDefaultCashDenominations,
+  minimalBillSummary,
+  MinimalBillSummary,
+} from '../../../../utils';
 import { StyleSheet } from 'react-native';
 import { paymentTypeNames } from '../../../../api/paymentType';
 import { capitalize } from 'lodash';
@@ -36,20 +43,19 @@ interface PaymentInnerProps {
   paymentTypes: PaymentType[];
   billDiscounts: BillDiscount[];
   billPayments: BillPayment[];
-  billItems: BillItem[];
+  chargableBillItems: BillItem[];
 }
 
 const PaymentsInner: React.FC<PaymentOuterProps & PaymentInnerProps> = ({
   billDiscounts,
   billPayments,
-  billItems,
+  chargableBillItems,
   bill,
   discounts,
   paymentTypes,
   onCompleteBill,
   database,
 }) => {
-  console.log('paymentTypes', paymentTypes);
   const [value, setValue] = useState<string>('');
   // TODO: this / payment types will need refactoring so not having to use find
   const cashType: PaymentType = paymentTypes.find(pt => pt.name.toLowerCase() === paymentTypeNames.CASH);
@@ -60,7 +66,7 @@ const PaymentsInner: React.FC<PaymentOuterProps & PaymentInnerProps> = ({
 
   const denominations = getDefaultCashDenominations(currency);
 
-  const [summary, setSummary] = useState<BillSummary>(null);
+  const [summary, setSummary] = useState<MinimalBillSummary>(null);
 
   // const checkComplete = async () => balance(currentBill) <= 0 && (await onCompleteBill(currentBill));
 
@@ -68,11 +74,17 @@ const PaymentsInner: React.FC<PaymentOuterProps & PaymentInnerProps> = ({
 
   useEffect(() => {
     const summary = async () => {
-      const summary = await billSummary(billItems, billDiscounts, billPayments, discounts);
+      const summary = await minimalBillSummary({
+        chargableBillItems,
+        billDiscounts,
+        billPayments,
+        discounts,
+        database,
+      });
       setSummary(summary);
     };
     summary();
-  }, [billPayments, billItems, billDiscounts]);
+  }, [billPayments, chargableBillItems, billDiscounts]);
 
   useEffect(() => {
     const finalize = async () => {
@@ -172,7 +184,7 @@ const enhance = component =>
         .observe(),
       billPayments: bill.billPayments,
       billDiscounts: bill.billDiscounts,
-      billItems: bill.billItems,
+      chargableBillItems: bill.chargableBillItems,
     }))(component),
   );
 

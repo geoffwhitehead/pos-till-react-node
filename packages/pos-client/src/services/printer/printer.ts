@@ -12,10 +12,10 @@ export async function portDiscovery(): Promise<Printers> {
 }
 
 export async function print(commands: any[], printer: Printer, openDrawer: boolean = false) {
-  // await portDiscovery();
-
   commands.push({ appendCutPaper: StarPRNT.CutPaperAction.PartialCutWithFeed });
   openDrawer && commands.push({ openCashDrawer: 1 });
+  console.log('commands', commands);
+
   try {
     await StarPRNT.print(printer.emulation, commands, printer.address);
     return { success: true };

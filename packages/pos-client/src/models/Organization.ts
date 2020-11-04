@@ -31,9 +31,7 @@ export class Organization extends Model {
       record.currentBillPeriod.set(newBillPeriod);
     });
 
-    await this.database.action<BillPeriod>(async () => {
-      await this.database.batch(newBillPeriod, orgUpdate);
-    });
+    await this.database.batch(newBillPeriod, orgUpdate);
   };
 }
 

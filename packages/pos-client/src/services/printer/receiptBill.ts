@@ -15,16 +15,6 @@ import {
 
 const modPrefix = ' -';
 
-const org = {
-  name: 'Nadon Thai Restaurant',
-  line1: '12a Newgate St',
-  line2: '',
-  city: 'Morpeth',
-  county: 'Northumberland',
-  postcode: 'NE61 1BA',
-  vat: '123 345 567',
-};
-
 export const receiptBill = async (
   billItems: BillItem[],
   billDiscounts: BillDiscount[],
@@ -35,7 +25,7 @@ export const receiptBill = async (
   printer: Printer,
   organization: Organization,
 ) => {
-  const { currency } = organization;
+  const { currency, vat } = organization;
 
   const printItemsGroup = (group: BillSummary['itemsBreakdown']) => {
     group.map(({ item, mods, total }) => {
@@ -59,11 +49,6 @@ export const receiptBill = async (
   };
 
   const summary = await billSummary(billItems, billDiscounts, billPayments, discounts);
-
-  console.log('billItems', billItems);
-  console.log('billDiscounts', billDiscounts);
-  console.log('discounts', discounts);
-  console.log('billPayments', billPayments);
 
   let c = [];
 
@@ -145,8 +130,8 @@ export const receiptBill = async (
   c.push(divider(printer.printWidth));
 
   c.push({ appendBitmapText: ' ' });
-  c.push({ appendBitmapText: alignCenter(`VAT: ${org.vat}`, printer.printWidth) });
+  c.push({ appendBitmapText: alignCenter(`VAT: ${vat}`, printer.printWidth) });
   c.push({ appendBitmapText: ' ' });
 
-  return receiptTempate(c, org, printer.printWidth);
+  return receiptTempate(c, organization, printer.printWidth);
 };

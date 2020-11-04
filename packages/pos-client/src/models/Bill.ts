@@ -16,8 +16,19 @@ import { BillPeriod } from './BillPeriod';
 import { BillPayment } from './BillPayment';
 import { BillDiscount } from './BillDiscount';
 import { BillItemModifierItem } from './BillItemModifierItem';
-import { PaymentType, Item, PriceGroup, Discount, Modifier, ModifierItem, BillItemModifier, tableNames } from '.';
+import {
+  PaymentType,
+  Item,
+  PriceGroup,
+  Discount,
+  Modifier,
+  ModifierItem,
+  BillItemModifier,
+  tableNames,
+  BillItemPrintLog,
+} from '.';
 import { flatten, times } from 'lodash';
+import { PrintStatus } from './BillItemPrintLog';
 
 export const billSchema = tableSchema({
   name: 'bills',
@@ -58,44 +69,58 @@ export class Bill extends Model {
 
   @children('bill_payments') billPayments: Query<BillPayment>;
   @children('bill_discounts') billDiscounts: Query<BillDiscount>;
-  @children('bill_items') _billItems: Query<BillItem>;
+  @children('bill_items') billItems: Query<BillItem>;
 
-  @lazy billItems: Query<BillItem> = this._billItems.extend(Q.where('is_voided', Q.notEq(true)));
-  @lazy billItemsNoComp: Query<BillItem> = this.billItems.extend(Q.where('is_comp', Q.notEq(true)));
-  @lazy billItemsPrintErrors: Query<BillItem> = this._billItems.extend(Q.where('print_status', 'error'));
-  @lazy billItemsNotStored: Query<BillItem> = this._billItems.extend(Q.where('print_status', null));
-  @lazy billItemVoids: Query<BillItem> = this._billItems.extend(Q.where('is_voided', true));
   @lazy _billModifierItems = this.collections
     .get<BillItemModifierItem>('bill_item_modifier_items')
     .query(Q.on('bill_items', 'bill_id', this.id)) as Query<BillItemModifierItem>;
+
+  /**
+   * Why are comps included? Because the reporting will need to account for these items when creating purchase reports.
+   */
   @lazy billModifierItems: Query<BillItemModifierItem> = this._billModifierItems.extend(
     Q.where('is_voided', Q.notEq(true)),
   );
-  @lazy billItemsIncPendingVoids: Query<BillItem> = this._billItems.extend(
-    Q.or(
-      Q.where('is_voided', Q.notEq(true)),
-      Q.where('print_status', 'void'),
-      Q.where('print_status', 'void_pending'),
-      Q.where('print_status', 'void_error'),
-    ),
+  @lazy chargableBillItems = this.billItems.extend(
+    Q.and(Q.where('is_voided', Q.notEq(true)), Q.where('is_comp', Q.notEq(true))),
   );
+  @lazy billItemsExclVoids = this.billItems.extend(Q.where('is_voided', Q.notEq(true)));
+  @lazy chargableBillItemModifierItems = this._billModifierItems.extend(
+    Q.and(Q.where('is_voided', Q.notEq(true)), Q.where('is_comp', Q.notEq(true))),
+  );
+
+  @lazy overviewPrintLogs: Query<BillItemPrintLog> = this.collections
+    .get<BillItemPrintLog>(tableNames.billItemPrintLogs)
+    .query(
+      Q.experimentalJoinTables([tableNames.bills]),
+      Q.where('status', Q.oneOf([PrintStatus.pending, PrintStatus.errored, PrintStatus.processing])),
+      Q.on(tableNames.bills, 'id', this.id),
+    );
+
+  @lazy billItemStatusLogs: Query<BillItemPrintLog> = this.collections
+    .get<BillItemPrintLog>(tableNames.billItemPrintLogs)
+    .query(
+      Q.experimentalJoinTables([tableNames.bills]),
+      Q.where('status', Q.oneOf([PrintStatus.succeeded, PrintStatus.errored, PrintStatus.processing])),
+      Q.on(tableNames.bills, 'id', this.id),
+    );
+
+  @lazy toPrintBillLogs: Query<BillItemPrintLog> = this.collections
+    .get<BillItemPrintLog>(tableNames.billItemPrintLogs)
+    .query(
+      Q.experimentalJoinTables([tableNames.bills]),
+      Q.where('status', Q.oneOf([PrintStatus.pending, PrintStatus.errored])),
+      Q.on(tableNames.bills, 'id', this.id),
+    );
 
   /**
-   * TODO: look at refactoring these queries
+   * Note: these 2 queries are mainly used in the period report. Once nested joins are available with watermelon
+   * they can be moved to the periodReport model to improve performance.
    */
-  @lazy billItemsVoidsStatusUnstored: Query<BillItem> = this.billItemsIncPendingVoids.extend(
-    Q.or(Q.where('print_status', ''), Q.where('print_status', 'void')),
-  );
-
-  @lazy billItemsVoidsStatusErrors: Query<BillItem> = this.billItemsIncPendingVoids.extend(
-    Q.or(Q.where('print_status', 'error'), Q.where('print_status', 'void_error')),
-  );
-
-  @lazy billItemsVoidsStatusPending: Query<BillItem> = this.billItemsIncPendingVoids.extend(
-    Q.or(Q.where('print_status', 'pending'), Q.where('print_status', 'void_pending')),
-  );
-
   @lazy billModifierItemVoids: Query<BillItemModifierItem> = this._billModifierItems.extend(Q.where('is_voided', true));
+  @lazy billModifierItemComps: Query<BillItemModifierItem> = this._billModifierItems.extend(
+    Q.and(Q.where('is_comp', Q.eq(true)), Q.where('is_voided', Q.notEq(true))),
+  );
 
   @action addPayment = async (p: { paymentType: PaymentType; amount: number; isChange?: boolean }) => {
     const { paymentType, amount, isChange } = p;
@@ -115,7 +140,6 @@ export class Bill extends Model {
       discount.discount.set(p.discount);
     });
   };
-  // billItems = await currentBill.addItems({ quantity: 1, item, priceGroup, selectedModifiers });
 
   @action addItems = async (p: {
     item: Item;
@@ -125,7 +149,6 @@ export class Bill extends Model {
   }): Promise<void> => {
     const { item, priceGroup, quantity, selectedModifiers } = p;
 
-    const x = await item.printers.fetch();
     const [category, prices, printers] = await Promise.all([
       item.category.fetch(),
       item.prices.fetch(),
@@ -144,12 +167,27 @@ export class Bill extends Model {
           itemPrice: resolvePrice(priceGroup, prices),
           priceGroupName: priceGroup.name,
           categoryName: category.name,
-          printStatus: printers.length ? '' : 'success',
         });
       });
 
-    // create a bill item x(quantity) times
+    const createPrintLog = (billItem: BillItem): BillItemPrintLog[] => {
+      return printers.map(printer => {
+        return this.collections.get<BillItemPrintLog>(tableNames.billItemPrintLogs).prepareCreate(record => {
+          record.billItem.set(billItem);
+          record.printer.set(printer);
+          record.bill.set(this);
+          Object.assign(record, {
+            status: PrintStatus.pending,
+          });
+        });
+      });
+    };
+
     const billItemsToCreate = times(quantity, createBillItem);
+
+    const _printLogsToCreate = billItemsToCreate.map(createPrintLog);
+
+    const printLogsToCreate = flatten(_printLogsToCreate);
 
     // for each item hit this function
     const createModifiers = async (billItem: BillItem, selectedModifiers: SelectedModifier[]) => {
@@ -203,41 +241,11 @@ export class Bill extends Model {
       billItemsToCreate.map(billItemToCreate => createModifiers(billItemToCreate, selectedModifiers)),
     );
 
-    const toCreate = [...billItemsToCreate, ...flatten(billItemModifiersToCreate)];
+    const toCreate = [...billItemsToCreate, ...flatten(billItemModifiersToCreate), ...printLogsToCreate];
 
     await this.database.action(async () => {
       await this.database.batch(...toCreate);
     });
-  };
-
-  @action addItem = async (p: { item: Item; priceGroup: PriceGroup }): Promise<BillItem> => {
-    const { item, priceGroup } = p;
-
-    const x = await item.printers.fetch();
-    const [category, prices, printers] = await Promise.all([
-      item.category.fetch(),
-      item.prices.fetch(),
-      item.printers.fetch(),
-    ]);
-
-    const newItem = await this.database.action<BillItem>(() =>
-      this.collections.get<BillItem>(tableNames.billItems).create(billItem => {
-        billItem.bill.set(this);
-        billItem.priceGroup.set(priceGroup);
-        billItem.category.set(category);
-        billItem.item.set(item);
-        Object.assign(billItem, {
-          itemName: item.name,
-          itemShortName: item.shortName,
-          itemPrice: resolvePrice(priceGroup, prices),
-          priceGroupName: priceGroup.name,
-          categoryName: category.name,
-          printStatus: printers.length ? '' : 'success',
-        });
-      }),
-    );
-
-    return newItem;
   };
 
   @action close = async () =>
@@ -245,4 +253,16 @@ export class Bill extends Model {
       bill.isClosed = true;
       bill.closedAt = dayjs().toDate();
     });
+
+  @action processPrintLogs = async (updates: { billItemPrintLog: BillItemPrintLog; status: PrintStatus }[]) => {
+    const printLogsToUpdate = updates.map(({ billItemPrintLog, status }) =>
+      billItemPrintLog.prepareUpdate(record => {
+        record.status = status;
+      }),
+    );
+
+    if (printLogsToUpdate.length > 0) {
+      await this.database.batch(...printLogsToUpdate);
+    }
+  };
 }

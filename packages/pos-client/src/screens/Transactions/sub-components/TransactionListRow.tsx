@@ -1,69 +1,98 @@
-import React from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Text, ListItem, Left, Badge, Body, Right } from 'native-base';
-import { transactionSummary, formatNumber } from '../../../utils';
+import { transactionSummary, formatNumber, minimalBillSummary, TransactionSummary } from '../../../utils';
 import dayjs from 'dayjs';
 import withObservables from '@nozbe/with-observables';
-import { StyleSheet } from 'react-native';
-import { capitalize } from 'lodash';
-import { Bill, PaymentType } from '../../../models';
-
-const symbol = '£'; // TODO move
+import { StyleSheet, View } from 'react-native';
+import { capitalize, keyBy } from 'lodash';
+import { Bill, BillDiscount, BillItem, BillPayment, PaymentType } from '../../../models';
+import { OrganizationContext } from '../../../contexts/OrganizationContext';
+import { useDatabase } from '@nozbe/watermelondb/hooks';
 
 interface TransactionListRowOuterProps {
   bill: Bill;
-  onSelectBill: (b: Bill) => void;
+  onSelectBill: (bill: Bill) => void;
   isSelected: boolean;
+  showBillRef?: boolean;
   paymentTypes: PaymentType[];
 }
 
 interface TransactionListRowInnerProps {
-  billItems: any;
-  billModifierItems: any;
-  billDiscounts: any;
-  billPayments: any;
+  chargableBillItems: BillItem[];
+  billDiscounts: BillDiscount[];
+  billPayments: BillPayment[];
 }
 
 const TransactionListRowInner: React.FC<TransactionListRowOuterProps & TransactionListRowInnerProps> = ({
   isSelected,
   onSelectBill,
   bill,
-  billItems,
-  billModifierItems,
+  chargableBillItems,
   billDiscounts,
   billPayments,
   paymentTypes,
+  showBillRef = true,
 }) => {
-  if (!(billItems || billModifierItems || billDiscounts || billPayments)) {
+  const {
+    organization: { currency },
+  } = useContext(OrganizationContext);
+
+  const [summary, setSummary] = useState<TransactionSummary>();
+  const database = useDatabase();
+
+  useEffect(() => {
+    const fetchSummary = async () => {
+      const summary = await transactionSummary({ chargableBillItems, billDiscounts, billPayments, database });
+      setSummary(summary);
+    };
+    fetchSummary();
+  }, [chargableBillItems, billDiscounts, billPayments]);
+  if (!summary) {
     return <Text>Loading...</Text>;
   }
 
-  const summary = transactionSummary(billItems, billModifierItems, billDiscounts, billPayments, paymentTypes);
+  const keyedPaymentTypes = keyBy(paymentTypes, type => type.id);
+  const hasDiscount = summary.discountTotal > 0;
+
   return (
     <ListItem noIndent style={isSelected && styles.selected} key={bill.id} onPress={() => onSelectBill(bill)}>
-      <Left>
-        <Badge style={{ minWidth: 28 }} success>
-          <Text>{bill.reference}</Text>
-        </Badge>
-        <Text>{` / ${dayjs(bill.closedAt)
+      <Left
+        style={{
+          flexDirection: 'column',
+        }}
+      >
+        {showBillRef && (
+          <Text
+            style={{ alignSelf: 'flex-start', fontWeight: 'bold', fontSize: 22 }}
+          >{`Table: ${bill.reference}`}</Text>
+        )}
+        <Text style={{ alignSelf: 'flex-start' }}>{`Closed at: ${dayjs(bill.closedAt)
           .format('HH:mm')
           .toString()}`}</Text>
       </Left>
       <Body>
-        <Text>{formatNumber(summary.total, symbol)}</Text>
+        <Text>{`Total: ${formatNumber(summary.total, currency)}`}</Text>
+        <Text>{`Change: ${formatNumber(summary.changeTotal, currency)}`}</Text>
+        {hasDiscount && <Text>{`Discount: ${formatNumber(summary.discountTotal, currency)}`}</Text>}
       </Body>
       <Right>
-        <Text>{summary.paymentMethods.map(capitalize).join(', ')}</Text>
+        {summary.paymentBreakdown.map(type => {
+          const paymentTypeName = keyedPaymentTypes[type.paymentTypeId].name;
+          const key = `${bill.id}-${type.paymentTypeId}`;
+          const amount = formatNumber(type.totalPayed, currency);
+          return <Text key={key}>{`${capitalize(paymentTypeName)}: ${amount}`}</Text>;
+        })}
+        {/* <Text>{summary.paymentMethods.map(capitalize).join(', ')}</Text>
+        <Text>{summary.paymentMethods.map(capitalize).join(', ')}</Text> */}
       </Right>
     </ListItem>
   );
 };
 
 const enhance = withObservables<TransactionListRowOuterProps, TransactionListRowInnerProps>(['bill'], ({ bill }) => ({
-  billItems: bill.billItems,
+  chargableBillItems: bill.chargableBillItems,
   billDiscounts: bill.billDiscounts,
   billPayments: bill.billPayments,
-  billVoids: bill.billItemVoids,
-  billModifierItems: bill.billModifierItems,
 }));
 
 export const TransactionListRow = enhance(TransactionListRowInner);

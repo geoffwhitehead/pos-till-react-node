@@ -35,4 +35,5 @@ export {
   H3,
   View,
   CheckBox,
+  Textarea,
 } from 'native-base';

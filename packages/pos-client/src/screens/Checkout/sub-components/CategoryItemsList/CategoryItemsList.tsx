@@ -63,7 +63,7 @@ const CategoryItemsInner: React.FC<CategoryItemsListOuterProps & CategoryItemsLi
       setSelectedItem(item);
       setModalOpen(true);
     } else {
-      await currentBill.addItem({ item, priceGroup });
+      await currentBill.addItems({ item, priceGroup, quantity: 1, selectedModifiers: [] });
     }
   };
 
@@ -98,7 +98,7 @@ const CategoryItemsInner: React.FC<CategoryItemsListOuterProps & CategoryItemsLi
         </ListItem>
         {Object.keys(sortedItems).map(key => {
           const elements = [
-            <ListItem itemDivider style={{ backgroundColor: 'lightgrey' }}>
+            <ListItem key={key} itemDivider style={{ backgroundColor: 'lightgrey' }}>
               <Text>{key}</Text>
             </ListItem>,
             ...sortedItems[key].map(item => {

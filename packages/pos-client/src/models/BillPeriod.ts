@@ -39,7 +39,13 @@ export class BillPeriod extends Model {
     BillItem
   >;
   @lazy periodItems: Query<BillItem> = this._periodItems.extend(Q.where('is_voided', Q.notEq(true)));
+  @lazy chargablePeriodItems: Query<BillItem> = this._periodItems.extend(
+    Q.and(Q.where('is_comp', Q.notEq(true)), Q.where('is_voided', Q.notEq(true))),
+  );
   @lazy periodItemVoids: Query<BillItem> = this._periodItems.extend(Q.where('is_voided', Q.eq(true)));
+  @lazy periodItemComps: Query<BillItem> = this._periodItems.extend(
+    Q.and(Q.where('is_comp', Q.eq(true)), Q.where('is_voided', Q.notEq(true))),
+  );
   @lazy periodDiscounts = this.collections
     .get('bill_discounts')
     .query(Q.on('bills', 'bill_period_id', this.id)) as Query<Discount>;

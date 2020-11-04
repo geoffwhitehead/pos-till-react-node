@@ -3,86 +3,85 @@ import { capitalize } from 'lodash';
 import React, { useContext } from 'react';
 import { formatNumber } from '../../../../../utils';
 import withObservables from '@nozbe/with-observables';
-import { BillItem, BillItemModifierItem } from '../../../../../models';
+import { BillItem, BillItemModifierItem, BillItemPrintLog, ModifierItem } from '../../../../../models';
 import { OrganizationContext } from '../../../../../contexts/OrganizationContext';
+import { PrintStatus } from '../../../../../models/BillItemPrintLog';
 
 interface ItemBreakdownInnerProps {
-  modifierItems: any; // TODO
+  modifierItems: BillItemModifierItem[];
+  printLogs: BillItemPrintLog[];
 }
 
 interface ItemBreakdownOuterProps {
-  item: BillItem;
+  billItem: BillItem;
   readonly: boolean;
   onSelect: (i: BillItem) => void;
+  status: PrintStatus;
 }
 
 const ItemBreakdownInner: React.FC<ItemBreakdownOuterProps & ItemBreakdownInnerProps> = ({
-  item,
+  billItem,
   modifierItems,
   readonly,
   onSelect,
+  status,
 }) => {
   const {
     organization: { currency },
   } = useContext(OrganizationContext);
 
-  const prefix = item.isVoided ? 'VOID ' : item.isComp ? 'COMP ' : '';
-  const style = item.isVoided ? styles.void : item.isComp ? styles.comp : {};
-
+  const prefix = billItem.isVoided ? 'VOID ' : billItem.isComp ? 'COMP ' : '';
+  const style = billItem.isVoided ? styles.void : billItem.isComp ? styles.comp : {};
+  const isChargable = !(billItem.isComp || billItem.isVoided);
+  const itemDisplayPrice = formatNumber(isChargable ? billItem.itemPrice : 0, currency);
   return (
     <ListItem
-      style={item.printStatus && styles[item.printStatus]}
+      style={status ? styles[status] : {}}
       noIndent
-      key={item.id}
-      onPress={() => !readonly && onSelect(item)}
+      key={billItem.id}
+      onPress={() => !readonly && onSelect(billItem)}
     >
       <Left>
         <Content>
-          <Text style={style}>{`${prefix}${capitalize(item.itemName)}`}</Text>
-
+          <Text style={style}>{`${prefix}${capitalize(billItem.itemName)}`}</Text>
           {modifierItems.map(m => (
             <Text style={style} key={`${m.id}-name`}>{`- ${m.modifierItemName}`}</Text>
           ))}
         </Content>
       </Left>
       <Right>
-        <Text style={style}>{`${formatNumber(item.isComp ? 0 : item.itemPrice, currency)}`}</Text>
-        {modifierItems.map(m => (
-          <Text style={style} key={`${m.id}-price`}>
-            {formatNumber(item.isComp ? 0 : m.modifierItemPrice, currency)}
-          </Text>
-        ))}
+        <Text style={style}>{itemDisplayPrice}</Text>
+        {modifierItems.map(m => {
+          const modifierItemDisplayPrice = formatNumber(isChargable ? m.modifierItemPrice : 0, currency);
+          return (
+            <Text style={style} key={`${m.id}-price`}>
+              {modifierItemDisplayPrice}
+            </Text>
+          );
+        })}
       </Right>
     </ListItem>
   );
 };
 
 export const ItemBreakdown = withObservables<ItemBreakdownOuterProps, ItemBreakdownInnerProps>(
-  ['item'],
-  ({ item }) => ({
-    item,
-    modifierItems: item.modifierItemsIncVoids,
+  ['billItem'],
+  ({ billItem }) => ({
+    billItem,
+    modifierItems: billItem.billItemModifierItems,
   }),
 )(ItemBreakdownInner);
 
 const styles = {
-  success: {
+  [PrintStatus.succeeded]: {
     borderLeftColor: 'green',
     borderLeftWidth: 8,
   },
-  pending: {
+  [PrintStatus.processing]: {
     borderLeftColor: 'yellow',
     borderLeftWidth: 8,
   },
-  error: {
-    borderLeftColor: 'red',
-    borderLeftWidth: 8,
-  },
-  void_pending: {
-    borderLeftColor: 'yellow',
-    borderLeftWidth: 8,
-  },
-  void_error: {
+  [PrintStatus.errored]: {
     borderLeftColor: 'red',
     borderLeftWidth: 8,
   },
