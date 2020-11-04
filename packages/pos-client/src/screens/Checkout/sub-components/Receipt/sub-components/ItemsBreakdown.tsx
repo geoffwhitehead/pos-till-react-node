@@ -5,7 +5,7 @@ import { capitalize } from 'lodash';
 import { ItemBreakdown } from './ItemBreakdown';
 import { Bill, BillItem, BillItemPrintLog, Discount, tableNames } from '../../../../../models';
 import withObservables from '@nozbe/with-observables';
-import { WrappedBillRow } from '../../SelectBill/BillRow';
+import { WrappedBillRow } from '../../../../Bills/SelectBill/BillRow';
 import { PrintStatus, PrintType } from '../../../../../models/BillItemPrintLog';
 
 type ItemsBreakdownOuterProps = {

@@ -3,7 +3,7 @@ import { Container, Grid, Col } from '../../core';
 import { SidebarHeader } from '../../components/SidebarHeader/SidebarHeader';
 import { CheckoutItemNavigator } from '../../navigators/CheckoutItemNavigator';
 import { Receipt } from './sub-components/Receipt/Receipt';
-import { SelectBill } from './sub-components/SelectBill/SelectBIll';
+import { SelectBill } from '../Bills/SelectBill/SelectBIll';
 import { Payments } from './sub-components/Payments/Payments';
 import { CompleteBill } from './sub-components/CompleteBill/CompleteBill';
 import { BillPeriodContext } from '../../contexts/BillPeriodContext';
