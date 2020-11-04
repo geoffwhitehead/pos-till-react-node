@@ -7,8 +7,6 @@ type ModalProps = {
   style?: Record<string, string | number>;
 };
 export const Modal: React.FC<ModalProps> = ({ children, isOpen, onClose, ...props }) => {
-  console.log('children', children);
-  console.log('isOpen', isOpen);
   return (
     <NativeModal
       {...props}

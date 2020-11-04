@@ -127,12 +127,9 @@ const ItemDetailsInner: React.FC<ItemDetailsOuterProps & ItemDetailsInnerProps> 
 
   const updateItem = async ({ prices, ...values }: FormValues) => {
     setLoading(true);
-    console.log('values', values);
-    console.log('item', item);
 
     const filteredPrices = prices.filter(price => price.price !== '');
 
-    console.log('filteredPrices', filteredPrices);
     if (item) {
       await item.updateItem({ ...values, prices: filteredPrices, modifiers: selectedModifiers });
       onClose();
@@ -165,7 +162,7 @@ const ItemDetailsInner: React.FC<ItemDetailsOuterProps & ItemDetailsInnerProps> 
       );
 
       const toCreate = [itemToCreate, ...itemModifersToCreate, ...pricesToCreate];
-      await database.action(() => database.batch(...toCreate));
+      await database.action(async () => await database.batch(...toCreate));
     }
     setLoading(false);
     onClose();

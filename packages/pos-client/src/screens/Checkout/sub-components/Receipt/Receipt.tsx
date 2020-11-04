@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { Text, Col, Grid, Row, Button } from '../../../../core';
 import { StyleSheet } from 'react-native';
-import { formatNumber, billSummary, BillSummary } from '../../../../utils';
+import { formatNumber, billSummary, BillSummary, minimalBillSummary, MinimalBillSummary } from '../../../../utils';
 import { Fonts } from '../../../../theme';
 import { ReceiptItems } from './ReceiptItems';
 import dayjs from 'dayjs';
@@ -9,27 +9,35 @@ import { print } from '../../../../services/printer/printer';
 import { receiptBill } from '../../../../services/printer/receiptBill';
 import withObservables from '@nozbe/with-observables';
 import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
-import { tableNames, Discount, PaymentType, PriceGroup, Bill, Printer } from '../../../../models';
-import { Database } from '@nozbe/watermelondb';
+import {
+  tableNames,
+  Discount,
+  PaymentType,
+  PriceGroup,
+  Bill,
+  Printer,
+  BillPayment,
+  BillDiscount,
+  BillItemModifierItem,
+} from '../../../../models';
+import { Database, Q } from '@nozbe/watermelondb';
 import { BillItem } from '../../../../models/BillItem';
 import { kitchenReceipt } from '../../../../services/printer/kitchenReceipt';
 import { flatten, groupBy } from 'lodash';
 import { Loading } from '../../../../components/Loading/Loading';
 import { OrganizationContext } from '../../../../contexts/OrganizationContext';
+import { BillItemPrintLog, PrintStatus } from '../../../../models/BillItemPrintLog';
+import { database } from '../../../../database';
+import { ReceiptPrinterContext } from '../../../../contexts/ReceiptPrinterContext';
+import { useDatabase } from '@nozbe/watermelondb/hooks';
 
 // TODO: type these
 interface ReceiptInnerProps {
-  billPayments: any[];
-  billDiscounts: any[];
-  billItems: any[];
-  billItemsNoComp: any[];
-  billItemsIncPendingVoids: any[];
-  discounts: any[];
-  paymentTypes: any[];
-  priceGroups: any[];
-  billModifierItems: any[];
-  printers: any[];
-  database: Database;
+  billPayments: BillPayment[];
+  billDiscounts: BillDiscount[];
+  chargableBillItems: BillItem[];
+  discounts: Discount[];
+  billModifierItemsCount: number;
 }
 
 interface ReceiptOuterProps {
@@ -42,119 +50,129 @@ interface ReceiptOuterProps {
 
 export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
   bill,
-  billItems,
-  billItemsNoComp,
-  billItemsIncPendingVoids,
+  chargableBillItems,
   billDiscounts,
   billPayments,
   onStore,
   onCheckout,
   complete,
   discounts,
-  paymentTypes,
-  priceGroups,
-  billModifierItems,
-  printers,
-  database,
+  billModifierItemsCount,
 }) => {
-  console.log('paymentTypes receipt', paymentTypes);
-  const [summary, setSummary] = useState<BillSummary>();
-  const [isStoreDisabled, setIsStoreDisabled] = useState(false);
-
+  const [summary, setSummary] = useState<MinimalBillSummary>();
+  const database = useDatabase();
   const { organization } = useContext(OrganizationContext);
+  const { receiptPrinter } = useContext(ReceiptPrinterContext);
   const { currency } = organization;
 
-  const receiptPrinter =
-    organization && printers ? printers.find(p => p.id === organization.receiptPrinterId) : undefined;
-
   const _onStore = async () => {
-    // setIsStoreDisabled(true);
     onStore();
-    const billItemsToPrint = billItemsIncPendingVoids.filter(
-      ({ printStatus }) => !(printStatus === 'success' || printStatus === 'pending' || printStatus === 'void_pending'),
-    ) as BillItem[];
 
-    if (billItemsToPrint.length) {
-      await database.action(
-        async () =>
-          await database.batch(
-            ...billItemsToPrint.map(bI =>
-              bI.prepareUpdate(billItem => {
-                billItem.printStatus = billItem.isVoided ? 'void_pending' : 'pending';
-              }),
-            ),
-          ),
-      );
+    // fetch all the print logs to print
+    const billItemsPrintLogs = await bill.toPrintBillLogs.fetch();
 
+    if (billItemsPrintLogs.length > 0) {
+      // updates the status of the print records to processing
+      const updates = billItemsPrintLogs.map(billItemPrintLog => ({
+        billItemPrintLog,
+        status: PrintStatus.processing,
+      }));
+      await database.action(() => bill.processPrintLogs(updates));
+
+      // filter items not being printed and generate print commands
+      const ids = billItemsPrintLogs.map(log => log.billItemId);
+
+      // fetch all the bill items associated with the print logs, the printers, and the price groups.
+      const [billItems, printers, priceGroups] = await Promise.all([
+        database.collections
+          .get<BillItem>(tableNames.billItems)
+          .query(Q.where('id', Q.oneOf(ids)))
+          .fetch(),
+        database.collections
+          .get<Printer>(tableNames.printers)
+          .query()
+          .fetch(),
+        database.collections
+          .get<PriceGroup>(tableNames.priceGroups)
+          .query()
+          .fetch(),
+      ]);
+      // const filteredBillItems = billItems.filter(billItem => ids.includes(billItem.id));
+
+      // this will generate the print commands to fire off to all the printers.
       const toPrint = await kitchenReceipt({
-        billItems: billItemsToPrint,
+        billItems,
+        billItemPrintLogs: billItemsPrintLogs,
         printers,
         priceGroups,
         reference: bill.reference.toString(),
-        prepTime: dayjs().add(10, 'minute'),
+        prepTime: dayjs().add(10, 'minute'), // TODO: set prep time
       });
 
+      console.log('-------- toPrint', toPrint);
+      // attempt to print the receipts
       const printStatuses = await Promise.all(
-        toPrint.map(async ({ billItems, printer, commands }) => {
+        toPrint.map(async ({ billItemPrintLogs, printer, commands }) => {
           const res = await print(commands, printer, false);
-          return billItems.map(billItem => {
+          const status = res.success ? PrintStatus.succeeded : PrintStatus.errored;
+
+          return billItemPrintLogs.map(billItemPrintLog => {
             return {
-              billItem,
-              success: res.success,
+              billItemPrintLog,
+              status,
             };
           });
         }),
       );
-
-      /**
-       * a single bill item can be sent to mulitple printers. If any print fails, the status
-       * will be set to failed.
-       */
-
-      // group all the print responses by bill item
-      const responses = groupBy(flatten(printStatuses), status => status.billItem.id);
-
-      // resolve the print status for each item by checking for existence of failed print
-      const reducedResponses = Object.keys(responses).map(key => {
-        const response = responses[key];
-        return {
-          billItem: responses[key][0].billItem,
-          success: !response.some(({ success }) => !success),
-        };
-      });
-
-      const updates = reducedResponses.map(({ billItem, success }) => {
-        let printStatus = 'success';
-
-        if (!success) {
-          printStatus = billItem.isVoided ? 'void_error' : 'error';
-        }
-
-        return billItem.prepareUpdate(billItemRecord => {
-          Object.assign(billItemRecord, { printStatus });
-        });
-      });
-
       await database.action(async () => {
-        await database.batch(...flatten(updates));
+        await bill.processPrintLogs(flatten(printStatuses));
       });
     }
-    // setIsStoreDisabled(false);
+
+    // is_stored is not set on removed items to distinguish between cancelled and voided items
+    const billItemsToStore = await bill.billItems
+      .extend(Q.and(Q.where('is_voided', Q.notEq(true))), Q.where('is_stored', Q.notEq(true)))
+      .fetch();
+
+    // update on all bill records, dont set voided items to stored. TODO: look at refactoring this so not using is_stored to determine.
+    const billItemsToUpdate = billItemsToStore.map(billItem => {
+      billItem.prepareUpdate(record => {
+        record.isStored = true;
+      });
+    });
+
+    await database.action(async () => {
+      await database.batch(...billItemsToUpdate);
+    });
   };
 
   useEffect(() => {
     const summary = async () => {
-      const summary = await billSummary(billItemsNoComp, billDiscounts, billPayments, discounts);
+      const summary = await minimalBillSummary({
+        chargableBillItems,
+        billDiscounts,
+        billPayments,
+        discounts,
+        database,
+      });
       setSummary(summary);
     };
     summary();
-  }, [billItemsNoComp, billDiscounts, billPayments, billModifierItems]); // keep billModifierItems
+  }, [chargableBillItems, billDiscounts, billPayments, billModifierItemsCount]);
 
   const onPrint = async () => {
-    console.log('printers', printers);
-    console.log('receiptPrinter', receiptPrinter);
-    console.log('onPrint');
-    console.log('billItems', billItems);
+    const [billItems, paymentTypes, priceGroups] = await Promise.all([
+      bill.billItemsExclVoids.fetch(), // include comps - receipts will show comps but not voids
+      database.collections
+        .get<PaymentType>(tableNames.paymentTypes)
+        .query()
+        .fetch(),
+      database.collections
+        .get<PriceGroup>(tableNames.priceGroups)
+        .query()
+        .fetch(),
+    ]);
+
     const commands = await receiptBill(
       billItems,
       billDiscounts,
@@ -165,7 +183,6 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
       receiptPrinter,
       organization,
     );
-    console.log('commands', commands);
 
     print(commands, receiptPrinter, false);
   };
@@ -195,12 +212,11 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
 
       <Row>
         <ReceiptItems
+          bill={bill}
           readonly={complete}
-          billItems={billItemsIncPendingVoids}
           discountBreakdown={summary.discountBreakdown}
           billPayments={billPayments}
           billDiscounts={billDiscounts}
-          paymentTypes={paymentTypes}
         />
       </Row>
       <Row style={styles.r3}>
@@ -223,7 +239,7 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
       {!complete && (
         <Row style={styles.r5}>
           <Col>
-            <Button style={styles.buttons} block small disabled={isStoreDisabled} onPress={_onStore}>
+            <Button style={styles.buttons} block small onPress={_onStore}>
               <Text>Store</Text>
             </Button>
           </Col>
@@ -239,23 +255,18 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
 };
 
 const enhance = component =>
-  withDatabase<any>( // TODO: type
+  withDatabase<any>(
     withObservables<ReceiptOuterProps, ReceiptInnerProps>(['bill'], ({ bill, database }) => ({
       bill,
       billPayments: bill.billPayments,
       billDiscounts: bill.billDiscounts,
-      billItems: bill.billItems,
-      billItemsNoComp: bill.billItemsNoComp,
-      billItemsIncPendingVoids: bill.billItemsIncPendingVoids,
+      chargableBillItems: bill.chargableBillItems, // TODO: should this be no voids too?
       discounts: database.collections.get<Discount>(tableNames.discounts).query(),
-      paymentTypes: database.collections.get<PaymentType>(tableNames.paymentTypes).query(),
-      priceGroups: database.collections.get<PriceGroup>(tableNames.priceGroups).query(),
-      printers: database.collections.get<Printer>(tableNames.printers).query(),
       /**
        * billModifierItems is here purely to cause a re render and recalculation of the
        * bill summary
        */
-      billModifierItems: bill.billModifierItems,
+      billModifierItemsCount: bill.billModifierItems.observeCount(),
     }))(component),
   );
 

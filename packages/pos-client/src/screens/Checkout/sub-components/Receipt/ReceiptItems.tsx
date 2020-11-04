@@ -1,93 +1,175 @@
 import { Content, List, ActionSheet } from '../../../../core';
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { ItemsBreakdown } from './sub-components/ItemsBreakdown';
 import { DiscountsBreakdown } from './sub-components/DiscountsBreakdown';
 import { PaymentsBreakdown } from './sub-components/PaymentsBreakdown';
 import { useDatabase } from '@nozbe/watermelondb/hooks';
-import { Bill, BillPayment, BillItem, Discount, BillDiscount, PaymentType } from '../../../../models';
+import {
+  Bill,
+  BillPayment,
+  BillItem,
+  Discount,
+  BillDiscount,
+  PaymentType,
+  PriceGroup,
+  tableNames,
+} from '../../../../models';
 import { BillSummary } from '../../../../utils';
+import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
+import withObservables from '@nozbe/with-observables';
+import { Modal } from '../../../../components/Modal/Modal';
+import { ModalReason, ModifyReason } from './sub-components/ModalReason';
+import dayjs from 'dayjs';
+import { find } from 'lodash';
+import { Database } from '@nozbe/watermelondb';
 
-interface ReceiptItemsProps {
+type ReceiptItemsOuterProps = {
   readonly: boolean;
   billPayments: BillPayment[];
   discountBreakdown: BillSummary['discountBreakdown'];
-  billItems: BillItem[];
   billDiscounts: BillDiscount[];
+  bill: Bill;
+  database: Database;
+};
+
+type ReceiptItemsInnerProps = {
+  billItemsCount: number;
   paymentTypes: PaymentType[];
+};
+
+export enum RemoveMode {
+  void = 'void',
+  comp = 'comp',
 }
 
-export const ReceiptItems: React.FC<ReceiptItemsProps> = ({
+export const ReceiptItemsInner: React.FC<ReceiptItemsOuterProps & ReceiptItemsInnerProps> = ({
   readonly,
-  billItems,
+  billItemsCount,
   discountBreakdown,
   billPayments,
   billDiscounts,
   paymentTypes,
+  bill,
 }) => {
   const refContentList = useRef();
+  const database = useDatabase();
+  const [selectedBillItem, setSelectedBillItem] = useState<BillItem>();
+  const [removeMode, setRemoveMode] = useState<RemoveMode>();
 
-  useEffect(() => refContentList.current._root.scrollToEnd(), [billItems, billDiscounts, billPayments]);
+  useEffect(() => refContentList.current._root.scrollToEnd(), [billItemsCount, billDiscounts, billPayments]);
 
-  const remove = async (item: BillItem | BillPayment | BillDiscount) => {
-    await item.void();
+  useEffect(() => {}, [selectedBillItem]);
+
+  const onRemoveBillItem = async (billItem: BillItem, values?: ModifyReason) => {
+    await database.action(() => billItem.void(values));
+    setSelectedBillItem(null);
+    setRemoveMode(null);
   };
 
-  const removeNoPrint = async (item: BillItem) => {
-    await item.voidNoPrint();
+  const onRemoveBillDiscount = async (billDiscount: BillDiscount) => database.action(() => billDiscount.void());
+  const onRemoveBillPayment = async (billPayment: BillPayment) => database.action(() => billPayment.void());
+
+  // const removeNoPrint = async (item: BillItem) => {
+  //   await database.action(() => item.voidNoPrint());
+  // };
+
+  const onMakeComplimentary = async (billItem: BillItem, values: ModifyReason) => {
+    await database.action(() => billItem.makeComp(values));
+    setSelectedBillItem(null);
+    setRemoveMode(null);
   };
 
-  const makeComplimentary = async (item: BillItem) => {
-    await item.makeComp();
-  };
-
-  const onRemoveBillItem = (item: BillItem) => {
-    const options = ['Make complimentary', 'Remove', 'Force remove (no print)', 'Cancel'];
+  const billItemDialog = (billItem: BillItem) => {
+    const options = ['Make complimentary', 'Remove', 'Cancel'];
     ActionSheet.show(
       {
         options,
-        cancelButtonIndex: options.length - 1,
-        title: item.itemName,
+        cancelButtonIndex: 2,
+        title: billItem.itemName,
       },
-      i => {
-        const fns = [makeComplimentary, remove, removeNoPrint];
-        i < fns.length && fns[i](item);
+      index => {
+        if (index === 0) {
+          setRemoveMode(RemoveMode.comp);
+          setSelectedBillItem(billItem);
+        } else {
+          const endOfGracePeriod = dayjs(billItem.createdAt).add(5, 'minute');
+          const hasGracePeriodExpired = dayjs().isAfter(endOfGracePeriod);
+          if (hasGracePeriodExpired) {
+            setRemoveMode(RemoveMode.void);
+            setSelectedBillItem(billItem);
+          } else {
+            onRemoveBillItem(billItem);
+          }
+        }
       },
     );
   };
 
-  const onRemove = (item: BillDiscount | BillPayment) => {
+  const areYouSureDialog = (item: BillPayment | BillDiscount, fn: (item: BillPayment | BillDiscount) => void) => {
     const options = ['Remove', 'Cancel'];
     ActionSheet.show(
       {
         options,
-        cancelButtonIndex: options.length - 1,
+        cancelButtonIndex: 1,
         title: 'Options',
       },
-      i => i < options.length && [remove][i](item),
+      () => {
+        fn(item);
+      },
     );
   };
 
-  const resolveBillDiscount = fn => billDiscountId => {
-    const billDiscount = billDiscounts.find(({ id }) => id === billDiscountId);
-    billDiscount && fn(billDiscount);
+  const onCloseReasonModalHandler = () => {
+    setSelectedBillItem(null);
+    setRemoveMode(null);
   };
 
   return (
     <Content ref={refContentList}>
       <List style={{ paddingBottom: 60 }}>
-        <ItemsBreakdown key="items_breakdown" readonly={readonly} onSelect={onRemoveBillItem} items={billItems} />
+        <ItemsBreakdown bill={bill} key="items_breakdown" readonly={readonly} onSelect={billItemDialog} />
         <DiscountsBreakdown
           readonly={readonly}
-          onSelect={resolveBillDiscount(onRemove)}
           discountBreakdown={discountBreakdown}
+          onSelect={billDiscount => areYouSureDialog(billDiscount, onRemoveBillDiscount)}
+          billDiscounts={billDiscounts}
         />
         <PaymentsBreakdown
           readonly={readonly}
-          onSelect={onRemove}
+          onSelect={billPayment => areYouSureDialog(billPayment, onRemoveBillPayment)}
           payments={billPayments}
           paymentTypes={paymentTypes}
         />
       </List>
+      <Modal
+        style={{ width: 600, height: '60%' }}
+        onClose={onCloseReasonModalHandler}
+        isOpen={!!selectedBillItem && !!removeMode}
+      >
+        <ModalReason
+          onClose={onCloseReasonModalHandler}
+          onComplete={values => {
+            if (removeMode === RemoveMode.void) {
+              onRemoveBillItem(selectedBillItem, values);
+            }
+            if (removeMode === RemoveMode.comp) {
+              onMakeComplimentary(selectedBillItem, values);
+            }
+          }}
+          mode={removeMode}
+        />
+      </Modal>
     </Content>
   );
 };
+
+const enhance = component =>
+  withDatabase(
+    withObservables<ReceiptItemsOuterProps, ReceiptItemsInnerProps>(['bill'], ({ bill, database }) => ({
+      bill,
+      billItemsCount: bill.billItems.observeCount(),
+      paymentTypes: database.collections.get<PaymentType>(tableNames.paymentTypes).query(),
+    }))(component),
+  );
+
+export const ReceiptItems = enhance(ReceiptItemsInner);

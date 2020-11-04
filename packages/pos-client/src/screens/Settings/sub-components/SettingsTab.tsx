@@ -27,6 +27,7 @@ import { styles } from './styles';
 import { useDatabase } from '@nozbe/watermelondb/hooks';
 import { AuthContext } from '../../../contexts/AuthContext';
 import { sync } from '../../../services/sync';
+import { ReceiptPrinterContext } from '../../../contexts/ReceiptPrinterContext';
 
 interface SettingsTabOuterProps {
   database: Database;
@@ -86,6 +87,7 @@ const SettingsTabInner: React.FC<SettingsTabOuterProps & SettingsTabInnerProps> 
   priceGroups,
 }) => {
   const { organization, setOrganization } = useContext(OrganizationContext);
+  const { setReceiptPrinter } = useContext(ReceiptPrinterContext);
   const [loading, setLoading] = useState(false);
   const database = useDatabase();
   const { signOut, unlink } = useContext(AuthContext);
@@ -102,13 +104,15 @@ const SettingsTabInner: React.FC<SettingsTabOuterProps & SettingsTabInnerProps> 
   };
 
   const updateOrganization = async values => {
-    console.log('values', values);
     setLoading(true);
     const priceGroup = priceGroups.find(pG => pG.id === values.defaultPriceGroupId);
     const receiptPrinter = printers.find(p => p.id === values.receiptPrinterId);
     if (!priceGroup || !receiptPrinter) {
       console.error('Failed to update organization');
     }
+
+    setReceiptPrinter(receiptPrinter);
+
     await database.action(() =>
       organization.update(org => {
         org.defaultPriceGroup.set(priceGroup);
@@ -151,7 +155,7 @@ const SettingsTabInner: React.FC<SettingsTabOuterProps & SettingsTabInnerProps> 
                   <Col style={styles.column}>
                     <Form>
                       <Item picker stackedLabel>
-                        <Label style={err.receiptPrinterId && formStyles.errorLabel}>Receipt Printer</Label>
+                        <Label style={err.receiptPrinterId ? formStyles.errorLabel : {}}>Receipt Printer</Label>
                         <Picker
                           mode="dropdown"
                           iosIcon={<Icon name="arrow-down" />}
@@ -168,7 +172,7 @@ const SettingsTabInner: React.FC<SettingsTabOuterProps & SettingsTabInnerProps> 
                         </Picker>
                       </Item>
                       <Item picker stackedLabel>
-                        <Label style={err.defaultPriceGroupId && formStyles.errorLabel}>Default Price Group</Label>
+                        <Label style={err.defaultPriceGroupId ? formStyles.errorLabel : {}}>Default Price Group</Label>
                         <Picker
                           mode="dropdown"
                           iosIcon={<Icon name="arrow-down" />}

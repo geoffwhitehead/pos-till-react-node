@@ -4,7 +4,7 @@ import { schemas, models } from '../models';
 
 const adapter = new SQLiteAdapter({
   schema: appSchema({
-    version: 34,
+    version: 41,
     tables: Object.values(schemas),
   }),
 });

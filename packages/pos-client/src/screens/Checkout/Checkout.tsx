@@ -55,7 +55,7 @@ export const Checkout: React.FC<CheckoutProps> = ({ navigation }) => {
       case Modes.Loading:
         return <Loading />;
       case Modes.Payments:
-        return <Payments bill={currentBill} onCompleteBill={completeBill}/>;
+        return <Payments bill={currentBill} onCompleteBill={completeBill} />;
       case Modes.Bills:
         return <SelectBill billPeriod={billPeriod} />;
       case Modes.Items:

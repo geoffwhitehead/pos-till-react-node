@@ -1,5 +1,6 @@
+import { Database, Q } from '@nozbe/watermelondb';
 import { flatten, uniq, groupBy, sumBy } from 'lodash';
-import { BillItem, BillItemModifierItem, BillDiscount, BillPayment, Discount, PriceGroup } from '../models';
+import { BillItem, BillItemModifierItem, BillDiscount, BillPayment, Discount, PriceGroup, tableNames } from '../models';
 
 export const getDefaultCashDenominations = (currency: string): number[] => {
   const map = {
@@ -36,7 +37,7 @@ export const _totalDiscount = (
   };
 };
 
-type DiscountBreakdownProps = {
+export type DiscountBreakdownProps = {
   billDiscountId: string;
   discountId: string;
   isPercent: boolean;
@@ -75,7 +76,7 @@ export const itemsBreakdown = async (items: BillItem[]): Promise<ItemsBreakdownP
   // TODO: fix type
   const itemsWithModifiers: any = await Promise.all(
     items.map(async item => {
-      const mods = await item._billItemModifierItems.fetch();
+      const mods = await item.billItemModifierItems.fetch();
       return {
         item,
         mods,
@@ -127,34 +128,121 @@ export const billSummary = async (
   };
 };
 
-type TransactionSummary = {
-  total: number;
-  paymentMethods: string[];
+export type MinimalBillSummary = {
+  totalDiscount: number;
+  totalPayable: number;
+  balance: number;
+  discountBreakdown: DiscountBreakdownProps[];
 };
+export const minimalBillSummary = async (params: {
+  chargableBillItems: BillItem[];
+  billDiscounts: BillDiscount[];
+  billPayments: BillPayment[];
+  discounts: Discount[];
+  database: Database;
+}): Promise<MinimalBillSummary> => {
+  const { chargableBillItems, billDiscounts, billPayments, discounts, database } = params;
+  const itemTotal = sumBy(chargableBillItems, billItem => billItem.itemPrice);
+  const itemIds = chargableBillItems.map(billItem => billItem.id);
+  const modifierItems = ((await database.collections
+    .get<BillItemModifierItem>(tableNames.billItemModifierItems)
+    .query(Q.where('bill_item_id', Q.oneOf(itemIds)))) as unknown) as BillItemModifierItem[];
+
+  const modifierItemTotal = sumBy(modifierItems, modifierItem => modifierItem.modifierItemPrice);
+
+  const total = modifierItemTotal + itemTotal;
+
+  const totalPayed = sumBy(billPayments, billPayment => billPayment.amount);
+
+  const discountBreakdown = _totalDiscount(total, billDiscounts, discounts);
+
+  return {
+    totalDiscount: discountBreakdown.total,
+    discountBreakdown: discountBreakdown.breakdown,
+    totalPayable: total - discountBreakdown.total,
+    balance: total - discountBreakdown.total - totalPayed,
+  };
+};
+
+// type TransactionSummary = {
+//   total: number;
+//   paymentMethods: string[];
+// };
 
 export const getItemPrice = (billItem: BillItem) => (billItem.isComp ? 0 : billItem.itemPrice);
 
 export const getModifierItemPrice = (modifierItem: BillItemModifierItem) =>
   modifierItem.isComp ? 0 : modifierItem.modifierItemPrice;
 
-export const transactionSummary = (
-  billItems,
-  billItemModifierItems,
-  billDiscounts,
-  billPayments,
-  paymentTypes,
-): TransactionSummary => {
-  const modifierTotal = billItemModifierItems.reduce(
-    (out, modifierItem) => out + getModifierItemPrice(modifierItem),
-    0,
-  );
-  const itemTotal = billItems.reduce((out, billItem) => out + getItemPrice(billItem), 0);
-  const billDiscountsTotal = billDiscounts.reduce((out, billDiscount) => out + billDiscount.closingAmount, 0);
-  const lookupPaymentType = id => paymentTypes.find(pT => pT.id === id).name;
-  const paymentMethods = uniq(billPayments.map(bP => bP.paymentTypeId)).map(lookupPaymentType);
+// export const transactionSummary = (
+//   billItems,
+//   billItemModifierItems,
+//   billDiscounts,
+//   billPayments,
+//   paymentTypes,
+// ): TransactionSummary => {
+//   const modifierTotal = billItemModifierItems.reduce(
+//     (out, modifierItem) => out + getModifierItemPrice(modifierItem),
+//     0,
+//   );
+//   const itemTotal = billItems.reduce((out, billItem) => out + getItemPrice(billItem), 0);
+//   const billDiscountsTotal = billDiscounts.reduce((out, billDiscount) => out + billDiscount.closingAmount, 0);
+//   const lookupPaymentType = id => paymentTypes.find(pT => pT.id === id).name;
+//   const paymentMethods = uniq(billPayments.map(bP => bP.paymentTypeId)).map(lookupPaymentType);
+//   return {
+//     total: modifierTotal + itemTotal - billDiscountsTotal,
+//     paymentMethods,
+//   };
+// };
+
+export type TransactionSummary = {
+  discountTotal: number;
+  paymentsTotal: number;
+  paymentBreakdown: { paymentTypeId: string; totalPayed: number }[];
+  changeTotal: number;
+  total: number;
+};
+
+export const transactionSummary = async (params: {
+  chargableBillItems: BillItem[];
+  billDiscounts: BillDiscount[];
+  billPayments: BillPayment[];
+  database: Database;
+}): Promise<TransactionSummary> => {
+  const { chargableBillItems, billDiscounts, billPayments, database } = params;
+
+  const itemTotal = sumBy(chargableBillItems, billItem => billItem.itemPrice);
+
+  const itemIds = chargableBillItems.map(billItem => billItem.id);
+  const modifierItems = ((await database.collections
+    .get<BillItemModifierItem>(tableNames.billItemModifierItems)
+    .query(Q.where('bill_item_id', Q.oneOf(itemIds)))) as unknown) as BillItemModifierItem[];
+
+  const modifierItemTotal = sumBy(modifierItems, modifierItem => modifierItem.modifierItemPrice);
+
+  const total = modifierItemTotal + itemTotal;
+
+  const paymentGroups = groupBy(billPayments, payment => payment.paymentTypeId);
+
+  const paymentsTotal = sumBy(billPayments, payment => payment.amount);
+  const discountTotal = sumBy(billDiscounts, discount => discount.closingAmount);
+  const changePayments = billPayments.filter(billPayment => billPayment.isChange);
+  const changeTotal = sumBy(changePayments, changePayment => Math.abs(changePayment.amount));
+  const paymentBreakdown = Object.keys(paymentGroups).map(keyPaymentGroup => {
+    return {
+      paymentTypeId: keyPaymentGroup,
+      totalPayed: sumBy(paymentGroups[keyPaymentGroup], payment => payment.amount),
+    };
+  });
+
+  // const change = total - discountTotal - paymentsTotal;
+
   return {
-    total: modifierTotal + itemTotal - billDiscountsTotal,
-    paymentMethods,
+    discountTotal,
+    paymentsTotal,
+    paymentBreakdown,
+    changeTotal: changeTotal || 0,
+    total,
   };
 };
 
@@ -189,7 +277,6 @@ export const categorySummary = billItems => {
     total: groupedBillItems[key].reduce((out, item) => out + getItemPrice(item), 0),
   }));
 
-  console.log('totals', totals);
   return { breakdown: totals, count: sumBy(totals, 'count'), total: sumBy(totals, 'total') };
 };
 

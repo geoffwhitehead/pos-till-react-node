@@ -19,7 +19,9 @@ import { BillItemModifier } from './BillItemModifier';
 import { Modifier } from './Modifier';
 import { ModifierItem } from './ModifierItem';
 import { Printer, BillItemPrintLog, tableNames } from '.';
-import { BillItemPrintLogStatus } from './BillItemPrintLog';
+import { PrintStatus, PrintType } from './BillItemPrintLog';
+import dayjs, { Dayjs } from 'dayjs';
+import { ModifyReason } from '../screens/Checkout/sub-components/Receipt/sub-components/ModalReason';
 
 export const billItemSchema = tableSchema({
   name: 'bill_items',
@@ -39,6 +41,11 @@ export const billItemSchema = tableSchema({
     { name: 'updated_at', type: 'number' },
     { name: 'is_comp', type: 'boolean' },
     { name: 'is_voided', type: 'boolean' },
+    { name: 'voided_at', type: 'string' },
+    { name: 'reason_description', type: 'string' },
+    { name: 'reason_name', type: 'string' },
+    { name: 'is_stored', type: 'boolean' },
+    { name: 'stored_at', type: 'string' },
     /**
      * Ideally print_status would be computed from the print logs and void logs but im not sure how performant this
      * will be using the watermelon query builder.
@@ -47,15 +54,6 @@ export const billItemSchema = tableSchema({
   ],
 });
 
-export type PrintStatus =
-  | 'success'
-  | 'error'
-  | 'pending'
-  | ''
-  | 'void'
-  | 'void_pending'
-  | 'void_error'
-  | 'void_no_print';
 export class BillItem extends Model {
   static table = 'bill_items';
 
@@ -71,62 +69,63 @@ export class BillItem extends Model {
   @readonly @date('created_at') createdAt: Date;
   @readonly @date('updated_at') updatedAt: Date;
   @field('is_comp') isComp: boolean;
+  @field('is_stored') isStored: boolean;
+  @field('stored_at') storedAt: string;
   @field('is_voided') isVoided: boolean;
-  @field('print_status') printStatus: PrintStatus;
+  @field('voided_at') voidedAt: string;
+  @field('reason_description') reasonDescription: string;
+  @field('reason_name') reasonName: string;
 
   @immutableRelation('bills', 'bill_id') bill: Relation<Bill>;
   @immutableRelation('items', 'item_id') item: Relation<Item>;
   @immutableRelation('price_groups', 'price_group_id') priceGroup: Relation<PriceGroup>;
   @immutableRelation('categories', 'category_id') category: Relation<Category>;
 
-  @children('bill_item_modifier_items') _billItemModifierItems: Query<BillItemModifierItem>;
+  @children('bill_item_modifier_items') billItemModifierItems: Query<BillItemModifierItem>;
   @children('bill_item_modifiers') billItemModifiers: Query<BillItemModifier>;
+  @children('bill_item_print_logs') billItemPrintLogs: Query<BillItemPrintLog>;
 
-  @lazy billItemModifierItems: Query<BillItemModifierItem> = this._billItemModifierItems.extend(
-    Q.where('is_voided', Q.notEq(true)),
-  );
+  @action void = async (values?: ModifyReason) => {
+    const [modifierItemsToVoid, item] = await Promise.all([this.billItemModifierItems.fetch(), this.item.fetch()]);
 
-  @lazy billItemModifierItemVoids: Query<BillItemModifierItem> = this._billItemModifierItems.extend(
-    Q.where('is_voided', true),
-  );
-
-  // used in the kitchen printer when printing voided items
-  @lazy modifierItemsIncVoids: Query<BillItemModifierItem> = this._billItemModifierItems;
-
-  // @lazy printers = this.collections.get('printers').query(Q.on('item_printers', 'item_id', this.itemId)) as Query<
-  //   Printer
-  // >;
-
-  @action void = async () => {
-    const modifierItemsToVoid = await this.billItemModifierItems.fetch();
-
-    let updates = [];
-
-    const modifierItemUpdates = modifierItemsToVoid.map(modItem =>
+    const modifierItemsToUpdate = modifierItemsToVoid.map(modItem =>
       modItem.prepareUpdate(mItem => {
-        mItem.isVoided = true;
+        mItem.isVoided = true; // TODO: refactor - not sure this is needed
       }),
     );
 
-    const billItemUpdate = this.prepareUpdate(bItem => {
+    const billItemToUpdate = this.prepareUpdate(bItem => {
       bItem.isVoided = true;
-      // only need to run through the void print process if the item has already been sent
-      if (bItem.printStatus != '') {
-        bItem.printStatus = 'void';
+      bItem.voidedAt = dayjs().toISOString();
+      if (values?.reason) {
+        bItem.reasonDescription = values.reason;
+        bItem.reasonName = values.name;
       }
     });
 
-    updates.push(...modifierItemUpdates, billItemUpdate);
-    await this.database.action(async () => {
-      await this.database.batch(...updates);
+    const printers = await item.printers.fetch();
+    const printLogsToCreate = printers.map(printer => {
+      return this.collections.get<BillItemPrintLog>(tableNames.billItemPrintLogs).prepareCreate(record => {
+        record.billItem.set(this);
+        record.printer.set(printer);
+        record.status = PrintStatus.pending;
+        record.type = PrintType.void;
+      });
     });
+
+    const batched = [...modifierItemsToUpdate, billItemToUpdate, ...printLogsToCreate];
+    await this.database.batch(...batched);
   };
 
-  @action makeComp = async () => {
+  @action makeComp = async (values: ModifyReason) => {
     const modifierItemsToComp = await this.billItemModifierItems.fetch();
 
-    const billItemUpdate = this.prepareUpdate(bI => {
-      bI.isComp = true;
+    const billItemUpdate = this.prepareUpdate(billItem => {
+      billItem.isComp = true;
+      if (values?.reason) {
+        billItem.reasonName = values.name;
+        billItem.reasonDescription = values.reason;
+      }
     });
 
     const modsToUpdate = modifierItemsToComp.map(mI =>
@@ -135,94 +134,34 @@ export class BillItem extends Model {
       }),
     );
 
-    await this.database.action(async () => {
-      await this.database.batch(billItemUpdate, ...modsToUpdate);
-    });
+    await this.database.batch(billItemUpdate, ...modsToUpdate);
   };
 
-  @action voidNoPrint = async () => {
-    const modifierItemsToVoid = await this.billItemModifierItems.fetch();
+  // @action voidNoPrint = async (reason: string = '') => {
+  //   const [modifierItemsToVoid, billItemPrintLogs] = await Promise.all([
+  //     this.billItemModifierItems.fetch(),
+  //     this.billItemPrintLogs.fetch(),
+  //   ]);
 
-    let updates = [];
+  //   const modifierItemsToUpdate = modifierItemsToVoid.map(modItem =>
+  //     modItem.prepareUpdate(mItem => {
+  //       mItem.isVoided = true;
+  //     }),
+  //   );
 
-    const modifierItemUpdates = modifierItemsToVoid.map(modItem =>
-      modItem.prepareUpdate(mItem => {
-        mItem.isVoided = true;
-      }),
-    );
+  //   const printLogsToUpdate = billItemPrintLogs.map(billItemPrintLog =>
+  //     billItemPrintLog.prepareUpdate(record => (record.status = PrintStatus.cancelled)),
+  //   );
 
-    const billItemUpdate = this.prepareUpdate(bItem => {
-      bItem.isVoided = true;
-      // only need to run through the void print process if the item has already been sent
-      if (bItem.printStatus != '') {
-        bItem.printStatus = 'void_no_print';
-      }
-    });
+  //   const billItemToUpdate = this.prepareUpdate(bItem => {
+  //     bItem.isVoided = true;
+  //     bItem.voidedAt = dayjs().toISOString();
+  //     bItem.removedReason = reason;
+  //   });
 
-    updates.push(...modifierItemUpdates, billItemUpdate);
-    await this.database.action(async () => {
-      await this.database.batch(...updates);
-    });
-  };
-
-  @action updatePrintStatus = async (printStatus: PrintStatus) => {
-    this.printStatus = printStatus;
-  };
-
-  @action createPrintLog = async (printer: Printer, status: BillItemPrintLogStatus) => {
-    const log = this.database.collections.get<BillItemPrintLog>(tableNames.billItemPrintLogs).create(log => {
-      log.billItem.set(this);
-      log.printer.set(printer);
-      log.status = status;
-    });
-
-    return log;
-  };
-
-  @action addModifierChoices = async (modifier: Modifier, modifierItems: ModifierItem[], priceGroup: PriceGroup) => {
-    const toCreate = [];
-
-    const billItemModifierToCreate = this.collections
-      .get<BillItemModifier>(tableNames.billItemModifiers)
-      .prepareCreate(billItemModifier => {
-        billItemModifier.modifier.set(modifier);
-        billItemModifier.billItem.set(this);
-        Object.assign(billItemModifier, {
-          modifierName: modifier.name,
-        });
-      });
-
-    const billItemModifierItemsToCreate = await Promise.all(
-      await modifierItems.map(async modifierItem => {
-        const prices = await modifierItem.prices.fetch();
-        const modifier = await modifierItem.modifier.fetch();
-        const mItem = this.collections
-          .get<BillItemModifierItem>(tableNames.billItemModifierItems)
-          .prepareCreate(billItemModifierItem => {
-            billItemModifierItem.billItem.set(this);
-            billItemModifierItem.modifierItem.set(modifierItem);
-            billItemModifierItem.billItemModifier.set(billItemModifierToCreate);
-            billItemModifierItem.priceGroup.set(priceGroup);
-            billItemModifierItem.modifier.set(modifier);
-            Object.assign(billItemModifierItem, {
-              modifierName: modifier.name,
-              modifierItemName: modifierItem.name,
-              modifierItemShortName: modifierItem.shortName,
-              modifierItemPrice: resolvePrice(priceGroup, prices),
-              priceGroupName: priceGroup.name,
-              isVoided: false,
-              // billItemModifierId: billItemModifierToCreate.id,
-            });
-          });
-        return mItem;
-      }),
-    );
-    toCreate.push(billItemModifierToCreate, ...billItemModifierItemsToCreate);
-
-    await this.database.action(async () => {
-      await this.database.batch(...toCreate);
-    });
-  };
+  //   const batched = [...modifierItemsToUpdate, billItemToUpdate, ...printLogsToUpdate];
+  //   await this.database.batch(...batched);
+  // };
 
   static associations = {
     bills: { type: 'belongs_to', key: 'bill_id' },
@@ -231,5 +170,6 @@ export class BillItem extends Model {
     categories: { type: 'belongs_to', key: 'category_id' },
     bill_item_modifier_items: { type: 'has_many', foreignKey: 'bill_item_id' },
     bill_item_modifiers: { type: 'has_many', foreignKey: 'bill_item_id' },
+    bill_item_print_logs: { type: 'has_many', foreignKey: 'bill_item_id' },
   };
 }

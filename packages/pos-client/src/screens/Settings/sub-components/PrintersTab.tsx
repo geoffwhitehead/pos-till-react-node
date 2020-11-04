@@ -83,7 +83,6 @@ const PrintersTabInner: React.FC<PrintersTabOuterProps & PrintersTabInnerProps> 
     // TODO: type vaalues
     setIsSaving(true);
 
-    console.log('SAVING', values);
     if (selectedPrinter.id) {
       await database.action(() =>
         selectedPrinter.update(printerRecord => {

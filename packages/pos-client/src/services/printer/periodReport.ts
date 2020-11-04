@@ -78,6 +78,10 @@ export const periodReport = async (billPeriod: BillPeriod, database: Database, p
       .fetch(),
   ]);
 
+  /**
+   * Note: Some of the queries here are combining comp and chargable items. This is needed as some of the
+   * breakdowns will count the comp. The price will be set to 0 for comp items.
+   */
   const [billModifierItems, billModifierItemVoids] = await Promise.all([
     flatten(await Promise.all(bills.map(async b => await b.billModifierItems.fetch()))),
     flatten(await Promise.all(bills.map(async b => await b.billModifierItemVoids.fetch()))),

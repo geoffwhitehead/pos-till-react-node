@@ -37,7 +37,6 @@ export class Printer extends Model {
 
   @action remove = async () => {
     const printerGroupLinks = await this.printerGroupsPrinters.fetch();
-    console.log('printerGroupLinks', printerGroupLinks);
     const printerGroupPrintersToDelete = printerGroupLinks.map(pGP => pGP.prepareMarkAsDeleted());
 
     const toDelete = [...printerGroupPrintersToDelete, this.prepareMarkAsDeleted()];
