@@ -1,24 +1,12 @@
 import { Model, Q, tableSchema, Relation, Query } from '@nozbe/watermelondb';
-import {
-  action,
-  nochange,
-  field,
-  readonly,
-  date,
-  immutableRelation,
-  children,
-  lazy,
-} from '@nozbe/watermelondb/decorators';
-import { resolvePrice } from '../helpers';
+import { action, nochange, field, readonly, date, immutableRelation, children } from '@nozbe/watermelondb/decorators';
 import { Bill } from './Bill';
 import { Item } from './Item';
 import { PriceGroup } from './PriceGroup';
 import { Category } from './Category';
 import { BillItemModifierItem } from './BillItemModifierItem';
 import { BillItemModifier } from './BillItemModifier';
-import { Modifier } from './Modifier';
-import { ModifierItem } from './ModifierItem';
-import { Printer, BillItemPrintLog, tableNames } from '.';
+import { BillItemPrintLog, tableNames } from '.';
 import { PrintStatus, PrintType } from './BillItemPrintLog';
 import dayjs, { Dayjs } from 'dayjs';
 import { ModifyReason } from '../screens/Checkout/sub-components/Receipt/sub-components/ModalReason';
@@ -91,20 +79,20 @@ export class BillItem extends Model {
       this.billItemPrintLogs.fetch(),
     ]);
 
+    const billItemToUpdate = this.prepareUpdate(bItem => {
+      bItem.isVoided = true;
+      bItem.voidedAt = dayjs().toISOString();
+      if (values?.reason && values?.name) {
+        bItem.reasonDescription = values.reason;
+        bItem.reasonName = values.name;
+      }
+    });
+
     const modifierItemsToUpdate = modifierItemsToVoid.map(modItem =>
       modItem.prepareUpdate(mItem => {
         mItem.isVoided = true; // TODO: refactor - not sure this is needed
       }),
     );
-
-    const billItemToUpdate = this.prepareUpdate(bItem => {
-      bItem.isVoided = true;
-      bItem.voidedAt = dayjs().toISOString();
-      if (values?.reason) {
-        bItem.reasonDescription = values.reason;
-        bItem.reasonName = values.name;
-      }
-    });
 
     const arrNotifiableLogs = [PrintStatus.errored, PrintStatus.processing, PrintStatus.succeeded];
     const arrNonNotifiableLogs = [PrintStatus.pending]; // TODO: might need cancelled aswell

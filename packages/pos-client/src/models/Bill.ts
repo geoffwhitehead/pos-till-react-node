@@ -170,7 +170,7 @@ export class Bill extends Model {
         });
       });
 
-    const createPrintLog = (billItem: BillItem): BillItemPrintLog[] => {
+    const createPrintLogs = (billItem: BillItem): BillItemPrintLog[] => {
       return printers.map(printer => {
         return this.collections.get<BillItemPrintLog>(tableNames.billItemPrintLogs).prepareCreate(record => {
           record.billItem.set(billItem);
@@ -185,7 +185,7 @@ export class Bill extends Model {
 
     const billItemsToCreate = times(quantity, createBillItem);
 
-    const _printLogsToCreate = billItemsToCreate.map(createPrintLog);
+    const _printLogsToCreate = billItemsToCreate.map(createPrintLogs);
 
     const printLogsToCreate = flatten(_printLogsToCreate);
 
@@ -225,7 +225,6 @@ export class Bill extends Model {
                     modifierItemPrice: resolvePrice(priceGroup, prices),
                     priceGroupName: priceGroup.name,
                     isVoided: false,
-                    // billItemModifierId: billItemModifierToCreate.id,
                   });
                 });
               return mItem;
@@ -237,13 +236,34 @@ export class Bill extends Model {
       return flatten(modifiersToCreate);
     };
 
-    const billItemModifiersToCreate = await Promise.all(
+    const billItemModifiersToCreateGroups = await Promise.all(
       billItemsToCreate.map(billItemToCreate => createModifiers(billItemToCreate, selectedModifiers)),
     );
 
-    const toCreate = [...billItemsToCreate, ...flatten(billItemModifiersToCreate), ...printLogsToCreate];
+    const billItemModifiersToCreate = flatten(billItemModifiersToCreateGroups);
+    const toCreate = [...billItemsToCreate, ...billItemModifiersToCreate, ...printLogsToCreate];
 
     await this.database.batch(...toCreate);
+  };
+
+  /**
+   * Find all bill items that are storable and update their stored status
+   */
+  @action storeBill = async () => {
+    // is_stored is not set on removed items to distinguish between cancelled and voided items
+    const billItemsToStore = await this.billItems
+      .extend(Q.and(Q.where('is_voided', Q.notEq(true))), Q.where('is_stored', Q.notEq(true)))
+      .fetch();
+
+    // update on all bill records, dont set voided items to stored. TODO: look at refactoring this so not using is_stored to determine.
+    const billItemsToUpdate = billItemsToStore.map(billItem =>
+      billItem.prepareUpdate(record => {
+        record.isStored = true;
+        record.storedAt = dayjs().toISOString();
+      }),
+    );
+
+    await this.database.batch(...billItemsToUpdate);
   };
 
   @action close = async () =>

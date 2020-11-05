@@ -79,11 +79,13 @@ export const organizationService = ({
         ]);
 
         return {
-            [ORGANIZATION_COLLECTION_NAME]: {
-                created: organizations.created.map(organizationToClient), // n/a
-                updated: organizations.updated.map(organizationToClient),
-                deleted: [], // n/a
-            },
+            ...toClientChanges({
+                [ORGANIZATION_COLLECTION_NAME]: {
+                    created: organizations.created.map(organizationToClient), // n/a
+                    updated: organizations.updated.map(organizationToClient),
+                    deleted: [], // n/a
+                },
+            }),
             ...toClientChanges({ [PAYMENT_TYPE_COLLECTION_NAME]: paymentTypes }),
         };
     };

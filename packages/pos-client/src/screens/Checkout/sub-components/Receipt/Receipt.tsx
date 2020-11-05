@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { Text, Col, Grid, Row, Button, Icon } from '../../../../core';
 import { StyleSheet } from 'react-native';
-import { formatNumber, billSummary, BillSummary, minimalBillSummary, MinimalBillSummary } from '../../../../utils';
+import { formatNumber, minimalBillSummary, MinimalBillSummary } from '../../../../utils';
 import { Fonts } from '../../../../theme';
 import { ReceiptItems } from './ReceiptItems';
 import dayjs from 'dayjs';
@@ -18,16 +18,14 @@ import {
   Printer,
   BillPayment,
   BillDiscount,
-  BillItemModifierItem,
 } from '../../../../models';
 import { Database, Q } from '@nozbe/watermelondb';
 import { BillItem } from '../../../../models/BillItem';
 import { kitchenReceipt } from '../../../../services/printer/kitchenReceipt';
-import { flatten, groupBy } from 'lodash';
+import { flatten } from 'lodash';
 import { Loading } from '../../../../components/Loading/Loading';
 import { OrganizationContext } from '../../../../contexts/OrganizationContext';
-import { BillItemPrintLog, PrintStatus } from '../../../../models/BillItemPrintLog';
-import { database } from '../../../../database';
+import { PrintStatus } from '../../../../models/BillItemPrintLog';
 import { ReceiptPrinterContext } from '../../../../contexts/ReceiptPrinterContext';
 import { useDatabase } from '@nozbe/watermelondb/hooks';
 
@@ -122,26 +120,13 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
           });
         }),
       );
+
       await database.action(async () => {
         await bill.processPrintLogs(flatten(printStatuses));
       });
     }
 
-    // is_stored is not set on removed items to distinguish between cancelled and voided items
-    const billItemsToStore = await bill.billItems
-      .extend(Q.and(Q.where('is_voided', Q.notEq(true))), Q.where('is_stored', Q.notEq(true)))
-      .fetch();
-
-    // update on all bill records, dont set voided items to stored. TODO: look at refactoring this so not using is_stored to determine.
-    const billItemsToUpdate = billItemsToStore.map(billItem => {
-      billItem.prepareUpdate(record => {
-        record.isStored = true;
-      });
-    });
-
-    await database.action(async () => {
-      await database.batch(...billItemsToUpdate);
-    });
+    await database.action(bill.storeBill);
   };
 
   useEffect(() => {

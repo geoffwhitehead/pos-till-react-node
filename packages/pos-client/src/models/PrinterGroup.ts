@@ -55,8 +55,8 @@ export class PrinterGroup extends Model {
       }),
     );
 
-    await this.database.action(async () => {
-      await this.database.batch(...printerGroupPrintersToDelete, ...itemsToUpdate, this.prepareMarkAsDeleted());
+    await this.database.action(() => {
+      this.database.batch(...printerGroupPrintersToDelete, ...itemsToUpdate, this.prepareMarkAsDeleted());
     });
   };
 }
