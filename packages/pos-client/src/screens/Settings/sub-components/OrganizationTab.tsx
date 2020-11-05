@@ -5,6 +5,7 @@ import * as Yup from 'yup';
 import { OrganizationContext } from '../../../contexts/OrganizationContext';
 import { useDatabase } from '@nozbe/watermelondb/hooks';
 import { styles } from './styles';
+import { HeaderButtonBar } from '../../../components/HeaderButtonBar/HeaderButtonBar';
 
 interface OrganizationTabProps {}
 
@@ -106,86 +107,80 @@ export const OrganizationTab: React.FC<OrganizationTabProps> = () => {
           };
 
           return (
-            <Content style={styles.container}>
-              <Grid>
-                <Row>
-                  <Col style={styles.column}>
-                    <Form>
-                      <Text style={styles.text} note>
-                        General company details. This information will also be printed on receipt and report headers
-                      </Text>
-                      <Item stackedLabel error={err.name}>
-                        <Label>Name</Label>
-                        <Input onChangeText={handleChange('name')} onBlur={handleBlur('name')} value={name} />
-                      </Item>
-                      <Item stackedLabel>
-                        <Label>Email</Label>
-                        <Label>{email}</Label>
-                      </Item>
-                      <Item stackedLabel error={err.phone}>
-                        <Label>Phone</Label>
-                        <Input onChangeText={handleChange('phone')} onBlur={handleBlur('phone')} value={phone} />
-                      </Item>
-                      <Item stackedLabel error={err.vat}>
-                        <Label>VAT</Label>
-                        <Input onChangeText={handleChange('vat')} onBlur={handleBlur('vat')} value={vat} />
-                      </Item>
-                    </Form>
-                  </Col>
-                  <Col style={styles.column}>
-                    <Form>
-                      <H2 style={styles.heading}>Address</H2>
+            <>
+              <HeaderButtonBar onPressPrimary={handleSubmit} primaryText="Save Changes"></HeaderButtonBar>
 
-                      <Item stackedLabel error={err.addressLine1}>
-                        <Label>Line 1</Label>
-                        <Input
-                          onChangeText={handleChange('addressLine1')}
-                          onBlur={handleBlur('addressLine1')}
-                          value={addressLine1}
-                        />
-                      </Item>
-                      <Item stackedLabel error={err.addressLine2}>
-                        <Label>Line 2</Label>
-                        <Input
-                          onChangeText={handleChange('addressLine2')}
-                          onBlur={handleBlur('addressLine2')}
-                          value={addressLine2}
-                        />
-                      </Item>
-                      <Item stackedLabel error={err.addressCity}>
-                        <Label>City</Label>
-                        <Input
-                          onChangeText={handleChange('addressCity')}
-                          onBlur={handleBlur('addressCity')}
-                          value={addressCity}
-                        />
-                      </Item>
-                      <Item stackedLabel error={err.addressCounty}>
-                        <Label>County</Label>
-                        <Input
-                          onChangeText={handleChange('addressCounty')}
-                          onBlur={handleBlur('addressCounty')}
-                          value={addressCounty}
-                        />
-                      </Item>
-                      <Item stackedLabel error={err.addressPostcode}>
-                        <Label>Postcode</Label>
-                        <Input
-                          onChangeText={handleChange('addressPostcode')}
-                          onBlur={handleBlur('addressPostcode')}
-                          value={addressPostcode}
-                        />
-                      </Item>
-                    </Form>
-                  </Col>
-                </Row>
-                <Row>
-                  <Button style={styles.indent} disabled={loading} onPress={handleSubmit}>
-                    <Text>Save</Text>
-                  </Button>
-                </Row>
-              </Grid>
-            </Content>
+              <Content style={{ ...styles.container, width: 500 }}>
+                <Form>
+                  <Text style={styles.text} note>
+                    * This information will also be printed on receipt and report headers
+                  </Text>
+                  <Text style={styles.text} note>
+                    General company details.
+                  </Text>
+                  <Item stackedLabel error={err.name}>
+                    <Label>Name</Label>
+                    <Input onChangeText={handleChange('name')} onBlur={handleBlur('name')} value={name} />
+                  </Item>
+                  <Item stackedLabel>
+                    <Label>Email</Label>
+                    <Label>{email}</Label>
+                  </Item>
+                  <Item stackedLabel error={err.phone}>
+                    <Label>Phone</Label>
+                    <Input onChangeText={handleChange('phone')} onBlur={handleBlur('phone')} value={phone} />
+                  </Item>
+                  <Item stackedLabel error={err.vat}>
+                    <Label>VAT</Label>
+                    <Input onChangeText={handleChange('vat')} onBlur={handleBlur('vat')} value={vat} />
+                  </Item>
+                  {/* <H2 style={styles.heading}>Address</H2> */}
+                  <Text style={styles.text} note>
+                    Address
+                  </Text>
+                  <Item stackedLabel error={err.addressLine1}>
+                    <Label>Line 1</Label>
+                    <Input
+                      onChangeText={handleChange('addressLine1')}
+                      onBlur={handleBlur('addressLine1')}
+                      value={addressLine1}
+                    />
+                  </Item>
+                  <Item stackedLabel error={err.addressLine2}>
+                    <Label>Line 2</Label>
+                    <Input
+                      onChangeText={handleChange('addressLine2')}
+                      onBlur={handleBlur('addressLine2')}
+                      value={addressLine2}
+                    />
+                  </Item>
+                  <Item stackedLabel error={err.addressCity}>
+                    <Label>City</Label>
+                    <Input
+                      onChangeText={handleChange('addressCity')}
+                      onBlur={handleBlur('addressCity')}
+                      value={addressCity}
+                    />
+                  </Item>
+                  <Item stackedLabel error={err.addressCounty}>
+                    <Label>County</Label>
+                    <Input
+                      onChangeText={handleChange('addressCounty')}
+                      onBlur={handleBlur('addressCounty')}
+                      value={addressCounty}
+                    />
+                  </Item>
+                  <Item stackedLabel error={err.addressPostcode}>
+                    <Label>Postcode</Label>
+                    <Input
+                      onChangeText={handleChange('addressPostcode')}
+                      onBlur={handleBlur('addressPostcode')}
+                      value={addressPostcode}
+                    />
+                  </Item>
+                </Form>
+              </Content>
+            </>
           );
         }}
       </Formik>

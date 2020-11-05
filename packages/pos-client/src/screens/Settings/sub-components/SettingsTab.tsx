@@ -13,6 +13,7 @@ import {
   Picker,
   Icon,
   Button,
+  View,
 } from '../../../core';
 import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import withObservables from '@nozbe/with-observables';
@@ -28,6 +29,7 @@ import { useDatabase } from '@nozbe/watermelondb/hooks';
 import { AuthContext } from '../../../contexts/AuthContext';
 import { sync } from '../../../services/sync';
 import { ReceiptPrinterContext } from '../../../contexts/ReceiptPrinterContext';
+import { HeaderButtonBar } from '../../../components/HeaderButtonBar/HeaderButtonBar';
 
 interface SettingsTabOuterProps {
   database: Database;
@@ -146,55 +148,62 @@ const SettingsTabInner: React.FC<SettingsTabOuterProps & SettingsTabInnerProps> 
           const hasOpenBills = openBills.length > 0;
 
           return (
-            <Content style={styles.container}>
-              <Grid>
-                <Col style={styles.column}>
-                  <H1 style={styles.heading}>Settings</H1>
-                </Col>
-                <Row>
-                  <Col style={styles.column}>
-                    <Form>
-                      <Item picker stackedLabel>
-                        <Label style={err.receiptPrinterId ? formStyles.errorLabel : {}}>Receipt Printer</Label>
-                        <Picker
-                          mode="dropdown"
-                          iosIcon={<Icon name="arrow-down" />}
-                          style={{ width: undefined }}
-                          placeholder="Select receipt printer"
-                          placeholderStyle={{ color: '#bfc6ea' }}
-                          placeholderIconColor="#007aff"
-                          selectedValue={receiptPrinterId}
-                          onValueChange={handleChange('receiptPrinterId')}
-                        >
-                          {printers.map(printer => (
-                            <Picker.Item key={printer.id} label={printer.name} value={printer.id} />
-                          ))}
-                        </Picker>
-                      </Item>
-                      <Item picker stackedLabel>
-                        <Label style={err.defaultPriceGroupId ? formStyles.errorLabel : {}}>Default Price Group</Label>
-                        <Picker
-                          mode="dropdown"
-                          iosIcon={<Icon name="arrow-down" />}
-                          style={{ width: undefined }}
-                          placeholder="Select default price group"
-                          placeholderStyle={{ color: '#bfc6ea' }}
-                          placeholderIconColor="#007aff"
-                          selectedValue={defaultPriceGroupId}
-                          onValueChange={handleChange('defaultPriceGroupId')}
-                        >
-                          {priceGroups.map(priceGroup => (
-                            <Picker.Item key={priceGroup.id} label={priceGroup.name} value={priceGroup.id} />
-                          ))}
-                        </Picker>
-                      </Item>
-                    </Form>
-                  </Col>
-                  <Col style={styles.column}>
-                    <Form>
+            <>
+              <HeaderButtonBar onPressPrimary={handleSubmit} primaryText="Save Changes"></HeaderButtonBar>
+              <Content style={styles.container}>
+                <Grid>
+                  <Form style={{ width: 500 }}>
+                    <Item picker stackedLabel>
+                      <Label style={err.receiptPrinterId ? formStyles.errorLabel : {}}>Receipt Printer</Label>
+                      <Picker
+                        mode="dropdown"
+                        iosIcon={<Icon name="arrow-down" />}
+                        style={{ width: undefined }}
+                        placeholder="Select receipt printer"
+                        placeholderStyle={{ color: '#bfc6ea' }}
+                        placeholderIconColor="#007aff"
+                        selectedValue={receiptPrinterId}
+                        onValueChange={handleChange('receiptPrinterId')}
+                      >
+                        {printers.map(printer => (
+                          <Picker.Item key={printer.id} label={printer.name} value={printer.id} />
+                        ))}
+                      </Picker>
+                    </Item>
+                    <Item picker stackedLabel>
+                      <Label style={err.defaultPriceGroupId ? formStyles.errorLabel : {}}>Default Price Group</Label>
+                      <Picker
+                        mode="dropdown"
+                        iosIcon={<Icon name="arrow-down" />}
+                        style={{ width: undefined }}
+                        placeholder="Select default price group"
+                        placeholderStyle={{ color: '#bfc6ea' }}
+                        placeholderIconColor="#007aff"
+                        selectedValue={defaultPriceGroupId}
+                        onValueChange={handleChange('defaultPriceGroupId')}
+                      >
+                        {priceGroups.map(priceGroup => (
+                          <Picker.Item key={priceGroup.id} label={priceGroup.name} value={priceGroup.id} />
+                        ))}
+                      </Picker>
+                    </Item>
+                    <View
+                      style={{
+                        marginLeft: 15,
+                        marginTop: 20,
+                        marginBottom: 20,
+                        padding: 10,
+                        borderLeftWidth: 1,
+                        borderRadius: 5,
+                        borderColor: 'lightgrey',
+                      }}
+                    >
+                      <Text style={{ color: 'grey', paddingBottom: 10 }}>
+                        Note: Can only be changed when there are no active bills
+                      </Text>
+
                       <Item disabled={hasOpenBills} stackedLabel error={err.maxBills}>
                         <Label>Max open bills</Label>
-                        <Label>Note: Can only be changed when there are no active bills</Label>
                         <Input
                           onChangeText={handleChange('maxBills')}
                           onBlur={handleBlur('maxBills')}
@@ -212,32 +221,28 @@ const SettingsTabInner: React.FC<SettingsTabOuterProps & SettingsTabInnerProps> 
                           placeholderIconColor="#007aff"
                           selectedValue={currency}
                           onValueChange={handleChange('currency')}
+                          enabled={!hasOpenBills}
                         >
                           {currencies.map(currency => (
                             <Picker.Item key={currency.id} label={currency.name} value={currency.id} />
                           ))}
                         </Picker>
                       </Item>
-                    </Form>
-                  </Col>
-                </Row>
-                <Row style={styles.row}>
-                  <Button disabled={loading} onPress={handleSubmit}>
-                    <Text>Save</Text>
-                  </Button>
-                </Row>
-                <Row style={styles.row}>
-                  <Button style={styles.button} onPress={() => areYouSure(signOut)}>
-                    <Text>Sign out</Text>
-                  </Button>
-                </Row>
-                <Row style={styles.row}>
-                  <Button danger style={styles.button} onPress={() => areYouSure(unlink)}>
-                    <Text>Delete account</Text>
-                  </Button>
-                </Row>
-              </Grid>
-            </Content>
+                    </View>
+                  </Form>
+                  <Row>
+                    <Button style={styles.button} bordered onPress={() => areYouSure(signOut)}>
+                      <Text>Sign out</Text>
+                    </Button>
+                  </Row>
+                  <Row>
+                    <Button danger bordered style={styles.button} onPress={() => areYouSure(unlink)}>
+                      <Text>Delete account</Text>
+                    </Button>
+                  </Row>
+                </Grid>
+              </Content>
+            </>
           );
         }}
       </Formik>

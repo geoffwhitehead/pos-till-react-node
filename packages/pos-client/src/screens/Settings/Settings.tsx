@@ -21,25 +21,23 @@ const SettingsInner: React.FC<SettingsOuterProps & SettingsInnerProps> = ({ navi
   return (
     <Container>
       <SidebarHeader title="Settings" onOpen={() => navigation.openDrawer()} />
-      <Content>
-        <Tabs>
-          <Tab heading="Settings">
-            <SettingsTab billPeriod={billPeriod} />
-          </Tab>
-          <Tab heading="Organization Details">
-            <OrganizationTab />
-          </Tab>
-          <Tab heading="Printers">
-            <PrintersTab />
-          </Tab>
-          <Tab heading="Printer Groups">
-            <PrinterGroupsTab />
-          </Tab>
-          <Tab heading="Price Groups">
-            <PriceGroupsTab />
-          </Tab>
-        </Tabs>
-      </Content>
+      <Tabs>
+        <Tab heading="Settings">
+          <SettingsTab billPeriod={billPeriod} />
+        </Tab>
+        <Tab heading="Organization Details">
+          <OrganizationTab />
+        </Tab>
+        <Tab heading="Printers">
+          <PrintersTab />
+        </Tab>
+        <Tab heading="Printer Groups">
+          <PrinterGroupsTab />
+        </Tab>
+        <Tab heading="Price Groups">
+          <PriceGroupsTab />
+        </Tab>
+      </Tabs>
     </Container>
   );
 };
