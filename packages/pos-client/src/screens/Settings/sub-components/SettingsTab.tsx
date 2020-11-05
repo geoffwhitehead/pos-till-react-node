@@ -14,6 +14,7 @@ import {
   Icon,
   Button,
   View,
+  ActionSheet,
 } from '../../../core';
 import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import withObservables from '@nozbe/with-observables';
@@ -21,10 +22,8 @@ import { tableNames, Printer, PriceGroup, BillPeriod, Bill } from '../../../mode
 import { Database } from '@nozbe/watermelondb';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
-import { H1, H2, ActionSheet } from 'native-base';
 import { OrganizationContext } from '../../../contexts/OrganizationContext';
 import { Loading } from '../../../components/Loading/Loading';
-import { styles } from './styles';
 import { useDatabase } from '@nozbe/watermelondb/hooks';
 import { AuthContext } from '../../../contexts/AuthContext';
 import { sync } from '../../../services/sync';
@@ -150,11 +149,11 @@ const SettingsTabInner: React.FC<SettingsTabOuterProps & SettingsTabInnerProps> 
           return (
             <>
               <HeaderButtonBar onPressPrimary={handleSubmit} primaryText="Save Changes"></HeaderButtonBar>
-              <Content style={styles.container}>
+              <Content style={styles.content}>
                 <Grid>
-                  <Form style={{ width: 500 }}>
+                  <Form>
                     <Item picker stackedLabel>
-                      <Label style={err.receiptPrinterId ? formStyles.errorLabel : {}}>Receipt Printer</Label>
+                      <Label style={err.receiptPrinterId ? styles.errorLabel : {}}>Receipt Printer</Label>
                       <Picker
                         mode="dropdown"
                         iosIcon={<Icon name="arrow-down" />}
@@ -171,7 +170,7 @@ const SettingsTabInner: React.FC<SettingsTabOuterProps & SettingsTabInnerProps> 
                       </Picker>
                     </Item>
                     <Item picker stackedLabel>
-                      <Label style={err.defaultPriceGroupId ? formStyles.errorLabel : {}}>Default Price Group</Label>
+                      <Label style={err.defaultPriceGroupId ? styles.errorLabel : {}}>Default Price Group</Label>
                       <Picker
                         mode="dropdown"
                         iosIcon={<Icon name="arrow-down" />}
@@ -193,6 +192,7 @@ const SettingsTabInner: React.FC<SettingsTabOuterProps & SettingsTabInnerProps> 
                         marginTop: 20,
                         marginBottom: 20,
                         padding: 10,
+                        paddingLeft: 30,
                         borderLeftWidth: 1,
                         borderRadius: 5,
                         borderColor: 'lightgrey',
@@ -230,13 +230,13 @@ const SettingsTabInner: React.FC<SettingsTabOuterProps & SettingsTabInnerProps> 
                       </Item>
                     </View>
                   </Form>
-                  <Row>
-                    <Button style={styles.button} bordered onPress={() => areYouSure(signOut)}>
+                  <Row style={styles.row}>
+                    <Button bordered onPress={() => areYouSure(signOut)}>
                       <Text>Sign out</Text>
                     </Button>
                   </Row>
-                  <Row>
-                    <Button danger bordered style={styles.button} onPress={() => areYouSure(unlink)}>
+                  <Row style={styles.row}>
+                    <Button danger bordered onPress={() => areYouSure(unlink)}>
                       <Text>Delete account</Text>
                     </Button>
                   </Row>
@@ -262,8 +262,12 @@ const enhance = c =>
 
 export const SettingsTab = enhance(SettingsTabInner);
 
-const formStyles = {
+const styles = {
   errorLabel: {
     color: 'red',
   },
+  row: {
+    padding: 5,
+  },
+  content: { padding: 15, width: 500 },
 };

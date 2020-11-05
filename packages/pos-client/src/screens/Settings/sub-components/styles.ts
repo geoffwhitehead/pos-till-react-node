@@ -4,13 +4,14 @@ export const styles = {
     marginBottom: 20,
     display: 'flex',
     justifyContent: 'space-between',
-  } as const,
+  },
   text: {
     margin: 10,
     marginTop: 20,
     marginBottom: 2,
     textAlign: 'left',
-  } as const,
+  },
+  content: { padding: 15, width: 500 },
   form: { width: 400 },
   selectedRow: { backgroundColor: '#cde1f9' },
   indent: {
@@ -32,4 +33,4 @@ export const styles = {
     marginTop: 10,
     marginBottom: 10,
   },
-};
+} as const;

@@ -110,7 +110,7 @@ export const OrganizationTab: React.FC<OrganizationTabProps> = () => {
             <>
               <HeaderButtonBar onPressPrimary={handleSubmit} primaryText="Save Changes"></HeaderButtonBar>
 
-              <Content style={{ ...styles.container, width: 500 }}>
+              <Content style={styles.content}>
                 <Form>
                   <Text style={styles.text} note>
                     * This information will also be printed on receipt and report headers
