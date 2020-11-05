@@ -19,7 +19,7 @@ export const kitchenReceipt = async (p: {
 
   const populatedItems = await Promise.all(
     billItems.map(async billItem => {
-      const mods = await billItem.modifierItemsIncVoids.fetch();
+      const mods = await billItem.billItemModifierItems.fetch();
       return {
         billItem,
         mods,
@@ -30,24 +30,18 @@ export const kitchenReceipt = async (p: {
   const combinedFields = billItemPrintLogs.map(billItemPrintLog => {
     const fields = populatedItems.find(item => item.billItem.id === billItemPrintLog.billItemId);
 
-    console.log('populatedItems', populatedItems);
-    console.log('billItems', billItems);
-    console.log('printLog', billItemPrintLog);
     return {
       billItemPrintLog,
       ...fields,
     };
   });
 
-  console.log('combinedFields', combinedFields);
   const groupedByPriceGroup = groupBy(combinedFields, fields => fields.billItem.priceGroupId);
 
-  console.log('groupedByPriceGroup', groupedByPriceGroup);
   const nestedGroupedByPrinterId = Object.values(groupedByPriceGroup).map(groups =>
     groupBy(groups, group => group.billItemPrintLog.printerId),
   );
 
-  console.log('nestedGroupedByPrinterId', nestedGroupedByPrinterId);
   const keyedPriceGroups = keyBy(priceGroups, pG => pG.id);
 
   const printCommands = nestedGroupedByPrinterId.map(group => {
@@ -63,8 +57,6 @@ export const kitchenReceipt = async (p: {
       };
     });
   });
-
-  console.log('printCommands', printCommands);
 
   const flattenedPrintCommands = flatten(printCommands);
 

@@ -97,7 +97,6 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
           .query()
           .fetch(),
       ]);
-      // const filteredBillItems = billItems.filter(billItem => ids.includes(billItem.id));
 
       // this will generate the print commands to fire off to all the printers.
       const toPrint = await kitchenReceipt({
@@ -109,7 +108,6 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
         prepTime: dayjs().add(10, 'minute'), // TODO: set prep time
       });
 
-      console.log('-------- toPrint', toPrint);
       // attempt to print the receipts
       const printStatuses = await Promise.all(
         toPrint.map(async ({ billItemPrintLogs, printer, commands }) => {

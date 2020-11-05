@@ -30,22 +30,17 @@ export const SyncInner: React.FC<SyncOuterProps & SyncInnerProps> = ({
       } catch (e) {
         console.error(e);
       }
+      setIsSyncDone(true);
     };
     checkSync();
   }, [database]);
 
-  useEffect(() => {
-    const hasSynced = organizations.some(o => o.id === organizationId);
-    if (hasSynced) {
-      setIsSyncDone(true);
-    }
-  }, [organizations]);
+  const hasOrganization = organizations.some(o => o.id === organizationId);
 
-  if (isSyncDone) {
-    return children;
+  if (!isSyncDone || !hasOrganization) {
+    return <Loading />;
   }
-
-  return <Loading />;
+  return children;
 };
 
 export const Sync = withObservables<SyncOuterProps, SyncInnerProps>([], ({ database }) => ({

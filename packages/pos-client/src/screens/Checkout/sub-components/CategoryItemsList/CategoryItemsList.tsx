@@ -37,6 +37,7 @@ const CategoryItemsInner: React.FC<CategoryItemsListOuterProps & CategoryItemsLi
   navigation,
   prices,
   priceGroup,
+  database,
 }) => {
   const [searchValue, setSearchValue] = useState<string>('');
   const [modalOpen, setModalOpen] = useState<boolean>(false);
@@ -63,7 +64,7 @@ const CategoryItemsInner: React.FC<CategoryItemsListOuterProps & CategoryItemsLi
       setSelectedItem(item);
       setModalOpen(true);
     } else {
-      await currentBill.addItems({ item, priceGroup, quantity: 1, selectedModifiers: [] });
+      await database.action(() => currentBill.addItems({ item, priceGroup, quantity: 1, selectedModifiers: [] }));
     }
   };
 

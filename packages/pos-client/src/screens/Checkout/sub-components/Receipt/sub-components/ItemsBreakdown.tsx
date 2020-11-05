@@ -1,11 +1,9 @@
 import { groupBy } from 'lodash';
 import { Separator, Text, ListItem, Left, Right } from '../../../../../core';
 import React from 'react';
-import { capitalize } from 'lodash';
 import { ItemBreakdown } from './ItemBreakdown';
 import { Bill, BillItem, BillItemPrintLog, Discount, tableNames } from '../../../../../models';
 import withObservables from '@nozbe/with-observables';
-import { WrappedBillRow } from '../../../../Bills/SelectBill/BillRow';
 import { PrintStatus, PrintType } from '../../../../../models/BillItemPrintLog';
 
 type ItemsBreakdownOuterProps = {
@@ -32,8 +30,6 @@ export const ItemsBreakdownInner: React.FC<ItemsBreakdownOuterProps & ItemsBreak
   const billItemGroups: Record<string, BillItem[]> = groupBy(billItems, item => item.priceGroupId);
   const keyedLogGroups: Record<string, BillItemPrintLog[]> = groupBy(billItemStatusLogs, log => log.billItemId);
 
-  console.log('keyedLogGroups', keyedLogGroups);
-
   return (
     <>
       <Separator bordered key="ib_sep">
@@ -52,23 +48,30 @@ export const ItemsBreakdownInner: React.FC<ItemsBreakdownOuterProps & ItemsBreak
           ...billItemGroup.map(billItem => {
             const logs = keyedLogGroups[billItem.id] || [];
 
-            const hasSucceeded = logs.some(log => log.status === PrintStatus.pending);
+            const hasSucceeded = logs.length > 0 && logs.every(log => log.status === PrintStatus.succeeded);
             const hasErrored = logs.some(log => log.status === PrintStatus.errored);
             const isProcessing = logs.some(log => log.status === PrintStatus.processing);
+            const isPending = logs.some(log => log.status === PrintStatus.pending);
+
+            const status = hasSucceeded
+              ? PrintStatus.succeeded
+              : hasErrored
+              ? PrintStatus.errored
+              : isProcessing
+              ? PrintStatus.processing
+              : isPending
+              ? PrintStatus.pending
+              : null;
 
             const isVoidComplete =
               billItem.isVoided &&
               logs.some(log => log.type === PrintType.void && log.status === PrintStatus.succeeded);
 
-            const status = hasErrored
-              ? PrintStatus.errored
-              : isProcessing
-              ? PrintStatus.processing
-              : hasSucceeded
-              ? PrintStatus.succeeded
-              : null;
-
             if (isVoidComplete) {
+              return null;
+            }
+
+            if (billItem.isVoided && (!status || status === PrintStatus.succeeded)) {
               return null;
             }
 

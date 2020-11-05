@@ -32,6 +32,7 @@ export const TransactionListInner: React.FC<TransactionListOuterProps & Transact
   const sorter = isOrderedDescending ? sorterClosedAtDescending : sorterClosedAtAscending;
   const sortedBills = bills.sort(sorter);
   const sortedBillsGrouped = groupBy(sortedBills, bill => bill.reference);
+  const hasNoTransactions = bills.length === 0;
 
   return (
     <Content>
@@ -58,38 +59,43 @@ export const TransactionListInner: React.FC<TransactionListOuterProps & Transact
             </Button>
           </Right>
         </ListItem>
-        {isGroupedByTable
-          ? Object.entries(sortedBillsGrouped).map(([billReference, sortedBillsByReference]) => {
-              return [
-                <ListItem itemDivider>
-                  <Text style={{ fontWeight: 'bold', fontSize: 22 }}>{`Table: ${billReference}`}</Text>
-                </ListItem>,
-                ...sortedBillsByReference.map(bill => {
-                  const isSelected = selectedBill && bill.id === selectedBill.id;
 
-                  return (
-                    <TransactionListRow
-                      paymentTypes={paymentTypes}
-                      bill={bill}
-                      isSelected={isSelected}
-                      onSelectBill={onSelectBill}
-                      showBillRef={false}
-                    />
-                  );
-                }),
-              ];
-            })
-          : sortedBills.map(bill => {
-              const isSelected = selectedBill && bill.id === selectedBill.id;
-              return (
-                <TransactionListRow
-                  paymentTypes={paymentTypes}
-                  bill={bill}
-                  isSelected={isSelected}
-                  onSelectBill={onSelectBill}
-                />
-              );
-            })}
+        {hasNoTransactions ? (
+          <Text style={{ padding: 15 }}>There aren't any completed transactions ...</Text>
+        ) : isGroupedByTable ? (
+          Object.entries(sortedBillsGrouped).map(([billReference, sortedBillsByReference]) => {
+            return [
+              <ListItem itemDivider>
+                <Text style={{ fontWeight: 'bold', fontSize: 22 }}>{`Table: ${billReference}`}</Text>
+              </ListItem>,
+              ...sortedBillsByReference.map(bill => {
+                const isSelected = selectedBill && bill.id === selectedBill.id;
+
+                return (
+                  <TransactionListRow
+                    paymentTypes={paymentTypes}
+                    bill={bill}
+                    isSelected={isSelected}
+                    onSelectBill={onSelectBill}
+                    showBillRef={false}
+                  />
+                );
+              }),
+            ];
+          })
+        ) : (
+          sortedBills.map(bill => {
+            const isSelected = selectedBill && bill.id === selectedBill.id;
+            return (
+              <TransactionListRow
+                paymentTypes={paymentTypes}
+                bill={bill}
+                isSelected={isSelected}
+                onSelectBill={onSelectBill}
+              />
+            );
+          })
+        )}
       </List>
     </Content>
   );

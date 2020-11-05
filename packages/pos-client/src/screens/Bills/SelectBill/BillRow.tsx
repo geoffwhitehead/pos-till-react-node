@@ -91,7 +91,7 @@ export const WrappedBillRow: React.FC<BillRowInnerProps & BillRowOuterProps> = (
 };
 
 const enhance = component =>
-  withDatabase<any>( // TODO: fix
+  withDatabase(
     withObservables<BillRowOuterProps, BillRowInnerProps>(['bill'], ({ database, bill }) => ({
       bill,
       billPayments: bill.billPayments,

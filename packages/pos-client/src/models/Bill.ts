@@ -243,9 +243,7 @@ export class Bill extends Model {
 
     const toCreate = [...billItemsToCreate, ...flatten(billItemModifiersToCreate), ...printLogsToCreate];
 
-    await this.database.action(async () => {
-      await this.database.batch(...toCreate);
-    });
+    await this.database.batch(...toCreate);
   };
 
   @action close = async () =>

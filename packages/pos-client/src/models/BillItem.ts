@@ -86,7 +86,10 @@ export class BillItem extends Model {
   @children('bill_item_print_logs') billItemPrintLogs: Query<BillItemPrintLog>;
 
   @action void = async (values?: ModifyReason) => {
-    const [modifierItemsToVoid, item] = await Promise.all([this.billItemModifierItems.fetch(), this.item.fetch()]);
+    const [modifierItemsToVoid, billItemPrintLogs] = await Promise.all([
+      this.billItemModifierItems.fetch(),
+      this.billItemPrintLogs.fetch(),
+    ]);
 
     const modifierItemsToUpdate = modifierItemsToVoid.map(modItem =>
       modItem.prepareUpdate(mItem => {
@@ -103,17 +106,29 @@ export class BillItem extends Model {
       }
     });
 
-    const printers = await item.printers.fetch();
-    const printLogsToCreate = printers.map(printer => {
+    const arrNotifiableLogs = [PrintStatus.errored, PrintStatus.processing, PrintStatus.succeeded];
+    const arrNonNotifiableLogs = [PrintStatus.pending]; // TODO: might need cancelled aswell
+
+    const notifiableLogs = billItemPrintLogs.filter(log => arrNotifiableLogs.includes(log.status));
+    const nonNotifiableLogs = billItemPrintLogs.filter(log => arrNonNotifiableLogs.includes(log.status));
+
+    /**
+     * A voided item will have existing print logs created for it. Depending on whether this item has already been stored
+     * they may have different states. All pending logs should be deleted and all processed or processed will need a void log creating
+     * to send to the printer.
+     */
+
+    const printLogsToCreate = notifiableLogs.map(({ printerId }) => {
       return this.collections.get<BillItemPrintLog>(tableNames.billItemPrintLogs).prepareCreate(record => {
         record.billItem.set(this);
-        record.printer.set(printer);
+        record.printerId = printerId;
         record.status = PrintStatus.pending;
         record.type = PrintType.void;
       });
     });
 
-    const batched = [...modifierItemsToUpdate, billItemToUpdate, ...printLogsToCreate];
+    const printLogsToDelete = nonNotifiableLogs.map(log => log.prepareDestroyPermanently());
+    const batched = [...modifierItemsToUpdate, billItemToUpdate, ...printLogsToCreate, ...printLogsToDelete];
     await this.database.batch(...batched);
   };
 

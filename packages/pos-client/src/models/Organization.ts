@@ -28,7 +28,7 @@ export class Organization extends Model {
   @action createNewBillPeriod = async () => {
     const newBillPeriod = this.database.collections.get<BillPeriod>(tableNames.billPeriods).prepareCreate();
     const orgUpdate = this.prepareUpdate(record => {
-      record.currentBillPeriod.set(newBillPeriod);
+      record.currentBillPeriodId = newBillPeriod.id;
     });
 
     await this.database.batch(newBillPeriod, orgUpdate);

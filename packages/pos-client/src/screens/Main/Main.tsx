@@ -33,31 +33,37 @@ export const MainWrapped: React.FC<MainOuterProps & MainInnerProps> = ({ priceGr
 
   useEffect(() => {
     const fetchAndSetBillPeriod = async (organization: Organization) => {
-      const billPeriod = await organization.currentBillPeriod.fetch();
-      setBillPeriod(billPeriod);
+      const currentBillPeriod = await organization.currentBillPeriod.fetch();
+      setBillPeriod(currentBillPeriod);
     };
-    const createAndSetNewBillPeriod = async (organization: Organization) =>
+    const createAndSetNewBillPeriod = async (organization: Organization) => {
       await database.action(() => organization.createNewBillPeriod());
+    };
 
     if (organization) {
       if (!organization.currentBillPeriodId) {
         createAndSetNewBillPeriod(organization);
-      } else if (organization.currentBillPeriodId !== billPeriod?.id) {
+      } else if (!billPeriod || billPeriod.id !== organization.currentBillPeriodId) {
         fetchAndSetBillPeriod(organization);
       }
     }
-
-    setOrganization(organization);
-  }, [organization, billPeriod, setBillPeriod]);
+  }, [organization.currentBillPeriodId, billPeriod, setBillPeriod]);
 
   useEffect(() => {
-    const setPrinter = async organization => {
-      const printer = await database.collections.get<Printer>(tableNames.printers).find(organization.receiptPrinterId);
+    setOrganization(organization);
+  }, [organization]);
+
+  useEffect(() => {
+    const setPrinter = async (receiptPrinterId: string) => {
+      const printer = await database.collections.get<Printer>(tableNames.printers).find(receiptPrinterId);
       setReceiptPrinter(printer);
     };
-    if (organization) {
-      if (organization.receiptPrinterId !== receiptPrinter?.id) {
-        setPrinter(organization);
+    if (organization && organization.receiptPrinterId) {
+      const { receiptPrinterId } = organization;
+
+      const isDifferentPrinter = receiptPrinterId !== receiptPrinter?.id;
+      if (isDifferentPrinter) {
+        setPrinter(receiptPrinterId);
       }
     }
   }, [organization, receiptPrinter, setReceiptPrinter]);
@@ -91,7 +97,6 @@ export const MainWrapped: React.FC<MainOuterProps & MainInnerProps> = ({ priceGr
 export const Main = withDatabase<any>(
   withObservables<MainOuterProps, MainInnerProps>([], ({ database, organizationId }) => ({
     priceGroups: database.collections.get<PriceGroup>(tableNames.priceGroups).query(),
-    organization:
-      database.collections.get<Organization>(tableNames.organizations).findAndObserve(organizationId) || null,
+    organization: database.collections.get<Organization>(tableNames.organizations).findAndObserve(organizationId),
   }))(MainWrapped),
 );

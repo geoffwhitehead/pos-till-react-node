@@ -7,6 +7,7 @@ import { keyBy } from 'lodash';
 import { View } from 'native-base';
 import { NumberPicker } from '../../../../../../components/NumberPicker/NumberPicker';
 import { Item, Bill, PriceGroup, Modifier, ModifierItem } from '../../../../../../models';
+import { useDatabase } from '@nozbe/watermelondb/hooks';
 
 interface ModifierListOuterProps {
   item: Item;
@@ -19,6 +20,8 @@ interface ModifierListInnerProps {
   modifiers: Modifier[];
 }
 
+type KeyedModifierSelections = Record<string, { modifier: Modifier; items: ModifierItem[] }>;
+
 export const ModifierListInner: React.FC<ModifierListOuterProps & ModifierListInnerProps> = ({
   item,
   currentBill,
@@ -26,16 +29,13 @@ export const ModifierListInner: React.FC<ModifierListOuterProps & ModifierListIn
   onClose,
   modifiers,
 }) => {
+  const database = useDatabase();
   const [quantity, setQuantity] = useState(1);
-
-  const [selectedModifiers, setSelectedModifiers] = useState<
-    Record<string, { modifier: Modifier; items: ModifierItem[] }>
-  >(
-    keyBy(
-      modifiers.map(modifier => ({ modifier, items: [] })),
-      'modifier.id',
-    ),
+  const keyedEmptyModifierSelections = keyBy(
+    modifiers.map(modifier => ({ modifier, items: [] })),
+    'modifier.id',
   );
+  const [selectedModifiers, setSelectedModifiers] = useState<KeyedModifierSelections>(keyedEmptyModifierSelections);
 
   const isSelectionValid = Object.keys(selectedModifiers).some(key => {
     const { modifier, items } = selectedModifiers[key];
@@ -43,7 +43,9 @@ export const ModifierListInner: React.FC<ModifierListOuterProps & ModifierListIn
   });
 
   const createItemWithModifiers = async () => {
-    await currentBill.addItems({ item, priceGroup, quantity, selectedModifiers: Object.values(selectedModifiers) });
+    await database.action(() =>
+      currentBill.addItems({ item, priceGroup, quantity, selectedModifiers: Object.values(selectedModifiers) }),
+    );
     onClose();
   };
 
