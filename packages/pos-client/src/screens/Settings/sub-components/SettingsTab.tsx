@@ -8,7 +8,6 @@ import {
   Input,
   Text,
   Grid,
-  Col,
   Row,
   Picker,
   Icon,
@@ -29,6 +28,7 @@ import { AuthContext } from '../../../contexts/AuthContext';
 import { sync } from '../../../services/sync';
 import { ReceiptPrinterContext } from '../../../contexts/ReceiptPrinterContext';
 import { HeaderButtonBar } from '../../../components/HeaderButtonBar/HeaderButtonBar';
+import { commonStyles } from './styles';
 
 interface SettingsTabOuterProps {
   database: Database;
@@ -149,7 +149,7 @@ const SettingsTabInner: React.FC<SettingsTabOuterProps & SettingsTabInnerProps> 
           return (
             <>
               <HeaderButtonBar onPressPrimary={handleSubmit} primaryText="Save Changes"></HeaderButtonBar>
-              <Content style={styles.content}>
+              <Content style={commonStyles.content}>
                 <Grid>
                   <Form>
                     <Item picker stackedLabel>
@@ -230,12 +230,12 @@ const SettingsTabInner: React.FC<SettingsTabOuterProps & SettingsTabInnerProps> 
                       </Item>
                     </View>
                   </Form>
-                  <Row style={styles.row}>
+                  <Row style={commonStyles.row}>
                     <Button bordered onPress={() => areYouSure(signOut)}>
                       <Text>Sign out</Text>
                     </Button>
                   </Row>
-                  <Row style={styles.row}>
+                  <Row style={commonStyles.row}>
                     <Button danger bordered onPress={() => areYouSure(unlink)}>
                       <Text>Delete account</Text>
                     </Button>
@@ -269,5 +269,4 @@ const styles = {
   row: {
     padding: 5,
   },
-  content: { padding: 15, width: 500 },
 };

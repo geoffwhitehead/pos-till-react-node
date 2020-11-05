@@ -21,7 +21,7 @@ import { tableNames, PriceGroup } from '../../../models';
 import { Database } from '@nozbe/watermelondb';
 import { Loading } from '../../../components/Loading/Loading';
 import { Modal } from '../../../components/Modal/Modal';
-import { styles } from './styles';
+import { commonStyles } from './styles';
 import { PriceGroupDetails } from './PriceGroupDetails';
 import { OrganizationContext } from '../../../contexts/OrganizationContext';
 
@@ -92,7 +92,7 @@ const PriceGroupsTabInner: React.FC<PriceGroupsTabOuterProps & PriceGroupsTabInn
                 {priceGroups.map(priceGroup => {
                   const isSelected = priceGroup === selectedPriceGroup;
                   return (
-                    <ListItem key={priceGroup.id} noIndent style={isSelected ? styles.selectedRow : {}}>
+                    <ListItem key={priceGroup.id} noIndent style={isSelected ? commonStyles.selectedRow : {}}>
                       <Left>
                         <Text>{priceGroup.name}</Text>
                       </Left>

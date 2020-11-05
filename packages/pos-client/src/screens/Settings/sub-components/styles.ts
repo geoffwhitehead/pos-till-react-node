@@ -1,4 +1,4 @@
-export const styles = {
+export const commonStyles = {
   heading: {
     marginTop: 40,
     marginBottom: 20,

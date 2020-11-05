@@ -1,6 +1,6 @@
 import { Printer } from '../../../models';
 import { ListItem, Left, Text, Body, Right, Icon } from 'native-base';
-import { styles } from './styles';
+import { commonStyles } from './styles';
 import React from 'react';
 // import { capitalize } from 'lodash';
 import withObservables from '@nozbe/with-observables';

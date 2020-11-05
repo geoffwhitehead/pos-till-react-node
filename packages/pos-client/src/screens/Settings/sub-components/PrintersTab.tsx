@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import {
   Container,
   Content,
@@ -20,14 +20,12 @@ import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import withObservables from '@nozbe/with-observables';
 import { tableNames, Printer } from '../../../models';
 import { Database } from '@nozbe/watermelondb';
-import { Loading } from '../../../components/Loading/Loading';
 import { capitalize } from 'lodash';
 import { PrinterDetails } from './PrinterDetails';
 import { portDiscovery } from '../../../services/printer/printer';
 import { Printers, Printer as StarPrinterProps } from 'react-native-star-prnt';
 import { PrinterRow } from './PrinterRow';
 import { Emulations, PrinterProps } from '../../../models/Printer';
-import { ModalContentButton } from '../../../components/Modal/ModalContentButton';
 import { Modal } from '../../../components/Modal/Modal';
 
 interface PrintersTabOuterProps {
@@ -67,20 +65,9 @@ const PrintersTabInner: React.FC<PrintersTabOuterProps & PrintersTabInnerProps> 
       address: portName,
     };
     setSelectedPrinter(selectedPrinterDetails);
-    // await database.action(async () => {
-    //   const collection = database.collections.get<Printer>(tableNames.printers);
-    //   await collection.create(printerRecord => {
-    //     Object.assign(printerRecord, {
-    //       macAddress: macAddress,
-    //       name: modelName,
-    //       address: portName,
-    //     });
-    //   });
-    // });
   };
 
   const onSave = async (values: PrinterProps) => {
-    // TODO: type vaalues
     setIsSaving(true);
 
     if (selectedPrinter.id) {

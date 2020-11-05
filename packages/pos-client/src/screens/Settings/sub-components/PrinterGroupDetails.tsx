@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import withObservables from '@nozbe/with-observables';
 import { PrinterGroup, PrinterGroupPrinter, tableNames } from '../../../models';
 import { Form, Label, H2, Input, Item, Button, Text, Col, Row, Content, List, ListItem } from '../../../core';
-import { styles } from './styles';
+import { commonStyles } from './styles';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 import { Printer } from '../../../models/Printer';
@@ -118,7 +118,7 @@ const PrinterGroupDetailsInner: React.FC<PrinterGroupDetailsOuterProps & Printer
             <Content>
               <Row>
                 <Col>
-                  <Form style={styles.form}>
+                  <Form style={commonStyles.form}>
                     <Item stackedLabel error={err.name}>
                       <Label>Name</Label>
                       <Input onChangeText={handleChange('name')} onBlur={handleBlur('name')} value={name} />
@@ -161,7 +161,7 @@ const PrinterGroupDetailsInner: React.FC<PrinterGroupDetailsOuterProps & Printer
 };
 
 const enhance = c =>
-  withDatabase<any>(
+  withDatabase(
     withObservables<PrinterGroupDetailsOuterProps, PrinterGroupDetailsInnerProps>(
       ['printerGroup'],
       ({ printerGroup, database }) => {

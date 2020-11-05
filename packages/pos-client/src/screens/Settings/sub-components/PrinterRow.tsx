@@ -1,6 +1,6 @@
 import { Printer } from '../../../models';
 import { ListItem, Left, Text, Body, Right, Icon, Button } from 'native-base';
-import { styles } from './styles';
+import { commonStyles } from './styles';
 import React from 'react';
 // import { capitalize } from 'lodash';
 import withObservables from '@nozbe/with-observables';
@@ -21,7 +21,7 @@ const PrinterRowInner: React.FC<PrinterRowOuterProps & PrinterRowInnerProps> = (
   onDelete,
 }) => {
   return (
-    <ListItem key={printer.id} noIndent style={isSelected ? styles.selectedRow : {}}>
+    <ListItem key={printer.id} noIndent style={isSelected ? commonStyles.selectedRow : {}}>
       <Left>
         <Text>{printer.name}</Text>
       </Left>

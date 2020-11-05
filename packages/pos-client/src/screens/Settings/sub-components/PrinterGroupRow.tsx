@@ -1,6 +1,6 @@
 import { Printer, PrinterGroup } from '../../../models';
 import { ListItem, Left, Text, Body, Button } from '../../../core';
-import { styles } from './styles';
+import { commonStyles } from './styles';
 import React from 'react';
 import withObservables from '@nozbe/with-observables';
 
@@ -24,7 +24,7 @@ const PrinterGroupRowInner: React.FC<PrinterGroupRowOuterProps & PrinterGroupRow
   ...props
 }) => {
   return (
-    <ListItem {...props} noIndent style={isSelected ? styles.selectedRow : {}}>
+    <ListItem {...props} noIndent style={isSelected ? commonStyles.selectedRow : {}}>
       <Left>
         <Text>{printerGroup.name}</Text>
       </Left>

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Printer, tableNames } from '../../../models';
 import { Form, Label, H2, Input, Item, Button, Text, Col, Row, Picker, Icon, Content } from '../../../core';
-import { styles } from './styles';
+import { commonStyles } from './styles';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 import { Emulations, PrinterProps } from '../../../models/Printer';
@@ -116,7 +116,7 @@ const PrinterDetailsInner: React.FC<PrinterDetailsOuterProps> = ({ printer, onCl
                   </Form>
                 </Col>
                 <Col>
-                  <Form style={styles.form}></Form>
+                  <Form style={commonStyles.form}></Form>
                 </Col>
               </Row>
             </Content>

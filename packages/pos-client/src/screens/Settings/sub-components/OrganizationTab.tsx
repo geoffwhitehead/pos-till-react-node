@@ -4,7 +4,7 @@ import { Formik } from 'formik';
 import * as Yup from 'yup';
 import { OrganizationContext } from '../../../contexts/OrganizationContext';
 import { useDatabase } from '@nozbe/watermelondb/hooks';
-import { styles } from './styles';
+import { commonStyles } from './styles';
 import { HeaderButtonBar } from '../../../components/HeaderButtonBar/HeaderButtonBar';
 
 interface OrganizationTabProps {}
@@ -110,12 +110,12 @@ export const OrganizationTab: React.FC<OrganizationTabProps> = () => {
             <>
               <HeaderButtonBar onPressPrimary={handleSubmit} primaryText="Save Changes"></HeaderButtonBar>
 
-              <Content style={styles.content}>
+              <Content style={commonStyles.content}>
                 <Form>
-                  <Text style={styles.text} note>
+                  <Text style={commonStyles.text} note>
                     * This information will also be printed on receipt and report headers
                   </Text>
-                  <Text style={styles.text} note>
+                  <Text style={commonStyles.text} note>
                     General company details.
                   </Text>
                   <Item stackedLabel error={err.name}>
@@ -135,7 +135,7 @@ export const OrganizationTab: React.FC<OrganizationTabProps> = () => {
                     <Input onChangeText={handleChange('vat')} onBlur={handleBlur('vat')} value={vat} />
                   </Item>
                   {/* <H2 style={styles.heading}>Address</H2> */}
-                  <Text style={styles.text} note>
+                  <Text style={commonStyles.text} note>
                     Address
                   </Text>
                   <Item stackedLabel error={err.addressLine1}>

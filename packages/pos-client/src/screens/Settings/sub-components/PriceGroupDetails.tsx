@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { PriceGroup, tableNames } from '../../../models';
 import { Form, Label, Input, Item, Text, Col, Row, Content, ListItem, CheckBox, Body } from '../../../core';
-import { styles } from './styles';
+import { commonStyles } from './styles';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 import { ModalContentButton } from '../../../components/Modal/ModalContentButton';
@@ -78,7 +78,7 @@ export const PriceGroupDetails: React.FC<PriceGroupDetailsProps> = ({ priceGroup
             <Content>
               <Row>
                 <Col>
-                  <Form style={styles.form}>
+                  <Form style={commonStyles.form}>
                     <Item stackedLabel error={err.name}>
                       <Label>Name</Label>
                       <Input onChangeText={handleChange('name')} onBlur={handleBlur('name')} value={name} />
