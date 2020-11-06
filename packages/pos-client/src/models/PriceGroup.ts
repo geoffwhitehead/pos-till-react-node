@@ -9,19 +9,15 @@ export class PriceGroup extends Model {
   @field('short_name') shortName: string;
   @field('is_prep_time_required') isPrepTimeRequired: boolean;
 
-  @action updatePriceGroup = (values: { name: string; shortName: string; isPrepTimeRequired: boolean }) => {
-    this.database.action(async () => {
-      await this.update(record => Object.assign(record, values));
-    });
+  @action updatePriceGroup = async (values: { name: string; shortName: string; isPrepTimeRequired: boolean }) => {
+    await this.update(record => Object.assign(record, values));
   };
 
   @action remove = async (organization: Organization) => {
-    this.database.action(async () => {
-      await this.markAsDeleted();
-      if (organization.defaultPriceGroupId === this.id) {
-        await organization.defaultPriceGroup.set(null);
-      }
-    });
+    await this.markAsDeleted();
+    if (organization.defaultPriceGroupId === this.id) {
+      await organization.update(record => record.defaultPriceGroup.set(null));
+    }
   };
 }
 

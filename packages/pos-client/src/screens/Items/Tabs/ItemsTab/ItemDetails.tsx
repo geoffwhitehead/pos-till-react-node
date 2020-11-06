@@ -162,14 +162,14 @@ const ItemDetailsInner: React.FC<ItemDetailsOuterProps & ItemDetailsInnerProps> 
       );
 
       const toCreate = [itemToCreate, ...itemModifersToCreate, ...pricesToCreate];
-      await database.action(async () => await database.batch(...toCreate));
+      await database.action(() => database.batch(...toCreate));
     }
     setLoading(false);
     onClose();
   };
 
   const handleDelete = async (item: ItemModel) => {
-    await item.remove();
+    await database.action(() => item.remove());
     onClose();
   };
 

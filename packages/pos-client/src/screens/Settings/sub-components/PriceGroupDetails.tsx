@@ -36,11 +36,11 @@ export const PriceGroupDetails: React.FC<PriceGroupDetailsProps> = ({ priceGroup
   const update = async (values: FormValues, priceGroup: PriceGroup) => {
     setLoading(true);
     if (priceGroup) {
-      await priceGroup.updatePriceGroup(values);
+      await database.action(() => priceGroup.updatePriceGroup(values));
     } else {
       const priceGroupCollection = database.collections.get<PriceGroup>(tableNames.priceGroups);
 
-      await database.action(async () => await priceGroupCollection.create(record => Object.assign(record, values)));
+      await database.action(() => priceGroupCollection.create(record => Object.assign(record, values)));
     }
     setLoading(false);
     onClose();

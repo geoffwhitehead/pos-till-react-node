@@ -41,9 +41,7 @@ export class Printer extends Model {
 
     const toDelete = [...printerGroupPrintersToDelete, this.prepareMarkAsDeleted()];
 
-    await this.database.action(async () => {
-      await this.database.batch(...toDelete);
-    });
+    await this.database.batch(...toDelete);
   };
 }
 

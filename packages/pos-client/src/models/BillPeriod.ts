@@ -74,8 +74,7 @@ export class BillPeriod extends Model {
       org.currentBillPeriod.set(newBillPeriod);
     });
     const updates = [updateBillPeriod, newBillPeriod, orgUpdate];
-    await this.database.action(async () => {
-      await this.database.batch(...updates);
-    });
+
+    await this.database.batch(...updates);
   };
 }

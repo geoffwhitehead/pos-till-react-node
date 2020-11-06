@@ -121,9 +121,7 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
         }),
       );
 
-      await database.action(async () => {
-        await bill.processPrintLogs(flatten(printStatuses));
-      });
+      await database.action(() => bill.processPrintLogs(flatten(printStatuses)));
     }
 
     await database.action(bill.storeBill);

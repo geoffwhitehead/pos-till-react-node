@@ -47,7 +47,7 @@ const PriceGroupsTabInner: React.FC<PriceGroupsTabOuterProps & PriceGroupsTabInn
   };
 
   const onDelete = async (priceGroup: PriceGroup) => {
-    await priceGroup.remove(organization);
+    await database.action(() => priceGroup.remove(organization));
   };
 
   const areYouSure = (fn, priceGroup: PriceGroup) => {

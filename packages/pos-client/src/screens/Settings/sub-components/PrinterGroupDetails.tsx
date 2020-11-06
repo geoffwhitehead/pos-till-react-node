@@ -67,7 +67,7 @@ const PrinterGroupDetailsInner: React.FC<PrinterGroupDetailsOuterProps & Printer
 
       const toCreate = [pGToCreate, ...pGRefsToCreate];
 
-      await database.action(async () => await database.batch(...toCreate));
+      await database.action(() => database.batch(...toCreate));
     }
     setLoading(false);
     onClose();

@@ -56,7 +56,7 @@ export const ReportsInner: React.FC<ReportsOuterProps & ReportsInnerProps> = ({
   };
 
   const closePeriod = async (billPeriod: BillPeriod, organization: Organization) => {
-    await billPeriod.closePeriod(organization);
+    await database.action(() => billPeriod.closePeriod(organization));
     onPrint(billPeriod);
   };
 

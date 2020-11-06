@@ -2,6 +2,24 @@ import { Model, tableSchema, Relation } from '@nozbe/watermelondb';
 import { action, field, relation } from '@nozbe/watermelondb/decorators';
 import { Printer, PriceGroup, BillPeriod, tableNames } from '.';
 
+export type OrganizationProps = {
+  name: string;
+  email: string;
+  phone: string;
+  vat: string;
+  addressLine1: string;
+  addressLine2: string;
+  addressCity: string;
+  addressCounty: string;
+  addressPostcode: string;
+  defaultPriceGroupId: string;
+  receiptPrinterId: string;
+  currency: string;
+  maxBills: number;
+  lastPulledAt: number;
+  currentBillPeriodId: string;
+};
+
 export class Organization extends Model {
   static table = 'organizations';
 

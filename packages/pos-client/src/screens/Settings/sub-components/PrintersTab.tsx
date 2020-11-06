@@ -99,7 +99,7 @@ const PrintersTabInner: React.FC<PrintersTabOuterProps & PrintersTabInnerProps> 
   };
 
   const onDelete = async (printer: Printer) => {
-    await printer.remove();
+    await database.action(printer.remove);
   };
 
   const areYouSure = (fn, p: Printer) => {

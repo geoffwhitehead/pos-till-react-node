@@ -41,7 +41,7 @@ export class Item extends Model {
     const pricesToDelete = prices.map(price => price.prepareMarkAsDeleted());
     const modifierRefsToDelete = modifierRefs.map(modifierRef => modifierRef.prepareMarkAsDeleted());
     const toRemove = [this.prepareMarkAsDeleted(), ...pricesToDelete, ...modifierRefsToDelete];
-    await this.database.action(async () => await this.database.batch(...toRemove));
+    await this.database.batch(...toRemove);
   };
 
   @action updateItem = async ({

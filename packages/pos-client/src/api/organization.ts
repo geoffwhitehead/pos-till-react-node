@@ -20,5 +20,4 @@ export interface OrganizationServerProps {
     currency?: string;
     maxBills?: number;
   };
-  lastPulledAt: number;
 }
