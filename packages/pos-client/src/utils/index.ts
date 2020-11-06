@@ -1,5 +1,5 @@
 import { Database, Q } from '@nozbe/watermelondb';
-import { flatten, uniq, groupBy, sumBy } from 'lodash';
+import { flatten, groupBy, sumBy } from 'lodash';
 import { BillItem, BillItemModifierItem, BillDiscount, BillPayment, Discount, PriceGroup, tableNames } from '../models';
 
 export const getDefaultCashDenominations = (currency: string): number[] => {
@@ -22,12 +22,11 @@ export const formatNumber = (value: number, currency = 'gbp'): string => {
 
   return new Intl.NumberFormat(format, { style: 'currency', currency }).format(value / 100);
 };
-// `${symbol}${(value ? value / 100 : 0).toFixed(2)}`;
 
 export const _totalDiscount = (
-  total,
-  billDiscounts,
-  discounts,
+  total: number,
+  billDiscounts: BillDiscount[],
+  discounts: Discount[],
 ): { total: number; breakdown: ReturnType<typeof _discountBreakdown> } => {
   const breakdown = _discountBreakdown(total, billDiscounts, discounts);
 
@@ -46,7 +45,11 @@ export type DiscountBreakdownProps = {
   calculatedDiscount: number;
 };
 
-export const _discountBreakdown = (total: number, billDiscounts: any, discounts): DiscountBreakdownProps[] => {
+export const _discountBreakdown = (
+  total: number,
+  billDiscounts: BillDiscount[],
+  discounts: Discount[],
+): DiscountBreakdownProps[] => {
   let rollingTotal = total;
   const lookupDiscount = billDiscount => discounts.find(discount => discount.id === billDiscount.discountId);
 

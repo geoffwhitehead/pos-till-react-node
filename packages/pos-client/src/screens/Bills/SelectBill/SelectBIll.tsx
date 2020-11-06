@@ -56,17 +56,6 @@ export const WrappedSelectBill: React.FC<SelectBillOuterProps & SelectBillInnerP
             </Button>
           </Right>
         </ListItem>
-        <ListItem itemHeader>
-          <Left>
-            <Text>State</Text>
-          </Left>
-          <Body>
-            <Text>Balance</Text>
-          </Body>
-          <Right>
-            <Text>Total</Text>
-          </Right>
-        </ListItem>
         {bills.filter(filterOpenOnly).map((bill, index) => {
           return bill ? (
             <BillRow key={bill.id} bill={bill} onSelectBill={_onSelectBill} />

@@ -121,7 +121,7 @@ const CategoryItemsInner: React.FC<CategoryItemsListOuterProps & CategoryItemsLi
           return elements;
         })}
       </List>
-      <Modal onClose={onCancelHandler} isOpen={modalOpen}>
+      <Modal onClose={onCancelHandler} isOpen={modalOpen} style={{ width: 600 }}>
         <ModifierList priceGroup={priceGroup} currentBill={currentBill} onClose={onCancelHandler} item={selectedItem} />
       </Modal>
     </Content>

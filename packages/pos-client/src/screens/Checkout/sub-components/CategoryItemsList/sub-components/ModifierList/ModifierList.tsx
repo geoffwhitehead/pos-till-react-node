@@ -8,6 +8,8 @@ import { View } from 'native-base';
 import { NumberPicker } from '../../../../../../components/NumberPicker/NumberPicker';
 import { Item, Bill, PriceGroup, Modifier, ModifierItem } from '../../../../../../models';
 import { useDatabase } from '@nozbe/watermelondb/hooks';
+import { ModalContentButton } from '../../../../../../components/Modal/ModalContentButton';
+import { commonStyles } from '../../../../../Settings/sub-components/styles';
 
 interface ModifierListOuterProps {
   item: Item;
@@ -63,25 +65,16 @@ export const ModifierListInner: React.FC<ModifierListOuterProps & ModifierListIn
   };
 
   return (
-    <Content style={styles.modal}>
-      <View style={styles.headerButtons}>
-        <Button light onPress={onClose}>
-          <Text>Cancel</Text>
-        </Button>
-        <Button disabled={!isSelectionValid} onPress={createItemWithModifiers}>
-          <Text>Save</Text>
-        </Button>
-      </View>
-      {item && (
+    <ModalContentButton
+      onPressPrimaryButton={createItemWithModifiers}
+      isPrimaryDisabled={!isSelectionValid}
+      onPressSecondaryButton={onClose}
+      secondaryButtonText="Cancel"
+      primaryButtonText="Save"
+      title={`${item.name}: Modifiers`}
+    >
+      <Content>
         <List>
-          <ListItem itemHeader first>
-            <Left>
-              <Icon onPress={onClose} name="ios-arrow-back" />
-              <Text style={{ fontWeight: 'bold' }}>{`${item.name} / Modifiers`}</Text>
-            </Left>
-            <Body></Body>
-            <Right />
-          </ListItem>
           {modifiers.map(modifier => {
             const selectedItems = selectedModifiers[modifier.id].items;
             return (
@@ -95,26 +88,19 @@ export const ModifierListInner: React.FC<ModifierListOuterProps & ModifierListIn
             );
           })}
         </List>
-      )}
-      <NumberPicker onPress={v => setQuantity(v)} />
-    </Content>
+        <NumberPicker onPress={v => setQuantity(v)} />
+      </Content>
+    </ModalContentButton>
   );
+};
+
+const styles = {
+  content: {
+    textAlign: 'center',
+    display: 'flex',
+  } as const,
 };
 
 export const ModifierList = withObservables<ModifierListOuterProps, ModifierListInnerProps>(['item'], ({ item }) => ({
   modifiers: item.modifiers,
 }))(ModifierListInner);
-
-const styles = StyleSheet.create({
-  modal: {
-    borderRadius: 5,
-    backgroundColor: 'white',
-    width: 400,
-    padding: 10,
-  },
-  headerButtons: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    flexDirection: 'row',
-  },
-});

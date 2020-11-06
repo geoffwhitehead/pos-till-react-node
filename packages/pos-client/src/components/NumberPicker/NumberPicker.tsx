@@ -13,19 +13,30 @@ export const NumberPicker: React.FC<{ value?: number; onPress?: (v: number) => v
 
   return (
     <View style={styles.numberPicker}>
-      <Icon onPress={() => _onPress(_value === 1 ? _value : _value - 1)} name="ios-remove" />
-      <Input style={{ width: 0 }} value={(value && value.toString()) || _value.toString()} />
-      <Icon onPress={() => _onPress(_value + 1)} name="ios-add" />
+      <Icon style={styles.icon} onPress={() => _onPress(_value === 1 ? _value : _value - 1)} name="ios-remove" />
+      <Input style={styles.numberInput} value={(value && value.toString()) || _value.toString()} />
+      <Icon style={styles.icon} onPress={() => _onPress(_value + 1)} name="ios-add" />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   numberPicker: {
-    margin: 30,
+    maxWidth: 200,
+    marginTop: 30,
+    marginLeft: 'auto',
+    marginRight: 'auto',
     justifyContent: 'space-between',
     alignItems: 'center',
     display: 'flex',
     flexDirection: 'row',
   },
+  numberInput: {
+    textAlign: 'center',
+    width: 60,
+    maxWidth: 120,
+    fontSize: 26,
+    fontWeight: 'bold',
+  },
+  icon: { fontSize: 50 },
 });

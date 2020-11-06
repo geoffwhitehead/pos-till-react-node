@@ -1,9 +1,10 @@
 import React from 'react';
 import withObservables from '@nozbe/with-observables';
-import { Text } from '../../../../../../core';
+import { Text, Header } from '../../../../../../core';
 import { View } from 'native-base';
 import { ModifierItemRow } from './ModifierItemRow';
 import { ModifierItem, Modifier, PriceGroup } from '../../../../../../models';
+import { min } from 'lodash';
 
 interface ModifierGroupOuterProps {
   modifier: Modifier;
@@ -27,9 +28,22 @@ const WrappedModifierGroup: React.FC<ModifierGroupInnerProps & ModifierGroupOute
     onPressModifierItem(modifier, modifierItem);
   };
 
+  const { minItems, maxItems, name } = modifier;
+
+  const single = minItems === maxItems;
+  const range = minItems === 0 && maxItems > 0;
+
+  const plural = maxItems === 1 ? 'modifier' : 'modifiers';
+  const singleMessage = `Choose ${minItems} ${plural}`;
+  const rangeSelection = `Choose between ${minItems} and ${maxItems} ${plural}`;
+
+  const message = single ? singleMessage : range ? rangeSelection : '';
+
   return (
     <View>
-      <Text>{modifier.name}</Text>
+      <Header>
+        <Text style={{ fontSize: 22 }}>{name}</Text>
+      </Header>
       {modifierItems.map(item => (
         <ModifierItemRow
           key={item.id}
@@ -39,6 +53,9 @@ const WrappedModifierGroup: React.FC<ModifierGroupInnerProps & ModifierGroupOute
           onPress={_onPressModifierItem}
         />
       ))}
+      <Text style={{ padding: 15 }} note>
+        {message}
+      </Text>
     </View>
   );
 };
