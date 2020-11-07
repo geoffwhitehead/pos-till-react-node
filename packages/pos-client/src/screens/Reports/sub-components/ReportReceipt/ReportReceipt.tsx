@@ -1,9 +1,5 @@
 import React from 'react';
-import { Text, Col, List, Row, Button, Content, Separator, ListItem, Left, Right } from '../../../../core';
 import { StyleSheet } from 'react-native';
-import { formatNumber } from '../../../../utils';
-import { capitalize } from 'lodash';
-import { Collection } from 'realm';
 
 const sumObject: (obj: Record<string, number>) => number = obj =>
   Object.keys(obj).reduce((acc, id) => acc + obj[id], 0);

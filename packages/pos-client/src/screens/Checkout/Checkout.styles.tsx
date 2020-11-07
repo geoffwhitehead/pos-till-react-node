@@ -1,5 +1,5 @@
-import { StyleSheet } from 'react-native'
-import { Helpers, Metrics, Fonts, Colors } from '../../theme'
+import { StyleSheet } from 'react-native';
+import { Colors, Fonts, Helpers, Metrics } from '../../theme';
 
 export default StyleSheet.create({
   error: {
@@ -29,4 +29,4 @@ export default StyleSheet.create({
     marginBottom: Metrics.tiny,
     textAlign: 'center',
   },
-})
+});

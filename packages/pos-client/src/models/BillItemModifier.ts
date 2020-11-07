@@ -1,8 +1,8 @@
-import { Model, Q, tableSchema, Relation, Query } from '@nozbe/watermelondb';
-import { nochange, field, immutableRelation, children, lazy } from '@nozbe/watermelondb/decorators';
-import { Modifier } from './Modifier';
-import { BillItemModifierItem } from './BillItemModifierItem';
+import { Model, Q, Query, Relation, tableSchema } from '@nozbe/watermelondb';
+import { children, field, immutableRelation, lazy, nochange } from '@nozbe/watermelondb/decorators';
 import { BillItem } from './BillItem';
+import { BillItemModifierItem } from './BillItemModifierItem';
+import { Modifier } from './Modifier';
 
 export const billItemModifierSchema = tableSchema({
   name: 'bill_item_modifiers',
@@ -24,9 +24,13 @@ export class BillItemModifier extends Model {
   @immutableRelation('bill_items', 'bill_item_id') billItem: Relation<BillItem>;
 
   @children('bill_item_modifier_items') _billItemModifierItems: Query<BillItemModifierItem>;
-  
-  @lazy billItemModifierItems: Query<BillItemModifierItem> = this._billItemModifierItems.extend(Q.where('is_voided', Q.notEq(true)));
-  @lazy billItemModifierItemVoids: Query<BillItemModifierItem> = this._billItemModifierItems.extend(Q.where('is_voided', true));
+
+  @lazy billItemModifierItems: Query<BillItemModifierItem> = this._billItemModifierItems.extend(
+    Q.where('is_voided', Q.notEq(true)),
+  );
+  @lazy billItemModifierItemVoids: Query<BillItemModifierItem> = this._billItemModifierItems.extend(
+    Q.where('is_voided', true),
+  );
 
   static associations = {
     bill_items: { type: 'belongs_to', key: 'bill_item_id' },

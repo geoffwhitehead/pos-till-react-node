@@ -1,5 +1,5 @@
-import { Model, tableSchema, Relation } from '@nozbe/watermelondb';
-import { nochange, field, readonly, date, immutableRelation, action } from '@nozbe/watermelondb/decorators';
+import { Model, Relation, tableSchema } from '@nozbe/watermelondb';
+import { action, date, field, immutableRelation, nochange, readonly } from '@nozbe/watermelondb/decorators';
 import { Bill } from './Bill';
 import { Discount } from './Discount';
 

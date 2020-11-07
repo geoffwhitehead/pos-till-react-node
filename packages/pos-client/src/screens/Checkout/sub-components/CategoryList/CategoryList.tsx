@@ -1,14 +1,14 @@
-import React, { useContext, useState } from 'react';
-import { Text, Content, List, ListItem, Left, Icon, Body, Right } from '../../../../core';
-import { SearchHeader } from '../../../../components/SearchHeader/SearchHeader';
-import { CheckoutItemStackParamList } from '../../../../navigators/CheckoutItemNavigator';
+import { Database } from '@nozbe/watermelondb';
 import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import withObservables from '@nozbe/with-observables';
-import { Database } from '@nozbe/watermelondb';
 import { RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { Category, PriceGroup } from '../../../../models';
+import React, { useContext, useState } from 'react';
+import { SearchHeader } from '../../../../components/SearchHeader/SearchHeader';
 import { PriceGroupContext } from '../../../../contexts/PriceGroupContext';
+import { Body, Content, Icon, Left, List, ListItem, Right, Text } from '../../../../core';
+import { Category, PriceGroup } from '../../../../models';
+import { CheckoutItemStackParamList } from '../../../../navigators/CheckoutItemNavigator';
 
 interface CategoriesInnerProps {
   categories: Category[];

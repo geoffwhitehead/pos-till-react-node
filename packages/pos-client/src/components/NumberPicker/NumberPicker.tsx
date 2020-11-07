@@ -1,7 +1,6 @@
-import { View, Icon, Input } from 'native-base';
-import { useState } from 'react';
+import { Icon, Input, View } from 'native-base';
+import React, { useState } from 'react';
 import { StyleSheet } from 'react-native';
-import React from 'react';
 
 export const NumberPicker: React.FC<{ value?: number; onPress?: (v: number) => void }> = ({ value, onPress }) => {
   const [_value, _setValue] = useState(value || 1);

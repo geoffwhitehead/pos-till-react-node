@@ -1,8 +1,7 @@
-import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import withObservables from '@nozbe/with-observables';
 import React from 'react';
 import { Button, Left, ListItem, Right, Text } from '../../../../core';
-import { Category, Modifier, tableNames } from '../../../../models';
+import { Category } from '../../../../models';
 
 type CategoryRowOuterProps = {
   onSelect: (category: Category) => void;

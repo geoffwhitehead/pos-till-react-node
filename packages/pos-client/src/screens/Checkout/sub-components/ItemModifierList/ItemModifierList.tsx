@@ -1,15 +1,13 @@
-import React, { useState } from 'react';
-import { Text, Content, List, ListItem, Left, Icon, Body, Right } from '../../../../core';
-import { SearchHeader } from '../../../../components/SearchHeader/SearchHeader';
 import { RouteProp } from '@react-navigation/native';
-import { CheckoutItemStackParamList } from '../../../../navigators/CheckoutItemNavigator';
 import { StackNavigationProp } from '@react-navigation/stack';
+import React from 'react';
 import { Item, Modifier } from '../../../../models';
+import { CheckoutItemStackParamList } from '../../../../navigators/CheckoutItemNavigator';
 
 interface ItemModifierListInnerProps {
-  item: Item,
-  modifier: Modifier,
-  createBillItem
+  item: Item;
+  modifier: Modifier;
+  createBillItem;
 }
 
 interface ItemModifierListOuterProps {
@@ -23,25 +21,19 @@ export const ItemModifierList: React.FC<ItemModifierListOuterProps & ItemModifie
 }) => {
   // const { item, modifier, createBillItem } = route.params;
   // const [searchValue, setSearchValue] = useState<string>('');
-
   // const goBack = () => navigation.goBack();
-
   // const onPressModifierFactory = (item, mod) => () => {
   //   // create a new item with modifier in a the bill
   //   createBillItem(item, [mod]);
   //   goBack();
   // };
-
   // const onSearchHandler = (value: string) => setSearchValue(value);
-
   // // TODO: type
   // const searchFilter = (modifier: any, searchValue: string) =>
   //   modifier.name.toLowerCase().includes(searchValue.toLowerCase());
-
   // return (
   //   <Content>
   //     <SearchHeader onChangeText={onSearchHandler} value={searchValue} />
-
   //     <List>
   //       <ListItem itemHeader first>
   //         <Left>

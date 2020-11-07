@@ -1,9 +1,7 @@
-import { Printer } from '../../../models';
-import { ListItem, Left, Text, Body, Right, Icon } from 'native-base';
-import { commonStyles } from './styles';
-import React from 'react';
-// import { capitalize } from 'lodash';
 import withObservables from '@nozbe/with-observables';
+import { Body, Icon, Left, ListItem, Right, Text } from 'native-base';
+import React from 'react';
+import { Printer } from '../../../models';
 
 interface PrinterRowChoiceInnerProps {}
 

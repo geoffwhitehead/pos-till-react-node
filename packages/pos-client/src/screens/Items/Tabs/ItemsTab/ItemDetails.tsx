@@ -1,43 +1,41 @@
-import {
-  ListItem,
-  Item,
-  Text,
-  Icon,
-  Grid,
-  Row,
-  Col,
-  Form,
-  Label,
-  Input,
-  H2,
-  Picker,
-  List,
-  ActionSheet,
-  Content,
-} from '../../../../core';
-import React, { useState, useEffect } from 'react';
-import withObservables from '@nozbe/with-observables';
-import {
-  Item as ItemModel,
-  Category,
-  tableNames,
-  PrinterGroup,
-  Modifier,
-  PriceGroup,
-  ItemPrice,
-  ItemModifier,
-} from '../../../../models';
-import { styles } from '../../../../styles';
-import * as Yup from 'yup';
-import { Formik, FieldArray } from 'formik';
-import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import { Database } from '@nozbe/watermelondb';
+import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
+import withObservables from '@nozbe/with-observables';
+import { FieldArray, Formik } from 'formik';
+import { keyBy } from 'lodash';
+import React, { useEffect, useState } from 'react';
+import * as Yup from 'yup';
 import { Loading } from '../../../../components/Loading/Loading';
 import { ModalContentButton } from '../../../../components/Modal/ModalContentButton';
-import { ModifierRow } from './ModifierRow';
-import { useDatabase } from '@nozbe/watermelondb/hooks';
-import { isPlainObject, keyBy } from 'lodash';
+import {
+  ActionSheet,
+  Col,
+  Form,
+  Grid,
+  H2,
+  Icon,
+  Input,
+  Item,
+  Label,
+  List,
+  ListItem,
+  Picker,
+  Row,
+  Text,
+} from '../../../../core';
+import {
+  Category,
+  Item as ItemModel,
+  ItemModifier,
+  ItemPrice,
+  Modifier,
+  PriceGroup,
+  PrinterGroup,
+  tableNames,
+} from '../../../../models';
+import { styles } from '../../../../styles';
 import { SHORT_NAME_LENGTH } from '../../../../utils/consts';
+import { ModifierRow } from './ModifierRow';
 
 interface ItemDetailsOuterProps {
   item?: ItemModel;
@@ -79,8 +77,6 @@ const ItemSchema = Yup.object().shape({
     }),
   ),
 });
-
-// TODO: really need to refaactor some of these components and styles.
 
 const ItemDetailsInner: React.FC<ItemDetailsOuterProps & ItemDetailsInnerProps> = ({
   item,

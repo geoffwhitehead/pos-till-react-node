@@ -1,29 +1,29 @@
-import React, { useContext, useState } from 'react';
-import {
-  Container,
-  Content,
-  Text,
-  Body,
-  Grid,
-  Col,
-  Row,
-  Button,
-  List,
-  ListItem,
-  Left,
-  Right,
-  ActionSheet,
-  Icon,
-} from '../../../core';
+import { Database } from '@nozbe/watermelondb';
 import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import withObservables from '@nozbe/with-observables';
-import { tableNames, PriceGroup } from '../../../models';
-import { Database } from '@nozbe/watermelondb';
+import React, { useContext, useState } from 'react';
 import { Loading } from '../../../components/Loading/Loading';
 import { Modal } from '../../../components/Modal/Modal';
-import { commonStyles } from './styles';
-import { PriceGroupDetails } from './PriceGroupDetails';
 import { OrganizationContext } from '../../../contexts/OrganizationContext';
+import {
+  ActionSheet,
+  Body,
+  Button,
+  Col,
+  Container,
+  Content,
+  Grid,
+  Icon,
+  Left,
+  List,
+  ListItem,
+  Right,
+  Row,
+  Text,
+} from '../../../core';
+import { PriceGroup, tableNames } from '../../../models';
+import { PriceGroupDetails } from './PriceGroupDetails';
+import { commonStyles } from './styles';
 
 interface PriceGroupsTabOuterProps {
   database: Database;

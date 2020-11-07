@@ -1,34 +1,34 @@
-import { Model, Q, tableSchema, Relation, Query } from '@nozbe/watermelondb';
+import { Model, Q, Query, Relation, tableSchema } from '@nozbe/watermelondb';
 import {
-  field,
-  nochange,
-  date,
-  readonly,
-  immutableRelation,
-  children,
-  lazy,
   action,
+  children,
+  date,
+  field,
+  immutableRelation,
+  lazy,
+  nochange,
+  readonly,
 } from '@nozbe/watermelondb/decorators';
-import { resolvePrice } from '../helpers';
 import dayjs from 'dayjs';
-import { BillItem } from './BillItem';
-import { BillPeriod } from './BillPeriod';
-import { BillPayment } from './BillPayment';
-import { BillDiscount } from './BillDiscount';
-import { BillItemModifierItem } from './BillItemModifierItem';
+import { flatten, times } from 'lodash';
 import {
-  PaymentType,
-  Item,
-  PriceGroup,
+  BillItemModifier,
+  BillItemPrintLog,
   Discount,
+  Item,
   Modifier,
   ModifierItem,
-  BillItemModifier,
+  PaymentType,
+  PriceGroup,
   tableNames,
-  BillItemPrintLog,
 } from '.';
-import { flatten, times } from 'lodash';
+import { resolvePrice } from '../helpers';
+import { BillDiscount } from './BillDiscount';
+import { BillItem } from './BillItem';
+import { BillItemModifierItem } from './BillItemModifierItem';
 import { PrintStatus } from './BillItemPrintLog';
+import { BillPayment } from './BillPayment';
+import { BillPeriod } from './BillPeriod';
 
 export const billSchema = tableSchema({
   name: 'bills',

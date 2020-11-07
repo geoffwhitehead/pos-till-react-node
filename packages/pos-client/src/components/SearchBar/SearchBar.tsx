@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Item, Icon, Input, Button, Text } from '../../core';
+import React from 'react';
+import { Button, Icon, Input, Item, Text } from '../../core';
 
 type SearchBarProps = {
   onSearch: (value: string) => void;

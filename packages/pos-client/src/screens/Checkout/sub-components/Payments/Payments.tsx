@@ -1,36 +1,28 @@
-import React, { useState, useEffect, useContext } from 'react';
-import {
-  Text,
-  Content,
-  Input,
-  Item,
-  Grid,
-  Col,
-  Button,
-  Row,
-  Body,
-  List,
-  ListItem,
-  Left,
-  Right,
-  Label,
-} from '../../../../core';
-import {
-  formatNumber,
-  billSummary,
-  BillSummary,
-  getDefaultCashDenominations,
-  minimalBillSummary,
-  MinimalBillSummary,
-} from '../../../../utils';
-import { StyleSheet } from 'react-native';
-import { paymentTypeNames } from '../../../../api/paymentType';
-import { capitalize } from 'lodash';
+import { Database } from '@nozbe/watermelondb';
 import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import withObservables from '@nozbe/with-observables';
-import { tableNames, Bill, Discount, PaymentType, BillItem, BillPayment, BillDiscount } from '../../../../models';
-import { Database } from '@nozbe/watermelondb';
+import { capitalize } from 'lodash';
+import React, { useContext, useEffect, useState } from 'react';
+import { StyleSheet } from 'react-native';
+import { paymentTypeNames } from '../../../../api/paymentType';
 import { OrganizationContext } from '../../../../contexts/OrganizationContext';
+import {
+  Button,
+  Col,
+  Content,
+  Grid,
+  Input,
+  Item,
+  Label,
+  Left,
+  List,
+  ListItem,
+  Right,
+  Row,
+  Text,
+} from '../../../../core';
+import { Bill, BillDiscount, BillItem, BillPayment, Discount, PaymentType, tableNames } from '../../../../models';
+import { formatNumber, getDefaultCashDenominations, minimalBillSummary, MinimalBillSummary } from '../../../../utils';
 
 interface PaymentOuterProps {
   bill: Bill;

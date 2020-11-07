@@ -1,15 +1,15 @@
-import { Database, Query } from '@nozbe/watermelondb';
-import { Content, List, Item as ItemComponent, Input, Icon, Text, View, Button } from '../../../../core';
-import React, { useState, useEffect } from 'react';
-import { Modal } from '../../../../components/Modal/Modal';
+import { Database } from '@nozbe/watermelondb';
 import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import withObservables from '@nozbe/with-observables';
-import { Category, Item, Modifier, PrinterGroup, tableNames } from '../../../../models';
-import { ItemsTabRow } from './ItemsTabRow';
-import { ItemDetails } from './ItemDetails';
-import { Loading } from '../../../../components/Loading/Loading';
 import { keyBy } from 'lodash';
+import React, { useEffect, useState } from 'react';
+import { Loading } from '../../../../components/Loading/Loading';
+import { Modal } from '../../../../components/Modal/Modal';
 import { SearchBar } from '../../../../components/SearchBar/SearchBar';
+import { Content, List, View } from '../../../../core';
+import { Category, Item, Modifier, PrinterGroup, tableNames } from '../../../../models';
+import { ItemDetails } from './ItemDetails';
+import { ItemsTabRow } from './ItemsTabRow';
 
 interface ItemsTabOuterProps {
   database?: Database;
@@ -33,8 +33,6 @@ const ItemsTabInner: React.FC<ItemsTabOuterProps & ItemsTabInnerProps> = ({ item
   }, [categories]);
 
   const searchFilter = (item: Item, searchValue: string) => item.name.toLowerCase().includes(searchValue.toLowerCase());
-
-  const onSearchHandler = (value: string) => setSearchValue(value);
 
   const onCloseHandler = () => {
     setModalOpen(false);

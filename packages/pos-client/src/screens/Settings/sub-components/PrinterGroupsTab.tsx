@@ -1,28 +1,27 @@
-import React, { useState } from 'react';
-import {
-  Container,
-  Content,
-  Text,
-  Body,
-  Grid,
-  Col,
-  Row,
-  Button,
-  List,
-  ListItem,
-  Left,
-  Right,
-  ActionSheet,
-  Icon,
-} from '../../../core';
+import { Database } from '@nozbe/watermelondb';
 import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import withObservables from '@nozbe/with-observables';
-import { tableNames, PrinterGroup } from '../../../models';
-import { Database } from '@nozbe/watermelondb';
+import React, { useState } from 'react';
 import { Loading } from '../../../components/Loading/Loading';
-import { PrinterGroupRow } from './PrinterGroupRow';
-import { PrinterGroupDetails } from './PrinterGroupDetails';
 import { Modal } from '../../../components/Modal/Modal';
+import {
+  ActionSheet,
+  Button,
+  Col,
+  Container,
+  Content,
+  Grid,
+  Icon,
+  Left,
+  List,
+  ListItem,
+  Right,
+  Row,
+  Text,
+} from '../../../core';
+import { PrinterGroup, tableNames } from '../../../models';
+import { PrinterGroupDetails } from './PrinterGroupDetails';
+import { PrinterGroupRow } from './PrinterGroupRow';
 
 interface PrinterGroupsTabOuterProps {
   database: Database;

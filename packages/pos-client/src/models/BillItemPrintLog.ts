@@ -1,6 +1,6 @@
-import { date, field, immutableRelation, readonly, relation } from '@nozbe/watermelondb/decorators';
+import { Model, Relation, tableSchema } from '@nozbe/watermelondb';
+import { date, field, immutableRelation, readonly } from '@nozbe/watermelondb/decorators';
 import { Bill, BillItem, Printer } from '.';
-import { Relation, tableSchema, Model } from '@nozbe/watermelondb';
 
 export enum PrintStatus {
   errored = 'errored',

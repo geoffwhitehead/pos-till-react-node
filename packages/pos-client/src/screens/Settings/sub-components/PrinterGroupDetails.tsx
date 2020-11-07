@@ -1,16 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import withObservables from '@nozbe/with-observables';
-import { PrinterGroup, PrinterGroupPrinter, tableNames } from '../../../models';
-import { Form, Label, H2, Input, Item, Button, Text, Col, Row, Content, List, ListItem } from '../../../core';
-import { commonStyles } from './styles';
-import { Formik } from 'formik';
-import * as Yup from 'yup';
-import { Printer } from '../../../models/Printer';
-import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import { Database } from '@nozbe/watermelondb';
-import { PrinterRowChoice } from './PrinterRowChoice';
+import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
+import withObservables from '@nozbe/with-observables';
+import { Formik } from 'formik';
+import React, { useEffect, useState } from 'react';
+import * as Yup from 'yup';
 import { Loading } from '../../../components/Loading/Loading';
 import { ModalContentButton } from '../../../components/Modal/ModalContentButton';
+import { Col, Content, Form, Input, Item, Label, List, ListItem, Row, Text } from '../../../core';
+import { PrinterGroup, PrinterGroupPrinter, tableNames } from '../../../models';
+import { Printer } from '../../../models/Printer';
+import { PrinterRowChoice } from './PrinterRowChoice';
+import { commonStyles } from './styles';
 
 interface PrinterGroupDetailsOuterProps {
   onClose: () => void;

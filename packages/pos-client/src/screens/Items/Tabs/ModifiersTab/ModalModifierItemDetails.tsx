@@ -1,17 +1,16 @@
-import React, { useState } from 'react';
-import { Form, Label, Input, Item, Text, Col, Row, Grid, Card, Separator, Button } from '../../../../core';
-import { Formik } from 'formik';
-import * as Yup from 'yup';
-import { useDatabase } from '@nozbe/watermelondb/hooks';
-import { ModalContentButton } from '../../../../components/Modal/ModalContentButton';
-import { commonStyles } from '../../../Settings/sub-components/styles';
-import { Category, Modifier, ModifierItem, ModifierPrice, PriceGroup, tableNames } from '../../../../models';
-import withObservables from '@nozbe/with-observables';
+import { Database } from '@nozbe/watermelondb';
 import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
-import { Database, tableSchema } from '@nozbe/watermelondb';
+import { useDatabase } from '@nozbe/watermelondb/hooks';
+import withObservables from '@nozbe/with-observables';
+import { Formik } from 'formik';
 import { keyBy } from 'lodash';
-import { formatNumber } from '../../../../utils';
+import React, { useState } from 'react';
+import * as Yup from 'yup';
+import { ModalContentButton } from '../../../../components/Modal/ModalContentButton';
+import { Form, Input, Item, Label, Separator, Text } from '../../../../core';
+import { Modifier, ModifierItem, ModifierPrice, PriceGroup, tableNames } from '../../../../models';
 import { SHORT_NAME_LENGTH } from '../../../../utils/consts';
+import { commonStyles } from '../../../Settings/sub-components/styles';
 
 type ModalModifierItemDetailsOuterProps = {
   database: Database;

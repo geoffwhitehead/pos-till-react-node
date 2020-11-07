@@ -1,20 +1,20 @@
-import React, { useState, useContext, useEffect } from 'react';
-import { Text, Content, List, ListItem, Left, Icon, Body, Right, Button } from '../../../../core';
-import { SearchHeader } from '../../../../components/SearchHeader/SearchHeader';
-import { ModifierList } from './sub-components/ModifierList/ModifierList';
+import { Database, Q } from '@nozbe/watermelondb';
 import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import withObservables from '@nozbe/with-observables';
-import { CurrentBillContext } from '../../../../contexts/CurrentBillContext';
-import { CategoryItemRow } from './sub-components/CategoryItemRow';
-import { Category, Item, Modifier, ItemPrice, tableNames, PriceGroup } from '../../../../models';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { CheckoutItemStackParamList } from '../../../../navigators/CheckoutItemNavigator';
 import { RouteProp } from '@react-navigation/native';
-import { Database, Q } from '@nozbe/watermelondb';
-import { Loading } from '../../../../components/Loading/Loading';
+import { StackNavigationProp } from '@react-navigation/stack';
 import { groupBy, keyBy, sortBy } from 'lodash';
-import { OrganizationContext } from '../../../../contexts/OrganizationContext';
+import React, { useContext, useEffect, useState } from 'react';
+import { Loading } from '../../../../components/Loading/Loading';
 import { Modal } from '../../../../components/Modal/Modal';
+import { SearchHeader } from '../../../../components/SearchHeader/SearchHeader';
+import { CurrentBillContext } from '../../../../contexts/CurrentBillContext';
+import { OrganizationContext } from '../../../../contexts/OrganizationContext';
+import { Body, Button, Content, Icon, Left, List, ListItem, Right, Text } from '../../../../core';
+import { Category, Item, ItemPrice, Modifier, PriceGroup, tableNames } from '../../../../models';
+import { CheckoutItemStackParamList } from '../../../../navigators/CheckoutItemNavigator';
+import { CategoryItemRow } from './sub-components/CategoryItemRow';
+import { ModifierList } from './sub-components/ModifierList/ModifierList';
 
 interface CategoryItemsListOuterProps {
   database?: Database;

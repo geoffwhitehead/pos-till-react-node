@@ -1,5 +1,5 @@
-import { Model, tableSchema, Query } from '@nozbe/watermelondb';
-import { children, nochange, field } from '@nozbe/watermelondb/decorators';
+import { Model, Query, tableSchema } from '@nozbe/watermelondb';
+import { children, field, nochange } from '@nozbe/watermelondb/decorators';
 import { Item } from './Item';
 
 export class Category extends Model {

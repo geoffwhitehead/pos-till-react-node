@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
-import { PriceGroup, tableNames } from '../../../models';
-import { Form, Label, Input, Item, Text, Col, Row, Content, ListItem, CheckBox, Body } from '../../../core';
-import { commonStyles } from './styles';
+import { useDatabase } from '@nozbe/watermelondb/hooks';
 import { Formik } from 'formik';
+import React, { useState } from 'react';
 import * as Yup from 'yup';
 import { ModalContentButton } from '../../../components/Modal/ModalContentButton';
-import { useDatabase } from '@nozbe/watermelondb/hooks';
+import { Body, CheckBox, Col, Content, Form, Input, Item, Label, ListItem, Row, Text } from '../../../core';
+import { PriceGroup, tableNames } from '../../../models';
+import { commonStyles } from './styles';
 
 interface PriceGroupDetailsProps {
   onClose: () => void;

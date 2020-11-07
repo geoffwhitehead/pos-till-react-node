@@ -1,10 +1,10 @@
-import { groupBy } from 'lodash';
-import { Separator, Text, ListItem, Left, Right } from '../../../../../core';
-import React from 'react';
-import { ItemBreakdown } from './ItemBreakdown';
-import { Bill, BillItem, BillItemPrintLog, Discount, tableNames } from '../../../../../models';
 import withObservables from '@nozbe/with-observables';
+import { groupBy } from 'lodash';
+import React from 'react';
+import { Left, ListItem, Right, Separator, Text } from '../../../../../core';
+import { Bill, BillItem, BillItemPrintLog } from '../../../../../models';
 import { PrintStatus, PrintType } from '../../../../../models/BillItemPrintLog';
+import { ItemBreakdown } from './ItemBreakdown';
 
 type ItemsBreakdownOuterProps = {
   bill: Bill;

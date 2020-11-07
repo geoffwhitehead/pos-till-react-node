@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Content, Label, Input, Item, Icon } from '../../core';
 import { StyleSheet, View } from 'react-native';
+import { Input, Item, Label } from '../../core';
 
 const InputPasscode: React.FC<{ value: string; onChange: any }> = ({ value, onChange }) => {
   return (

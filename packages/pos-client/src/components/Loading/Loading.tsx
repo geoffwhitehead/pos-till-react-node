@@ -1,6 +1,5 @@
-import React from 'react'
-import { Container, Content, Header, Spinner, Text } from '../../core'
-
+import React from 'react';
+import { Container, Content, Header, Spinner, Text } from '../../core';
 
 // TODO: update this
 export const Loading: React.FC = () => {
@@ -12,5 +11,5 @@ export const Loading: React.FC = () => {
         <Text>Loading ... </Text>
       </Content>
     </Container>
-  )
-}
+  );
+};

@@ -1,9 +1,8 @@
-import { Printer } from '../../../models';
-import { ListItem, Left, Text, Body, Right, Icon, Button } from 'native-base';
-import { commonStyles } from './styles';
-import React from 'react';
-// import { capitalize } from 'lodash';
 import withObservables from '@nozbe/with-observables';
+import { Body, Button, Left, ListItem, Text } from 'native-base';
+import React from 'react';
+import { Printer } from '../../../models';
+import { commonStyles } from './styles';
 
 interface PrinterRowInnerProps {}
 

@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
-import { Form, Label, Input, Item, Text, Col, Row, Grid } from '../../../../core';
-import { Formik } from 'formik';
-import * as Yup from 'yup';
 import { useDatabase } from '@nozbe/watermelondb/hooks';
-import { ModalContentButton } from '../../../../components/Modal/ModalContentButton';
-import { commonStyles } from '../../../Settings/sub-components/styles';
-import { Category, Modifier, tableNames } from '../../../../models';
 import withObservables from '@nozbe/with-observables';
+import { Formik } from 'formik';
+import React, { useState } from 'react';
+import * as Yup from 'yup';
+import { ModalContentButton } from '../../../../components/Modal/ModalContentButton';
+import { Form, Input, Item, Label } from '../../../../core';
+import { Modifier, tableNames } from '../../../../models';
+import { commonStyles } from '../../../Settings/sub-components/styles';
 
 type ModalModifierDetailsOuterProps = {
   onClose: () => void;

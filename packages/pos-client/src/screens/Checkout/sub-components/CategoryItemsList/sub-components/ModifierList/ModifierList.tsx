@@ -1,15 +1,12 @@
-import React, { useState } from 'react';
-import { StyleSheet } from 'react-native';
-import { Content, Text, List, ListItem, Left, Icon, Body, Right, Button } from '../../../../../../core';
-import withObservables from '@nozbe/with-observables';
-import { ModifierGroup } from './ModifierGroup';
-import { keyBy } from 'lodash';
-import { View } from 'native-base';
-import { NumberPicker } from '../../../../../../components/NumberPicker/NumberPicker';
-import { Item, Bill, PriceGroup, Modifier, ModifierItem } from '../../../../../../models';
 import { useDatabase } from '@nozbe/watermelondb/hooks';
+import withObservables from '@nozbe/with-observables';
+import { keyBy } from 'lodash';
+import React, { useState } from 'react';
 import { ModalContentButton } from '../../../../../../components/Modal/ModalContentButton';
-import { commonStyles } from '../../../../../Settings/sub-components/styles';
+import { NumberPicker } from '../../../../../../components/NumberPicker/NumberPicker';
+import { Content, List } from '../../../../../../core';
+import { Bill, Item, Modifier, ModifierItem, PriceGroup } from '../../../../../../models';
+import { ModifierGroup } from './ModifierGroup';
 
 interface ModifierListOuterProps {
   item: Item;

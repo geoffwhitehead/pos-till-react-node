@@ -1,7 +1,7 @@
-import { ListItem, Left, Text, Icon, Body, Right, Button } from '../../../../core';
-import React from 'react';
 import withObservables from '@nozbe/with-observables';
+import React from 'react';
 import { StyleSheet } from 'react-native';
+import { Body, Button, Left, ListItem, Right, Text } from '../../../../core';
 import { Item } from '../../../../models';
 
 interface ItemsTabRowOuterProps {

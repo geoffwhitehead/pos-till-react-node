@@ -1,7 +1,7 @@
-import { Model, tableSchema, Relation } from '@nozbe/watermelondb';
-import { nochange, field, readonly, date, immutableRelation, action } from '@nozbe/watermelondb/decorators';
-import { PaymentType } from './PaymentType';
+import { Model, Relation, tableSchema } from '@nozbe/watermelondb';
+import { action, date, field, immutableRelation, nochange, readonly } from '@nozbe/watermelondb/decorators';
 import { Bill } from './Bill';
+import { PaymentType } from './PaymentType';
 
 export const billPaymentSchema = tableSchema({
   name: 'bill_payments',
@@ -21,7 +21,7 @@ export class BillPayment extends Model {
 
   @nochange @field('payment_type_id') paymentTypeId: string;
   @nochange @field('amount') amount: number;
-  @nochange @field('is_change') isChange: boolean; // TODO: rethink this - update to credit / debit? 
+  @nochange @field('is_change') isChange: boolean; // TODO: rethink this - update to credit / debit?
   @readonly @date('created_at') createdAt: Date;
   @readonly @date('updated_at') updatedAt: Date;
 

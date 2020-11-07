@@ -1,8 +1,8 @@
-import React, { useContext } from 'react';
-import { Item, Icon, Input, Header, Right, Text, Button, ActionSheet } from '../../core';
-import { PriceGroupContext } from '../../contexts/PriceGroupContext';
 import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import withObservables from '@nozbe/with-observables';
+import React, { useContext } from 'react';
+import { PriceGroupContext } from '../../contexts/PriceGroupContext';
+import { ActionSheet, Button, Header, Icon, Input, Item, Right, Text } from '../../core';
 import { tableNames } from '../../models';
 
 interface SearchHeaderProps {

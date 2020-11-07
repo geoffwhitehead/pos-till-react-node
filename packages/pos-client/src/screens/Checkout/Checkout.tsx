@@ -1,16 +1,16 @@
-import React, { useState, useEffect, useContext } from 'react';
-import { Container, Grid, Col } from '../../core';
+import { DrawerNavigationProp } from '@react-navigation/drawer';
+import React, { useContext, useEffect, useState } from 'react';
+import { Loading } from '../../components/Loading/Loading';
 import { SidebarHeader } from '../../components/SidebarHeader/SidebarHeader';
-import { CheckoutItemNavigator } from '../../navigators/CheckoutItemNavigator';
-import { Receipt } from './sub-components/Receipt/Receipt';
-import { SelectBill } from '../Bills/SelectBill/SelectBIll';
-import { Payments } from './sub-components/Payments/Payments';
-import { CompleteBill } from './sub-components/CompleteBill/CompleteBill';
 import { BillPeriodContext } from '../../contexts/BillPeriodContext';
 import { CurrentBillContext } from '../../contexts/CurrentBillContext';
-import { DrawerNavigationProp } from '@react-navigation/drawer';
+import { Col, Container, Grid } from '../../core';
+import { CheckoutItemNavigator } from '../../navigators/CheckoutItemNavigator';
 import { SidebarDrawerStackParamList } from '../../navigators/SidebarNavigator';
-import { Loading } from '../../components/Loading/Loading';
+import { SelectBill } from '../Bills/SelectBill/SelectBIll';
+import { CompleteBill } from './sub-components/CompleteBill/CompleteBill';
+import { Payments } from './sub-components/Payments/Payments';
+import { Receipt } from './sub-components/Receipt/Receipt';
 
 export enum Modes {
   Payments = 'payments',

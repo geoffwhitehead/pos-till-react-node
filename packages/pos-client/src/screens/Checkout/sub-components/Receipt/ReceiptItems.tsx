@@ -1,27 +1,17 @@
-import { Content, List, ActionSheet } from '../../../../core';
-import React, { useEffect, useRef, useState } from 'react';
-import { ItemsBreakdown } from './sub-components/ItemsBreakdown';
-import { DiscountsBreakdown } from './sub-components/DiscountsBreakdown';
-import { PaymentsBreakdown } from './sub-components/PaymentsBreakdown';
-import { useDatabase } from '@nozbe/watermelondb/hooks';
-import {
-  Bill,
-  BillPayment,
-  BillItem,
-  Discount,
-  BillDiscount,
-  PaymentType,
-  PriceGroup,
-  tableNames,
-} from '../../../../models';
-import { BillSummary } from '../../../../utils';
-import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
-import withObservables from '@nozbe/with-observables';
-import { Modal } from '../../../../components/Modal/Modal';
-import { ModalReason, ModifyReason } from './sub-components/ModalReason';
-import dayjs from 'dayjs';
-import { find } from 'lodash';
 import { Database } from '@nozbe/watermelondb';
+import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
+import { useDatabase } from '@nozbe/watermelondb/hooks';
+import withObservables from '@nozbe/with-observables';
+import dayjs from 'dayjs';
+import React, { useEffect, useRef, useState } from 'react';
+import { Modal } from '../../../../components/Modal/Modal';
+import { ActionSheet, Content, List } from '../../../../core';
+import { Bill, BillDiscount, BillItem, BillPayment, PaymentType, tableNames } from '../../../../models';
+import { BillSummary } from '../../../../utils';
+import { DiscountsBreakdown } from './sub-components/DiscountsBreakdown';
+import { ItemsBreakdown } from './sub-components/ItemsBreakdown';
+import { ModalReason, ModifyReason } from './sub-components/ModalReason';
+import { PaymentsBreakdown } from './sub-components/PaymentsBreakdown';
 
 type ReceiptItemsOuterProps = {
   readonly: boolean;

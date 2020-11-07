@@ -1,33 +1,33 @@
+import { Database } from '@nozbe/watermelondb';
+import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
+import { useDatabase } from '@nozbe/watermelondb/hooks';
+import withObservables from '@nozbe/with-observables';
+import { Formik } from 'formik';
 import React, { useContext, useState } from 'react';
+import * as Yup from 'yup';
+import { HeaderButtonBar } from '../../../components/HeaderButtonBar/HeaderButtonBar';
+import { Loading } from '../../../components/Loading/Loading';
+import { AuthContext } from '../../../contexts/AuthContext';
+import { OrganizationContext } from '../../../contexts/OrganizationContext';
+import { ReceiptPrinterContext } from '../../../contexts/ReceiptPrinterContext';
 import {
+  ActionSheet,
+  Button,
   Container,
   Content,
   Form,
+  Grid,
+  Icon,
+  Input,
   Item,
   Label,
-  Input,
-  Text,
-  Grid,
-  Row,
   Picker,
-  Icon,
-  Button,
+  Row,
+  Text,
   View,
-  ActionSheet,
 } from '../../../core';
-import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
-import withObservables from '@nozbe/with-observables';
-import { tableNames, Printer, PriceGroup, BillPeriod, Bill } from '../../../models';
-import { Database } from '@nozbe/watermelondb';
-import { Formik } from 'formik';
-import * as Yup from 'yup';
-import { OrganizationContext } from '../../../contexts/OrganizationContext';
-import { Loading } from '../../../components/Loading/Loading';
-import { useDatabase } from '@nozbe/watermelondb/hooks';
-import { AuthContext } from '../../../contexts/AuthContext';
+import { Bill, BillPeriod, PriceGroup, Printer, tableNames } from '../../../models';
 import { sync } from '../../../services/sync';
-import { ReceiptPrinterContext } from '../../../contexts/ReceiptPrinterContext';
-import { HeaderButtonBar } from '../../../components/HeaderButtonBar/HeaderButtonBar';
 import { commonStyles } from './styles';
 
 interface SettingsTabOuterProps {

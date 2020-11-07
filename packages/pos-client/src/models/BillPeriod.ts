@@ -1,11 +1,11 @@
-import { Model, Q, tableSchema, Query } from '@nozbe/watermelondb';
-import { readonly, date, children, lazy, action } from '@nozbe/watermelondb/decorators';
+import { Model, Q, Query, tableSchema } from '@nozbe/watermelondb';
+import { action, children, date, lazy, readonly } from '@nozbe/watermelondb/decorators';
 import dayjs from 'dayjs';
+import { Organization, tableNames } from '.';
 import { Bill } from './Bill';
 import { BillItem } from './BillItem';
-import { Discount } from './Discount';
 import { BillPayment } from './BillPayment';
-import { Organization, tableNames } from '.';
+import { Discount } from './Discount';
 
 export const billPeriodSchema = tableSchema({
   name: 'bill_periods',

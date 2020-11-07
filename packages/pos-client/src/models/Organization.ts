@@ -1,6 +1,6 @@
-import { Model, tableSchema, Relation } from '@nozbe/watermelondb';
+import { Model, Relation, tableSchema } from '@nozbe/watermelondb';
 import { action, field, relation } from '@nozbe/watermelondb/decorators';
-import { Printer, PriceGroup, BillPeriod, tableNames } from '.';
+import { BillPeriod, PriceGroup, Printer, tableNames } from '.';
 
 export type OrganizationProps = {
   name: string;

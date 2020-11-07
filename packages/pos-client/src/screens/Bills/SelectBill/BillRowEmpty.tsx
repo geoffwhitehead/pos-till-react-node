@@ -1,5 +1,5 @@
 import React from 'react';
-import { ListItem, Left, Text, Body, Right } from '../../../core';
+import { Body, Left, ListItem, Right, Text } from '../../../core';
 import { Bill, BillPeriod } from '../../../models';
 
 interface BillRowEmptyProps {

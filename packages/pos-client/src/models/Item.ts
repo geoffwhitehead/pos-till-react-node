@@ -1,10 +1,10 @@
-import { Model, Q, tableSchema, Relation, Query } from '@nozbe/watermelondb';
-import { field, relation, children, lazy, action } from '@nozbe/watermelondb/decorators';
+import { Model, Q, Query, Relation, tableSchema } from '@nozbe/watermelondb';
+import { action, children, field, lazy, relation } from '@nozbe/watermelondb/decorators';
+import { ItemModifier, PrinterGroup, tableNames } from '.';
 import { Category } from './Category';
 import { ItemPrice } from './ItemPrice';
-import { Printer } from './Printer';
 import { Modifier } from './Modifier';
-import { PrinterGroup, ModifierItem, ItemModifier, tableNames, PriceGroup } from '.';
+import { Printer } from './Printer';
 
 type UpdateItemProps = {
   name: string;

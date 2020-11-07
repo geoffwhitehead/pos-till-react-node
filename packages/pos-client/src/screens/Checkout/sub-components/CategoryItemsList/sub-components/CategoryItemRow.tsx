@@ -1,9 +1,9 @@
-import React from 'react';
 import withObservables from '@nozbe/with-observables';
-import { ListItem, Left, Text, Icon, Body, Right } from '../../../../../core';
+import React from 'react';
 import { StyleSheet } from 'react-native';
+import { Body, Icon, Left, ListItem, Right, Text } from '../../../../../core';
+import { Item } from '../../../../../models';
 import { formatNumber } from '../../../../../utils';
-import { Item, PriceGroup } from '../../../../../models';
 
 interface CategoryItemRowOuterProps {
   item: Item;

@@ -1,13 +1,11 @@
 import { createDrawerNavigator } from '@react-navigation/drawer';
+import React from 'react';
+import { Bills } from '../screens/Bills/Bills';
 import { Checkout } from '../screens/Checkout/Checkout';
 import { Items } from '../screens/Items/Items';
 import { Reports } from '../screens/Reports/Reports';
-import { Bills } from '../screens/Bills/Bills';
-import { Transactions } from '../screens/Transactions/Transactions';
-
-import React from 'react';
 import { Settings } from '../screens/Settings/Settings';
-import { Text, View } from '../core';
+import { Transactions } from '../screens/Transactions/Transactions';
 import { colors } from '../theme/colors';
 
 export const sidebarRoutes: Record<string, string> = {

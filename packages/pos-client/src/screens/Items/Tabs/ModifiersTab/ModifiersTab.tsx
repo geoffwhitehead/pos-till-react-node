@@ -1,28 +1,14 @@
 import { Database } from '@nozbe/watermelondb';
-import {
-  Content,
-  List,
-  Text,
-  View,
-  Button,
-  ListItem,
-  Body,
-  Right,
-  Left,
-  Col,
-  Row,
-  Grid,
-  Separator,
-} from '../../../../core';
-import React, { useState } from 'react';
-import { Modal } from '../../../../components/Modal/Modal';
 import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import withObservables from '@nozbe/with-observables';
-import { Category, Modifier } from '../../../../models';
+import React, { useState } from 'react';
+import { Modal } from '../../../../components/Modal/Modal';
 import { SearchBar } from '../../../../components/SearchBar/SearchBar';
+import { Col, Content, Grid, List, Row, Separator, Text, View } from '../../../../core';
+import { Modifier } from '../../../../models';
 import { ModalModifierDetails } from './ModalModifierDetails';
-import { ModifierRow } from './ModifierRow';
 import { ModifierItems } from './ModifierItems';
+import { ModifierRow } from './ModifierRow';
 
 interface ModifiersTabOuterProps {
   database?: Database;

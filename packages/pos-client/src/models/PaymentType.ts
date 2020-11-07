@@ -1,5 +1,5 @@
 import { Model, tableSchema } from '@nozbe/watermelondb';
-import { nochange, field } from '@nozbe/watermelondb/decorators';
+import { field, nochange } from '@nozbe/watermelondb/decorators';
 
 export class PaymentType extends Model {
   static table = 'payment_types';

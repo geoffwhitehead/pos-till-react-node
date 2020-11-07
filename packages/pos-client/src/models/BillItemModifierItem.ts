@@ -1,10 +1,10 @@
-import { Model, tableSchema, Relation } from '@nozbe/watermelondb';
-import { action, nochange, field, immutableRelation } from '@nozbe/watermelondb/decorators';
-import { ModifierItem } from './ModifierItem';
-import { BillItemModifier } from './BillItemModifier';
-import { PriceGroup } from './PriceGroup';
-import { Modifier } from './Modifier';
+import { Model, Relation, tableSchema } from '@nozbe/watermelondb';
+import { action, field, immutableRelation, nochange } from '@nozbe/watermelondb/decorators';
 import { BillItem } from './BillItem';
+import { BillItemModifier } from './BillItemModifier';
+import { Modifier } from './Modifier';
+import { ModifierItem } from './ModifierItem';
+import { PriceGroup } from './PriceGroup';
 
 export const billItemModifierItemSchema = tableSchema({
   name: 'bill_item_modifier_items',

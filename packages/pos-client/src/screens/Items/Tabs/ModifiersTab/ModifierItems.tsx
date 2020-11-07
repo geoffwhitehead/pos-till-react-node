@@ -1,7 +1,7 @@
 import withObservables from '@nozbe/with-observables';
 import React, { useState } from 'react';
 import { Modal } from '../../../../components/Modal/Modal';
-import { Button, Icon, Left, ListItem, Right, Separator, Text } from '../../../../core';
+import { Button, Icon, Left, ListItem, Right, Text } from '../../../../core';
 import { Modifier, ModifierItem } from '../../../../models';
 import { ModalModifierItemDetails } from './ModalModifierItemDetails';
 

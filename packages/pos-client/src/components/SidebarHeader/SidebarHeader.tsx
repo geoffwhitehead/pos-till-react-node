@@ -1,5 +1,5 @@
 import React from 'react';
-import { Header, Left, Right, Body, Button, Icon, Title } from '../../core';
+import { Body, Button, Header, Icon, Left, Right, Title } from '../../core';
 
 interface SidebarHeaderProps {
   title: string;

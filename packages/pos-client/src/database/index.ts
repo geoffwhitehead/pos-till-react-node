@@ -1,6 +1,6 @@
-import SQLiteAdapter from '@nozbe/watermelondb/adapters/sqlite';
 import { appSchema, Database } from '@nozbe/watermelondb';
-import { schemas, models } from '../models';
+import SQLiteAdapter from '@nozbe/watermelondb/adapters/sqlite';
+import { models, schemas } from '../models';
 
 const adapter = new SQLiteAdapter({
   schema: appSchema({

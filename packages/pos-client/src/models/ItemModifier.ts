@@ -1,4 +1,4 @@
-import { Model, tableSchema, Relation } from '@nozbe/watermelondb';
+import { Model, Relation, tableSchema } from '@nozbe/watermelondb';
 import { field, relation } from '@nozbe/watermelondb/decorators';
 import { Item } from './Item';
 import { Modifier } from './Modifier';

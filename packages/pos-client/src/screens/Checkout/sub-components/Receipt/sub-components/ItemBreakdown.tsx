@@ -1,11 +1,11 @@
-import { ListItem, Left, Content, Text, Right } from '../../../../../core';
+import withObservables from '@nozbe/with-observables';
 import { capitalize } from 'lodash';
 import React, { useContext } from 'react';
-import { formatNumber } from '../../../../../utils';
-import withObservables from '@nozbe/with-observables';
-import { BillItem, BillItemModifierItem, BillItemPrintLog, ModifierItem } from '../../../../../models';
 import { OrganizationContext } from '../../../../../contexts/OrganizationContext';
+import { Content, Left, ListItem, Right, Text } from '../../../../../core';
+import { BillItem, BillItemModifierItem, BillItemPrintLog } from '../../../../../models';
 import { PrintStatus } from '../../../../../models/BillItemPrintLog';
+import { formatNumber } from '../../../../../utils';
 
 interface ItemBreakdownInnerProps {
   modifierItems: BillItemModifierItem[];

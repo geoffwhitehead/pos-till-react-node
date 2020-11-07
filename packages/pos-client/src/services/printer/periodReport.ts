@@ -1,20 +1,19 @@
+import { Database } from '@nozbe/watermelondb';
+import dayjs from 'dayjs';
+import { capitalize, flatten, sumBy } from 'lodash';
+import { BillPeriod, Category, Discount, PaymentType, PriceGroup, Printer, tableNames } from '../../models';
 import {
-  formatNumber,
-  paymentSummary,
-  finalizedDiscountSummary,
   categorySummary,
-  modifierSummary,
-  priceGroupSummmary,
+  finalizedDiscountSummary,
+  formatNumber,
   getItemPrice,
   getModifierItemPrice,
+  modifierSummary,
+  paymentSummary,
+  priceGroupSummmary,
 } from '../../utils';
-import { addHeader, alignLeftRight, divider, starDivider, alignCenter } from './helpers';
+import { addHeader, alignCenter, alignLeftRight, divider, starDivider } from './helpers';
 import { receiptTempate } from './template';
-import { capitalize } from 'lodash';
-import dayjs from 'dayjs';
-import { flatten, sumBy } from 'lodash';
-import { tableNames, BillPeriod, Category, PaymentType, Discount, PriceGroup, Printer } from '../../models';
-import { Database } from '@nozbe/watermelondb';
 
 // TODO: fetch from db
 const org = {

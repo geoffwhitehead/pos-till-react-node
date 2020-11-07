@@ -1,10 +1,9 @@
 import { Database } from '@nozbe/watermelondb';
-import { useState, useEffect } from 'react';
+import withObservables from '@nozbe/with-observables';
+import React, { useEffect, useState } from 'react';
+import { Organization, tableNames } from '../../models';
 import { sync } from '../../services/sync';
 import { Loading } from '../Loading/Loading';
-import React from 'react';
-import { Organization, tableNames } from '../../models';
-import withObservables from '@nozbe/with-observables';
 
 type SyncOuterProps = {
   database: Database;

@@ -1,33 +1,33 @@
-import React, { useEffect, useState, useContext } from 'react';
+import { Database } from '@nozbe/watermelondb';
+import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
+import withObservables from '@nozbe/with-observables';
+import { DrawerNavigationProp } from '@react-navigation/drawer';
+import dayjs from 'dayjs';
+import React, { useContext, useEffect, useState } from 'react';
+import { View } from 'react-native';
+import { SidebarHeader } from '../../components/SidebarHeader/SidebarHeader';
+import { OrganizationContext } from '../../contexts/OrganizationContext';
 import {
-  Toast,
-  Container,
-  Grid,
-  Col,
-  Text,
   ActionSheet,
   Button,
+  Col,
+  Container,
   Content,
+  Grid,
+  Left,
   List,
   ListItem,
-  Left,
   Right,
+  Text,
+  Toast,
 } from '../../core';
-import { SidebarHeader } from '../../components/SidebarHeader/SidebarHeader';
+import { BillPeriod, Organization, PaymentType, Printer, tableNames } from '../../models';
+import { SidebarDrawerStackParamList } from '../../navigators/SidebarNavigator';
 // import { Protected } from './Protected';
 import { periodReport } from '../../services/printer/periodReport';
 // import { ReportsList } from './sub-components/ReportsList/ReportsList';
 // import { ReportReceipt } from './sub-components/ReportReceipt/ReportReceipt';
 import { print } from '../../services/printer/printer';
-import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
-import withObservables from '@nozbe/with-observables';
-import { tableNames, BillPeriod, PaymentType, Printer, Organization } from '../../models';
-import dayjs from 'dayjs';
-import { View } from 'react-native';
-import { Database } from '@nozbe/watermelondb';
-import { DrawerNavigationProp } from '@react-navigation/drawer';
-import { SidebarDrawerStackParamList } from '../../navigators/SidebarNavigator';
-import { OrganizationContext } from '../../contexts/OrganizationContext';
 
 // const ORG_PASSCODE = '1234'; // TODO: move to an org setting and hash
 interface ReportsInnerProps {

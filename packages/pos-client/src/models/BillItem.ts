@@ -1,15 +1,15 @@
-import { Model, Q, tableSchema, Relation, Query } from '@nozbe/watermelondb';
-import { action, nochange, field, readonly, date, immutableRelation, children } from '@nozbe/watermelondb/decorators';
+import { Model, Query, Relation, tableSchema } from '@nozbe/watermelondb';
+import { action, children, date, field, immutableRelation, nochange, readonly } from '@nozbe/watermelondb/decorators';
+import dayjs from 'dayjs';
+import { BillItemPrintLog, tableNames } from '.';
+import { ModifyReason } from '../screens/Checkout/sub-components/Receipt/sub-components/ModalReason';
 import { Bill } from './Bill';
+import { BillItemModifier } from './BillItemModifier';
+import { BillItemModifierItem } from './BillItemModifierItem';
+import { PrintStatus, PrintType } from './BillItemPrintLog';
+import { Category } from './Category';
 import { Item } from './Item';
 import { PriceGroup } from './PriceGroup';
-import { Category } from './Category';
-import { BillItemModifierItem } from './BillItemModifierItem';
-import { BillItemModifier } from './BillItemModifier';
-import { BillItemPrintLog, tableNames } from '.';
-import { PrintStatus, PrintType } from './BillItemPrintLog';
-import dayjs, { Dayjs } from 'dayjs';
-import { ModifyReason } from '../screens/Checkout/sub-components/Receipt/sub-components/ModalReason';
 
 export const billItemSchema = tableSchema({
   name: 'bill_items',

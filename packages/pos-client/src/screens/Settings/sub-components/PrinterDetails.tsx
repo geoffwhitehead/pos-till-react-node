@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
-import { Printer, tableNames } from '../../../models';
-import { Form, Label, H2, Input, Item, Button, Text, Col, Row, Picker, Icon, Content } from '../../../core';
-import { commonStyles } from './styles';
 import { Formik } from 'formik';
+import React from 'react';
 import * as Yup from 'yup';
-import { Emulations, PrinterProps } from '../../../models/Printer';
 import { ModalContentButton } from '../../../components/Modal/ModalContentButton';
+import { Col, Content, Form, Icon, Input, Item, Label, Picker, Row } from '../../../core';
+import { Printer } from '../../../models';
+import { Emulations, PrinterProps } from '../../../models/Printer';
+import { commonStyles } from './styles';
 
 interface PrinterDetailsOuterProps {
   onClose: () => void;

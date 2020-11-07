@@ -1,13 +1,13 @@
-import React, { useState, useEffect, useContext } from 'react';
-import { ListItem, Left, Text, Body, Right, Icon, View } from '../../../core';
-import { formatNumber, _total, billSummary, BillSummary, minimalBillSummary, MinimalBillSummary } from '../../../utils';
-import withObservables from '@nozbe/with-observables';
-import { tableNames, Bill, Discount, BillItem, BillDiscount, BillPayment, BillItemPrintLog } from '../../../models';
-import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import { Database } from '@nozbe/watermelondb';
-import { OrganizationContext } from '../../../contexts/OrganizationContext';
-import { PrintStatus } from '../../../models/BillItemPrintLog';
+import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
+import withObservables from '@nozbe/with-observables';
 import dayjs from 'dayjs';
+import React, { useContext, useEffect, useState } from 'react';
+import { OrganizationContext } from '../../../contexts/OrganizationContext';
+import { Body, Icon, Left, ListItem, Right, Text, View } from '../../../core';
+import { Bill, BillDiscount, BillItem, BillItemPrintLog, BillPayment, Discount, tableNames } from '../../../models';
+import { PrintStatus } from '../../../models/BillItemPrintLog';
+import { formatNumber, minimalBillSummary, MinimalBillSummary } from '../../../utils';
 
 interface BillRowInnerProps {
   billPayments: BillPayment[];

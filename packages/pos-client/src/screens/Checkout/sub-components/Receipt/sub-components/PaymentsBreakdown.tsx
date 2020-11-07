@@ -1,9 +1,9 @@
-import React, { useContext } from 'react';
-import { Separator, Text, ListItem, Left, Right } from '../../../../../core';
-import { formatNumber } from '../../../../../utils';
 import { capitalize, keyBy } from 'lodash';
-import { BillPayment, PaymentType } from '../../../../../models';
+import React, { useContext } from 'react';
 import { OrganizationContext } from '../../../../../contexts/OrganizationContext';
+import { Left, ListItem, Right, Separator, Text } from '../../../../../core';
+import { BillPayment, PaymentType } from '../../../../../models';
+import { formatNumber } from '../../../../../utils';
 
 interface PaymentsBreakdownProps {
   payments: BillPayment[];

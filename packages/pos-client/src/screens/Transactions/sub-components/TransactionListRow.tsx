@@ -1,13 +1,13 @@
-import React, { useContext, useEffect, useState } from 'react';
-import { Text, ListItem, Left, Badge, Body, Right } from 'native-base';
-import { transactionSummary, formatNumber, minimalBillSummary, TransactionSummary } from '../../../utils';
-import dayjs from 'dayjs';
-import withObservables from '@nozbe/with-observables';
-import { StyleSheet, View } from 'react-native';
-import { capitalize, keyBy } from 'lodash';
-import { Bill, BillDiscount, BillItem, BillPayment, PaymentType } from '../../../models';
-import { OrganizationContext } from '../../../contexts/OrganizationContext';
 import { useDatabase } from '@nozbe/watermelondb/hooks';
+import withObservables from '@nozbe/with-observables';
+import dayjs from 'dayjs';
+import { capitalize, keyBy } from 'lodash';
+import { Body, Left, ListItem, Right, Text } from 'native-base';
+import React, { useContext, useEffect, useState } from 'react';
+import { StyleSheet } from 'react-native';
+import { OrganizationContext } from '../../../contexts/OrganizationContext';
+import { Bill, BillDiscount, BillItem, BillPayment, PaymentType } from '../../../models';
+import { formatNumber, transactionSummary, TransactionSummary } from '../../../utils';
 
 interface TransactionListRowOuterProps {
   bill: Bill;

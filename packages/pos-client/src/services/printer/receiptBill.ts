@@ -1,17 +1,17 @@
-import { formatNumber, billSummary, BillSummary, getItemPrice, getModifierItemPrice } from '../../utils';
-import { alignCenter, alignLeftRight, addHeader, divider, alignRight } from './helpers';
-import { receiptTempate } from './template';
 import { capitalize, groupBy } from 'lodash';
 import {
-  BillItem,
   BillDiscount,
+  BillItem,
   BillPayment,
   Discount,
-  PriceGroup,
-  PaymentType,
-  Printer,
   Organization,
+  PaymentType,
+  PriceGroup,
+  Printer,
 } from '../../models';
+import { billSummary, BillSummary, formatNumber, getItemPrice, getModifierItemPrice } from '../../utils';
+import { addHeader, alignCenter, alignLeftRight, alignRight, divider } from './helpers';
+import { receiptTempate } from './template';
 
 const modPrefix = ' -';
 

@@ -1,7 +1,7 @@
-import { Model, tableSchema, Relation } from '@nozbe/watermelondb';
+import { Model, Relation, tableSchema } from '@nozbe/watermelondb';
 import { field, relation } from '@nozbe/watermelondb/decorators';
-import { PriceGroup } from './PriceGroup';
 import { ModifierItem } from './ModifierItem';
+import { PriceGroup } from './PriceGroup';
 
 export class ModifierPrice extends Model {
   static table = 'modifier_prices';

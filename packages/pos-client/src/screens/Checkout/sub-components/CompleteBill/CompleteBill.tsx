@@ -1,26 +1,26 @@
-import React, { useContext } from 'react';
-import { Text, Button } from '../../../../core';
-import { formatNumber } from '../../../../utils';
-import { StyleSheet, View, BackHandler } from 'react-native';
-import { Fonts } from '../../../../theme';
-import { print } from '../../../../services/printer/printer';
-import { useFocusEffect } from '@react-navigation/native';
-import { receiptBill } from '../../../../services/printer/receiptBill';
+import { Database } from '@nozbe/watermelondb';
 import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import withObservables from '@nozbe/with-observables';
+import { useFocusEffect } from '@react-navigation/native';
+import React, { useContext } from 'react';
+import { BackHandler, StyleSheet, View } from 'react-native';
+import { OrganizationContext } from '../../../../contexts/OrganizationContext';
+import { Button, Text } from '../../../../core';
 import {
-  tableNames,
-  Discount,
   Bill,
-  PaymentType,
-  PriceGroup,
-  Printer,
   BillDiscount,
   BillItem,
   BillPayment,
+  Discount,
+  PaymentType,
+  PriceGroup,
+  Printer,
+  tableNames,
 } from '../../../../models';
-import { Database } from '@nozbe/watermelondb';
-import { OrganizationContext } from '../../../../contexts/OrganizationContext';
+import { print } from '../../../../services/printer/printer';
+import { receiptBill } from '../../../../services/printer/receiptBill';
+import { Fonts } from '../../../../theme';
+import { formatNumber } from '../../../../utils';
 
 interface CompleteBillOuterProps {
   bill: Bill;

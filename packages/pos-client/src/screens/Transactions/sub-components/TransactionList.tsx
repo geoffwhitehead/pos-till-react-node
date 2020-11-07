@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
-import withObservables from '@nozbe/with-observables';
-import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
-import { Content, ListItem, Left, List, Text, Body, Right, Button } from '../../../core';
-import { TransactionListRow } from './TransactionListRow';
-import { tableNames, Bill, PaymentType } from '../../../models';
 import { Database } from '@nozbe/watermelondb';
+import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
+import withObservables from '@nozbe/with-observables';
 import { groupBy } from 'lodash';
+import React, { useState } from 'react';
+import { Button, Content, Left, List, ListItem, Right, Text } from '../../../core';
+import { Bill, PaymentType, tableNames } from '../../../models';
+import { TransactionListRow } from './TransactionListRow';
 
 interface TransactionListInnerProps {
   paymentTypes: PaymentType[];

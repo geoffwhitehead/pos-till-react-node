@@ -1,15 +1,15 @@
-import React, { useContext } from 'react';
-import { Container, Content } from '../../core';
-import { SidebarHeader } from '../../components/SidebarHeader/SidebarHeader';
 import { DrawerNavigationProp } from '@react-navigation/drawer';
-import { SidebarDrawerStackParamList } from '../../navigators/SidebarNavigator';
-import { H1, Tabs, Tab } from 'native-base';
-import { OrganizationTab } from './sub-components/OrganizationTab';
-import { SettingsTab } from './sub-components/SettingsTab';
-import { PrintersTab } from './sub-components/PrintersTab';
-import { PrinterGroupsTab } from './sub-components/PrinterGroupsTab';
-import { PriceGroupsTab } from './sub-components/PriceGroupsTab';
+import { Tab, Tabs } from 'native-base';
+import React, { useContext } from 'react';
+import { SidebarHeader } from '../../components/SidebarHeader/SidebarHeader';
 import { BillPeriodContext } from '../../contexts/BillPeriodContext';
+import { Container } from '../../core';
+import { SidebarDrawerStackParamList } from '../../navigators/SidebarNavigator';
+import { OrganizationTab } from './sub-components/OrganizationTab';
+import { PriceGroupsTab } from './sub-components/PriceGroupsTab';
+import { PrinterGroupsTab } from './sub-components/PrinterGroupsTab';
+import { PrintersTab } from './sub-components/PrintersTab';
+import { SettingsTab } from './sub-components/SettingsTab';
 
 interface SettingsOuterProps {
   navigation: DrawerNavigationProp<SidebarDrawerStackParamList, 'Settings'>;

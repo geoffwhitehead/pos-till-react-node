@@ -1,8 +1,7 @@
-import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import withObservables from '@nozbe/with-observables';
 import React from 'react';
 import { Button, Left, ListItem, Right, Text } from '../../../../core';
-import { Category, Modifier, tableNames } from '../../../../models';
+import { Modifier } from '../../../../models';
 
 type ModifierRowOuterProps = {
   onSelect: (modifier: Modifier) => void;
@@ -42,7 +41,7 @@ const ModifierRowInner: React.FC<ModifierRowOuterProps & ModifierRowInnerProps> 
 };
 
 const enhance = c =>
-  withObservables<ModifierRowOuterProps, ModifierRowInnerProps>(['modifier'], ({ modifier, database }) => {
+  withObservables<ModifierRowOuterProps, ModifierRowInnerProps>(['modifier'], ({ modifier }) => {
     return {
       modifier,
       itemsCount: modifier.itemModifiers.observeCount(),

@@ -1,17 +1,17 @@
-import React, { useEffect } from 'react';
-import { SplashScreen } from './screens/SplashScreen/SplashScreen';
+import DatabaseProvider from '@nozbe/watermelondb/DatabaseProvider';
 import AsyncStorage from '@react-native-community/async-storage';
-import { AuthContext } from './contexts/AuthContext';
+import { NavigationContainer } from '@react-navigation/native';
+import decode from 'jwt-decode';
+import { Root } from 'native-base';
+import React from 'react';
 import { api } from './api';
-import { signUp, signIn } from './api/auth';
+import { signIn, signUp } from './api/auth';
+import { Sync } from './components/Sync/Sync';
+import { AuthContext } from './contexts/AuthContext';
+import { database, resetDatabase } from './database';
 import { AuthNavigator } from './navigators/AuthNavigator';
 import { Main } from './screens/Main/Main';
-import { NavigationContainer } from '@react-navigation/native';
-import { Root } from 'native-base';
-import decode from 'jwt-decode';
-import DatabaseProvider from '@nozbe/watermelondb/DatabaseProvider';
-import { database, resetDatabase } from './database';
-import { Sync } from './components/Sync/Sync';
+import { SplashScreen } from './screens/SplashScreen/SplashScreen';
 import { defaultTheme } from './theme/drawer';
 
 export const App = () => {

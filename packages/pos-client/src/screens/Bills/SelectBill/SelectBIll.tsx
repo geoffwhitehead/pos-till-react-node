@@ -1,11 +1,11 @@
-import React, { useState, useContext } from 'react';
-import { Text, Content, List, ListItem, Left, Body, Right, Button } from '../../../core';
 import withObservables from '@nozbe/with-observables';
+import React, { useContext, useState } from 'react';
 import { CurrentBillContext } from '../../../contexts/CurrentBillContext';
-import { BillRowEmpty } from './BillRowEmpty';
-import { BillRow } from './BillRow';
-import { Bill, BillPeriod } from '../../../models';
 import { OrganizationContext } from '../../../contexts/OrganizationContext';
+import { Button, Content, Left, List, ListItem, Right, Text } from '../../../core';
+import { Bill, BillPeriod } from '../../../models';
+import { BillRow } from './BillRow';
+import { BillRowEmpty } from './BillRowEmpty';
 
 interface SelectBillInnerProps {
   openBills: Bill[];

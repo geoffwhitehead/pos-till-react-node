@@ -1,10 +1,10 @@
-import React, { useContext } from 'react';
-import withObservables from '@nozbe/with-observables';
-import { ListItem, Left, Body, Text, Right } from 'native-base';
-import { formatNumber } from '../../../../../../utils';
-import { PriceGroup, ModifierItem, ModifierPrice } from '../../../../../../models';
-import { OrganizationContext } from '../../../../../../contexts/OrganizationContext';
 import { Q } from '@nozbe/watermelondb';
+import withObservables from '@nozbe/with-observables';
+import { Body, Left, ListItem, Right, Text } from 'native-base';
+import React, { useContext } from 'react';
+import { OrganizationContext } from '../../../../../../contexts/OrganizationContext';
+import { ModifierItem, ModifierPrice, PriceGroup } from '../../../../../../models';
+import { formatNumber } from '../../../../../../utils';
 
 interface ModifierItemRowOuterProps {
   priceGroup: PriceGroup;

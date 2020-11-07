@@ -1,6 +1,6 @@
 import { Database, Q } from '@nozbe/watermelondb';
 import { flatten, groupBy, sumBy } from 'lodash';
-import { BillItem, BillItemModifierItem, BillDiscount, BillPayment, Discount, PriceGroup, tableNames } from '../models';
+import { BillDiscount, BillItem, BillItemModifierItem, BillPayment, Discount, PriceGroup, tableNames } from '../models';
 
 export const getDefaultCashDenominations = (currency: string): number[] => {
   const map = {

@@ -1,6 +1,4 @@
 import React from 'react';
-import { List, ListItem, Text, Left, Body, Right, Button, Content, Icon } from '../../../../core';
-import dayjs from 'dayjs';
 import { BillPeriod } from '../../../../models';
 
 interface ReportsListProps {

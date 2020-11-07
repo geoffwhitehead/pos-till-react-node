@@ -1,6 +1,5 @@
-import { Model, tableSchema, Query, Q } from '@nozbe/watermelondb';
+import { Model, Query, tableSchema } from '@nozbe/watermelondb';
 import { action, children, field } from '@nozbe/watermelondb/decorators';
-import { Clock } from 'react-native-reanimated';
 import { PrinterGroupPrinter } from '.';
 
 export enum Emulations {

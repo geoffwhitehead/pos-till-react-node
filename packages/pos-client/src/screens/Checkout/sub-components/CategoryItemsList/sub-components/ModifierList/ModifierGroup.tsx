@@ -1,10 +1,9 @@
-import React from 'react';
 import withObservables from '@nozbe/with-observables';
-import { Text, Header } from '../../../../../../core';
 import { View } from 'native-base';
+import React from 'react';
+import { Header, Text } from '../../../../../../core';
+import { Modifier, ModifierItem, PriceGroup } from '../../../../../../models';
 import { ModifierItemRow } from './ModifierItemRow';
-import { ModifierItem, Modifier, PriceGroup } from '../../../../../../models';
-import { min } from 'lodash';
 
 interface ModifierGroupOuterProps {
   modifier: Modifier;

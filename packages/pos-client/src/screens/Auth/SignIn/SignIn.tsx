@@ -1,10 +1,10 @@
-import React, { useState, useContext } from 'react';
-import { Container, Input, Button, Content, Item, Text, Label, Form } from '../../../core';
-import { AuthContext } from '../../../contexts/AuthContext';
-import { AuthStackParamList } from '../../../navigators/AuthNavigator';
-import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import React, { useContext, useState } from 'react';
 import { View } from 'react-native';
+import { AuthContext } from '../../../contexts/AuthContext';
+import { Button, Container, Content, Form, Input, Item, Label, Text } from '../../../core';
+import { AuthStackParamList } from '../../../navigators/AuthNavigator';
 
 interface SignInProps {
   navigation: StackNavigationProp<AuthStackParamList, 'SignIn'>;

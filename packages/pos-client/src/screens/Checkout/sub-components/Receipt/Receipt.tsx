@@ -1,33 +1,33 @@
-import React, { useState, useEffect, useContext } from 'react';
-import { Text, Col, Grid, Row, Button, Icon } from '../../../../core';
-import { StyleSheet } from 'react-native';
-import { formatNumber, minimalBillSummary, MinimalBillSummary } from '../../../../utils';
-import { Fonts } from '../../../../theme';
-import { ReceiptItems } from './ReceiptItems';
-import dayjs from 'dayjs';
-import { print } from '../../../../services/printer/printer';
-import { receiptBill } from '../../../../services/printer/receiptBill';
-import withObservables from '@nozbe/with-observables';
+import { Database, Q } from '@nozbe/watermelondb';
 import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
+import { useDatabase } from '@nozbe/watermelondb/hooks';
+import withObservables from '@nozbe/with-observables';
+import dayjs from 'dayjs';
+import { flatten } from 'lodash';
+import React, { useContext, useEffect, useState } from 'react';
+import { StyleSheet } from 'react-native';
+import { Loading } from '../../../../components/Loading/Loading';
+import { OrganizationContext } from '../../../../contexts/OrganizationContext';
+import { ReceiptPrinterContext } from '../../../../contexts/ReceiptPrinterContext';
+import { Button, Col, Grid, Icon, Row, Text } from '../../../../core';
 import {
-  tableNames,
+  Bill,
+  BillDiscount,
+  BillPayment,
   Discount,
   PaymentType,
   PriceGroup,
-  Bill,
   Printer,
-  BillPayment,
-  BillDiscount,
+  tableNames,
 } from '../../../../models';
-import { Database, Q } from '@nozbe/watermelondb';
 import { BillItem } from '../../../../models/BillItem';
-import { kitchenReceipt } from '../../../../services/printer/kitchenReceipt';
-import { flatten } from 'lodash';
-import { Loading } from '../../../../components/Loading/Loading';
-import { OrganizationContext } from '../../../../contexts/OrganizationContext';
 import { PrintStatus } from '../../../../models/BillItemPrintLog';
-import { ReceiptPrinterContext } from '../../../../contexts/ReceiptPrinterContext';
-import { useDatabase } from '@nozbe/watermelondb/hooks';
+import { kitchenReceipt } from '../../../../services/printer/kitchenReceipt';
+import { print } from '../../../../services/printer/printer';
+import { receiptBill } from '../../../../services/printer/receiptBill';
+import { Fonts } from '../../../../theme';
+import { formatNumber, minimalBillSummary, MinimalBillSummary } from '../../../../utils';
+import { ReceiptItems } from './ReceiptItems';
 
 // TODO: type these
 interface ReceiptInnerProps {

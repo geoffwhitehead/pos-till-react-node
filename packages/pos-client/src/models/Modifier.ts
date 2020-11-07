@@ -1,5 +1,5 @@
-import { Model, tableSchema, Query, Q } from '@nozbe/watermelondb';
-import { field, children, lazy, action } from '@nozbe/watermelondb/decorators';
+import { Model, Q, Query, tableSchema } from '@nozbe/watermelondb';
+import { action, children, field, lazy } from '@nozbe/watermelondb/decorators';
 import { ModifierPrice, tableNames } from '.';
 import { ModifierItem } from './ModifierItem';
 

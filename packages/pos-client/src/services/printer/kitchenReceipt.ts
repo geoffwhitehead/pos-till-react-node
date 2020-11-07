@@ -1,8 +1,8 @@
 import dayjs, { Dayjs } from 'dayjs';
-import { BillItem, PriceGroup, Printer, BillItemModifierItem, BillItemPrintLog } from '../../models';
-import { groupBy, flatten, omit, capitalize, keyBy } from 'lodash';
-import { alignCenter, starDivider, alignLeftRightSingle } from './helpers';
+import { capitalize, flatten, groupBy, keyBy } from 'lodash';
+import { BillItem, BillItemModifierItem, BillItemPrintLog, PriceGroup, Printer } from '../../models';
 import { PrintType } from '../../models/BillItemPrintLog';
+import { alignCenter, alignLeftRightSingle, starDivider } from './helpers';
 
 const MOD_PREFIX = '- ';
 const REF_NAME = 'Table';

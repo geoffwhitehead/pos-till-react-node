@@ -1,9 +1,8 @@
+import { Left, ListItem, Right, Separator, Text } from 'native-base';
 import React, { useContext } from 'react';
-import { formatNumber } from '../../../../../utils';
-import { Separator, Text, ListItem, Left, Right } from 'native-base';
 import { OrganizationContext } from '../../../../../contexts/OrganizationContext';
 import { BillDiscount } from '../../../../../models';
-import { DiscountBreakdownProps as DiscountsBreakdownCalculationProps } from '../../../../../utils';
+import { DiscountBreakdownProps as DiscountsBreakdownCalculationProps, formatNumber } from '../../../../../utils';
 
 interface DiscountBreakdownProps {
   discountBreakdown: DiscountsBreakdownCalculationProps[];

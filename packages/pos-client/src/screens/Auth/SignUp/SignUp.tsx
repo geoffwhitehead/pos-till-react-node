@@ -1,8 +1,8 @@
-import React from 'react';
-import { Container, Input, Button, Header, Content, Item, Text, Form, Label } from '../../../core';
-import { AuthContext } from '../../../contexts/AuthContext';
 import { Formik } from 'formik';
+import React from 'react';
 import * as Yup from 'yup';
+import { AuthContext } from '../../../contexts/AuthContext';
+import { Button, Container, Content, Form, Header, Input, Item, Label, Text } from '../../../core';
 
 const SignupSchema = Yup.object().shape({
   firstName: Yup.string()

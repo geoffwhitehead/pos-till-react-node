@@ -1,10 +1,10 @@
-import React from 'react';
-import { Tab, Container, Content, Tabs } from '../../core';
-import { SidebarHeader } from '../../components/SidebarHeader/SidebarHeader';
 import { DrawerNavigationProp } from '@react-navigation/drawer';
+import React from 'react';
+import { SidebarHeader } from '../../components/SidebarHeader/SidebarHeader';
+import { Container, Content, Tab, Tabs } from '../../core';
 import { SidebarDrawerStackParamList } from '../../navigators/SidebarNavigator';
-import { ItemsTab } from './Tabs/ItemsTab/ItemsTab';
 import { CategoriesTab } from './Tabs/CategoriesTab/CategoriesTab';
+import { ItemsTab } from './Tabs/ItemsTab/ItemsTab';
 import { ModifiersTab } from './Tabs/ModifiersTab/ModifiersTab';
 
 interface ItemsProps {

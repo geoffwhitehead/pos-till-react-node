@@ -1,9 +1,9 @@
-import React, { useContext } from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
-import { CategoryItems, AllItems } from '../screens/Checkout/sub-components/CategoryItemsList/CategoryItemsList';
-import { ItemModifierList } from '../screens/Checkout/sub-components/ItemModifierList/ItemModifierList';
+import React from 'react';
+import { Category, Modifier } from '../models';
+import { AllItems, CategoryItems } from '../screens/Checkout/sub-components/CategoryItemsList/CategoryItemsList';
 import { Categories } from '../screens/Checkout/sub-components/CategoryList/CategoryList';
-import { Category, Modifier, PriceGroup } from '../models';
+import { ItemModifierList } from '../screens/Checkout/sub-components/ItemModifierList/ItemModifierList';
 
 const Stack = createStackNavigator();
 

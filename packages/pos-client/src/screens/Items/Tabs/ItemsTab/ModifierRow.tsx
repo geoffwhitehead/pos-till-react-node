@@ -1,6 +1,6 @@
-import { ListItem, Left, Text, Body, Right, Icon } from 'native-base';
-import React from 'react';
 import withObservables from '@nozbe/with-observables';
+import { Body, Icon, Left, ListItem, Right, Text } from 'native-base';
+import React from 'react';
 import { Modifier } from '../../../../models';
 import { styles } from '../../../../styles';
 

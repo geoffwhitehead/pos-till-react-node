@@ -1,13 +1,13 @@
 import { Database } from '@nozbe/watermelondb';
-import { Content, List, Text, View, Button, ListItem, Body, Right, Left } from '../../../../core';
-import React, { useState } from 'react';
-import { Modal } from '../../../../components/Modal/Modal';
 import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import withObservables from '@nozbe/with-observables';
-import { Category } from '../../../../models';
+import React, { useState } from 'react';
+import { Modal } from '../../../../components/Modal/Modal';
 import { SearchBar } from '../../../../components/SearchBar/SearchBar';
-import { ModalCategoryDetails } from './ModalCategoryDetails';
+import { Content, List, View } from '../../../../core';
+import { Category } from '../../../../models';
 import { CategoryRow } from './CategoryRow';
+import { ModalCategoryDetails } from './ModalCategoryDetails';
 
 interface CategoriesTabOuterProps {
   database?: Database;

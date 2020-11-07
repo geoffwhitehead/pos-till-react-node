@@ -1,4 +1,4 @@
-import { StarPRNT, Printers } from 'react-native-star-prnt';
+import { Printers, StarPRNT } from 'react-native-star-prnt';
 import { Toast } from '../../core';
 import { Printer } from '../../models';
 

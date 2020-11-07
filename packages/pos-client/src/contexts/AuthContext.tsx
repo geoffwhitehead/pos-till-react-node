@@ -1,14 +1,12 @@
-import React from 'react'
+import React from 'react';
 
 type AuthContextProps = {
-    signIn: (data: any) => void
-    signOut: () => void
-    signUp: (data: any) => void
-}
+  signIn: (data: any) => void;
+  signOut: () => void;
+  signUp: (data: any) => void;
+};
 export const AuthContext = React.createContext<AuthContextProps>({
-  signIn: async (data) => {},
+  signIn: async data => {},
   signOut: () => {},
-  signUp: async (data) => {},
-})
-
-
+  signUp: async data => {},
+});

@@ -1,17 +1,17 @@
+import withObservables from '@nozbe/with-observables';
+import { DrawerNavigationProp } from '@react-navigation/drawer';
 import React, { useState } from 'react';
-import { Container, Grid, Col } from '../../core';
 import { SidebarHeader } from '../../components/SidebarHeader/SidebarHeader';
+import { Col, Container, Grid } from '../../core';
+import { withBillPeriod } from '../../hocs/withBillPeriod';
+import { Bill, BillPeriod } from '../../models';
+import { SidebarDrawerStackParamList } from '../../navigators/SidebarNavigator';
 import { Receipt } from '../Checkout/sub-components/Receipt/Receipt';
 import { TransactionList } from './sub-components/TransactionList';
-import withObservables from '@nozbe/with-observables';
-import { withBillPeriod } from '../../hocs/withBillPeriod';
-import { DrawerNavigationProp } from '@react-navigation/drawer';
-import { SidebarDrawerStackParamList } from '../../navigators/SidebarNavigator';
-import { Bill, BillPeriod } from '../../models';
 
 interface TransactionsOuterProps {
   navigation: DrawerNavigationProp<SidebarDrawerStackParamList, 'Transactions'>;
-  billPeriod: BillPeriod
+  billPeriod: BillPeriod;
 }
 
 interface TransactionsInnerProps {

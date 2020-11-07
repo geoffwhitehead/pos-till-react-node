@@ -1,7 +1,6 @@
 import React, { useContext } from 'react';
-import { Text, Content, List, ListItem, Button } from '../../core';
-import { createDrawerNavigator } from '@react-navigation/drawer';
 import { AuthContext } from '../../contexts/AuthContext';
+import { Button, Content, List, ListItem, Text } from '../../core';
 
 const routes = ['Checkout', 'SplashScreen'];
 

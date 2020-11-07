@@ -1,16 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import { SidebarNavigator } from '../../navigators/SidebarNavigator';
-import { BillPeriodContext } from '../../contexts/BillPeriodContext';
-import { PriceGroupContext } from '../../contexts/PriceGroupContext';
-import { ReceiptPrinterContext } from '../../contexts/ReceiptPrinterContext';
+import { Database } from '@nozbe/watermelondb';
 import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import withObservables from '@nozbe/with-observables';
-import { Database } from '@nozbe/watermelondb';
-import { tableNames, BillPeriod, PriceGroup, Bill, Organization, Printer } from '../../models';
-import { CurrentBillContext } from '../../contexts/CurrentBillContext';
+import React, { useEffect, useState } from 'react';
 import { Loading } from '../../components/Loading/Loading';
+import { BillPeriodContext } from '../../contexts/BillPeriodContext';
+import { CurrentBillContext } from '../../contexts/CurrentBillContext';
 import { OrganizationContext } from '../../contexts/OrganizationContext';
+import { PriceGroupContext } from '../../contexts/PriceGroupContext';
+import { ReceiptPrinterContext } from '../../contexts/ReceiptPrinterContext';
 import { database } from '../../database';
+import { Bill, BillPeriod, Organization, PriceGroup, Printer, tableNames } from '../../models';
+import { SidebarNavigator } from '../../navigators/SidebarNavigator';
 
 interface MainInnerProps {
   priceGroups: PriceGroup[];

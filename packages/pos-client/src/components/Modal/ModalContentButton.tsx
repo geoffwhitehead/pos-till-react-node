@@ -1,6 +1,6 @@
 import React from 'react';
-import { Content, Text, Button, H3, Icon } from '../../core';
 import { View } from 'react-native';
+import { Button, Content, H3, Icon, Text } from '../../core';
 
 interface ModalContentButtonProps {
   title: string;

@@ -1,8 +1,8 @@
+import { Formik } from 'formik';
 import React from 'react';
 import * as Yup from 'yup';
-import { Formik } from 'formik';
-import { Content, Row, Col, Label, Input, Item, Text, Form, Textarea } from '../../../../../core';
 import { ModalContentButton } from '../../../../../components/Modal/ModalContentButton';
+import { Form, Input, Item, Label, Text, Textarea } from '../../../../../core';
 import { RemoveMode } from '../ReceiptItems';
 
 const modalReasonSchema = Yup.object().shape({

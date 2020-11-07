@@ -1,32 +1,32 @@
-import React, { useState } from 'react';
-import {
-  Container,
-  Content,
-  Text,
-  Body,
-  Grid,
-  Col,
-  Row,
-  Button,
-  List,
-  ListItem,
-  Left,
-  Right,
-  Spinner,
-  ActionSheet,
-  Icon,
-} from '../../../core';
+import { Database } from '@nozbe/watermelondb';
 import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import withObservables from '@nozbe/with-observables';
-import { tableNames, Printer } from '../../../models';
-import { Database } from '@nozbe/watermelondb';
 import { capitalize } from 'lodash';
-import { PrinterDetails } from './PrinterDetails';
-import { portDiscovery } from '../../../services/printer/printer';
-import { Printers, Printer as StarPrinterProps } from 'react-native-star-prnt';
-import { PrinterRow } from './PrinterRow';
-import { Emulations, PrinterProps } from '../../../models/Printer';
+import React, { useState } from 'react';
+import { Printer as StarPrinterProps, Printers } from 'react-native-star-prnt';
 import { Modal } from '../../../components/Modal/Modal';
+import {
+  ActionSheet,
+  Body,
+  Button,
+  Col,
+  Container,
+  Content,
+  Grid,
+  Icon,
+  Left,
+  List,
+  ListItem,
+  Right,
+  Row,
+  Spinner,
+  Text,
+} from '../../../core';
+import { Printer, tableNames } from '../../../models';
+import { Emulations, PrinterProps } from '../../../models/Printer';
+import { portDiscovery } from '../../../services/printer/printer';
+import { PrinterDetails } from './PrinterDetails';
+import { PrinterRow } from './PrinterRow';
 
 interface PrintersTabOuterProps {
   database: Database;
