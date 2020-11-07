@@ -1,0 +1,114 @@
+import React, { useState } from 'react';
+import { Form, Label, Input, Item, Text, Col, Row, Content, ListItem, CheckBox, Body } from '../../../../core';
+import { Formik } from 'formik';
+import * as Yup from 'yup';
+import { useDatabase } from '@nozbe/watermelondb/hooks';
+import { ModalContentButton } from '../../../../components/Modal/ModalContentButton';
+import { commonStyles } from '../../../Settings/sub-components/styles';
+import { Category, tableNames } from '../../../../models';
+import withObservables from '@nozbe/with-observables';
+
+type ModalCategoryDetailsOuterProps = {
+  onClose: () => void;
+  category: Category;
+};
+
+type ModalCategoryDetailsInnerProps = {
+  itemsCount: number;
+};
+const categorySchema = Yup.object().shape({
+  name: Yup.string()
+    .min(2, 'Too Short')
+    .max(50, 'Too Long')
+    .required('Required'),
+  shortName: Yup.string()
+    .min(2, 'Too Short')
+    .max(50, 'Too Long'),
+});
+
+type FormValues = {
+  name: string;
+  shortName: string;
+};
+
+export const ModalCategoryDetailsInner: React.FC<ModalCategoryDetailsOuterProps & ModalCategoryDetailsInnerProps> = ({
+  category,
+  onClose,
+  itemsCount,
+}) => {
+  const [loading, setLoading] = useState(false);
+  const database = useDatabase();
+
+  const update = async (values: FormValues, category: Category) => {
+    setLoading(true);
+    if (category) {
+      await database.action(() => category.update(record => Object.assign(record, values)));
+    } else {
+      const categoryCollection = database.collections.get<Category>(tableNames.categories);
+      await database.action(() => categoryCollection.create(record => Object.assign(record, values)));
+    }
+    setLoading(false);
+    onClose();
+  };
+
+  const initialValues = {
+    name: category?.name || '',
+    shortName: category?.shortName || '',
+  };
+
+  const onDelete = async () => {
+    database.action(() => category.markAsDeleted());
+    onClose();
+  };
+
+  return (
+    <Formik
+      initialValues={initialValues}
+      validationSchema={categorySchema}
+      onSubmit={values => update(values, category)}
+    >
+      {({ handleChange, handleBlur, handleSubmit, errors, touched, values }) => {
+        const { name, shortName } = values;
+        const err = {
+          name: !!(touched.name && errors.name),
+          shortName: !!(touched.shortName && errors.shortName),
+        };
+
+        return (
+          <ModalContentButton
+            primaryButtonText="Save"
+            onPressPrimaryButton={handleSubmit}
+            onPressSecondaryButton={onClose}
+            secondaryButtonText="Cancel"
+            title="Category Details"
+            isPrimaryDisabled={loading}
+            style={{ width: 600 }}
+            isDeleteDisabled={itemsCount > 0}
+            onPressDelete={onDelete}
+          >
+            <Form style={commonStyles.form}>
+              <Item stackedLabel error={err.name}>
+                <Label>Name</Label>
+                <Input onChangeText={handleChange('name')} onBlur={handleBlur('name')} value={name} />
+              </Item>
+              <Item stackedLabel error={err.shortName}>
+                <Label>Short Name</Label>
+                <Input onChangeText={handleChange('shortName')} onBlur={handleBlur('shortName')} value={shortName} />
+              </Item>
+            </Form>
+          </ModalContentButton>
+        );
+      }}
+    </Formik>
+  );
+};
+
+const enhance = c =>
+  withObservables<ModalCategoryDetailsOuterProps, ModalCategoryDetailsInnerProps>(['category'], ({ category }) => {
+    return {
+      category,
+      itemsCount: category.items.observeCount(),
+    };
+  })(c);
+
+export const ModalCategoryDetails = enhance(ModalCategoryDetailsInner);

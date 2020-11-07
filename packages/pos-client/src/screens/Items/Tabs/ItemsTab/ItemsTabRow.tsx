@@ -10,6 +10,7 @@ interface ItemsTabRowOuterProps {
   onPressItem: (i: Item) => void;
   title: string;
   subtitle: string;
+  index: number;
 }
 
 interface ItemsTabRowInnerProps {
@@ -17,20 +18,21 @@ interface ItemsTabRowInnerProps {
 }
 
 const ItemsTabRowInner: React.FC<ItemsTabRowOuterProps & ItemsTabRowInnerProps> = ({
-  children,
-  isActive,
   item,
   title,
   subtitle,
   onPressItem,
+  index,
 }) => {
   return (
-    <ListItem thumbnail>
-      <Left></Left>
-      <Body>
-        <Text>{title}</Text>
-        <Text note>{subtitle}</Text>
-      </Body>
+    <ListItem>
+      <Left style={styles.item}>
+        <Text style={{ alignSelf: 'flex-start' }}>{`${index + 1}: ${title}`}</Text>
+        <Text style={{ alignSelf: 'flex-start' }} note>
+          {subtitle}
+        </Text>
+      </Left>
+      <Body />
       <Right>
         <Button bordered info small onPress={() => onPressItem(item)} transparent>
           <Text>View</Text>
@@ -47,5 +49,8 @@ export const ItemsTabRow = withObservables<ItemsTabRowOuterProps, ItemsTabRowInn
 const styles = StyleSheet.create({
   activeRow: {
     backgroundColor: '#cde1f9',
+  },
+  item: {
+    flexDirection: 'column',
   },
 });

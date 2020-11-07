@@ -6,6 +6,15 @@ import { Printer } from './Printer';
 import { Modifier } from './Modifier';
 import { PrinterGroup, ModifierItem, ItemModifier, tableNames, PriceGroup } from '.';
 
+type UpdateItemProps = {
+  name: string;
+  shortName: string;
+  categoryId: string;
+  printerGroupId: string;
+  selectedModifiers: Modifier[];
+  prices: { price: number | null; itemPrice: ItemPrice }[];
+};
+
 export class Item extends Model {
   static table = 'items';
 
@@ -26,7 +35,7 @@ export class Item extends Model {
   };
 
   @children('item_prices') prices: Query<ItemPrice>;
-  @children('item_modifiers') itemModifierLinks: Query<ItemModifier>;
+  @children('item_modifiers') itemModifiers: Query<ItemModifier>;
 
   @lazy printers = this.collections
     .get('printers')
@@ -36,12 +45,15 @@ export class Item extends Model {
   >;
 
   @action remove = async () => {
-    const [prices, modifierRefs] = await Promise.all([this.prices.fetch(), this.itemModifierLinks.fetch()]);
+    const [prices, itemModifiers] = await Promise.all([this.prices.fetch(), this.itemModifiers.fetch()]);
 
-    const pricesToDelete = prices.map(price => price.prepareMarkAsDeleted());
-    const modifierRefsToDelete = modifierRefs.map(modifierRef => modifierRef.prepareMarkAsDeleted());
-    const toRemove = [this.prepareMarkAsDeleted(), ...pricesToDelete, ...modifierRefsToDelete];
-    await this.database.batch(...toRemove);
+    const itemPricesToDelete = prices.map(price => price.prepareMarkAsDeleted());
+    const itemModifiersToDelete = itemModifiers.map(itemModifier => itemModifier.prepareMarkAsDeleted());
+    const itemToDelete = this.prepareMarkAsDeleted();
+
+    const batched = [itemToDelete, ...itemPricesToDelete, ...itemModifiersToDelete];
+
+    await this.database.batch(...batched);
   };
 
   @action updateItem = async ({
@@ -50,72 +62,35 @@ export class Item extends Model {
     categoryId,
     printerGroupId,
     prices,
-    modifiers,
-  }: {
-    name: string;
-    shortName: string;
-    categoryId: string;
-    printerGroupId: string;
-    modifiers: Modifier[];
-    prices: { price: string; priceGroup: PriceGroup }[];
-  }) => {
-    const modifierLinksCollection = this.database.collections.get<ItemModifier>(tableNames.itemModifiers);
-    const itemPricesCollection = this.database.collections.get<ItemPrice>(tableNames.itemPrices);
+    selectedModifiers,
+  }: UpdateItemProps) => {
+    const itemModifierCollection = this.database.collections.get<ItemModifier>(tableNames.itemModifiers);
 
-    let batched = [];
+    const itemModifiers = await this.itemModifiers.fetch();
 
-    const [itemPrices, itemModifierLinks, priceGroups] = await Promise.all([
-      this.prices.fetch(),
-      this.itemModifierLinks.fetch(),
-      this.database.collections
-        .get<PriceGroup>(tableNames.priceGroups)
-        .query()
-        .fetch(),
-    ]);
+    // delete all records from pivot table
+    const itemModifiersToDelete = itemModifiers.map(itemModifier => itemModifier.prepareMarkAsDeleted());
 
-    batched.push(
-      this.prepareUpdate(itemRecord => {
-        Object.assign(itemRecord, { name, shortName, categoryId, printerGroupId });
+    // create new pivot records for selected modifiers
+    const itemModifiersToCreate = selectedModifiers.map(selectedModifier =>
+      itemModifierCollection.prepareCreate(record => {
+        record.modifier.set(selectedModifier);
+        record.item.set(this);
       }),
     );
 
-    batched.push(...itemModifierLinks.map(l => l.prepareMarkAsDeleted()));
-    batched.push(
-      ...modifiers.map(modifier => {
-        return modifierLinksCollection.prepareCreate(modifierLink => {
-          modifierLink.modifier.set(modifier);
-          modifierLink.item.set(this);
-        });
+    const itemToUpdate = this.prepareUpdate(record => {
+      Object.assign(record, { name, shortName, categoryId, printerGroupId });
+    });
+
+    const itemPricesToUpdate = prices.map(({ itemPrice, price }) =>
+      itemPrice.prepareUpdate(record => {
+        Object.assign(record, { price });
       }),
     );
 
-    batched.push(
-      ...priceGroups.map(priceGroup => {
-        const existingRecord = itemPrices.find(iP => iP.priceGroupId === priceGroup.id);
-        const newPrice = prices.find(p => p.priceGroup.id === priceGroup.id)?.price;
-
-        if (newPrice) {
-          if (existingRecord) {
-            return existingRecord.prepareUpdate(itemPriceRecord => {
-              Object.assign(itemPriceRecord, { price: newPrice ? parseInt(newPrice) : null });
-            });
-          } else {
-            return itemPricesCollection.prepareCreate(newItemPriceRecord => {
-              newItemPriceRecord.item.set(this);
-              newItemPriceRecord.priceGroup.set(priceGroup);
-              Object.assign(newItemPriceRecord, {
-                price: newPrice ? parseInt(newPrice) : null,
-              });
-            });
-          }
-        } else if (existingRecord) {
-          return existingRecord.prepareMarkAsDeleted();
-        }
-        return null;
-      }),
-    );
-
-    await this.database.action(async () => await this.database.batch(...batched));
+    const batched = [itemToUpdate, ...itemPricesToUpdate, ...itemModifiersToCreate, ...itemModifiersToDelete];
+    await this.database.batch(...batched);
   };
 }
 

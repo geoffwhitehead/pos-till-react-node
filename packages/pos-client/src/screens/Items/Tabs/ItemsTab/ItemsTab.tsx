@@ -9,6 +9,7 @@ import { ItemsTabRow } from './ItemsTabRow';
 import { ItemDetails } from './ItemDetails';
 import { Loading } from '../../../../components/Loading/Loading';
 import { keyBy } from 'lodash';
+import { SearchBar } from '../../../../components/SearchBar/SearchBar';
 
 interface ItemsTabOuterProps {
   database?: Database;
@@ -51,24 +52,22 @@ const ItemsTabInner: React.FC<ItemsTabOuterProps & ItemsTabInnerProps> = ({ item
 
   return (
     <View>
-      <ItemComponent style={{ marginLeft: 10, marginRight: 10 }}>
-        <Icon name="ios-search" />
-        <Input placeholder="Search" onChangeText={onSearchHandler} value={searchValue} />
-        <Button iconLeft small success onPress={() => setModalOpen(true)}>
-          <Icon name="ios-add-circle-outline" />
-          <Text>Create</Text>
-        </Button>
-      </ItemComponent>
+      <SearchBar
+        value={searchValue}
+        onPressCreate={() => setModalOpen(true)}
+        onSearch={value => setSearchValue(value)}
+      />
       <Content>
         <List>
           {items
             .filter(item => searchFilter(item, searchValue))
-            .map(item => {
+            .map((item, index) => {
               const categoryName = keyedCategories[item.categoryId].name;
               const subtitle = `Category: ${categoryName}`;
 
               return (
                 <ItemsTabRow
+                  index={index}
                   key={item.id}
                   item={item}
                   isActive={selectedItem === item}

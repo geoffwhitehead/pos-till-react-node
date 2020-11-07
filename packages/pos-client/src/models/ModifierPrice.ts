@@ -17,7 +17,7 @@ export class ModifierPrice extends Model {
 export const modifierPriceSchema = tableSchema({
   name: 'modifier_prices',
   columns: [
-    { name: 'price', type: 'number' },
+    { name: 'price', type: 'number', isOptional: true }, // null field prevents selection for this price group
     { name: 'price_group_id', type: 'string' },
     { name: 'modifier_item_id', type: 'string', isIndexed: true },
   ],

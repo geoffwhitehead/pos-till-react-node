@@ -1,5 +1,4 @@
 import React from 'react';
-import { styles } from '../../styles';
 import { Content, Text, Button, H3, Icon } from '../../core';
 import { View } from 'react-native';
 
@@ -11,22 +10,26 @@ interface ModalContentButtonProps {
   secondaryButtonText: string;
   isPrimaryDisabled?: boolean;
   isSecondaryDisabled?: boolean;
+  isDeleteDisabled?: boolean;
   onPressDelete?: () => void;
+  style?: Record<string, any>;
 }
 
 export const ModalContentButton: React.FC<ModalContentButtonProps> = ({
   children,
   isPrimaryDisabled,
   isSecondaryDisabled,
+  isDeleteDisabled,
   title,
   onPressPrimaryButton,
   onPressSecondaryButton,
   primaryButtonText,
   secondaryButtonText,
   onPressDelete,
+  style = {},
 }) => {
   return (
-    <Content style={cStyles.modal}>
+    <View style={{ ...cStyles.modal, ...style }}>
       <View style={cStyles.heading}>
         <H3>{title}</H3>
         <View style={cStyles.buttons}>
@@ -37,14 +40,14 @@ export const ModalContentButton: React.FC<ModalContentButtonProps> = ({
             <Text>{primaryButtonText}</Text>
           </Button>
           {onPressDelete && (
-            <Button style={cStyles.buttonSpacingLeft} danger onPress={onPressDelete}>
+            <Button style={cStyles.buttonSpacingLeft} danger disabled={isDeleteDisabled} onPress={onPressDelete}>
               <Icon name="ios-trash" />
             </Button>
           )}
         </View>
       </View>
       <Content style={cStyles.content}>{children}</Content>
-    </Content>
+    </View>
   );
 };
 
@@ -65,7 +68,10 @@ const cStyles = {
   content: {
     padding: 30,
   },
+
   modal: {
+    width: '100%',
+    height: '100%',
     backgroundColor: 'white',
     borderStyle: 'solid',
     borderWidth: 1,
@@ -75,8 +81,8 @@ const cStyles = {
     shadowOpacity: 0.8,
     shadowRadius: 2,
     shadowOffset: {
-      height: 5,
-      width: 5,
+      height: 1,
+      width: 2,
     },
   },
   buttons: {
@@ -87,4 +93,4 @@ const cStyles = {
   buttonSpacingLeft: {
     marginLeft: 10,
   },
-};
+} as const;

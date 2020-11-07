@@ -13,6 +13,7 @@ import {
   Picker,
   List,
   ActionSheet,
+  Content,
 } from '../../../../core';
 import React, { useState, useEffect } from 'react';
 import withObservables from '@nozbe/with-observables';
@@ -35,7 +36,8 @@ import { Loading } from '../../../../components/Loading/Loading';
 import { ModalContentButton } from '../../../../components/Modal/ModalContentButton';
 import { ModifierRow } from './ModifierRow';
 import { useDatabase } from '@nozbe/watermelondb/hooks';
-import { isPlainObject } from 'lodash';
+import { isPlainObject, keyBy } from 'lodash';
+import { SHORT_NAME_LENGTH } from '../../../../utils/consts';
 
 interface ItemDetailsOuterProps {
   item?: ItemModel;
@@ -48,7 +50,7 @@ interface ItemDetailsInnerProps {
   item?: ItemModel;
   categories: Category[];
   printerGroups: PrinterGroup[];
-  prices: ItemPrice[];
+  itemPrices: ItemPrice[];
   modifiers: Modifier[];
   itemModifiers: Modifier[];
   priceGroups: PriceGroup[];
@@ -61,7 +63,7 @@ const ItemSchema = Yup.object().shape({
     .required('Required'),
   shortName: Yup.string()
     .min(2, 'Too Short')
-    .max(10, 'Too Long')
+    .max(SHORT_NAME_LENGTH, 'Too Long')
     .required('Required'),
   categoryId: Yup.string()
     .min(2, 'Too Short')
@@ -85,7 +87,7 @@ const ItemDetailsInner: React.FC<ItemDetailsOuterProps & ItemDetailsInnerProps> 
   onClose,
   categories,
   printerGroups,
-  prices = [],
+  itemPrices = [],
   priceGroups,
   modifiers = [],
   itemModifiers,
@@ -96,6 +98,8 @@ const ItemDetailsInner: React.FC<ItemDetailsOuterProps & ItemDetailsInnerProps> 
   }
   const [selectedModifiers, setSelectedModifiers] = useState<Modifier[]>([]);
   const [loading, setLoading] = useState(false);
+
+  const keyedItemPricesByPriceGroup = keyBy(itemPrices, itemPrice => itemPrice.priceGroupId);
 
   useEffect(() => {
     itemModifiers && setSelectedModifiers(itemModifiers);
@@ -128,10 +132,16 @@ const ItemDetailsInner: React.FC<ItemDetailsOuterProps & ItemDetailsInnerProps> 
   const updateItem = async ({ prices, ...values }: FormValues) => {
     setLoading(true);
 
-    const filteredPrices = prices.filter(price => price.price !== '');
-
     if (item) {
-      await item.updateItem({ ...values, prices: filteredPrices, modifiers: selectedModifiers });
+      const reMappedPrices = prices.map(({ priceGroup, price }) => {
+        const nullOrPrice = price === '' ? null : parseInt(price);
+
+        return {
+          itemPrice: keyedItemPricesByPriceGroup[priceGroup.id],
+          price: nullOrPrice,
+        };
+      });
+      await database.action(() => item.updateItem({ ...values, prices: reMappedPrices, selectedModifiers }));
       onClose();
     } else {
       const itemCollection = database.collections.get<ItemModel>(tableNames.items);
@@ -153,13 +163,17 @@ const ItemDetailsInner: React.FC<ItemDetailsOuterProps & ItemDetailsInnerProps> 
         }),
       );
 
-      const pricesToCreate = filteredPrices.map(price =>
-        itemPriceCollection.prepareCreate(newPrice => {
-          newPrice.priceGroup.set(price.priceGroup);
-          newPrice.item.set(itemToCreate);
-          newPrice.price = parseInt(price.price);
-        }),
-      );
+      const pricesToCreate = prices.map(({ price, priceGroup }) => {
+        const nullOrPrice = price === '' ? null : parseInt(price);
+
+        return itemPriceCollection.prepareCreate(record => {
+          record.priceGroup.set(priceGroup);
+          record.item.set(itemToCreate);
+          Object.assign(record, {
+            price: nullOrPrice,
+          });
+        });
+      });
 
       const toCreate = [itemToCreate, ...itemModifersToCreate, ...pricesToCreate];
       await database.action(() => database.batch(...toCreate));
@@ -173,18 +187,19 @@ const ItemDetailsInner: React.FC<ItemDetailsOuterProps & ItemDetailsInnerProps> 
     onClose();
   };
 
-  const resolvePrice = (priceGroup: PriceGroup, prices: ItemPrice[]): string => {
-    const found = prices.find(price => price.priceGroupId === priceGroup.id);
-    return found ? found.price.toString() : '';
-  };
-
   const initialValues = {
     name: item?.name || '',
     shortName: item?.shortName || '',
     categoryId: item?.categoryId || '',
     printerGroupId: item?.printerGroupId || '',
-    prices: priceGroups.map(pG => {
-      return { priceGroup: pG, price: resolvePrice(pG, prices) };
+    prices: priceGroups.map(priceGroup => {
+      /**
+       * the 2 null checks here cover 2 scenarios:
+       * - the item price doesnt exist because this is the "create" modal.
+       * - the price exists but has been set to null to prevent the item being selected for this price group.
+       */
+      const priceOrEmptyString = keyedItemPricesByPriceGroup[priceGroup.id]?.price?.toString() || '';
+      return { priceGroup: priceGroup, price: priceOrEmptyString };
     }),
   };
 
@@ -292,7 +307,7 @@ const ItemDetailsInner: React.FC<ItemDetailsOuterProps & ItemDetailsInnerProps> 
                               <Input
                                 onChangeText={handleChange(`prices[${i}].price`)}
                                 onBlur={handleBlur(`prices[${i}]`)}
-                                value={prices[i].price.toString()}
+                                value={prices[i].price}
                               />
                             </Item>
                           );
@@ -349,7 +364,7 @@ const enhance = c =>
         return {
           item,
           printerGroups: database.collections.get<PrinterGroup>(tableNames.printerGroups).query(),
-          prices: item.prices,
+          itemPrices: item.prices,
           itemModifiers: item.modifiers,
           modifiers: database.collections.get<Modifier>(tableNames.modifiers).query(),
           priceGroups: database.collections.get<PriceGroup>(tableNames.priceGroups).query(),

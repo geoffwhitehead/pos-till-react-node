@@ -6,7 +6,7 @@ import { Item } from './Item';
 export class ItemPrice extends Model {
   static table = 'item_prices';
 
-  @field('price') price: number;
+  @field('price') price?: number;
   @field('price_group_id') priceGroupId: string;
   @field('item_id') itemId: string;
 
@@ -22,7 +22,7 @@ export class ItemPrice extends Model {
 export const itemPriceSchema = tableSchema({
   name: 'item_prices',
   columns: [
-    { name: 'price', type: 'number' },
+    { name: 'price', type: 'number', isOptional: true }, // setting this to null prevent selection for this price group
     { name: 'price_group_id', type: 'string' },
     { name: 'item_id', type: 'string', isIndexed: true },
   ],
