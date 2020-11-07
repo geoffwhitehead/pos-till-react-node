@@ -66,7 +66,7 @@ const ModifierItemsInner: React.FC<ModifierItemsOuterProps & ModifierItemsInnerP
 };
 
 const enhance = c =>
-  withObservables<ModifierItemsOuterProps, ModifierItemsInnerProps>(['modifier'], ({ modifier, database }) => {
+  withObservables<ModifierItemsOuterProps, ModifierItemsInnerProps>(['modifier'], ({ modifier }) => {
     return {
       modifier,
       modifierItems: modifier.modifierItems,

@@ -1,14 +1,14 @@
-import { ModifierProps, MODIFIER_COLLECTION_NAME } from '../../models/Modifier';
-import { InjectedDependencies, pull, push } from '..';
 import { CommonServiceFns } from '.';
-import { toClientChanges } from '../../utils/sync';
+import { InjectedDependencies, pull, push } from '..';
+import { ModifierProps, MODIFIER_COLLECTION_NAME } from '../../models/Modifier';
 import { MODIFIER_ITEM_COLLECTION_NAME } from '../../models/ModifierItem';
-import { MODIFIER_PRICE_COLLECTION_NAME } from '../../models/ModifierPrice';
+import { MODIFIER_ITEM_PRICE_COLLECTION_NAME } from '../../models/ModifierItemPrice';
+import { toClientChanges } from '../../utils/sync';
 
 export type ModifierService = CommonServiceFns<ModifierProps>;
 
 export const modifierService = ({
-    repositories: { modifierRepository, modifierItemRepository, modifierPriceRepository },
+    repositories: { modifierRepository, modifierItemRepository, modifierItemPriceRepository },
     logger,
 }: InjectedDependencies): ModifierService => {
     const findAll = async () => await modifierRepository.findAll();
@@ -36,13 +36,13 @@ export const modifierService = ({
         const [modifiers, modifierItems, modifierPrices] = await Promise.all([
             pull(modifierRepository, lastPulledAt),
             pull(modifierItemRepository, lastPulledAt),
-            pull(modifierPriceRepository, lastPulledAt),
+            pull(modifierItemPriceRepository, lastPulledAt),
         ]);
 
         return toClientChanges({
             [MODIFIER_COLLECTION_NAME]: modifiers,
             [MODIFIER_ITEM_COLLECTION_NAME]: modifierItems,
-            [MODIFIER_PRICE_COLLECTION_NAME]: modifierPrices,
+            [MODIFIER_ITEM_PRICE_COLLECTION_NAME]: modifierPrices,
         });
     };
 
@@ -50,7 +50,7 @@ export const modifierService = ({
         Promise.all([
             await push(modifierRepository, changes[MODIFIER_COLLECTION_NAME], lastPulledAt),
             await push(modifierItemRepository, changes[MODIFIER_ITEM_COLLECTION_NAME], lastPulledAt),
-            await push(modifierPriceRepository, changes[MODIFIER_PRICE_COLLECTION_NAME], lastPulledAt),
+            await push(modifierItemPriceRepository, changes[MODIFIER_ITEM_PRICE_COLLECTION_NAME], lastPulledAt),
         ]);
     };
 

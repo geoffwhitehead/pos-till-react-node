@@ -1,6 +1,6 @@
 import { Model, Q, Query, tableSchema } from '@nozbe/watermelondb';
 import { action, children, field, lazy } from '@nozbe/watermelondb/decorators';
-import { ModifierPrice, tableNames } from '.';
+import { ModifierItemPrice, tableNames } from '.';
 import { ModifierItem } from './ModifierItem';
 
 export class Modifier extends Model {
@@ -20,21 +20,23 @@ export class Modifier extends Model {
   @children('item_modifiers') itemModifiers: Query<ModifierItem>; // pivot table - items assigned to this printer
 
   @lazy modifierItemPrices = this.collections
-    .get<ModifierPrice>(tableNames.modifierPrices)
-    .query(Q.on(tableNames.modifierItems, 'modifier_id', this.id)) as Query<ModifierPrice>;
+    .get<ModifierItemPrice>(tableNames.modifierItemPrices)
+    .query(Q.on(tableNames.modifierItems, 'modifier_id', this.id)) as Query<ModifierItemPrice>;
 
   @action remove = async () => {
-    const [modifierItems, modifierPrices, itemModifiers] = await Promise.all([
+    const [modifierItems, modifierItemPrices, itemModifiers] = await Promise.all([
       this.modifierItems.fetch(),
       this.modifierItemPrices.fetch(),
       this.itemModifiers.fetch(),
     ]);
 
     const modifierItemsToDelete = modifierItems.map(modifierItem => modifierItem.prepareMarkAsDeleted());
-    const modifierPricesToDelete = modifierPrices.map(modifierPrice => modifierPrice.prepareMarkAsDeleted());
+    const modifierItemPricesToDelete = modifierItemPrices.map(modifierItemPrice =>
+      modifierItemPrice.prepareMarkAsDeleted(),
+    );
     const itemModifiersToDelete = itemModifiers.map(itemModifier => itemModifier.prepareMarkAsDeleted());
 
-    const batched = [...modifierItemsToDelete, ...modifierPricesToDelete, ...itemModifiersToDelete];
+    const batched = [...modifierItemsToDelete, ...modifierItemPricesToDelete, ...itemModifiersToDelete];
 
     await this.batch(...batched);
   };

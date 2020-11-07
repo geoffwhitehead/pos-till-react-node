@@ -15,36 +15,13 @@ import { ItemPrice, itemPriceSchema } from './ItemPrice';
 // import { itemPrinterSchema, ItemPrinter } from './ItemPrinter';
 import { Modifier, modifierSchema } from './Modifier';
 import { ModifierItem, modifierItemSchema } from './ModifierItem';
-import { ModifierPrice, modifierPriceSchema } from './ModifierPrice';
+import { ModifierItemPrice, modifierItemPriceSchema } from './ModifierItemPrice';
 import { Organization, organizationSchema } from './Organization';
 import { PaymentType, paymentTypeSchema } from './PaymentType';
 import { PriceGroup, priceGroupSchema } from './PriceGroup';
 import { Printer, printerSchema } from './Printer';
 import { PrinterGroup, printerGroupSchema } from './PrinterGroup';
 import { PrinterGroupPrinter, printerGroupPrinterSchema } from './PrinterGroupPrinter';
-
-// export const tableNames = {
-//   modifiers: 'modifiers',
-//   itemModifiers: 'item_modifiers',
-//   priceGroups: 'price_groups',
-//   itemPrices: 'item_prices',
-//   modifierPrices: 'modifier_prices',
-//   paymentTypes: 'payment_types',
-//   modifierItems: 'modifier_items',
-//   discounts: 'discounts',
-//   organizations: 'organizations',
-//   printers: 'printers',
-//   categories: 'categories',
-//   itemPrinters: 'item_printers',
-//   items: 'items',
-//   billPayments: 'bill_payments',
-//   bills: 'bills',
-//   billDiscounts: 'bill_discounts',
-//   billPeriods: 'bill_periods',
-//   billItems: 'bill_items',
-//   billItemModifiers: 'bill_item_modifiers',
-//   billItemModifierItems: 'bill_item_modifier_items',
-// };
 
 type TableNames = {
   paymentTypes: string;
@@ -56,7 +33,7 @@ type TableNames = {
   itemModifiers: string;
   modifiers: string;
   modifierItems: string;
-  modifierPrices: string;
+  modifierItemPrices: string;
   priceGroups: string;
   printers: string;
   printerGroups: string;
@@ -82,7 +59,7 @@ export const tableNames: TableNames = {
   itemModifiers: itemModifierSchema.name,
   modifiers: modifierSchema.name,
   modifierItems: modifierItemSchema.name,
-  modifierPrices: modifierPriceSchema.name,
+  modifierItemPrices: modifierItemPriceSchema.name,
   priceGroups: priceGroupSchema.name,
   printers: printerSchema.name,
   printerGroups: printerGroupSchema.name,
@@ -114,7 +91,7 @@ export const schemas: Record<string, TableSchema> = {
   // itemPrinterSchema,
   modifierSchema,
   modifierItemSchema,
-  modifierPriceSchema,
+  modifierItemPriceSchema,
   organizationSchema,
   paymentTypeSchema,
   priceGroupSchema,
@@ -134,7 +111,7 @@ export const models: Record<string, typeof Model> = {
   Modifier,
   PriceGroup,
   ItemPrice,
-  ModifierPrice,
+  ModifierItemPrice,
   PaymentType,
   Discount,
   Organization,
@@ -160,7 +137,7 @@ export {
   Modifier,
   PriceGroup,
   ItemPrice,
-  ModifierPrice,
+  ModifierItemPrice,
   PaymentType,
   Discount,
   Organization,

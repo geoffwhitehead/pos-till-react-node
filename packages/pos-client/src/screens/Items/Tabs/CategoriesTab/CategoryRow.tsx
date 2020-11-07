@@ -37,7 +37,7 @@ const CategoryRowInner: React.FC<CategoryRowOuterProps & CategoryRowInnerProps> 
 };
 
 const enhance = c =>
-  withObservables<CategoryRowOuterProps, CategoryRowInnerProps>(['category'], ({ category, database }) => {
+  withObservables<CategoryRowOuterProps, CategoryRowInnerProps>(['category'], ({ category }) => {
     return {
       category,
       itemsCount: category.items.observeCount(),

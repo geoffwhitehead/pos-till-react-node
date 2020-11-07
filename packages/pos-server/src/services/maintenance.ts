@@ -1,16 +1,13 @@
 import faker from 'faker';
-import { random } from 'lodash';
-import { PriceGroupProps } from '../models/PriceGroup';
-import { InjectedDependencies } from '.';
-import { PrinterProps } from '../models/Printer';
-import { ItemPriceProps } from '../models/ItemPrice';
+import { flatten, random } from 'lodash';
 import uuid from 'uuid';
+import { InjectedDependencies } from '.';
+import { ItemProps } from '../models/Item';
+import { ItemPriceProps } from '../models/ItemPrice';
 import { ModifierProps } from '../models/Modifier';
 import { ModifierItemProps } from '../models/ModifierItem';
-import { ModifierPriceProps } from '../models/ModifierPrice';
-import { flatten } from 'lodash';
-import { ItemProps } from '../models/Item';
-import { ItemModifierProps } from '../models/ItemModifier';
+import { ModifierItemPriceProps } from '../models/ModifierItemPrice';
+import { PriceGroupProps } from '../models/PriceGroup';
 
 export interface MaintenanceService {
     seed: () => Promise<any>;
@@ -38,10 +35,10 @@ const generateItemPrices: (priceGroups: PriceGroupProps[], itemId: string) => It
     });
 };
 
-const generateModifierPrices: (priceGroups: PriceGroupProps[], modifierItemId: string) => ModifierPriceProps[] = (
-    priceGroups,
-    modifierItemId,
-) => {
+const generateModifierItemPrices: (
+    priceGroups: PriceGroupProps[],
+    modifierItemId: string,
+) => ModifierItemPriceProps[] = (priceGroups, modifierItemId) => {
     return priceGroups.map((group, i) => {
         return {
             _id: uuid(),
@@ -63,7 +60,7 @@ export const maintenanceService = ({
         priceGroupRepository,
         modifierRepository,
         modifierItemRepository,
-        modifierPriceRepository,
+        modifierItemPriceRepository: modifierPriceRepository,
         itemRepository,
         itemPriceRepository,
         itemModifierRepository,
@@ -204,13 +201,13 @@ export const maintenanceService = ({
             },
         ];
 
-        const modifierPrices: ModifierPriceProps[] = flatten(
-            modifierItems.map(mItem => generateModifierPrices(priceGroups, mItem._id)),
+        const modifierItemPrices: ModifierItemPriceProps[] = flatten(
+            modifierItems.map(mItem => generateModifierItemPrices(priceGroups, mItem._id)),
         );
 
         await modifierRepository.create(modifier);
         await modifierItemRepository.insert(modifierItems);
-        await modifierPriceRepository.insert(modifierPrices);
+        await modifierPriceRepository.insert(modifierItemPrices);
 
         const items: ItemProps[] = [...Array(ITEMS_TO_SEED)].map(() => {
             const productName = faker.commerce.product();

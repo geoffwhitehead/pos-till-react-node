@@ -1,9 +1,7 @@
-import { Router, Request, Response, NextFunction } from 'express';
-import { PrinterService } from '../../services/printer';
+import { fromUnixTime, getUnixTime } from 'date-fns';
+import { NextFunction, Request, Response, Router } from 'express';
 import { Container } from 'typedi';
 import { LoggerService } from '../../loaders/logger';
-import { ProductService } from '../../services/product';
-import { Changes } from '../../services';
 import { CATEGORY_COLLECTION_NAME } from '../../models/Category';
 import { DISCOUNT_COLLECTION_NAME } from '../../models/Discount';
 import { ITEM_COLLECTION_NAME } from '../../models/Item';
@@ -11,15 +9,17 @@ import { ITEM_MODIFIER_COLLECTION_NAME } from '../../models/ItemModifier';
 import { ITEM_PRICE_COLLECTION_NAME } from '../../models/ItemPrice';
 import { MODIFIER_COLLECTION_NAME } from '../../models/Modifier';
 import { MODIFIER_ITEM_COLLECTION_NAME } from '../../models/ModifierItem';
-import { MODIFIER_PRICE_COLLECTION_NAME } from '../../models/ModifierPrice';
+import { MODIFIER_ITEM_PRICE_COLLECTION_NAME } from '../../models/ModifierItemPrice';
+import { ORGANIZATION_COLLECTION_NAME } from '../../models/Organization';
 import { PRICE_GROUP_COLLECTION_NAME } from '../../models/PriceGroup';
-import { fromClientChanges } from '../../utils/sync';
 import { PRINTER_COLLECTION_NAME } from '../../models/Printer';
 import { PRINTER_GROUP_COLLECTION_NAME } from '../../models/PrinterGroup';
 import { PRINTER_GROUP_PRINTER_COLLECTION_NAME } from '../../models/PrinterGroupPrinter';
+import { Changes } from '../../services';
 import { OrganizationService } from '../../services/organization';
-import { ORGANIZATION_COLLECTION_NAME } from '../../models/Organization';
-import { fromUnixTime, getUnixTime } from 'date-fns';
+import { PrinterService } from '../../services/printer';
+import { ProductService } from '../../services/product';
+import { fromClientChanges } from '../../utils/sync';
 
 type SyncRequest = Request & { body: { lastPulledAt: Date; changes: Changes } };
 
@@ -96,7 +96,6 @@ export default (app: Router) => {
         const changes = fromClientChanges(unmappedChanges);
         const lastPulledAt = lastPulledAtUnix ? fromUnixTime(lastPulledAtUnix) : null;
 
-        console.log('JSON.stringify(changes, null, 4)', JSON.stringify(changes, null, 4));
         try {
             await Promise.all([
                 itemService.pushChanges({
@@ -112,7 +111,7 @@ export default (app: Router) => {
                     changes: {
                         ...deconstructChanges(changes, MODIFIER_COLLECTION_NAME),
                         ...deconstructChanges(changes, MODIFIER_ITEM_COLLECTION_NAME),
-                        ...deconstructChanges(changes, MODIFIER_PRICE_COLLECTION_NAME),
+                        ...deconstructChanges(changes, MODIFIER_ITEM_PRICE_COLLECTION_NAME),
                     },
                 }),
                 categoryService.pushChanges({

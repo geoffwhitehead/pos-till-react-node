@@ -77,6 +77,9 @@ export const MainWrapped: React.FC<MainOuterProps & MainInnerProps> = ({ priceGr
     }
   }, [priceGroups, organization, setPriceGroup]);
 
+  console.log('billPeriod', billPeriod);
+  console.log('priceGroup', priceGroup);
+  console.log('organization', organization);
   if (!billPeriod || !priceGroup || !organization) {
     return <Loading />;
   }

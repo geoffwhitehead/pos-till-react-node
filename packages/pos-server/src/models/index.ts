@@ -1,18 +1,18 @@
-import { User } from './User';
-import { Item } from './Item';
 import { Category } from './Category';
 import { Discount } from './Discount';
+import { Item } from './Item';
+import { ItemModifier } from './ItemModifier';
+import { ItemPrice } from './ItemPrice';
 import { Modifier } from './Modifier';
-import { PriceGroup } from './PriceGroup';
+import { ModifierItem } from './ModifierItem';
+import { ModifierItemPrice } from './ModifierItemPrice';
 import { Organization } from './Organization';
+import { PaymentType } from './PaymentType';
+import { PriceGroup } from './PriceGroup';
 import { Printer } from './Printer';
 import { PrinterGroup } from './PrinterGroup';
-import { ItemPrice } from './ItemPrice';
-import { ItemModifier } from './ItemModifier';
-import { ModifierItem } from './ModifierItem';
-import { ModifierPrice } from './ModifierPrice';
 import { PrinterGroupPrinter } from './PrinterGroupPrinter';
-import { PaymentType } from './PaymentType';
+import { User } from './User';
 export default {
     User,
     Discount,
@@ -23,7 +23,7 @@ export default {
     ItemModifier,
     Modifier,
     ModifierItem,
-    ModifierPrice,
+    ModifierItemPrice,
     PriceGroup,
     Printer,
     PrinterGroup,

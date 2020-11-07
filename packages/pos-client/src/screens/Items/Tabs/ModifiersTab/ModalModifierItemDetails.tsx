@@ -8,7 +8,7 @@ import React, { useState } from 'react';
 import * as Yup from 'yup';
 import { ModalContentButton } from '../../../../components/Modal/ModalContentButton';
 import { Form, Input, Item, Label, Separator, Text } from '../../../../core';
-import { Modifier, ModifierItem, ModifierPrice, PriceGroup, tableNames } from '../../../../models';
+import { Modifier, ModifierItem, ModifierItemPrice, PriceGroup, tableNames } from '../../../../models';
 import { SHORT_NAME_LENGTH } from '../../../../utils/consts';
 import { commonStyles } from '../../../Settings/sub-components/styles';
 
@@ -20,7 +20,7 @@ type ModalModifierItemDetailsOuterProps = {
 };
 
 type ModalModifierItemDetailsInnerProps = {
-  modifierItemPrices?: ModifierPrice[];
+  modifierItemPrices?: ModifierItemPrice[];
   priceGroups: PriceGroup[];
 };
 
@@ -36,7 +36,7 @@ const modifierItemSchema = Yup.object().shape({
   prices: Yup.array()
     .of(
       Yup.object().shape({
-        modifierPrice: Yup.object(),
+        modifierItemPrice: Yup.object(),
         price: Yup.number(),
       }),
     )
@@ -87,7 +87,7 @@ export const ModalModifierItemDetailsInner: React.FC<ModalModifierItemDetailsOut
       console.log('creating');
       // create
       const modifierItemCollection = database.collections.get<ModifierItem>(tableNames.modifierItems);
-      const modifierPriceCollection = database.collections.get<ModifierPrice>(tableNames.modifierPrices);
+      const modifierItemPriceCollection = database.collections.get<ModifierItemPrice>(tableNames.modifierItemPrices);
 
       await database.action(async () => {
         const modifierItemToCreate = modifierItemCollection.prepareCreate(record => {
@@ -98,8 +98,7 @@ export const ModalModifierItemDetailsInner: React.FC<ModalModifierItemDetailsOut
         const modifierItemPricesToCreate = prices.map(({ priceGroup, price }) => {
           const nullOrPrice = price === '' ? null : parseInt(price);
 
-          console.log('price', price);
-          return modifierPriceCollection.prepareCreate(record => {
+          return modifierItemPriceCollection.prepareCreate(record => {
             record.priceGroup.set(priceGroup);
             record.modifierItem.set(modifierItemToCreate);
 

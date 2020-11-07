@@ -36,6 +36,8 @@ export const SyncInner: React.FC<SyncOuterProps & SyncInnerProps> = ({
 
   const hasOrganization = organizations.some(o => o.id === organizationId);
 
+  console.log('isSyncDone', isSyncDone);
+  console.log('hasOrganization', hasOrganization);
   if (!isSyncDone || !hasOrganization) {
     return <Loading />;
   }

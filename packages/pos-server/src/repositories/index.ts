@@ -1,19 +1,19 @@
 import Models from '../models';
-import { userRepository, UserRepository } from './userRepository';
-import { organizationRepository, OrganizationRepository } from './organizationRepository';
 import { categoryRepository, CategoryRepository } from './categoryRepository';
 import { discountRepository, DiscountRepository } from './discountRepository';
-import { priceGroupRepository, PriceGroupRepository } from './priceGroupRepository';
-import { ModifierRepository, modifierRepository } from './modifierRepository';
-import { ModifierItemRepository, modifierItemRepository } from './modifierItemRepository';
-import { ModifierPriceRepository, modifierPriceRepository } from './modifierPriceRepository';
-import { ItemRepository, itemRepository } from './itemRepository';
 import { ItemModifierRepository, itemModifierRepository } from './itemModifierRepository';
 import { ItemPriceRepository, itemPriceRepository } from './itemPriceRepository';
-import { printerRepository, PrinterRepository } from './printerRepository';
-import { PrinterGroupRepository, printerGroupRepository } from './printerGroupRepository';
-import { printerGroupPrinterRepository, PrinterGroupPrinterRepository } from './printerGroupPrinterRepository';
+import { ItemRepository, itemRepository } from './itemRepository';
+import { ModifierItemPriceRepository, modifierItemPriceRepository } from './modifierItemPriceRepository';
+import { ModifierItemRepository, modifierItemRepository } from './modifierItemRepository';
+import { ModifierRepository, modifierRepository } from './modifierRepository';
+import { organizationRepository, OrganizationRepository } from './organizationRepository';
 import { paymentTypeRepository, PaymentTypeRepository } from './paymentTypeRepository';
+import { priceGroupRepository, PriceGroupRepository } from './priceGroupRepository';
+import { printerGroupPrinterRepository, PrinterGroupPrinterRepository } from './printerGroupPrinterRepository';
+import { PrinterGroupRepository, printerGroupRepository } from './printerGroupRepository';
+import { printerRepository, PrinterRepository } from './printerRepository';
+import { userRepository, UserRepository } from './userRepository';
 
 export interface RepositoryService {
     userRepository: UserRepository;
@@ -23,7 +23,7 @@ export interface RepositoryService {
     priceGroupRepository: PriceGroupRepository;
     modifierRepository: ModifierRepository;
     modifierItemRepository: ModifierItemRepository;
-    modifierPriceRepository: ModifierPriceRepository;
+    modifierItemPriceRepository: ModifierItemPriceRepository;
     itemRepository: ItemRepository;
     itemModifierRepository: ItemModifierRepository;
     itemPriceRepository: ItemPriceRepository;
@@ -42,7 +42,7 @@ export interface InjectedRepositoryDependencies {
         PriceGroupModel: typeof Models.PriceGroup;
         ModifierModel: typeof Models.Modifier;
         ModifierItemModel: typeof Models.ModifierItem;
-        ModifierPriceModel: typeof Models.ModifierPrice;
+        ModifierItemPriceModel: typeof Models.ModifierItemPrice;
         ItemModel: typeof Models.Item;
         ItemModifierModel: typeof Models.ItemModifier;
         ItemPriceModel: typeof Models.ItemPrice;
@@ -62,7 +62,7 @@ export const registerRepositories = (): RepositoryService => {
         PriceGroupModel: Models.PriceGroup,
         ModifierModel: Models.Modifier,
         ModifierItemModel: Models.ModifierItem,
-        ModifierPriceModel: Models.ModifierPrice,
+        ModifierItemPriceModel: Models.ModifierItemPrice,
         ItemModel: Models.Item,
         ItemPriceModel: Models.ItemPrice,
         ItemModifierModel: Models.ItemModifier,
@@ -98,8 +98,8 @@ export const registerRepositories = (): RepositoryService => {
             repo: modifierItemRepository,
         },
         {
-            name: 'modifierPriceRepository',
-            repo: modifierPriceRepository,
+            name: 'modifierItemPriceRepository',
+            repo: modifierItemPriceRepository,
         },
         {
             name: 'discountRepository',

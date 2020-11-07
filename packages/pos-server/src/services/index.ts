@@ -1,31 +1,15 @@
-import { userService } from './user';
-import { authService } from './auth';
+import { EnvConfig } from '../config';
 import { LoggerService } from '../loaders/logger';
 import { RepositoryService } from '../repositories';
-import { MailerService } from './mailer';
-import { productService } from './product';
-import { maintenanceService } from './maintenance';
-import { printerService } from './printer';
-import { organizationService } from './organization';
-import { EnvConfig } from '../config';
-import { printerGroupService } from './printerGroup';
-import { CategoryProps } from '../models/Category';
-import { DiscountProps } from '../models/Discount';
-import { ItemProps } from '../models/Item';
-import { ItemModifierProps } from '../models/ItemModifier';
-import { ItemPriceProps } from '../models/ItemPrice';
-import { ModifierProps } from '../models/Modifier';
-import { ModifierItemProps } from '../models/ModifierItem';
-import { ModifierPriceProps } from '../models/ModifierPrice';
-import { OrganizationProps } from '../models/Organization';
-import { PriceGroupProps } from '../models/PriceGroup';
-import { PrinterProps } from '../models/Printer';
-import { PrinterGroupProps } from '../models/PrinterGroup';
 import { RepositoryFns } from '../repositories/utils';
-import { loggers } from 'winston';
-import { GenericResponseNoData } from '../utils/types';
-import { fromClientChanges } from '../utils/sync';
-import { stringify } from 'querystring';
+import { authService } from './auth';
+import { MailerService } from './mailer';
+import { maintenanceService } from './maintenance';
+import { organizationService } from './organization';
+import { printerService } from './printer';
+import { printerGroupService } from './printerGroup';
+import { productService } from './product';
+import { userService } from './user';
 
 export interface InjectedDependencies {
     mailer: MailerService;
@@ -43,14 +27,6 @@ export interface ServiceResponse<T> {
     };
 }
 
-// Changes = {
-//     [table_name: string]: {
-//       created: RawRecord[],
-//       updated: RawRecord[],
-//       deleted: string[],
-//     }
-//   }
-
 export type ChangeDocument = Record<string, any> & { id: string }; // TODO: fix this
 export type ChangesObject = {
     created: ChangeDocument[];
@@ -58,25 +34,6 @@ export type ChangesObject = {
     deleted: string[];
 };
 export type Changes = Record<string, ChangesObject>;
-
-// type PullChangesResponse = {
-//     changes: {
-//         categorys: ChangeResponse<CategoryProps>;
-//         discounts: ChangeResponse<DiscountProps>;
-//         items: ChangeResponse<ItemProps>;
-//         item_modifiers: ChangeResponse<ItemModifierProps>;
-//         item_prices: ChangeResponse<ItemPriceProps>;
-//         modifiers: ChangeResponse<ModifierProps>;
-//         modifier_items: ChangeResponse<ModifierItemProps>;
-//         modifier_prices: ChangeResponse<ModifierPriceProps>;
-//         organizations: ChangeResponse<OrganizationProps>;
-//         price_groups: ChangeResponse<PriceGroupProps>;
-//         // printers: ChangeResponse<PrinterProps>
-//         // printers_groups: ChangeResponse<PrinterGroupProps>
-//         // printers_groups_printers: ChangeResponse<asd>
-//     };
-//     timestamp: Date;
-// };
 
 export type ServiceFns = RepositoryService;
 
