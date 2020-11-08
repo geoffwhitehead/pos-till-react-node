@@ -48,7 +48,7 @@ export const AuthNavigatorInner: React.FC<AuthNavigatorInnerProps> = ({ database
 
 const enhance = c =>
   withDatabase(
-    withObservables([], () => ({
+    withObservables(null, () => ({
       organizations: database.collections.get<Organization>(tableNames.organizations).query(),
     }))(c),
   );

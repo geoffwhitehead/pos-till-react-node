@@ -7,7 +7,7 @@ import { formatNumber } from '../../../../../../utils';
 
 interface ModifierItemRowOuterProps {
   modifierItem: ModifierItem;
-  onPress: (mI: ModifierItem) => void;
+  onPress: (modifierItem: ModifierItem) => void;
   selected: boolean;
   modifierItemPrice: ModifierItemPrice;
   isDisabled: boolean;
@@ -26,11 +26,10 @@ const ModifierItemRowInner: React.FC<ModifierItemRowOuterProps & ModifierItemRow
     organization: { currency },
   } = useContext(OrganizationContext);
 
-  const _onPress = () => onPress(modifierItem);
   const hasPriceSet = modifierItemPrice.price !== null;
 
   return (
-    <ListItem selected={selected} onPress={_onPress} disabled={isDisabled}>
+    <ListItem selected={selected} onPress={() => onPress(modifierItem)} disabled={isDisabled}>
       <Left>
         <Text>{modifierItem.name}</Text>
         <Body />

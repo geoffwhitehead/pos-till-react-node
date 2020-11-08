@@ -18,7 +18,6 @@ export enum Modes {
   Items = 'items',
   Loading = 'loading',
   Complete = 'complete',
-  Watermelon = 'watermelon',
 }
 
 interface CheckoutProps {

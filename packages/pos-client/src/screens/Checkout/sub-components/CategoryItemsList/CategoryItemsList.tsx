@@ -20,8 +20,12 @@ interface CategoryItemsListOuterProps {
   database?: Database;
   category?: Category;
   modifiers: Modifier[];
-  route: RouteProp<CheckoutItemStackParamList, 'CategoryItemsList'>;
-  navigation: StackNavigationProp<CheckoutItemStackParamList, 'CategoryItemsList'>;
+  route:
+    | RouteProp<CheckoutItemStackParamList, 'CategoryItemsList'>
+    | RouteProp<CheckoutItemStackParamList, 'AllItemsList'>;
+  navigation:
+    | StackNavigationProp<CheckoutItemStackParamList, 'CategoryItemsList'>
+    | StackNavigationProp<CheckoutItemStackParamList, 'AllItemsList'>;
   priceGroupId: PriceGroup;
 }
 
@@ -130,19 +134,18 @@ const CategoryItemsInner: React.FC<CategoryItemsListOuterProps & CategoryItemsLi
 
 export const CategoryItems = withDatabase<any>(
   withObservables<CategoryItemsListOuterProps, CategoryItemsListInnerProps>(['route'], ({ route, database }) => {
-    const { category, priceGroupId } = route.params;
+    const { category, priceGroupId } = route.params as CheckoutItemStackParamList['CategoryItemsList'];
     return {
       priceGroup: database.collections.get<PriceGroup>(tableNames.priceGroups).findAndObserve(priceGroupId),
       items: category.items.observeWithColumns(['name']),
       prices: database.collections.get<ItemPrice>(tableNames.itemPrices).query(Q.where('price_group_id', priceGroupId)),
-      // .observeWithColumns(['price']),
     };
   })(CategoryItemsInner),
 );
 
-export const AllItems = withDatabase(
+export const AllItems = withDatabase<any>(
   withObservables<CategoryItemsListOuterProps, CategoryItemsListInnerProps>(['route'], ({ database, route }) => {
-    const { priceGroupId } = route.params;
+    const { priceGroupId } = route.params as CheckoutItemStackParamList['AllItemsList'];
     return {
       priceGroup: database.collections.get<PriceGroup>(tableNames.priceGroups).findAndObserve(priceGroupId),
       items: database.collections
