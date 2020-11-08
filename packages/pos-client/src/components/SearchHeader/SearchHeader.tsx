@@ -4,7 +4,7 @@ import withObservables from '@nozbe/with-observables';
 import { useNavigation } from '@react-navigation/native';
 import React, { useContext } from 'react';
 import { PriceGroupContext } from '../../contexts/PriceGroupContext';
-import { ActionSheet, Button, Header, Icon, Input, Item, Right, Text } from '../../core';
+import { ActionSheet, Button, Icon, Input, Item, Text } from '../../core';
 import { PriceGroup, tableNames } from '../../models';
 
 interface SearchHeaderOuterProps {
@@ -23,6 +23,7 @@ export const WrappedSearchHeader: React.FC<SearchHeaderOuterProps & SearchHeader
   priceGroups,
   onChangeText,
   value = '',
+  ...props
 }) => {
   const { priceGroup, setPriceGroup } = useContext(PriceGroupContext);
   const navigation = useNavigation();
@@ -49,17 +50,13 @@ export const WrappedSearchHeader: React.FC<SearchHeaderOuterProps & SearchHeader
   };
 
   return (
-    <Header searchBar rounded>
-      <Item>
-        <Icon name="ios-search" />
-        <Input placeholder="Search" onChangeText={onChangeText} value={value} />
-      </Item>
-      <Right>
-        <Button style={{ marginBottom: 15 }} onPress={onChangePriceGroup}>
-          <Text>{priceGroup.name}</Text>
-        </Button>
-      </Right>
-    </Header>
+    <Item {...props} style={styles.searchBar}>
+      <Icon name="ios-search" />
+      <Input placeholder="Search" onChangeText={onChangeText} value={value} />
+      <Button small warning bordered onPress={onChangePriceGroup}>
+        <Text style={{ fontWeight: 'bold' }}>{`Price Group: ${priceGroup.name}`}</Text>
+      </Button>
+    </Item>
   );
 };
 
@@ -68,3 +65,10 @@ export const SearchHeader = withDatabase(
     priceGroups: database.collections.get(tableNames.priceGroups).query(),
   }))(WrappedSearchHeader),
 );
+
+const styles = {
+  searchBar: {
+    paddingLeft: 15,
+    paddingRight: 15,
+  },
+};
