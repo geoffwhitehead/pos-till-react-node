@@ -171,7 +171,7 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
     return <Loading />;
   }
 
-  const { totalDiscount, totalPayable, balance } = summary;
+  const { totalDiscount, total, totalPayable, balance } = summary;
 
   return (
     <Grid style={styles.grid}>
@@ -200,9 +200,9 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
         />
       </Row>
       <Row style={styles.r3}>
-        <Text>{`Discount: ${formatNumber(totalDiscount, currency)}`}</Text>
+        <Text>{`Discount: -${formatNumber(totalDiscount, currency)}`}</Text>
 
-        <Text>{`Total: ${formatNumber(totalPayable, currency)}`}</Text>
+        <Text>{`Total: ${formatNumber(total, currency)}`}</Text>
         {complete && (
           <Text>{`Change Due: ${formatNumber(
             Math.abs(billPayments.find(payment => payment.isChange).amount),

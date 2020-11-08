@@ -84,7 +84,7 @@ export const ReceiptItemsInner: React.FC<ReceiptItemsOuterProps & ReceiptItemsIn
           setRemoveMode(RemoveMode.comp);
           setSelectedBillItem(billItem);
         } else {
-          const endOfGracePeriod = dayjs(billItem.createdAt).add(5, 'minute');
+          const endOfGracePeriod = dayjs(billItem.createdAt).add(5, 'minute'); // TODO: org setting
           const hasGracePeriodExpired = dayjs().isAfter(endOfGracePeriod);
           if (hasGracePeriodExpired) {
             setRemoveMode(RemoveMode.void);

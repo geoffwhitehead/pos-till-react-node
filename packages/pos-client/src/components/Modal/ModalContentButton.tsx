@@ -2,6 +2,12 @@ import React from 'react';
 import { View } from 'react-native';
 import { Button, Container, H3, Icon, Text } from '../../core';
 
+enum ModalSizes {
+  small = 500,
+  medium = 800,
+  large = 1000,
+}
+
 interface ModalContentButtonProps {
   title: string;
   onPressPrimaryButton: () => void;
@@ -13,6 +19,7 @@ interface ModalContentButtonProps {
   isDeleteDisabled?: boolean;
   onPressDelete?: () => void;
   style?: Record<string, any>;
+  size?: 'small' | 'medium' | 'large';
 }
 
 export const ModalContentButton: React.FC<ModalContentButtonProps> = ({
@@ -26,10 +33,14 @@ export const ModalContentButton: React.FC<ModalContentButtonProps> = ({
   primaryButtonText,
   secondaryButtonText,
   onPressDelete,
-  style = {},
+  style,
+  size,
+  ...props
 }) => {
+  const width = size ? ModalSizes[size] : 'auto';
+
   return (
-    <View style={{ ...cStyles.modal, ...style }}>
+    <View {...props} style={{ ...cStyles.modal, ...style, width }}>
       <View style={cStyles.heading}>
         <H3>{title}</H3>
         <View style={cStyles.buttons}>

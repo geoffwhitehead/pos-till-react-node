@@ -81,7 +81,7 @@ export const ModalCategoryDetailsInner: React.FC<ModalCategoryDetailsOuterProps 
             secondaryButtonText="Cancel"
             title="Category Details"
             isPrimaryDisabled={loading}
-            style={{ width: 600 }}
+            size="small"
             isDeleteDisabled={category && itemsCount > 0}
             onPressDelete={onDelete}
           >

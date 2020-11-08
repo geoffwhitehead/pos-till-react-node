@@ -103,7 +103,7 @@ export const ModalModifierDetailsInner: React.FC<ModalModifierDetailsOuterProps 
             isPrimaryDisabled={loading}
             isDeleteDisabled={itemsCount > 0}
             onPressDelete={onDelete}
-            style={{ width: 600 }}
+            size="small"
           >
             <Form style={commonStyles.form}>
               <Item stackedLabel error={err.name}>

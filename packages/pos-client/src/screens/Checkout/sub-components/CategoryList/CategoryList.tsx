@@ -21,10 +21,7 @@ interface CategoriesOuterProps {
   navigation: StackNavigationProp<CheckoutItemStackParamList, 'CategoryList'>;
 }
 
-export const CategoriesInner: React.FC<CategoriesOuterProps & CategoriesInnerProps> = ({
-  navigation,
-  categories: c,
-}) => {
+export const CategoriesInner: React.FC<CategoriesOuterProps & CategoriesInnerProps> = ({ navigation, categories }) => {
   const [searchValue, setSearchValue] = useState<string>('');
   const { priceGroup } = useContext(PriceGroupContext);
 
@@ -41,8 +38,6 @@ export const CategoriesInner: React.FC<CategoriesOuterProps & CategoriesInnerPro
       });
     }
   };
-
-  const categories = [...c, ...c, ...c, ...c];
 
   const onSearchHandler = (value: string) => setSearchValue(value);
 

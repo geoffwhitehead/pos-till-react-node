@@ -22,7 +22,7 @@ import {
 import { Printer, tableNames } from '../../../../models';
 import { Emulations, PrinterProps } from '../../../../models/Printer';
 import { portDiscovery } from '../../../../services/printer/printer';
-import { PrinterDetails } from './PrinterDetails';
+import { ModalPrinterDetails } from './ModalPrinterDetails';
 import { PrinterRow } from './PrinterRow';
 
 interface PrintersTabOuterProps {
@@ -198,7 +198,7 @@ const PrintersTabInner: React.FC<PrintersTabOuterProps & PrintersTabInnerProps> 
       </List>
 
       <Modal isOpen={!!selectedPrinter} onClose={onCancelHandler} style={{ maxWidth: 800 }}>
-        <PrinterDetails printer={selectedPrinter} onSave={onSave} onClose={onCancelHandler} isLoading={isSaving} />
+        <ModalPrinterDetails printer={selectedPrinter} onSave={onSave} onClose={onCancelHandler} isLoading={isSaving} />
       </Modal>
     </Container>
   );

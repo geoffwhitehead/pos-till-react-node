@@ -7,7 +7,7 @@ import { Body, CheckBox, Form, Input, Item, Label, ListItem, Text, View } from '
 import { Discount, tableNames } from '../../../../models';
 import { commonStyles } from '../styles';
 
-interface DiscountDetailsProps {
+interface ModalDiscountDetailsProps {
   onClose: () => void;
   discount?: Discount;
 }
@@ -29,7 +29,7 @@ type FormValues = {
   isPercent: boolean;
 };
 
-export const DiscountDetails: React.FC<DiscountDetailsProps> = ({ discount, onClose }) => {
+export const ModalDiscountDetails: React.FC<ModalDiscountDetailsProps> = ({ discount, onClose }) => {
   const [loading, setLoading] = useState(false);
   const database = useDatabase();
 
@@ -43,13 +43,15 @@ export const DiscountDetails: React.FC<DiscountDetailsProps> = ({ discount, onCl
     } else {
       const discountCollection = database.collections.get<Discount>(tableNames.discounts);
 
-      await discountCollection.create(record => {
-        Object.assign(record, {
-          name,
-          amount: parseInt(amount),
-          isPercent,
-        });
-      });
+      await database.action(() =>
+        discountCollection.create(record => {
+          Object.assign(record, {
+            name,
+            amount: parseInt(amount),
+            isPercent,
+          });
+        }),
+      );
     }
     setLoading(false);
     onClose();
@@ -83,6 +85,7 @@ export const DiscountDetails: React.FC<DiscountDetailsProps> = ({ discount, onCl
             secondaryButtonText="Cancel"
             title="Discount Details"
             isPrimaryDisabled={loading}
+            size="small"
           >
             <View>
               <Form style={commonStyles.form}>

@@ -229,6 +229,7 @@ const ItemDetailsInner: React.FC<ItemDetailsOuterProps & ItemDetailsInnerProps> 
             onPressSecondaryButton={onClose}
             secondaryButtonText="Cancel"
             onPressDelete={() => areYouSure(handleDelete, item)}
+            size="medium"
           >
             <ScrollView>
               <Grid>

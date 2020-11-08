@@ -136,6 +136,7 @@ export type MinimalBillSummary = {
   totalPayable: number;
   balance: number;
   discountBreakdown: DiscountBreakdownProps[];
+  total: number;
 };
 export const minimalBillSummary = async (params: {
   chargableBillItems: BillItem[];
@@ -160,6 +161,7 @@ export const minimalBillSummary = async (params: {
   const discountBreakdown = _totalDiscount(total, billDiscounts, discounts);
 
   return {
+    total,
     totalDiscount: discountBreakdown.total,
     discountBreakdown: discountBreakdown.breakdown,
     totalPayable: total - discountBreakdown.total,

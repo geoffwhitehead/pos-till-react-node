@@ -8,8 +8,10 @@ import { OrganizationContext } from '../../../../contexts/OrganizationContext';
 import { ActionSheet, Body, Button, Icon, Left, List, ListItem, Right, Spinner, Text, View } from '../../../../core';
 import { Discount, tableNames } from '../../../../models';
 import { formatNumber } from '../../../../utils';
+import { MAX_DISCOUNTS } from '../../../../utils/consts';
+import { resolveButtonState } from '../../../../utils/helpers';
 import { commonStyles } from '../styles';
-import { DiscountDetails } from './DiscountDetails';
+import { ModalDiscountDetails } from './ModalDiscountDetails';
 
 interface DiscountTabOuterProps {
   database: Database;
@@ -25,7 +27,7 @@ const DiscountTabInner: React.FC<DiscountTabOuterProps & DiscountTabInnerProps> 
   const [selectedDiscount, setSelectedDiscount] = useState<Discount>();
 
   const onDelete = async (discount: Discount) => {
-    await database.action(() => discount.remove(organization));
+    await database.action(() => discount.markAsDeleted());
   };
 
   const onCancelHandler = () => {
@@ -51,6 +53,8 @@ const DiscountTabInner: React.FC<DiscountTabOuterProps & DiscountTabInnerProps> 
     return <Spinner />;
   }
 
+  const isCreateDisabled = discounts.length >= MAX_DISCOUNTS;
+
   return (
     <View>
       <List>
@@ -59,7 +63,12 @@ const DiscountTabInner: React.FC<DiscountTabOuterProps & DiscountTabInnerProps> 
             <Text>Discount</Text>
           </Left>
           <Right>
-            <Button iconLeft success small onPress={() => setIsModalOpen(true)}>
+            <Button
+              {...resolveButtonState(isCreateDisabled, 'success')}
+              iconLeft
+              small
+              onPress={() => setIsModalOpen(true)}
+            >
               <Icon name="ios-add-circle-outline" />
               <Text>Create</Text>
             </Button>
@@ -95,10 +104,11 @@ const DiscountTabInner: React.FC<DiscountTabOuterProps & DiscountTabInnerProps> 
               </ListItem>
             );
           })}
+          {isCreateDisabled && <Text>Max discounts reached</Text>}
         </ScrollView>
       </List>
       <Modal isOpen={isModalOpen} onClose={onCancelHandler} style={{ maxWidth: 600 }}>
-        <DiscountDetails discount={selectedDiscount} onClose={onCancelHandler} />
+        <ModalDiscountDetails discount={selectedDiscount} onClose={onCancelHandler} />
       </Modal>
     </View>
   );

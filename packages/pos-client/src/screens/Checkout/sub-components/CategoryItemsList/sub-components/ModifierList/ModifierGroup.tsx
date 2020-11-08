@@ -2,9 +2,8 @@ import { Database, Q } from '@nozbe/watermelondb';
 import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import withObservables from '@nozbe/with-observables';
 import { keyBy } from 'lodash';
-import { View } from 'native-base';
 import React from 'react';
-import { Header, Text } from '../../../../../../core';
+import { ListItem, Text } from '../../../../../../core';
 import { Modifier, ModifierItem, ModifierItemPrice, PriceGroup, tableNames } from '../../../../../../models';
 import { ModifierItemRow } from './ModifierItemRow';
 
@@ -54,10 +53,10 @@ const WrappedModifierGroup: React.FC<ModifierGroupInnerProps & ModifierGroupOute
   const hasNoPricesSet = modifierItems.length === 0;
 
   return (
-    <View>
-      <Header>
-        <Text style={{ fontSize: 22 }}>{name}</Text>
-      </Header>
+    <>
+      <ListItem itemHeader>
+        <Text>{name}</Text>
+      </ListItem>
       {hasNoPricesSet && <Text note>No prices have been set for this modifier in this price group.</Text>}
       {modifierItems.map(modifierItem => {
         const modifierItemPrice = keyedModifierPricesByModifierItem[modifierItem.id];
@@ -78,7 +77,7 @@ const WrappedModifierGroup: React.FC<ModifierGroupInnerProps & ModifierGroupOute
       <Text style={{ padding: 15 }} note>
         {message}
       </Text>
-    </View>
+    </>
   );
 };
 

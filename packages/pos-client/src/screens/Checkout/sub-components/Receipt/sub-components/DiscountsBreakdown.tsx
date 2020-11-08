@@ -1,3 +1,4 @@
+import { capitalize } from 'lodash';
 import { Left, ListItem, Right, Separator, Text } from 'native-base';
 import React, { useContext } from 'react';
 import { OrganizationContext } from '../../../../../contexts/OrganizationContext';
@@ -25,9 +26,7 @@ export const DiscountsBreakdown: React.FC<DiscountBreakdownProps> = ({
   }
 
   const discountText = discount =>
-    discount.isPercent
-      ? `Discount: ${discount.name} ${discount.amount}%`
-      : `Discount: ${discount.name} ${formatNumber(discount.amount, currency)}`;
+    discount.isPercent ? `${capitalize(discount.name)} ${discount.amount}%` : `${capitalize(discount.name)}`;
 
   return (
     <>
@@ -42,7 +41,7 @@ export const DiscountsBreakdown: React.FC<DiscountBreakdownProps> = ({
               <Text>{discountText(breakdown)}</Text>
             </Left>
             <Right>
-              <Text>{`${formatNumber(breakdown.calculatedDiscount, currency)}`}</Text>
+              <Text>{`-${formatNumber(breakdown.calculatedDiscount, currency)}`}</Text>
             </Right>
           </ListItem>
         );

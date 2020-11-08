@@ -45,7 +45,7 @@ const ItemBreakdownInner: React.FC<ItemBreakdownOuterProps & ItemBreakdownInnerP
         <View>
           <Text style={style}>{`${prefix}${capitalize(billItem.itemName)}`}</Text>
           {modifierItems.map(m => (
-            <Text style={style} key={`${m.id}-name`}>{`- ${m.modifierItemName}`}</Text>
+            <Text note style={style} key={`${m.id}-name`}>{`- ${m.modifierItemName}`}</Text>
           ))}
         </View>
       </Left>
@@ -54,7 +54,7 @@ const ItemBreakdownInner: React.FC<ItemBreakdownOuterProps & ItemBreakdownInnerP
         {modifierItems.map(m => {
           const modifierItemDisplayPrice = formatNumber(isChargable ? m.modifierItemPrice : 0, currency);
           return (
-            <Text style={style} key={`${m.id}-price`}>
+            <Text note style={style} key={`${m.id}-price`}>
               {modifierItemDisplayPrice}
             </Text>
           );

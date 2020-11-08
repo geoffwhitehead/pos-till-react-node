@@ -7,7 +7,7 @@ import { Loading } from '../../../../components/Loading/Loading';
 import { Modal } from '../../../../components/Modal/Modal';
 import { ActionSheet, Button, Container, Icon, Left, List, ListItem, Right, Text } from '../../../../core';
 import { PrinterGroup, tableNames } from '../../../../models';
-import { PrinterGroupDetails } from './PrinterGroupDetails';
+import { ModalPrinterGroupDetails } from './ModalPrinterGroupDetails';
 import { PrinterGroupRow } from './PrinterGroupRow';
 
 interface PrinterGroupsTabOuterProps {
@@ -83,7 +83,7 @@ const PrinterGroupsTabInner: React.FC<PrinterGroupsTabOuterProps & PrinterGroups
         </ScrollView>
       </List>
       <Modal isOpen={isModalOpen} onClose={onCancelHandler} style={{ maxWidth: 800 }}>
-        <PrinterGroupDetails printerGroup={selectedPrinterGroup} onClose={onCancelHandler} />
+        <ModalPrinterGroupDetails printerGroup={selectedPrinterGroup} onClose={onCancelHandler} />
       </Modal>
     </Container>
   );

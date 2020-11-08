@@ -54,6 +54,7 @@ export const ModalReason: React.FC<ModalReasonProps> = ({ onComplete, onClose, m
             onPressSecondaryButton={onClose}
             secondaryButtonText="Cancel"
             title={title}
+            size="medium"
           >
             <Form>
               <Text style={{ paddingBottom: 20 }}>{description}</Text>

@@ -7,7 +7,7 @@ import { Form, Icon, Input, Item, Label, Picker } from '../../../../core';
 import { Printer } from '../../../../models';
 import { Emulations, PrinterProps } from '../../../../models/Printer';
 
-interface PrinterDetailsOuterProps {
+interface ModalPrinterDetailsOuterProps {
   onClose: () => void;
   printer: Partial<Printer>;
   onSave: (values: PrinterProps) => void;
@@ -36,7 +36,12 @@ const printerDetailsSchema = Yup.object().shape({
     .required('Required'),
 });
 
-const PrinterDetailsInner: React.FC<PrinterDetailsOuterProps> = ({ printer, onClose, onSave, isLoading }) => {
+export const ModalPrinterDetails: React.FC<ModalPrinterDetailsOuterProps> = ({
+  printer,
+  onClose,
+  onSave,
+  isLoading,
+}) => {
   const { name, address, macAddress, emulation, printWidth } = printer;
 
   const initialValues = {
@@ -67,6 +72,7 @@ const PrinterDetailsInner: React.FC<PrinterDetailsOuterProps> = ({ printer, onCl
             secondaryButtonText="Cancel"
             title="Printer details"
             isPrimaryDisabled={isLoading}
+            size="small"
           >
             <ScrollView>
               <Form>
@@ -119,5 +125,3 @@ const PrinterDetailsInner: React.FC<PrinterDetailsOuterProps> = ({ printer, onCl
     </Formik>
   );
 };
-
-export const PrinterDetails = PrinterDetailsInner;

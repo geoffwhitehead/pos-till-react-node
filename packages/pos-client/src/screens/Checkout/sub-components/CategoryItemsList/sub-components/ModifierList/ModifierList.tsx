@@ -2,9 +2,10 @@ import { useDatabase } from '@nozbe/watermelondb/hooks';
 import withObservables from '@nozbe/with-observables';
 import { keyBy } from 'lodash';
 import React, { useState } from 'react';
+import { ScrollView } from 'react-native-gesture-handler';
 import { ModalContentButton } from '../../../../../../components/Modal/ModalContentButton';
 import { NumberPicker } from '../../../../../../components/NumberPicker/NumberPicker';
-import { List, View } from '../../../../../../core';
+import { Container, List } from '../../../../../../core';
 import { Bill, Item, Modifier, ModifierItem, PriceGroup } from '../../../../../../models';
 import { ModifierGroup } from './ModifierGroup';
 
@@ -78,24 +79,27 @@ export const ModifierListInner: React.FC<ModifierListOuterProps & ModifierListIn
       secondaryButtonText="Cancel"
       primaryButtonText="Save"
       title={`${item.name}: Modifiers`}
+      size="small"
     >
-      <View>
-        <List>
-          {modifiers.map(modifier => {
-            const selectedItems = selectedModifiers[modifier.id].items;
-            return (
-              <ModifierGroup
-                key={modifier.id}
-                selectedModifierItems={selectedItems}
-                onPressModifierItem={onPressModifierItem}
-                modifier={modifier}
-                priceGroup={priceGroup}
-              />
-            );
-          })}
-        </List>
+      <Container>
+        <ScrollView>
+          <List>
+            {modifiers.map(modifier => {
+              const selectedItems = selectedModifiers[modifier.id].items;
+              return (
+                <ModifierGroup
+                  key={modifier.id}
+                  selectedModifierItems={selectedItems}
+                  onPressModifierItem={onPressModifierItem}
+                  modifier={modifier}
+                  priceGroup={priceGroup}
+                />
+              );
+            })}
+          </List>
+        </ScrollView>
         <NumberPicker onPress={v => setQuantity(v)} />
-      </View>
+      </Container>
     </ModalContentButton>
   );
 };

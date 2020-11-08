@@ -158,7 +158,7 @@ export const ModalModifierItemDetailsInner: React.FC<ModalModifierItemDetailsOut
             isPrimaryDisabled={loading}
             isDeleteDisabled={!isValid}
             onPressDelete={onDelete}
-            style={{ width: 600 }}
+            size="small"
           >
             <Content>
               <Form style={commonStyles.form}>

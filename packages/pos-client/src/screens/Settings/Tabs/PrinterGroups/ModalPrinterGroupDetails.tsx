@@ -10,16 +10,16 @@ import { ModalContentButton } from '../../../../components/Modal/ModalContentBut
 import { Col, Form, Input, Item, Label, List, ListItem, Row, Text } from '../../../../core';
 import { PrinterGroup, PrinterGroupPrinter, tableNames } from '../../../../models';
 import { Printer } from '../../../../models/Printer';
-import { commonStyles } from './../styles';
-import { PrinterRowChoice } from './PrinterRowChoice';
+import { PrinterRowChoice } from '../PrintersTab/PrinterRowChoice';
+import { commonStyles } from '../styles';
 
-interface PrinterGroupDetailsOuterProps {
+interface ModalPrinterGroupDetailsOuterProps {
   onClose: () => void;
   printerGroup?: PrinterGroup;
   database: Database;
 }
 
-interface PrinterGroupDetailsInnerProps {
+interface ModalPrinterGroupDetailsInnerProps {
   printers: Printer[];
   assignedPrinters?: Printer[];
 }
@@ -35,13 +35,8 @@ type FormValues = {
   name: string;
 };
 
-const PrinterGroupDetailsInner: React.FC<PrinterGroupDetailsOuterProps & PrinterGroupDetailsInnerProps> = ({
-  printerGroup,
-  onClose,
-  assignedPrinters,
-  printers,
-  database,
-}) => {
+const ModalPrinterGroupDetailsInner: React.FC<ModalPrinterGroupDetailsOuterProps &
+  ModalPrinterGroupDetailsInnerProps> = ({ printerGroup, onClose, assignedPrinters, printers, database }) => {
   const [loading, setLoading] = useState(false);
   const [selectedPrinters, setSelectedPrinters] = useState<Printer[]>([]);
 
@@ -115,6 +110,7 @@ const PrinterGroupDetailsInner: React.FC<PrinterGroupDetailsOuterProps & Printer
             secondaryButtonText="Cancel"
             title="Printer Group Details"
             isPrimaryDisabled={loading}
+            size="medium"
           >
             <ScrollView>
               <Row>
@@ -161,7 +157,7 @@ const PrinterGroupDetailsInner: React.FC<PrinterGroupDetailsOuterProps & Printer
 
 const enhance = c =>
   withDatabase(
-    withObservables<PrinterGroupDetailsOuterProps, PrinterGroupDetailsInnerProps>(
+    withObservables<ModalPrinterGroupDetailsOuterProps, ModalPrinterGroupDetailsInnerProps>(
       ['printerGroup'],
       ({ printerGroup, database }) => {
         if (printerGroup) {
@@ -178,7 +174,7 @@ const enhance = c =>
     )(c),
   );
 
-export const PrinterGroupDetails = enhance(PrinterGroupDetailsInner);
+export const ModalPrinterGroupDetails = enhance(ModalPrinterGroupDetailsInner);
 
 const s = {
   pl: {

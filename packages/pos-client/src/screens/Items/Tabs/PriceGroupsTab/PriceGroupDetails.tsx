@@ -111,6 +111,7 @@ export const PriceGroupDetails: React.FC<PriceGroupDetailsProps> = ({ priceGroup
             secondaryButtonText="Cancel"
             title="Price Group Details"
             isPrimaryDisabled={loading}
+            size="small"
           >
             <View>
               <Form style={commonStyles.form}>
