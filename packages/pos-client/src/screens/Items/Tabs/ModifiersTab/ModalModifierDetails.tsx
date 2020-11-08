@@ -10,11 +10,11 @@ import { commonStyles } from '../../../Settings/sub-components/styles';
 
 type ModalModifierDetailsOuterProps = {
   onClose: () => void;
-  modifier: Modifier;
+  modifier?: Modifier;
 };
 
 type ModalModifierDetailsInnerProps = {
-  itemsCount: number;
+  itemsCount?: number;
 };
 const modifierSchema = Yup.object().shape({
   name: Yup.string()

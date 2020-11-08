@@ -4,23 +4,10 @@ import withObservables from '@nozbe/with-observables';
 import { DrawerNavigationProp } from '@react-navigation/drawer';
 import dayjs from 'dayjs';
 import React, { useContext, useEffect, useState } from 'react';
-import { View } from 'react-native';
+import { ScrollView } from 'react-native-gesture-handler';
 import { SidebarHeader } from '../../components/SidebarHeader/SidebarHeader';
 import { OrganizationContext } from '../../contexts/OrganizationContext';
-import {
-  ActionSheet,
-  Button,
-  Col,
-  Container,
-  Content,
-  Grid,
-  Left,
-  List,
-  ListItem,
-  Right,
-  Text,
-  Toast,
-} from '../../core';
+import { ActionSheet, Button, Col, Container, Grid, Left, List, ListItem, Right, Text, Toast, View } from '../../core';
 import { BillPeriod, Organization, PaymentType, Printer, tableNames } from '../../models';
 import { SidebarDrawerStackParamList } from '../../navigators/SidebarNavigator';
 // import { Protected } from './Protected';
@@ -84,10 +71,10 @@ export const ReportsInner: React.FC<ReportsOuterProps & ReportsInnerProps> = ({
   };
   const sorterOpenedAtDescending = (p1: BillPeriod, p2: BillPeriod) => p2.createdAt - p1.createdAt;
 
-  const [periods, setPeriods] = useState<BillPeriod[]>([]);
+  const [filteredBillPeriods, setFilteredBillPeriods] = useState<BillPeriod[]>([]);
 
   useEffect(() => {
-    setPeriods(
+    setFilteredBillPeriods(
       billPeriods
         .slice()
         .sort(sorterOpenedAtDescending)
@@ -98,14 +85,14 @@ export const ReportsInner: React.FC<ReportsOuterProps & ReportsInnerProps> = ({
     <Container>
       <SidebarHeader title="Reports" onOpen={openDrawer} />
       {/* <Protected code={ORG_PASSCODE} navigation={navigation}> */}
-      <Content>
-        <Grid>
-          <Col>
+      <Grid>
+        <Col>
+          <ListItem itemHeader first>
+            <Text style={{ fontWeight: 'bold' }}>Recent bill periods</Text>
+          </ListItem>
+          <ScrollView>
             <List>
-              <ListItem itemHeader first>
-                <Text style={{ fontWeight: 'bold' }}>Recent bill periods</Text>
-              </ListItem>
-              {periods.map(bP => {
+              {filteredBillPeriods.map(bP => {
                 return (
                   <ListItem key={bP.id}>
                     <Left>
@@ -135,8 +122,9 @@ export const ReportsInner: React.FC<ReportsOuterProps & ReportsInnerProps> = ({
                 );
               })}
             </List>
-          </Col>
-          {/* {selectedBillPeriod && (
+          </ScrollView>
+        </Col>
+        {/* {selectedBillPeriod && (
           <ReportReceipt
             billPeriod={selectedBillPeriod}
             bills={allBills.filtered('billPeriod._id = $0', selectedBillPeriod._id)}
@@ -146,8 +134,7 @@ export const ReportsInner: React.FC<ReportsOuterProps & ReportsInnerProps> = ({
             onPressPrint={() => onPrint(selectedBillPeriod)}
           />
         )} */}
-        </Grid>
-      </Content>
+      </Grid>
       {/* </Protected> */}
     </Container>
   );

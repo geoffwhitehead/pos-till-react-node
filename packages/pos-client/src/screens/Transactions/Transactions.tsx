@@ -2,7 +2,7 @@ import withObservables from '@nozbe/with-observables';
 import { DrawerNavigationProp } from '@react-navigation/drawer';
 import React, { useState } from 'react';
 import { SidebarHeader } from '../../components/SidebarHeader/SidebarHeader';
-import { Col, Container, Grid } from '../../core';
+import { Col, Container, Content, Grid } from '../../core';
 import { withBillPeriod } from '../../hocs/withBillPeriod';
 import { Bill, BillPeriod } from '../../models';
 import { SidebarDrawerStackParamList } from '../../navigators/SidebarNavigator';
@@ -15,7 +15,7 @@ interface TransactionsOuterProps {
 }
 
 interface TransactionsInnerProps {
-  closedBills: any;
+  closedBills: Bill[];
 }
 
 export const TransactionsInner: React.FC<TransactionsOuterProps & TransactionsInnerProps> = ({
@@ -30,9 +30,15 @@ export const TransactionsInner: React.FC<TransactionsOuterProps & TransactionsIn
       <SidebarHeader title="Transactions" onOpen={() => navigation.openDrawer()} />
       <Grid>
         <Col>
-          <TransactionList bills={closedBills} selectedBill={selectedBill} onSelectBill={selectBillHandler} />
+          <Content>
+            <TransactionList bills={closedBills} selectedBill={selectedBill} onSelectBill={selectBillHandler} />
+          </Content>
         </Col>
-        <Col style={{ width: 350 }}>{selectedBill && <Receipt bill={selectedBill} complete={true} />}</Col>
+        {selectedBill && (
+          <Col style={{ width: 350 }}>
+            <Receipt bill={selectedBill} complete={true} />
+          </Col>
+        )}
       </Grid>
     </Container>
   );

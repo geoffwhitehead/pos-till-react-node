@@ -64,21 +64,25 @@ export const Checkout: React.FC<CheckoutProps> = ({ navigation }) => {
     }
   };
 
+  const isSelectBillMode = mode === Modes.Bills;
+
   return (
     <Container>
       <SidebarHeader title="Checkout" onOpen={openDrawer} disableNav={mode === Modes.Complete} />
       <Grid>
         <Col>{renderMainPanel()}</Col>
-        <Col style={{ width: 350 }}>
-          {currentBill && (
-            <Receipt
-              bill={currentBill}
-              onStore={clearBill}
-              onCheckout={onCheckout}
-              complete={mode === Modes.Complete}
-            />
-          )}
-        </Col>
+        {!isSelectBillMode && (
+          <Col style={{ width: 350 }}>
+            {currentBill && (
+              <Receipt
+                bill={currentBill}
+                onStore={clearBill}
+                onCheckout={onCheckout}
+                complete={mode === Modes.Complete}
+              />
+            )}
+          </Col>
+        )}
       </Grid>
     </Container>
   );

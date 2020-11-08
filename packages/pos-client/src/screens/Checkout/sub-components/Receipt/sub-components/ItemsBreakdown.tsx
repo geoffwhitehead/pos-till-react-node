@@ -39,10 +39,10 @@ export const ItemsBreakdownInner: React.FC<ItemsBreakdownOuterProps & ItemsBreak
         return [
           <ListItem itemDivider first key={billItemGroup[0].priceGroupId}>
             <Left>
-              <Text>{billItemGroup[0].priceGroupName}</Text>
+              <Text style={{ fontWeight: 'bold' }}>{billItemGroup[0].priceGroupName}</Text>
             </Left>
             <Right>
-              <Text>{`${billItemGroup.length} items`}</Text>
+              <Text style={{ fontWeight: 'bold' }}>{`${billItemGroup.length} items`}</Text>
             </Right>
           </ListItem>,
           ...billItemGroup.map(billItem => {

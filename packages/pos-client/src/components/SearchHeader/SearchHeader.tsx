@@ -33,18 +33,19 @@ export const WrappedSearchHeader: React.FC<SearchHeaderOuterProps & SearchHeader
     ActionSheet.show(
       {
         options,
-        cancelButtonIndex: options.length,
+        cancelButtonIndex: options.length - 1,
         title: 'Select price group',
       },
       index => {
-        console.log('priceGroups[index]', priceGroups[index]);
         /**
          * need to use set params to allow propgation through stack navigation. Everywhere else can use context hook.
          */
-        navigation.setParams({
-          priceGroupId: priceGroups[index].id,
-        });
-        setPriceGroup(priceGroups[index]);
+        if (index < options.length - 1) {
+          navigation.setParams({
+            priceGroupId: priceGroups[index].id,
+          });
+          setPriceGroup(priceGroups[index]);
+        }
       },
     );
   };
@@ -53,7 +54,7 @@ export const WrappedSearchHeader: React.FC<SearchHeaderOuterProps & SearchHeader
     <Item {...props} style={styles.searchBar}>
       <Icon name="ios-search" />
       <Input placeholder="Search" onChangeText={onChangeText} value={value} />
-      <Button small warning bordered onPress={onChangePriceGroup}>
+      <Button small danger onPress={onChangePriceGroup}>
         <Text style={{ fontWeight: 'bold' }}>{`Price Group: ${priceGroup.name}`}</Text>
       </Button>
     </Item>

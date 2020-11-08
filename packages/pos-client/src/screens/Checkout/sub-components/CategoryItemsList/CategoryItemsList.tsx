@@ -5,12 +5,13 @@ import { RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { groupBy, keyBy, sortBy } from 'lodash';
 import React, { useContext, useEffect, useState } from 'react';
+import { ScrollView } from 'react-native-gesture-handler';
 import { Loading } from '../../../../components/Loading/Loading';
 import { Modal } from '../../../../components/Modal/Modal';
 import { SearchHeader } from '../../../../components/SearchHeader/SearchHeader';
 import { CurrentBillContext } from '../../../../contexts/CurrentBillContext';
 import { OrganizationContext } from '../../../../contexts/OrganizationContext';
-import { Body, Button, Content, Icon, Left, List, ListItem, Right, Text } from '../../../../core';
+import { Button, Icon, Left, List, ListItem, Text } from '../../../../core';
 import { Category, Item, ItemPrice, Modifier, PriceGroup, tableNames } from '../../../../models';
 import { CheckoutItemStackParamList } from '../../../../navigators/CheckoutItemNavigator';
 import { CategoryItemRow } from './sub-components/CategoryItemRow';
@@ -87,48 +88,46 @@ const CategoryItemsInner: React.FC<CategoryItemsListOuterProps & CategoryItemsLi
   }
 
   return (
-    <Content>
+    <>
+      <ListItem itemHeader first>
+        <Left>
+          <Button bordered info onPress={goBack} iconLeft>
+            <Icon name="ios-arrow-back" />
+            <Text style={{ fontWeight: 'bold' }}>{`${category ? category.name : 'All'} / Items`}</Text>
+          </Button>
+        </Left>
+      </ListItem>
       <SearchHeader onChangeText={onSearchHandler} value={searchValue} />
-
-      <List>
-        <ListItem itemHeader first>
-          <Left>
-            <Button bordered info onPress={goBack} iconLeft>
-              <Icon name="ios-arrow-back" />
-              <Text style={{ fontWeight: 'bold' }}>{`${category ? category.name : 'All'} / Items`}</Text>
-            </Button>
-          </Left>
-          <Body></Body>
-          <Right />
-        </ListItem>
-        {Object.keys(sortedItems).map(key => {
-          const elements = [
-            <ListItem key={key} itemDivider style={{ backgroundColor: 'lightgrey' }}>
-              <Text>{key}</Text>
-            </ListItem>,
-            ...sortedItems[key].map(item => {
-              // this should always succeed
-              const itemPrice = keyedPrices[item.id];
-              return (
-                <CategoryItemRow
-                  key={item.id}
-                  item={item}
-                  itemPrice={itemPrice}
-                  isActive={selectedItem === item}
-                  onPressItem={onSelectItem}
-                  currency={currency}
-                />
-              );
-            }),
-          ];
-
-          return elements;
-        })}
-      </List>
+      <ScrollView>
+        <List>
+          {Object.keys(sortedItems).map(key => {
+            return (
+              <>
+                <ListItem key={`${key}-divider`} itemDivider style={{ backgroundColor: 'lightgrey' }}>
+                  <Text>{key}</Text>
+                </ListItem>
+                {sortedItems[key].map(item => {
+                  const itemPrice = keyedPrices[item.id];
+                  return (
+                    <CategoryItemRow
+                      key={item.id}
+                      item={item}
+                      itemPrice={itemPrice}
+                      isActive={selectedItem === item}
+                      onPressItem={onSelectItem}
+                      currency={currency}
+                    />
+                  );
+                })}
+              </>
+            );
+          })}
+        </List>
+      </ScrollView>
       <Modal onClose={onCancelHandler} isOpen={modalOpen} style={{ width: 600 }}>
         <ModifierList priceGroup={priceGroup} currentBill={currentBill} onClose={onCancelHandler} item={selectedItem} />
       </Modal>
-    </Content>
+    </>
   );
 };
 

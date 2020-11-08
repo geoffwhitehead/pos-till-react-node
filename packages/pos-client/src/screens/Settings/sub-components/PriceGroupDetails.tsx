@@ -3,7 +3,7 @@ import { Formik } from 'formik';
 import React, { useState } from 'react';
 import * as Yup from 'yup';
 import { ModalContentButton } from '../../../components/Modal/ModalContentButton';
-import { Body, CheckBox, Col, Content, Form, Input, Item, Label, ListItem, Row, Text } from '../../../core';
+import { Body, CheckBox, Form, Input, Item, Label, ListItem, Text, View } from '../../../core';
 import { Item as ItemModel, ItemPrice, ModifierItem, ModifierItemPrice, PriceGroup, tableNames } from '../../../models';
 import { SHORT_NAME_LENGTH } from '../../../utils/consts';
 import { commonStyles } from './styles';
@@ -105,38 +105,28 @@ export const PriceGroupDetails: React.FC<PriceGroupDetailsProps> = ({ priceGroup
             title="Price Group Details"
             isPrimaryDisabled={loading}
           >
-            <Content>
-              <Row>
-                <Col>
-                  <Form style={commonStyles.form}>
-                    <Item stackedLabel error={err.name}>
-                      <Label>Name</Label>
-                      <Input onChangeText={handleChange('name')} onBlur={handleBlur('name')} value={name} />
-                    </Item>
-                    <Item stackedLabel error={err.shortName}>
-                      <Label>Short Name</Label>
-                      <Input
-                        onChangeText={handleChange('shortName')}
-                        onBlur={handleBlur('shortName')}
-                        value={shortName}
-                      />
-                    </Item>
-                    <ListItem>
-                      <CheckBox
-                        checked={isPrepTimeRequired}
-                        onPress={() => setFieldValue('isPrepTimeRequired', !isPrepTimeRequired)}
-                        onBlur={handleBlur('isPrepTimeRequired')}
-                      />
-                      <Body>
-                        <Text>Is prep time required</Text>
-                      </Body>
-                    </ListItem>
-                  </Form>
-                </Col>
-                <Col />
-              </Row>
-              <Row></Row>
-            </Content>
+            <View>
+              <Form style={commonStyles.form}>
+                <Item stackedLabel error={err.name}>
+                  <Label>Name</Label>
+                  <Input onChangeText={handleChange('name')} onBlur={handleBlur('name')} value={name} />
+                </Item>
+                <Item stackedLabel error={err.shortName}>
+                  <Label>Short Name</Label>
+                  <Input onChangeText={handleChange('shortName')} onBlur={handleBlur('shortName')} value={shortName} />
+                </Item>
+                <ListItem>
+                  <CheckBox
+                    checked={isPrepTimeRequired}
+                    onPress={() => setFieldValue('isPrepTimeRequired', !isPrepTimeRequired)}
+                    onBlur={handleBlur('isPrepTimeRequired')}
+                  />
+                  <Body>
+                    <Text>Is prep time required</Text>
+                  </Body>
+                </ListItem>
+              </Form>
+            </View>
           </ModalContentButton>
         );
       }}

@@ -3,25 +3,10 @@ import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import withObservables from '@nozbe/with-observables';
 import { capitalize } from 'lodash';
 import React, { useState } from 'react';
+import { ScrollView } from 'react-native';
 import { Printer as StarPrinterProps, Printers } from 'react-native-star-prnt';
 import { Modal } from '../../../components/Modal/Modal';
-import {
-  ActionSheet,
-  Body,
-  Button,
-  Col,
-  Container,
-  Content,
-  Grid,
-  Icon,
-  Left,
-  List,
-  ListItem,
-  Right,
-  Row,
-  Spinner,
-  Text,
-} from '../../../core';
+import { ActionSheet, Body, Button, Container, Icon, Left, List, ListItem, Right, Spinner, Text } from '../../../core';
 import { Printer, tableNames } from '../../../models';
 import { Emulations, PrinterProps } from '../../../models/Printer';
 import { portDiscovery } from '../../../services/printer/printer';
@@ -128,88 +113,81 @@ const PrintersTabInner: React.FC<PrintersTabOuterProps & PrintersTabInnerProps> 
 
   return (
     <Container>
-      <Content>
-        <Grid>
-          <Row>
-            <Col>
-              <List>
-                <ListItem itemDivider>
+      <List>
+        <ListItem itemDivider>
+          <Left>
+            <Text>Installed Printers</Text>
+          </Left>
+          <Right>
+            <Button iconLeft success small onPress={() => addPrinter({})}>
+              <Icon name="ios-add-circle-outline" />
+              <Text>Add</Text>
+            </Button>
+          </Right>
+        </ListItem>
+        <ScrollView>
+          {printers.map(p => (
+            <PrinterRow
+              key={p.id}
+              isSelected={p === selectedPrinter}
+              printer={p}
+              onSelect={setSelectedPrinter}
+              onDelete={() => areYouSure(onDelete, p)}
+            />
+          ))}
+        </ScrollView>
+      </List>
+
+      <List>
+        <ListItem itemDivider>
+          <Left>
+            <Text>Discover Printers</Text>
+          </Left>
+          <Right>
+            <Button small disabled={isLoading} onPress={() => discoverPrinters()}>
+              <Text>Discover Printers</Text>
+            </Button>
+          </Right>
+        </ListItem>
+        {isLoading ? (
+          <Spinner />
+        ) : discoveredPrinters.length === 0 ? (
+          <Text style={{ padding: 10 }}> No printers found</Text>
+        ) : (
+          <ScrollView>
+            {discoveredPrinters.map(discoveredPrinter => {
+              const isInstalled = printers.find(printer => printer.macAddress === discoveredPrinter.macAddress);
+
+              return (
+                <ListItem key={discoveredPrinter.macAddress}>
                   <Left>
-                    <Text>Installed Printers</Text>
+                    <Text>{discoveredPrinter.modelName}</Text>
                   </Left>
+                  <Body>
+                    <Text note>{capitalize(discoveredPrinter.portName)}</Text>
+                    <Text note>{discoveredPrinter.macAddress}</Text>
+                  </Body>
                   <Right>
-                    <Button iconLeft success small onPress={() => addPrinter({})}>
-                      <Icon name="ios-add-circle-outline" />
-                      <Text>Add</Text>
-                    </Button>
+                    {isInstalled ? (
+                      <Button small onPress={() => updatePrinter(discoveredPrinter)}>
+                        <Text>Update</Text>
+                      </Button>
+                    ) : (
+                      <Button small onPress={() => addPrinter(discoveredPrinter)}>
+                        <Text>Add</Text>
+                      </Button>
+                    )}
                   </Right>
                 </ListItem>
-                {printers.map(p => (
-                  <PrinterRow
-                    key={p.id}
-                    isSelected={p === selectedPrinter}
-                    printer={p}
-                    onSelect={setSelectedPrinter}
-                    onDelete={() => areYouSure(onDelete, p)}
-                  />
-                ))}
-              </List>
-            </Col>
-          </Row>
-          <Row>
-            <Col>
-              <List>
-                <ListItem itemDivider>
-                  <Left>
-                    <Text>Discover Printers</Text>
-                  </Left>
-                  <Right>
-                    <Button small disabled={isLoading} onPress={() => discoverPrinters()}>
-                      <Text>Discover Printers</Text>
-                    </Button>
-                  </Right>
-                </ListItem>
-                {isLoading ? (
-                  <Spinner />
-                ) : discoveredPrinters.length === 0 ? (
-                  <Text style={{ padding: 10 }}> No printers found</Text>
-                ) : (
-                  discoveredPrinters.map(discoveredPrinter => {
-                    const isInstalled = printers.find(printer => printer.macAddress === discoveredPrinter.macAddress);
+              );
+            })}
+          </ScrollView>
+        )}
+      </List>
 
-                    return (
-                      <ListItem key={discoveredPrinter.macAddress}>
-                        <Left>
-                          <Text>{discoveredPrinter.modelName}</Text>
-                        </Left>
-                        <Body>
-                          <Text note>{capitalize(discoveredPrinter.portName)}</Text>
-                          <Text note>{discoveredPrinter.macAddress}</Text>
-                        </Body>
-                        <Right>
-                          {isInstalled ? (
-                            <Button small onPress={() => updatePrinter(discoveredPrinter)}>
-                              <Text>Update</Text>
-                            </Button>
-                          ) : (
-                            <Button small onPress={() => addPrinter(discoveredPrinter)}>
-                              <Text>Add</Text>
-                            </Button>
-                          )}
-                        </Right>
-                      </ListItem>
-                    );
-                  })
-                )}
-              </List>
-            </Col>
-          </Row>
-
-          <Modal isOpen={!!selectedPrinter} onClose={onCancelHandler} style={{ maxWidth: 800 }}>
-            <PrinterDetails printer={selectedPrinter} onSave={onSave} onClose={onCancelHandler} isLoading={isSaving} />
-          </Modal>
-        </Grid>
-      </Content>
+      <Modal isOpen={!!selectedPrinter} onClose={onCancelHandler} style={{ maxWidth: 800 }}>
+        <PrinterDetails printer={selectedPrinter} onSave={onSave} onClose={onCancelHandler} isLoading={isSaving} />
+      </Modal>
     </Container>
   );
 };

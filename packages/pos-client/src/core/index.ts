@@ -10,6 +10,7 @@ export {
   Container,
   Content,
   Drawer,
+  Footer,
   Form,
   Grid,
   H1,

@@ -2,25 +2,11 @@ import { Database } from '@nozbe/watermelondb';
 import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import withObservables from '@nozbe/with-observables';
 import React, { useContext, useState } from 'react';
+import { ScrollView } from 'react-native';
 import { Loading } from '../../../components/Loading/Loading';
 import { Modal } from '../../../components/Modal/Modal';
 import { OrganizationContext } from '../../../contexts/OrganizationContext';
-import {
-  ActionSheet,
-  Body,
-  Button,
-  Col,
-  Container,
-  Content,
-  Grid,
-  Icon,
-  Left,
-  List,
-  ListItem,
-  Right,
-  Row,
-  Text,
-} from '../../../core';
+import { ActionSheet, Body, Button, Icon, Left, List, ListItem, Right, Text, View } from '../../../core';
 import { PriceGroup, tableNames } from '../../../models';
 import { PriceGroupDetails } from './PriceGroupDetails';
 import { commonStyles } from './styles';
@@ -72,57 +58,51 @@ const PriceGroupsTabInner: React.FC<PriceGroupsTabOuterProps & PriceGroupsTabInn
     return <Loading />;
   }
   return (
-    <Container>
-      <Content>
-        <Grid>
-          <Row>
-            <Col>
-              <List>
-                <ListItem itemDivider>
-                  <Left>
-                    <Text>Price Groups</Text>
-                  </Left>
-                  <Right>
-                    <Button iconLeft success small onPress={() => setIsModalOpen(true)}>
-                      <Icon name="ios-add-circle-outline" />
-                      <Text>Create</Text>
-                    </Button>
-                  </Right>
-                </ListItem>
-                {priceGroups.map(priceGroup => {
-                  const isSelected = priceGroup === selectedPriceGroup;
-                  return (
-                    <ListItem key={priceGroup.id} noIndent style={isSelected ? commonStyles.selectedRow : {}}>
-                      <Left>
-                        <Text>{priceGroup.name}</Text>
-                      </Left>
-                      <Body></Body>
+    <View>
+      <List>
+        <ListItem itemDivider>
+          <Left>
+            <Text>Price Groups</Text>
+          </Left>
+          <Right>
+            <Button iconLeft success small onPress={() => setIsModalOpen(true)}>
+              <Icon name="ios-add-circle-outline" />
+              <Text>Create</Text>
+            </Button>
+          </Right>
+        </ListItem>
+        <ScrollView>
+          {priceGroups.map(priceGroup => {
+            const isSelected = priceGroup === selectedPriceGroup;
+            return (
+              <ListItem key={priceGroup.id} noIndent style={isSelected ? commonStyles.selectedRow : {}}>
+                <Left>
+                  <Text>{priceGroup.name}</Text>
+                </Left>
+                <Body></Body>
 
-                      <Button
-                        style={{ marginRight: 10 }}
-                        bordered
-                        danger
-                        small
-                        disabled={priceGroups.length === 1}
-                        onPress={() => areYouSure(onDelete, priceGroup)}
-                      >
-                        <Text>Delete</Text>
-                      </Button>
-                      <Button bordered info small onPress={() => onSelect(priceGroup)}>
-                        <Text>View</Text>
-                      </Button>
-                    </ListItem>
-                  );
-                })}
-              </List>
-            </Col>
-          </Row>
-          <Modal isOpen={isModalOpen} onClose={onCancelHandler} style={{ maxWidth: 800 }}>
-            <PriceGroupDetails priceGroup={selectedPriceGroup} onClose={onCancelHandler} />
-          </Modal>
-        </Grid>
-      </Content>
-    </Container>
+                <Button
+                  style={{ marginRight: 10 }}
+                  bordered
+                  danger
+                  small
+                  disabled={priceGroups.length === 1}
+                  onPress={() => areYouSure(onDelete, priceGroup)}
+                >
+                  <Text>Delete</Text>
+                </Button>
+                <Button bordered info small onPress={() => onSelect(priceGroup)}>
+                  <Text>View</Text>
+                </Button>
+              </ListItem>
+            );
+          })}
+        </ScrollView>
+      </List>
+      <Modal isOpen={isModalOpen} onClose={onCancelHandler} style={{ maxWidth: 800 }}>
+        <PriceGroupDetails priceGroup={selectedPriceGroup} onClose={onCancelHandler} />
+      </Modal>
+    </View>
   );
 };
 

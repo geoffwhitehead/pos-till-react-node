@@ -2,12 +2,13 @@ import { Database } from '@nozbe/watermelondb';
 import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import withObservables from '@nozbe/with-observables';
 import React, { useState } from 'react';
+import { ScrollView } from 'react-native';
 import { Modal } from '../../../../components/Modal/Modal';
 import { SearchBar } from '../../../../components/SearchBar/SearchBar';
-import { Content, List, View } from '../../../../core';
+import { List, View } from '../../../../core';
 import { Category } from '../../../../models';
 import { CategoryRow } from './CategoryRow';
-import { ModalCategoryDetails } from './ModalCategoryDetails';
+import { ModalCategoryDetails, ModalCategoryDetailsInner } from './ModalCategoryDetails';
 
 interface CategoriesTabOuterProps {
   database?: Database;
@@ -35,14 +36,12 @@ const CategoriesTabInner: React.FC<CategoriesTabOuterProps & CategoriesTabInnerP
     setModalOpen(true);
   };
 
+  const onPressCreate = () => setModalOpen(true);
+
   return (
     <View>
-      <SearchBar
-        value={searchValue}
-        onPressCreate={() => setModalOpen(true)}
-        onSearch={value => setSearchValue(value)}
-      />
-      <Content>
+      <SearchBar value={searchValue} onPressCreate={onPressCreate} onSearch={value => setSearchValue(value)} />
+      <ScrollView>
         <List>
           {categories
             .filter(category => searchFilter(category, searchValue))
@@ -50,9 +49,13 @@ const CategoriesTabInner: React.FC<CategoriesTabOuterProps & CategoriesTabInnerP
               return <CategoryRow key={category.id} index={index} category={category} onSelect={onSelectCategory} />;
             })}
         </List>
-      </Content>
+      </ScrollView>
       <Modal isOpen={modalOpen} onClose={onCloseHandler}>
-        <ModalCategoryDetails category={selectedCategory} onClose={onCloseHandler} />
+        {selectedCategory ? (
+          <ModalCategoryDetails category={selectedCategory} onClose={onCloseHandler} />
+        ) : (
+          <ModalCategoryDetailsInner category={selectedCategory} onClose={onCloseHandler} />
+        )}
       </Modal>
     </View>
   );

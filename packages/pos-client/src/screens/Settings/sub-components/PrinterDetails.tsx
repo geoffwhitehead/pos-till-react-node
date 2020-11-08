@@ -1,11 +1,11 @@
 import { Formik } from 'formik';
 import React from 'react';
+import { ScrollView } from 'react-native';
 import * as Yup from 'yup';
 import { ModalContentButton } from '../../../components/Modal/ModalContentButton';
-import { Col, Content, Form, Icon, Input, Item, Label, Picker, Row } from '../../../core';
+import { Form, Icon, Input, Item, Label, Picker } from '../../../core';
 import { Printer } from '../../../models';
 import { Emulations, PrinterProps } from '../../../models/Printer';
-import { commonStyles } from './styles';
 
 interface PrinterDetailsOuterProps {
   onClose: () => void;
@@ -68,58 +68,51 @@ const PrinterDetailsInner: React.FC<PrinterDetailsOuterProps> = ({ printer, onCl
             title="Printer details"
             isPrimaryDisabled={isLoading}
           >
-            <Content>
-              <Row>
-                <Col>
-                  <Form>
-                    <Item stackedLabel error={err.name}>
-                      <Label>Name</Label>
-                      <Input onChangeText={handleChange('name')} onBlur={handleBlur('name')} value={name} />
-                    </Item>
-                    <Item stackedLabel error={err.address}>
-                      <Label>Address</Label>
-                      <Input onChangeText={handleChange('address')} onBlur={handleBlur('vat')} value={address} />
-                    </Item>
-                    <Item stackedLabel error={err.macAddress}>
-                      <Label>MAC Address</Label>
-                      <Input
-                        onChangeText={handleChange('macAddress')}
-                        onBlur={handleBlur('macAddress')}
-                        value={macAddress}
-                      />
-                    </Item>
-                    <Item stackedLabel error={err.printWidth}>
-                      <Label>Print Width</Label>
-                      <Input
-                        onChangeText={handleChange('printWidth')}
-                        onBlur={handleBlur('printWidth')}
-                        value={printWidth.toString()}
-                      />
-                    </Item>
-                    <Item picker stackedLabel>
-                      <Label>Emulation</Label>
-                      <Picker
-                        mode="dropdown"
-                        iosIcon={<Icon name="arrow-down" />}
-                        style={{ width: undefined }}
-                        placeholder="Select emulation"
-                        placeholderStyle={{ color: '#bfc6ea' }}
-                        placeholderIconColor="#007aff"
-                        selectedValue={emulation}
-                        onValueChange={handleChange('emulation')}
-                      >
-                        {Object.keys(Emulations).map(emulation => (
-                          <Picker.Item key={emulation} label={emulation} value={emulation} />
-                        ))}
-                      </Picker>
-                    </Item>
-                  </Form>
-                </Col>
-                <Col>
-                  <Form style={commonStyles.form}></Form>
-                </Col>
-              </Row>
-            </Content>
+            <ScrollView>
+              <Form>
+                <Item stackedLabel error={err.name}>
+                  <Label>Name</Label>
+                  <Input onChangeText={handleChange('name')} onBlur={handleBlur('name')} value={name} />
+                </Item>
+                <Item stackedLabel error={err.address}>
+                  <Label>Address</Label>
+                  <Input onChangeText={handleChange('address')} onBlur={handleBlur('vat')} value={address} />
+                </Item>
+                <Item stackedLabel error={err.macAddress}>
+                  <Label>MAC Address</Label>
+                  <Input
+                    onChangeText={handleChange('macAddress')}
+                    onBlur={handleBlur('macAddress')}
+                    value={macAddress}
+                  />
+                </Item>
+                <Item stackedLabel error={err.printWidth}>
+                  <Label>Print Width</Label>
+                  <Input
+                    onChangeText={handleChange('printWidth')}
+                    onBlur={handleBlur('printWidth')}
+                    value={printWidth.toString()}
+                  />
+                </Item>
+                <Item picker stackedLabel>
+                  <Label>Emulation</Label>
+                  <Picker
+                    mode="dropdown"
+                    iosIcon={<Icon name="arrow-down" />}
+                    style={{ width: undefined }}
+                    placeholder="Select emulation"
+                    placeholderStyle={{ color: '#bfc6ea' }}
+                    placeholderIconColor="#007aff"
+                    selectedValue={emulation}
+                    onValueChange={handleChange('emulation')}
+                  >
+                    {Object.keys(Emulations).map(emulation => (
+                      <Picker.Item key={emulation} label={emulation} value={emulation} />
+                    ))}
+                  </Picker>
+                </Item>
+              </Form>
+            </ScrollView>
           </ModalContentButton>
         );
       }}

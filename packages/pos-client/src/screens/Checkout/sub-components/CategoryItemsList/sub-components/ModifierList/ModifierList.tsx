@@ -4,7 +4,7 @@ import { keyBy } from 'lodash';
 import React, { useState } from 'react';
 import { ModalContentButton } from '../../../../../../components/Modal/ModalContentButton';
 import { NumberPicker } from '../../../../../../components/NumberPicker/NumberPicker';
-import { Content, List } from '../../../../../../core';
+import { List, View } from '../../../../../../core';
 import { Bill, Item, Modifier, ModifierItem, PriceGroup } from '../../../../../../models';
 import { ModifierGroup } from './ModifierGroup';
 
@@ -70,7 +70,7 @@ export const ModifierListInner: React.FC<ModifierListOuterProps & ModifierListIn
       primaryButtonText="Save"
       title={`${item.name}: Modifiers`}
     >
-      <Content>
+      <View>
         <List>
           {modifiers.map(modifier => {
             const selectedItems = selectedModifiers[modifier.id].items;
@@ -86,7 +86,7 @@ export const ModifierListInner: React.FC<ModifierListOuterProps & ModifierListIn
           })}
         </List>
         <NumberPicker onPress={v => setQuantity(v)} />
-      </Content>
+      </View>
     </ModalContentButton>
   );
 };

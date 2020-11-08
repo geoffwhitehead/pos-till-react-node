@@ -4,9 +4,10 @@ import withObservables from '@nozbe/with-observables';
 import { RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import React, { useContext, useState } from 'react';
+import { ScrollView } from 'react-native';
 import { SearchHeader } from '../../../../components/SearchHeader/SearchHeader';
 import { PriceGroupContext } from '../../../../contexts/PriceGroupContext';
-import { Body, Content, Icon, Left, List, ListItem, Right, Text } from '../../../../core';
+import { Body, Container, Icon, Left, List, ListItem, Right, Text } from '../../../../core';
 import { Category, PriceGroup } from '../../../../models';
 import { CheckoutItemStackParamList } from '../../../../navigators/CheckoutItemNavigator';
 
@@ -20,7 +21,10 @@ interface CategoriesOuterProps {
   navigation: StackNavigationProp<CheckoutItemStackParamList, 'CategoryList'>;
 }
 
-export const CategoriesInner: React.FC<CategoriesOuterProps & CategoriesInnerProps> = ({ navigation, categories }) => {
+export const CategoriesInner: React.FC<CategoriesOuterProps & CategoriesInnerProps> = ({
+  navigation,
+  categories: c,
+}) => {
   const [searchValue, setSearchValue] = useState<string>('');
   const { priceGroup } = useContext(PriceGroupContext);
 
@@ -38,44 +42,48 @@ export const CategoriesInner: React.FC<CategoriesOuterProps & CategoriesInnerPro
     }
   };
 
+  const categories = [...c, ...c, ...c, ...c];
+
   const onSearchHandler = (value: string) => setSearchValue(value);
 
   const searchFilter = (category: Category, searchValue: string) =>
     category.name.toLowerCase().includes(searchValue.toLowerCase());
 
   return (
-    <Content>
+    <Container>
       <SearchHeader onChangeText={onSearchHandler} value={searchValue} />
-      <List>
-        <ListItem itemHeader first>
-          <Text style={{ fontWeight: 'bold' }}>Categories</Text>
-        </ListItem>
-        <ListItem key={'cat.all'} icon onPress={onPressCategoryFactory({ priceGroup })}>
-          <Left>
-            <Text>All</Text>
-          </Left>
-          <Body>
-            <Icon name="ios-arrow-forward" />
-          </Body>
-          <Right />
-        </ListItem>
-        {categories
-          .filter(category => searchFilter(category, searchValue))
-          .map(category => {
-            return (
-              <ListItem key={category.id} icon onPress={onPressCategoryFactory({ category, priceGroup })}>
-                <Left>
-                  <Text>{category.name}</Text>
-                </Left>
-                <Body>
-                  <Icon name="ios-arrow-forward" />
-                </Body>
-                <Right />
-              </ListItem>
-            );
-          })}
-      </List>
-    </Content>
+      <ListItem itemHeader first>
+        <Text style={{ fontWeight: 'bold' }}>Categories</Text>
+      </ListItem>
+      <ScrollView>
+        <List>
+          <ListItem key={'cat.all'} icon onPress={onPressCategoryFactory({ priceGroup })}>
+            <Left>
+              <Text>All</Text>
+            </Left>
+            <Body>
+              <Icon name="ios-arrow-forward" />
+            </Body>
+            <Right />
+          </ListItem>
+          {categories
+            .filter(category => searchFilter(category, searchValue))
+            .map(category => {
+              return (
+                <ListItem key={category.id} icon onPress={onPressCategoryFactory({ category, priceGroup })}>
+                  <Left>
+                    <Text>{category.name}</Text>
+                  </Left>
+                  <Body>
+                    <Icon name="ios-arrow-forward" />
+                  </Body>
+                  <Right />
+                </ListItem>
+              );
+            })}
+        </List>
+      </ScrollView>
+    </Container>
   );
 };
 

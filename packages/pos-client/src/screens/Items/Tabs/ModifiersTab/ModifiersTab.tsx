@@ -2,11 +2,12 @@ import { Database } from '@nozbe/watermelondb';
 import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import withObservables from '@nozbe/with-observables';
 import React, { useState } from 'react';
+import { ScrollView } from 'react-native';
 import { Modal } from '../../../../components/Modal/Modal';
 import { SearchBar } from '../../../../components/SearchBar/SearchBar';
-import { Col, Content, Grid, List, Row, Separator, Text, View } from '../../../../core';
+import { Col, Container, Grid, List, Row, Separator, Text } from '../../../../core';
 import { Modifier } from '../../../../models';
-import { ModalModifierDetails } from './ModalModifierDetails';
+import { ModalModifierDetails, ModalModifierDetailsInner } from './ModalModifierDetails';
 import { ModifierItems } from './ModifierItems';
 import { ModifierRow } from './ModifierRow';
 
@@ -28,7 +29,6 @@ const ModifierTabInner: React.FC<ModifiersTabOuterProps & ModifiersTabInnerProps
 
   const onCloseHandler = () => {
     setModalOpen(false);
-    setSelectedModifier(null);
   };
 
   const onViewModifier = async (modifier: Modifier) => {
@@ -41,21 +41,19 @@ const ModifierTabInner: React.FC<ModifiersTabOuterProps & ModifiersTabInnerProps
   };
 
   return (
-    <View>
+    <Container>
       <Grid>
         <Row>
           <Col>
-            <View>
-              <Separator bordered>
-                <Text>Modifiers</Text>
-              </Separator>
-              <SearchBar
-                value={searchValue}
-                onPressCreate={() => setModalOpen(true)}
-                onSearch={value => setSearchValue(value)}
-              />
-            </View>
-            <Content>
+            <Separator style={styles.separator} bordered>
+              <Text>Modifiers</Text>
+            </Separator>
+            <SearchBar
+              value={searchValue}
+              onPressCreate={() => setModalOpen(true)}
+              onSearch={value => setSearchValue(value)}
+            />
+            <ScrollView>
               <List>
                 {modifiers
                   .filter(modifier => searchFilter(modifier, searchValue))
@@ -73,29 +71,34 @@ const ModifierTabInner: React.FC<ModifiersTabOuterProps & ModifiersTabInnerProps
                     );
                   })}
               </List>
-            </Content>
+            </ScrollView>
           </Col>
           <Col>
-            <View>
-              <Separator bordered>
-                <Text>Modifier Items</Text>
-              </Separator>
-              <Content>
-                {!selectedModifier && (
-                  <Text note style={{ padding: 15 }}>
-                    Select a modifier to view the assigned items...{' '}
-                  </Text>
-                )}
-                {selectedModifier && <ModifierItems key={selectedModifier.id} modifier={selectedModifier} />}
-              </Content>
-            </View>
+            <Separator style={styles.separator} bordered>
+              <Text>Modifier Items</Text>
+            </Separator>
+            {!selectedModifier && (
+              <Text note style={{ padding: 15 }}>
+                Select a modifier to view the assigned items...{' '}
+              </Text>
+            )}
+
+            {selectedModifier && (
+              <ScrollView>
+                <ModifierItems key={selectedModifier.id} modifier={selectedModifier} />
+              </ScrollView>
+            )}
           </Col>
         </Row>
       </Grid>
       <Modal isOpen={modalOpen} onClose={onCloseHandler}>
-        <ModalModifierDetails modifier={selectedModifier} onClose={onCloseHandler} />
+        {selectedModifier ? (
+          <ModalModifierDetails modifier={selectedModifier} onClose={onCloseHandler} />
+        ) : (
+          <ModalModifierDetailsInner modifier={selectedModifier} onClose={onCloseHandler} />
+        )}
       </Modal>
-    </View>
+    </Container>
   );
 };
 
@@ -104,3 +107,9 @@ export const ModifiersTab = withDatabase(
     modifiers: database.collections.get<Modifier>('modifiers').query(),
   }))(ModifierTabInner),
 );
+
+const styles = {
+  separator: {
+    maxHeight: 45,
+  },
+};

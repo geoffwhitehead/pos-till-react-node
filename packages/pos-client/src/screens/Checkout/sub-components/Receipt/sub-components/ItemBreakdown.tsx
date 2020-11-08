@@ -2,7 +2,7 @@ import withObservables from '@nozbe/with-observables';
 import { capitalize } from 'lodash';
 import React, { useContext } from 'react';
 import { OrganizationContext } from '../../../../../contexts/OrganizationContext';
-import { Content, Left, ListItem, Right, Text } from '../../../../../core';
+import { Left, ListItem, Right, Text, View } from '../../../../../core';
 import { BillItem, BillItemModifierItem, BillItemPrintLog } from '../../../../../models';
 import { PrintStatus } from '../../../../../models/BillItemPrintLog';
 import { formatNumber } from '../../../../../utils';
@@ -42,12 +42,12 @@ const ItemBreakdownInner: React.FC<ItemBreakdownOuterProps & ItemBreakdownInnerP
       onPress={() => !readonly && onSelect(billItem)}
     >
       <Left>
-        <Content>
+        <View>
           <Text style={style}>{`${prefix}${capitalize(billItem.itemName)}`}</Text>
           {modifierItems.map(m => (
             <Text style={style} key={`${m.id}-name`}>{`- ${m.modifierItemName}`}</Text>
           ))}
-        </Content>
+        </View>
       </Left>
       <Right>
         <Text style={style}>{itemDisplayPrice}</Text>

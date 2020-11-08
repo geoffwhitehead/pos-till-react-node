@@ -6,21 +6,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { StyleSheet } from 'react-native';
 import { paymentTypeNames } from '../../../../api/paymentType';
 import { OrganizationContext } from '../../../../contexts/OrganizationContext';
-import {
-  Button,
-  Col,
-  Content,
-  Grid,
-  Input,
-  Item,
-  Label,
-  Left,
-  List,
-  ListItem,
-  Right,
-  Row,
-  Text,
-} from '../../../../core';
+import { Button, Col, Grid, Input, Item, Label, Row, Text, View } from '../../../../core';
 import { Bill, BillDiscount, BillItem, BillPayment, Discount, PaymentType, tableNames } from '../../../../models';
 import { formatNumber, getDefaultCashDenominations, minimalBillSummary, MinimalBillSummary } from '../../../../utils';
 
@@ -105,60 +91,54 @@ const PaymentsInner: React.FC<PaymentOuterProps & PaymentInnerProps> = ({
   };
 
   return (
-    <Content>
-      <Grid>
-        <Col />
-        <Col>
-          <Row style={styles.row}>
+    <Grid>
+      <Col style={styles.leftPanel} />
+      <Col>
+        <View style={styles.rightPanel}>
+          <Row style={styles.rowCustomAmount}>
             <Item stackedLabel style={{ width: '100%', height: 40 }}>
               <Label>Custom amount</Label>
               <Input value={value} onChangeText={onValueChange} keyboardType="number-pad" />
             </Item>
           </Row>
           <Row style={styles.row}>
-            <List style={{ width: '100%', height: '100%' }}>
-              <ListItem itemHeader first>
-                <Text>Discounts</Text>
-              </ListItem>
+            <Col style={styles.buttonColumn}>
               {discounts.map(discount => {
                 return (
-                  <ListItem key={discount.id} onPress={addDiscount(discount)}>
-                    <Left>
-                      <Text>{discount.name}</Text>
-                    </Left>
-                    <Right>
-                      <Text>
-                        {discount.isPercent ? discount.amount + '%' : formatNumber(discount.amount, currency)}
-                      </Text>
-                    </Right>
-                  </ListItem>
+                  <Button key={discount.id} style={{ ...styles.button, backgroundColor: 'purple' }}>
+                    <Text>{discount.name}</Text>
+                  </Button>
                 );
               })}
-            </List>
+            </Col>
+            {/* <Col /> */}
+            <Col style={styles.denomButtonColumn}>
+              {denominations.map(amt => {
+                return (
+                  <Button key={amt} bordered style={styles.button} onPress={addPayment(cashType, amt)}>
+                    <Text>{`${formatNumber(amt, currency)}`}</Text>
+                  </Button>
+                );
+              })}
+            </Col>
+            <Col style={styles.buttonColumn}>
+              {paymentTypes.map(paymentType => {
+                return (
+                  <Button
+                    large
+                    key={paymentType.id}
+                    style={styles.button}
+                    onPress={addPayment(paymentType, parseFloat(value))}
+                  >
+                    <Text>{capitalize(paymentType.name)}</Text>
+                  </Button>
+                );
+              })}
+            </Col>
           </Row>
-        </Col>
-        <Col style={styles.buttonColumn}>
-          {paymentTypes.map(paymentType => {
-            return (
-              <Button
-                key={paymentType.id}
-                style={styles.paymentButtons}
-                onPress={addPayment(paymentType, parseFloat(value))}
-              >
-                <Text>{capitalize(paymentType.name)}</Text>
-              </Button>
-            );
-          })}
-          {denominations.map(amt => {
-            return (
-              <Button key={amt} bordered style={styles.paymentButtons} onPress={addPayment(cashType, amt)}>
-                <Text>{`${formatNumber(amt, currency)}`}</Text>
-              </Button>
-            );
-          })}
-        </Col>
-      </Grid>
-    </Content>
+        </View>
+      </Col>
+    </Grid>
   );
 };
 
@@ -183,18 +163,33 @@ const enhance = component =>
 export const Payments = enhance(PaymentsInner);
 
 const styles = StyleSheet.create({
+  rowCustomAmount: {
+    height: 80,
+  },
   row: {
     padding: 10,
-    borderLeftColor: 'lightgrey',
-    borderLeftWidth: 1,
+  },
+  leftPanel: {
+    borderRightColor: 'lightgrey',
+    borderRightWidth: 1,
+    backgroundColor: 'whitesmoke',
+  },
+  rightPanel: {
+    padding: 10,
   },
   buttonColumn: {
-    width: 125,
     flexDirection: 'column',
+    padding: 5,
   },
-  paymentButtons: {
-    margin: 5,
+  denomButtonColumn: {
+    flexDirection: 'column',
+    padding: 5,
+    paddingLeft: 80,
+  },
+  button: {
+    marginBottom: 5,
     textAlign: 'center',
     alignContent: 'center',
   },
+  col: { padding: 0 },
 });

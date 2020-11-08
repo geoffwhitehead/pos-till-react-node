@@ -2,7 +2,7 @@ import { useDatabase } from '@nozbe/watermelondb/hooks';
 import withObservables from '@nozbe/with-observables';
 import dayjs from 'dayjs';
 import { capitalize, keyBy } from 'lodash';
-import { Body, Left, ListItem, Right, Text } from 'native-base';
+import { Body, Left, ListItem, Right, Spinner, Text } from 'native-base';
 import React, { useContext, useEffect, useState } from 'react';
 import { StyleSheet } from 'react-native';
 import { OrganizationContext } from '../../../contexts/OrganizationContext';
@@ -32,6 +32,7 @@ const TransactionListRowInner: React.FC<TransactionListRowOuterProps & Transacti
   billPayments,
   paymentTypes,
   showBillRef = true,
+  ...props
 }) => {
   const {
     organization: { currency },
@@ -48,14 +49,14 @@ const TransactionListRowInner: React.FC<TransactionListRowOuterProps & Transacti
     fetchSummary();
   }, [chargableBillItems, billDiscounts, billPayments]);
   if (!summary) {
-    return <Text>Loading...</Text>;
+    return <Spinner />;
   }
 
   const keyedPaymentTypes = keyBy(paymentTypes, type => type.id);
   const hasDiscount = summary.discountTotal > 0;
 
   return (
-    <ListItem noIndent style={isSelected && styles.selected} key={bill.id} onPress={() => onSelectBill(bill)}>
+    <ListItem {...props} noIndent style={isSelected && styles.selected} onPress={() => onSelectBill(bill)}>
       <Left
         style={{
           flexDirection: 'column',
@@ -63,7 +64,7 @@ const TransactionListRowInner: React.FC<TransactionListRowOuterProps & Transacti
       >
         {showBillRef && (
           <Text
-            style={{ alignSelf: 'flex-start', fontWeight: 'bold', fontSize: 22 }}
+            style={{ alignSelf: 'flex-start', fontWeight: 'bold', fontSize: 20 }}
           >{`Table: ${bill.reference}`}</Text>
         )}
         <Text style={{ alignSelf: 'flex-start' }}>{`Closed at: ${dayjs(bill.closedAt)
@@ -72,7 +73,6 @@ const TransactionListRowInner: React.FC<TransactionListRowOuterProps & Transacti
       </Left>
       <Body>
         <Text>{`Total: ${formatNumber(summary.total, currency)}`}</Text>
-        <Text>{`Change: ${formatNumber(summary.changeTotal, currency)}`}</Text>
         {hasDiscount && <Text>{`Discount: ${formatNumber(summary.discountTotal, currency)}`}</Text>}
       </Body>
       <Right>
@@ -82,8 +82,6 @@ const TransactionListRowInner: React.FC<TransactionListRowOuterProps & Transacti
           const amount = formatNumber(type.totalPayed, currency);
           return <Text key={key}>{`${capitalize(paymentTypeName)}: ${amount}`}</Text>;
         })}
-        {/* <Text>{summary.paymentMethods.map(capitalize).join(', ')}</Text>
-        <Text>{summary.paymentMethods.map(capitalize).join(', ')}</Text> */}
       </Right>
     </ListItem>
   );

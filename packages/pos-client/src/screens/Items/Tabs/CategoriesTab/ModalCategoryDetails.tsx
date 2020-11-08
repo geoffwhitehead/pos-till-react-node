@@ -6,15 +6,14 @@ import * as Yup from 'yup';
 import { ModalContentButton } from '../../../../components/Modal/ModalContentButton';
 import { Form, Input, Item, Label } from '../../../../core';
 import { Category, tableNames } from '../../../../models';
-import { commonStyles } from '../../../Settings/sub-components/styles';
 
 type ModalCategoryDetailsOuterProps = {
   onClose: () => void;
-  category: Category;
+  category?: Category;
 };
 
 type ModalCategoryDetailsInnerProps = {
-  itemsCount: number;
+  itemsCount?: number;
 };
 const categorySchema = Yup.object().shape({
   name: Yup.string()
@@ -27,7 +26,7 @@ const categorySchema = Yup.object().shape({
 });
 
 type FormValues = {
-  name: string;
+  // name: string;
   shortName: string;
 };
 
@@ -42,7 +41,7 @@ export const ModalCategoryDetailsInner: React.FC<ModalCategoryDetailsOuterProps 
   const update = async (values: FormValues, category: Category) => {
     setLoading(true);
     if (category) {
-      await database.action(() => category.update(record => Object.assign(record, values)));
+      await database.action(() => category.update(record => Object.assign(record, { shortName: values.shortName })));
     } else {
       const categoryCollection = database.collections.get<Category>(tableNames.categories);
       await database.action(() => categoryCollection.create(record => Object.assign(record, values)));
@@ -68,7 +67,7 @@ export const ModalCategoryDetailsInner: React.FC<ModalCategoryDetailsOuterProps 
       onSubmit={values => update(values, category)}
     >
       {({ handleChange, handleBlur, handleSubmit, errors, touched, values }) => {
-        const { name, shortName } = values;
+        const { shortName, name } = values;
         const err = {
           name: !!(touched.name && errors.name),
           shortName: !!(touched.shortName && errors.shortName),
@@ -83,14 +82,21 @@ export const ModalCategoryDetailsInner: React.FC<ModalCategoryDetailsOuterProps 
             title="Category Details"
             isPrimaryDisabled={loading}
             style={{ width: 600 }}
-            isDeleteDisabled={itemsCount > 0}
+            isDeleteDisabled={category && itemsCount > 0}
             onPressDelete={onDelete}
           >
-            <Form style={commonStyles.form}>
-              <Item stackedLabel error={err.name}>
-                <Label>Name</Label>
-                <Input onChangeText={handleChange('name')} onBlur={handleBlur('name')} value={name} />
-              </Item>
+            <Form>
+              {!category && (
+                <Item stackedLabel error={err.name}>
+                  <Label>Name</Label>
+                  <Input
+                    onChangeText={handleChange('name')}
+                    onBlur={handleBlur('name')}
+                    value={name}
+                    disabled={!!category}
+                  />
+                </Item>
+              )}
               <Item stackedLabel error={err.shortName}>
                 <Label>Short Name</Label>
                 <Input onChangeText={handleChange('shortName')} onBlur={handleBlur('shortName')} value={shortName} />

@@ -46,7 +46,9 @@ export const ReceiptItemsInner: React.FC<ReceiptItemsOuterProps & ReceiptItemsIn
   const [selectedBillItem, setSelectedBillItem] = useState<BillItem>();
   const [removeMode, setRemoveMode] = useState<RemoveMode>();
 
-  useEffect(() => refContentList.current._root.scrollToEnd(), [billItemsCount, billDiscounts, billPayments]);
+  useEffect(() => {
+    refContentList.current._root.scrollToEnd();
+  }, [billItemsCount, billDiscounts, billPayments]);
 
   useEffect(() => {}, [selectedBillItem]);
 
@@ -116,7 +118,7 @@ export const ReceiptItemsInner: React.FC<ReceiptItemsOuterProps & ReceiptItemsIn
 
   return (
     <Content ref={refContentList}>
-      <List style={{ paddingBottom: 60 }}>
+      <List style={styles.receiptItems}>
         <ItemsBreakdown bill={bill} key="items_breakdown" readonly={readonly} onSelect={billItemDialog} />
         <DiscountsBreakdown
           readonly={readonly}
@@ -163,3 +165,9 @@ const enhance = component =>
   );
 
 export const ReceiptItems = enhance(ReceiptItemsInner);
+
+const styles = {
+  receiptItems: {
+    paddingBottom: 60,
+  },
+};

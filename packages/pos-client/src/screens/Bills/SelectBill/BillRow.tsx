@@ -124,5 +124,5 @@ const styles = {
     // { color: 'grey', fontSize: 22 }
   },
   iconStyle: { marginLeft: 20, marginRight: 2, color: 'grey' },
-  totalText: { color: 'grey', fontWeight: 'bold', fontSize: 22 },
+  totalText: { color: 'grey', fontWeight: 'bold', fontSize: 20 },
 } as const;

@@ -4,6 +4,7 @@ import withObservables from '@nozbe/with-observables';
 import { FieldArray, Formik } from 'formik';
 import { keyBy } from 'lodash';
 import React, { useEffect, useState } from 'react';
+import { ScrollView } from 'react-native-gesture-handler';
 import * as Yup from 'yup';
 import { Loading } from '../../../../components/Loading/Loading';
 import { ModalContentButton } from '../../../../components/Modal/ModalContentButton';
@@ -229,123 +230,125 @@ const ItemDetailsInner: React.FC<ItemDetailsOuterProps & ItemDetailsInnerProps> 
             secondaryButtonText="Cancel"
             onPressDelete={() => areYouSure(handleDelete, item)}
           >
-            <Grid>
-              <Row>
-                <Col style={styles.columnLeft}>
-                  <Form>
-                    <Item stackedLabel error={err.name}>
-                      <Label>Name</Label>
-                      <Input onChangeText={handleChange('name')} onBlur={handleBlur('name')} value={name} />
-                    </Item>
-                    <Text style={styles.text} note>
-                      A shortname will be used on printers where space is restricted.
-                    </Text>
-                    <Item stackedLabel error={err.shortName}>
-                      <Label>ShortName</Label>
-                      <Input
-                        onChangeText={handleChange('shortName')}
-                        onBlur={handleBlur('shortName')}
-                        value={shortName}
-                      />
-                    </Item>
-                    <Item picker stackedLabel>
-                      <Label>Category</Label>
-                      <Picker
-                        mode="dropdown"
-                        iosIcon={<Icon name="arrow-down" />}
-                        style={{ width: undefined }}
-                        placeholder="Select category"
-                        placeholderStyle={{ color: '#bfc6ea' }}
-                        placeholderIconColor="#007aff"
-                        selectedValue={categoryId}
-                        onValueChange={handleChange('categoryId')}
-                      >
-                        {categories.map(({ id, name }) => (
-                          <Picker.Item key={id} label={name} value={id} />
-                        ))}
-                      </Picker>
-                    </Item>
-                    <Text style={styles.text} note>
-                      On storing a bill, this item will be sent to all printers associated with this printer group.
-                    </Text>
-                    <Item picker stackedLabel>
-                      <Label>Printer Group</Label>
-                      <Picker
-                        mode="dropdown"
-                        iosIcon={<Icon name="arrow-down" />}
-                        style={{ width: undefined }}
-                        placeholder="Select printer group"
-                        placeholderStyle={{ color: '#bfc6ea' }}
-                        placeholderIconColor="#007aff"
-                        selectedValue={printerGroupId}
-                        onValueChange={handleChange('printerGroupId')}
-                      >
-                        {[...printerGroups, { id: '', name: 'None' }].map(({ id, name }) => (
-                          <Picker.Item key={id} label={name} value={id} />
-                        ))}
-                      </Picker>
-                    </Item>
-                  </Form>
-                </Col>
-                <Col style={styles.columnRight}>
-                  <Form>
-                    <H2>Price Groups</H2>
-                    <Text style={styles.text} note>
-                      Note: If you leave a price group blank, the item won't exist within that price group.
-                    </Text>
-                    <FieldArray
-                      name="prices"
-                      render={() => {
-                        return priceGroups.map((priceGroup, i) => {
-                          return (
-                            <Item key={priceGroup.id} stackedLabel error={err?.prices[i]?.price}>
-                              <Label>{priceGroup.name}</Label>
-                              <Input
-                                onChangeText={handleChange(`prices[${i}].price`)}
-                                onBlur={handleBlur(`prices[${i}]`)}
-                                value={prices[i].price}
-                              />
-                            </Item>
-                          );
-                        });
-                      }}
-                    />
-                  </Form>
-                </Col>
-              </Row>
-
-              <Row style={styles.row}>
-                <H2 style={{ paddingTop: 20, ...styles.heading }}>Modifiers</H2>
-              </Row>
-              <Row style={styles.row}>
-                <Col>
-                  <List>
-                    <ListItem itemDivider>
-                      <Text>Assigned</Text>
-                    </ListItem>
-                    {selectedModifiers.map(m => (
-                      <ModifierRow isLeft key={m.id} modifier={m} onSelect={m => setAssignedModifiers(m)} />
-                    ))}
-                  </List>
-                </Col>
-                <Col>
-                  <List>
-                    <ListItem itemDivider>
-                      <Text>Available</Text>
-                    </ListItem>
-                    {modifiers
-                      .filter(m => !selectedModifiers.includes(m))
-                      .map(m => (
-                        <ModifierRow
-                          key={m.id}
-                          modifier={m}
-                          onSelect={m => setSelectedModifiers([...selectedModifiers, m])}
+            <ScrollView>
+              <Grid>
+                <Row>
+                  <Col style={styles.columnLeft}>
+                    <Form>
+                      <Item stackedLabel error={err.name}>
+                        <Label>Name</Label>
+                        <Input onChangeText={handleChange('name')} onBlur={handleBlur('name')} value={name} />
+                      </Item>
+                      <Text style={styles.text} note>
+                        A shortname will be used on printers where space is restricted.
+                      </Text>
+                      <Item stackedLabel error={err.shortName}>
+                        <Label>ShortName</Label>
+                        <Input
+                          onChangeText={handleChange('shortName')}
+                          onBlur={handleBlur('shortName')}
+                          value={shortName}
                         />
+                      </Item>
+                      <Item picker stackedLabel>
+                        <Label>Category</Label>
+                        <Picker
+                          mode="dropdown"
+                          iosIcon={<Icon name="arrow-down" />}
+                          style={{ width: undefined }}
+                          placeholder="Select category"
+                          placeholderStyle={{ color: '#bfc6ea' }}
+                          placeholderIconColor="#007aff"
+                          selectedValue={categoryId}
+                          onValueChange={handleChange('categoryId')}
+                        >
+                          {categories.map(({ id, name }) => (
+                            <Picker.Item key={id} label={name} value={id} />
+                          ))}
+                        </Picker>
+                      </Item>
+                      <Text style={styles.text} note>
+                        On storing a bill, this item will be sent to all printers associated with this printer group.
+                      </Text>
+                      <Item picker stackedLabel>
+                        <Label>Printer Group</Label>
+                        <Picker
+                          mode="dropdown"
+                          iosIcon={<Icon name="arrow-down" />}
+                          style={{ width: undefined }}
+                          placeholder="Select printer group"
+                          placeholderStyle={{ color: '#bfc6ea' }}
+                          placeholderIconColor="#007aff"
+                          selectedValue={printerGroupId}
+                          onValueChange={handleChange('printerGroupId')}
+                        >
+                          {[...printerGroups, { id: '', name: 'None' }].map(({ id, name }) => (
+                            <Picker.Item key={id} label={name} value={id} />
+                          ))}
+                        </Picker>
+                      </Item>
+                    </Form>
+                  </Col>
+                  <Col style={styles.columnRight}>
+                    <Form>
+                      <H2>Price Groups</H2>
+                      <Text style={styles.text} note>
+                        Note: If you leave a price group blank, the item won't exist within that price group.
+                      </Text>
+                      <FieldArray
+                        name="prices"
+                        render={() => {
+                          return priceGroups.map((priceGroup, i) => {
+                            return (
+                              <Item key={priceGroup.id} stackedLabel error={err?.prices[i]?.price}>
+                                <Label>{priceGroup.name}</Label>
+                                <Input
+                                  onChangeText={handleChange(`prices[${i}].price`)}
+                                  onBlur={handleBlur(`prices[${i}]`)}
+                                  value={prices[i].price}
+                                />
+                              </Item>
+                            );
+                          });
+                        }}
+                      />
+                    </Form>
+                  </Col>
+                </Row>
+
+                <Row style={styles.row}>
+                  <H2 style={{ paddingTop: 20, ...styles.heading }}>Modifiers</H2>
+                </Row>
+                <Row style={styles.row}>
+                  <Col>
+                    <List>
+                      <ListItem itemDivider>
+                        <Text>Assigned</Text>
+                      </ListItem>
+                      {selectedModifiers.map(m => (
+                        <ModifierRow isLeft key={m.id} modifier={m} onSelect={m => setAssignedModifiers(m)} />
                       ))}
-                  </List>
-                </Col>
-              </Row>
-            </Grid>
+                    </List>
+                  </Col>
+                  <Col>
+                    <List>
+                      <ListItem itemDivider>
+                        <Text>Available</Text>
+                      </ListItem>
+                      {modifiers
+                        .filter(m => !selectedModifiers.includes(m))
+                        .map(m => (
+                          <ModifierRow
+                            key={m.id}
+                            modifier={m}
+                            onSelect={m => setSelectedModifiers([...selectedModifiers, m])}
+                          />
+                        ))}
+                    </List>
+                  </Col>
+                </Row>
+              </Grid>
+            </ScrollView>
           </ModalContentButton>
         );
       }}

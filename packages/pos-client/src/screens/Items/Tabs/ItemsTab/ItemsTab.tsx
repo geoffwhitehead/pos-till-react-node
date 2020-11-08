@@ -3,13 +3,14 @@ import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import withObservables from '@nozbe/with-observables';
 import { keyBy } from 'lodash';
 import React, { useEffect, useState } from 'react';
+import { ScrollView } from 'react-native';
 import { Loading } from '../../../../components/Loading/Loading';
 import { Modal } from '../../../../components/Modal/Modal';
 import { SearchBar } from '../../../../components/SearchBar/SearchBar';
-import { Content, List, View } from '../../../../core';
+import { List, View } from '../../../../core';
 import { Category, Item, Modifier, PrinterGroup, tableNames } from '../../../../models';
-import { ItemDetails } from './ItemDetails';
 import { ItemsTabRow } from './ItemsTabRow';
+import { ItemDetails } from './ModalItemDetails';
 
 interface ItemsTabOuterProps {
   database?: Database;
@@ -55,7 +56,7 @@ const ItemsTabInner: React.FC<ItemsTabOuterProps & ItemsTabInnerProps> = ({ item
         onPressCreate={() => setModalOpen(true)}
         onSearch={value => setSearchValue(value)}
       />
-      <Content>
+      <ScrollView>
         <List>
           {items
             .filter(item => searchFilter(item, searchValue))
@@ -76,7 +77,7 @@ const ItemsTabInner: React.FC<ItemsTabOuterProps & ItemsTabInnerProps> = ({ item
               );
             })}
         </List>
-      </Content>
+      </ScrollView>
       <Modal isOpen={modalOpen} onClose={onCloseHandler}>
         <ItemDetails item={selectedItem} onClose={onCloseHandler} categories={categories} />
       </Modal>

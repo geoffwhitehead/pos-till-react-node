@@ -3,7 +3,6 @@ import { Tab, Tabs } from 'native-base';
 import React, { useContext } from 'react';
 import { SidebarHeader } from '../../components/SidebarHeader/SidebarHeader';
 import { BillPeriodContext } from '../../contexts/BillPeriodContext';
-import { Container } from '../../core';
 import { SidebarDrawerStackParamList } from '../../navigators/SidebarNavigator';
 import { OrganizationTab } from './sub-components/OrganizationTab';
 import { PriceGroupsTab } from './sub-components/PriceGroupsTab';
@@ -19,7 +18,7 @@ interface SettingsInnerProps {}
 const SettingsInner: React.FC<SettingsOuterProps & SettingsInnerProps> = ({ navigation }) => {
   const { billPeriod } = useContext(BillPeriodContext);
   return (
-    <Container>
+    <>
       <SidebarHeader title="Settings" onOpen={() => navigation.openDrawer()} />
       <Tabs>
         <Tab heading="Settings">
@@ -38,7 +37,7 @@ const SettingsInner: React.FC<SettingsOuterProps & SettingsInnerProps> = ({ navi
           <PriceGroupsTab />
         </Tab>
       </Tabs>
-    </Container>
+    </>
   );
 };
 

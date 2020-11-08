@@ -7,7 +7,7 @@ import { keyBy } from 'lodash';
 import React, { useState } from 'react';
 import * as Yup from 'yup';
 import { ModalContentButton } from '../../../../components/Modal/ModalContentButton';
-import { Form, Input, Item, Label, Separator, Text } from '../../../../core';
+import { Content, Form, Input, Item, Label, Separator, Text } from '../../../../core';
 import { Modifier, ModifierItem, ModifierItemPrice, PriceGroup, tableNames } from '../../../../models';
 import { SHORT_NAME_LENGTH } from '../../../../utils/consts';
 import { commonStyles } from '../../../Settings/sub-components/styles';
@@ -160,31 +160,33 @@ export const ModalModifierItemDetailsInner: React.FC<ModalModifierItemDetailsOut
             onPressDelete={onDelete}
             style={{ width: 600 }}
           >
-            <Form style={commonStyles.form}>
-              <Item stackedLabel error={err.name}>
-                <Label>Name</Label>
-                <Input onChangeText={handleChange('name')} onBlur={handleBlur('name')} value={name} />
-              </Item>
-              <Item stackedLabel error={err.name}>
-                <Label>Short Name</Label>
-                <Input onChangeText={handleChange('shortName')} onBlur={handleBlur('shortName')} value={shortName} />
-              </Item>
-              <Separator bordered style={{ marginTop: 30 }}>
-                <Text>Prices</Text>
-              </Separator>
-              {prices.map(({ price, priceGroup }, index) => {
-                return (
-                  <Item key={priceGroup.id} stackedLabel error={err.prices}>
-                    <Label>{priceGroup.name}</Label>
-                    <Input
-                      onChangeText={handleChange(`prices[${index}].price`)}
-                      onBlur={handleBlur(`prices[${index}].price`)}
-                      value={price.toString()}
-                    />
-                  </Item>
-                );
-              })}
-            </Form>
+            <Content>
+              <Form style={commonStyles.form}>
+                <Item stackedLabel error={err.name}>
+                  <Label>Name</Label>
+                  <Input onChangeText={handleChange('name')} onBlur={handleBlur('name')} value={name} />
+                </Item>
+                <Item stackedLabel error={err.name}>
+                  <Label>Short Name</Label>
+                  <Input onChangeText={handleChange('shortName')} onBlur={handleBlur('shortName')} value={shortName} />
+                </Item>
+                <Separator bordered style={{ marginTop: 30, padding: 10 }}>
+                  <Text>Prices</Text>
+                </Separator>
+                {prices.map(({ price, priceGroup }, index) => {
+                  return (
+                    <Item key={priceGroup.id} stackedLabel error={err.prices}>
+                      <Label>{priceGroup.name}</Label>
+                      <Input
+                        onChangeText={handleChange(`prices[${index}].price`)}
+                        onBlur={handleBlur(`prices[${index}].price`)}
+                        value={price.toString()}
+                      />
+                    </Item>
+                  );
+                })}
+              </Form>
+            </Content>
           </ModalContentButton>
         );
       }}

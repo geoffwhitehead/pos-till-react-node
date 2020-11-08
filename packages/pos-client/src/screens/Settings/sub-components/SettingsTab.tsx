@@ -15,6 +15,7 @@ import {
   Button,
   Container,
   Content,
+  Footer,
   Form,
   Grid,
   Icon,
@@ -22,7 +23,6 @@ import {
   Item,
   Label,
   Picker,
-  Row,
   Text,
   View,
 } from '../../../core';
@@ -147,7 +147,7 @@ const SettingsTabInner: React.FC<SettingsTabOuterProps & SettingsTabInnerProps> 
           const hasOpenBills = openBills.length > 0;
 
           return (
-            <>
+            <Container>
               <HeaderButtonBar onPressPrimary={handleSubmit} primaryText="Save Changes"></HeaderButtonBar>
               <Content style={commonStyles.content}>
                 <Grid>
@@ -230,19 +230,19 @@ const SettingsTabInner: React.FC<SettingsTabOuterProps & SettingsTabInnerProps> 
                       </Item>
                     </View>
                   </Form>
-                  <Row style={commonStyles.row}>
-                    <Button bordered onPress={() => areYouSure(signOut)}>
-                      <Text>Sign out</Text>
-                    </Button>
-                  </Row>
-                  <Row style={commonStyles.row}>
-                    <Button danger bordered onPress={() => areYouSure(unlink)}>
-                      <Text>Delete account</Text>
-                    </Button>
-                  </Row>
                 </Grid>
               </Content>
-            </>
+              <Footer>
+                <View style={{ display: 'flex', flexDirection: 'row', padding: 5 }}>
+                  <Button style={{ marginRight: 10 }} onPress={() => areYouSure(signOut)}>
+                    <Text>Sign out</Text>
+                  </Button>
+                  <Button danger bordered onPress={() => areYouSure(unlink)}>
+                    <Text>Delete local account</Text>
+                  </Button>
+                </View>
+              </Footer>
+            </Container>
           );
         }}
       </Formik>

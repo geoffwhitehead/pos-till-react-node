@@ -29,7 +29,6 @@ import { Fonts } from '../../../../theme';
 import { formatNumber, minimalBillSummary, MinimalBillSummary } from '../../../../utils';
 import { ReceiptItems } from './ReceiptItems';
 
-// TODO: type these
 interface ReceiptInnerProps {
   billPayments: BillPayment[];
   billDiscounts: BillDiscount[];
@@ -63,7 +62,7 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
   const { receiptPrinter } = useContext(ReceiptPrinterContext);
   const { currency } = organization;
 
-  const _onStore = async () => {
+  const handleOnStore = async () => {
     onStore();
 
     // fetch all the print logs to print
@@ -221,7 +220,7 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
       {!complete && (
         <Row style={styles.r5}>
           <Col>
-            <Button block iconLeft onPress={_onStore} full style={{ height: '100%' }}>
+            <Button block iconLeft onPress={handleOnStore} full style={{ height: '100%' }}>
               <Icon name="ios-save" />
               <Text>Store</Text>
             </Button>

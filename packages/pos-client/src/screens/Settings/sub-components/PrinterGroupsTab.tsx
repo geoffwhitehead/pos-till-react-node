@@ -2,23 +2,10 @@ import { Database } from '@nozbe/watermelondb';
 import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import withObservables from '@nozbe/with-observables';
 import React, { useState } from 'react';
+import { ScrollView } from 'react-native';
 import { Loading } from '../../../components/Loading/Loading';
 import { Modal } from '../../../components/Modal/Modal';
-import {
-  ActionSheet,
-  Button,
-  Col,
-  Container,
-  Content,
-  Grid,
-  Icon,
-  Left,
-  List,
-  ListItem,
-  Right,
-  Row,
-  Text,
-} from '../../../core';
+import { ActionSheet, Button, Container, Icon, Left, List, ListItem, Right, Text } from '../../../core';
 import { PrinterGroup, tableNames } from '../../../models';
 import { PrinterGroupDetails } from './PrinterGroupDetails';
 import { PrinterGroupRow } from './PrinterGroupRow';
@@ -71,39 +58,33 @@ const PrinterGroupsTabInner: React.FC<PrinterGroupsTabOuterProps & PrinterGroups
   }
   return (
     <Container>
-      <Content>
-        <Grid>
-          <Row>
-            <Col>
-              <List>
-                <ListItem itemDivider>
-                  <Left>
-                    <Text>Printer Groups</Text>
-                  </Left>
-                  <Right>
-                    <Button iconLeft success small onPress={() => setIsModalOpen(true)}>
-                      <Icon name="ios-add-circle-outline" />
-                      <Text>Create</Text>
-                    </Button>
-                  </Right>
-                </ListItem>
-                {printerGroups.map(printerGroup => (
-                  <PrinterGroupRow
-                    key={printerGroup.id}
-                    isSelected={printerGroup === selectedPrinterGroup}
-                    printerGroup={printerGroup}
-                    onSelect={onSelect}
-                    onDelete={() => areYouSure(onDelete, printerGroup)}
-                  />
-                ))}
-              </List>
-            </Col>
-          </Row>
-          <Modal isOpen={isModalOpen} onClose={onCancelHandler} style={{ maxWidth: 800 }}>
-            <PrinterGroupDetails printerGroup={selectedPrinterGroup} onClose={onCancelHandler} />
-          </Modal>
-        </Grid>
-      </Content>
+      <List>
+        <ListItem itemDivider>
+          <Left>
+            <Text>Printer Groups</Text>
+          </Left>
+          <Right>
+            <Button iconLeft success small onPress={() => setIsModalOpen(true)}>
+              <Icon name="ios-add-circle-outline" />
+              <Text>Create</Text>
+            </Button>
+          </Right>
+        </ListItem>
+        <ScrollView>
+          {printerGroups.map(printerGroup => (
+            <PrinterGroupRow
+              key={printerGroup.id}
+              isSelected={printerGroup === selectedPrinterGroup}
+              printerGroup={printerGroup}
+              onSelect={onSelect}
+              onDelete={() => areYouSure(onDelete, printerGroup)}
+            />
+          ))}
+        </ScrollView>
+      </List>
+      <Modal isOpen={isModalOpen} onClose={onCancelHandler} style={{ maxWidth: 800 }}>
+        <PrinterGroupDetails printerGroup={selectedPrinterGroup} onClose={onCancelHandler} />
+      </Modal>
     </Container>
   );
 };

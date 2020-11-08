@@ -1,10 +1,11 @@
 import { useDatabase } from '@nozbe/watermelondb/hooks';
 import { Formik } from 'formik';
 import React, { useContext, useState } from 'react';
+import { ScrollView } from 'react-native';
 import * as Yup from 'yup';
 import { HeaderButtonBar } from '../../../components/HeaderButtonBar/HeaderButtonBar';
 import { OrganizationContext } from '../../../contexts/OrganizationContext';
-import { Container, Content, Form, Input, Item, Label, Text } from '../../../core';
+import { Container, Form, Input, Item, Label, Text } from '../../../core';
 import { commonStyles } from './styles';
 
 interface OrganizationTabProps {}
@@ -110,7 +111,7 @@ export const OrganizationTab: React.FC<OrganizationTabProps> = () => {
             <>
               <HeaderButtonBar onPressPrimary={handleSubmit} primaryText="Save Changes"></HeaderButtonBar>
 
-              <Content style={commonStyles.content}>
+              <ScrollView style={commonStyles.content}>
                 <Form>
                   <Text style={commonStyles.text} note>
                     * This information will also be printed on receipt and report headers
@@ -179,7 +180,7 @@ export const OrganizationTab: React.FC<OrganizationTabProps> = () => {
                     />
                   </Item>
                 </Form>
-              </Content>
+              </ScrollView>
             </>
           );
         }}

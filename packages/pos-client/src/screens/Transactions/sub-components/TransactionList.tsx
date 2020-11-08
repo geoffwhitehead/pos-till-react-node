@@ -3,7 +3,8 @@ import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import withObservables from '@nozbe/with-observables';
 import { groupBy } from 'lodash';
 import React, { useState } from 'react';
-import { Button, Content, Left, List, ListItem, Right, Text } from '../../../core';
+import { ScrollView } from 'react-native';
+import { Button, Left, List, ListItem, Right, Text } from '../../../core';
 import { Bill, PaymentType, tableNames } from '../../../models';
 import { TransactionListRow } from './TransactionListRow';
 
@@ -35,44 +36,45 @@ export const TransactionListInner: React.FC<TransactionListOuterProps & Transact
   const hasNoTransactions = bills.length === 0;
 
   return (
-    <Content>
-      <List>
-        <ListItem itemHeader>
-          <Left></Left>
-          <Right
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'flex-end',
-            }}
+    <List>
+      <ListItem>
+        <Left></Left>
+        <Right
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'flex-end',
+          }}
+        >
+          <Button
+            style={{ marginRight: 5 }}
+            active={isGroupedByTable}
+            small
+            info
+            onPress={() => setIsOrderedDescending(!isOrderedDescending)}
           >
-            <Button
-              style={{ marginRight: 5 }}
-              active={isGroupedByTable}
-              small
-              info
-              onPress={() => setIsOrderedDescending(!isOrderedDescending)}
-            >
-              <Text>{isOrderedDescending ? 'Descending' : 'Ascending'}</Text>
-            </Button>
-            <Button active={isGroupedByTable} small info onPress={() => setIsGroupedByTable(!isGroupedByTable)}>
-              <Text>Grouped</Text>
-            </Button>
-          </Right>
-        </ListItem>
+            <Text>{isOrderedDescending ? 'Descending' : 'Ascending'}</Text>
+          </Button>
+          <Button active={isGroupedByTable} small info onPress={() => setIsGroupedByTable(!isGroupedByTable)}>
+            <Text>Grouped</Text>
+          </Button>
+        </Right>
+      </ListItem>
 
-        {hasNoTransactions ? (
-          <Text style={{ padding: 15 }}>There aren't any completed transactions ...</Text>
-        ) : isGroupedByTable ? (
-          Object.entries(sortedBillsGrouped).map(([billReference, sortedBillsByReference]) => {
+      {hasNoTransactions ? (
+        <Text style={{ padding: 15 }}>There aren't any completed transactions ...</Text>
+      ) : isGroupedByTable ? (
+        <ScrollView>
+          {Object.entries(sortedBillsGrouped).map(([billReference, sortedBillsByReference]) => {
             return [
-              <ListItem itemDivider>
-                <Text style={{ fontWeight: 'bold', fontSize: 22 }}>{`Table: ${billReference}`}</Text>
+              <ListItem key={`${billReference}-seperator`} itemDivider>
+                <Text style={{ fontWeight: 'bold', fontSize: 20 }}>{`Ref: ${billReference}`}</Text>
               </ListItem>,
               ...sortedBillsByReference.map(bill => {
                 const isSelected = selectedBill && bill.id === selectedBill.id;
 
                 return (
                   <TransactionListRow
+                    key={bill.id}
                     paymentTypes={paymentTypes}
                     bill={bill}
                     isSelected={isSelected}
@@ -82,28 +84,30 @@ export const TransactionListInner: React.FC<TransactionListOuterProps & Transact
                 );
               }),
             ];
-          })
-        ) : (
-          sortedBills.map(bill => {
+          })}
+        </ScrollView>
+      ) : (
+        <ScrollView>
+          {sortedBills.map(bill => {
             const isSelected = selectedBill && bill.id === selectedBill.id;
             return (
               <TransactionListRow
+                key={bill.id}
                 paymentTypes={paymentTypes}
                 bill={bill}
                 isSelected={isSelected}
                 onSelectBill={onSelectBill}
               />
             );
-          })
-        )}
-      </List>
-    </Content>
+          })}
+        </ScrollView>
+      )}
+    </List>
   );
 };
 
-// TODO: type
 const enhance = c =>
-  withDatabase<any>(
+  withDatabase(
     withObservables<TransactionListOuterProps, TransactionListInnerProps>([], ({ database }) => ({
       paymentTypes: database.collections.get<PaymentType>(tableNames.paymentTypes).query(),
     }))(c),

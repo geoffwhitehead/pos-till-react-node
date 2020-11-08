@@ -1,8 +1,9 @@
 import withObservables from '@nozbe/with-observables';
 import React, { useContext, useState } from 'react';
+import { ScrollView } from 'react-native';
 import { CurrentBillContext } from '../../../contexts/CurrentBillContext';
 import { OrganizationContext } from '../../../contexts/OrganizationContext';
-import { Button, Content, Left, List, ListItem, Right, Text } from '../../../core';
+import { Button, Content, Footer, Left, List, ListItem, Right, Text } from '../../../core';
 import { Bill, BillPeriod } from '../../../models';
 import { BillRow } from './BillRow';
 import { BillRowEmpty } from './BillRowEmpty';
@@ -44,32 +45,37 @@ export const WrappedSelectBill: React.FC<SelectBillOuterProps & SelectBillInnerP
   const filterOpenOnly = bill => (isFilterOpenOnly ? !!bill : true);
 
   return (
-    <Content>
-      <List>
-        <ListItem itemHeader first>
-          <Left>
-            <Text>Bills </Text>
-          </Left>
-          <Right>
-            <Button active={isFilterOpenOnly} small info onPress={toggleOpenOnlyFilter}>
-              <Text>{isFilterOpenOnly ? 'Show all' : 'Show only open'}</Text>
-            </Button>
-          </Right>
-        </ListItem>
-        {bills.filter(filterOpenOnly).map((bill, index) => {
-          return bill ? (
-            <BillRow key={bill.id} bill={bill} onSelectBill={_onSelectBill} />
-          ) : (
-            <BillRowEmpty
-              key={'k' + index + 1}
-              billPeriod={billPeriod}
-              reference={index + 1}
-              onSelectBill={_onSelectBill}
-            />
-          );
-        })}
-      </List>
-    </Content>
+    <>
+      <Content>
+        <List>
+          <ListItem itemHeader first>
+            <Left />
+            <Right>
+              <Button active={isFilterOpenOnly} small info onPress={toggleOpenOnlyFilter}>
+                <Text>{isFilterOpenOnly ? 'Show all' : 'Show only open'}</Text>
+              </Button>
+            </Right>
+          </ListItem>
+          <ScrollView>
+            {bills.filter(filterOpenOnly).map((bill, index) => {
+              return bill ? (
+                <BillRow key={bill.id} bill={bill} onSelectBill={_onSelectBill} />
+              ) : (
+                <BillRowEmpty
+                  key={'k' + index + 1}
+                  billPeriod={billPeriod}
+                  reference={index + 1}
+                  onSelectBill={_onSelectBill}
+                />
+              );
+            })}
+          </ScrollView>
+        </List>
+      </Content>
+      <Footer>
+        <Text style={{ padding: 10 }} note>{`Open bills: ${openBills.length}`}</Text>
+      </Footer>
+    </>
   );
 };
 

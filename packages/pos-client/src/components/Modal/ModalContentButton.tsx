@@ -1,6 +1,6 @@
 import React from 'react';
 import { View } from 'react-native';
-import { Button, Content, H3, Icon, Text } from '../../core';
+import { Button, Container, H3, Icon, Text } from '../../core';
 
 interface ModalContentButtonProps {
   title: string;
@@ -46,7 +46,7 @@ export const ModalContentButton: React.FC<ModalContentButtonProps> = ({
           )}
         </View>
       </View>
-      <Content style={cStyles.content}>{children}</Content>
+      <Container style={cStyles.content}>{children}</Container>
     </View>
   );
 };

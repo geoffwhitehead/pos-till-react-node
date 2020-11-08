@@ -3,10 +3,11 @@ import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import withObservables from '@nozbe/with-observables';
 import { Formik } from 'formik';
 import React, { useEffect, useState } from 'react';
+import { ScrollView } from 'react-native';
 import * as Yup from 'yup';
 import { Loading } from '../../../components/Loading/Loading';
 import { ModalContentButton } from '../../../components/Modal/ModalContentButton';
-import { Col, Content, Form, Input, Item, Label, List, ListItem, Row, Text } from '../../../core';
+import { Col, Form, Input, Item, Label, List, ListItem, Row, Text } from '../../../core';
 import { PrinterGroup, PrinterGroupPrinter, tableNames } from '../../../models';
 import { Printer } from '../../../models/Printer';
 import { PrinterRowChoice } from './PrinterRowChoice';
@@ -115,7 +116,7 @@ const PrinterGroupDetailsInner: React.FC<PrinterGroupDetailsOuterProps & Printer
             title="Printer Group Details"
             isPrimaryDisabled={loading}
           >
-            <Content>
+            <ScrollView>
               <Row>
                 <Col>
                   <Form style={commonStyles.form}>
@@ -125,7 +126,6 @@ const PrinterGroupDetailsInner: React.FC<PrinterGroupDetailsOuterProps & Printer
                     </Item>
                   </Form>
                 </Col>
-                <Col />
               </Row>
               <Row>
                 <Col style={s.pl}>
@@ -151,8 +151,7 @@ const PrinterGroupDetailsInner: React.FC<PrinterGroupDetailsOuterProps & Printer
                   </List>
                 </Col>
               </Row>
-              <Row></Row>
-            </Content>
+            </ScrollView>
           </ModalContentButton>
         );
       }}
