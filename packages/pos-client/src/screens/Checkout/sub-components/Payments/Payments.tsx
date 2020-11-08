@@ -46,8 +46,6 @@ const PaymentsInner: React.FC<PaymentOuterProps & PaymentInnerProps> = ({
 
   const [summary, setSummary] = useState<MinimalBillSummary>(null);
 
-  // const checkComplete = async () => balance(currentBill) <= 0 && (await onCompleteBill(currentBill));
-
   const onValueChange = (value: string) => setValue(value);
 
   useEffect(() => {
@@ -81,14 +79,12 @@ const PaymentsInner: React.FC<PaymentOuterProps & PaymentInnerProps> = ({
     summary && summary.balance <= 0 && finalize();
   }, [summary, bill]);
 
-  const addPayment = (paymentType: PaymentType, amt: number) => async () => {
+  const addPayment = async (paymentType: PaymentType, amt: number) => {
     await database.action(() => bill.addPayment({ paymentType, amount: amt || Math.max(summary.balance, 0) }));
     setValue('');
   };
 
-  const addDiscount = (discount: Discount) => async () => {
-    await database.action(() => bill.addDiscount({ discount }));
-  };
+  const addDiscount = async (discount: Discount) => database.action(() => bill.addDiscount({ discount }));
 
   return (
     <Grid>
@@ -105,7 +101,11 @@ const PaymentsInner: React.FC<PaymentOuterProps & PaymentInnerProps> = ({
             <Col style={styles.buttonColumn}>
               {discounts.map(discount => {
                 return (
-                  <Button key={discount.id} style={{ ...styles.button, backgroundColor: 'purple' }}>
+                  <Button
+                    key={discount.id}
+                    onPress={() => addDiscount(discount)}
+                    style={{ ...styles.button, backgroundColor: 'purple' }}
+                  >
                     <Text>{discount.name}</Text>
                   </Button>
                 );
@@ -115,7 +115,7 @@ const PaymentsInner: React.FC<PaymentOuterProps & PaymentInnerProps> = ({
             <Col style={styles.denomButtonColumn}>
               {denominations.map(amt => {
                 return (
-                  <Button key={amt} bordered style={styles.button} onPress={addPayment(cashType, amt)}>
+                  <Button key={amt} bordered style={styles.button} onPress={() => addPayment(cashType, amt)}>
                     <Text>{`${formatNumber(amt, currency)}`}</Text>
                   </Button>
                 );
@@ -128,7 +128,7 @@ const PaymentsInner: React.FC<PaymentOuterProps & PaymentInnerProps> = ({
                     large
                     key={paymentType.id}
                     style={styles.button}
-                    onPress={addPayment(paymentType, parseFloat(value))}
+                    onPress={() => addPayment(paymentType, parseFloat(value))}
                   >
                     <Text>{capitalize(paymentType.name)}</Text>
                   </Button>

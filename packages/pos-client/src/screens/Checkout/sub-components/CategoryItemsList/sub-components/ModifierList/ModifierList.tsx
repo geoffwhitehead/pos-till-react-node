@@ -38,7 +38,11 @@ export const ModifierListInner: React.FC<ModifierListOuterProps & ModifierListIn
 
   const isSelectionValid = Object.keys(selectedModifiers).some(key => {
     const { modifier, items } = selectedModifiers[key];
-    return !(items.length < modifier.minItems || items.length > modifier.maxItems);
+    const hasTooFewSelectedItems = items.length < modifier.minItems;
+    const hasTooManySelectedItems = items.length > modifier.maxItems;
+
+    const isValid = !hasTooFewSelectedItems && !hasTooManySelectedItems;
+    return isValid;
   });
 
   const createItemWithModifiers = async () => {
@@ -49,14 +53,19 @@ export const ModifierListInner: React.FC<ModifierListOuterProps & ModifierListIn
   };
 
   const onPressModifierItem = (modifier: Modifier, modifierItem: ModifierItem) => {
+    console.log('---------');
+    console.log('modifierItem', modifierItem);
+
+    console.log('selectedModfiiers', selectedModifiers['6d69cbb9-39a0-4330-bc12-bf5403d2017f'].items);
     const m = selectedModifiers[modifier.id];
     const containsModifier = m.items.includes(modifierItem);
+    console.log('containsModifier', containsModifier);
     if (containsModifier) {
       setSelectedModifiers({
         ...selectedModifiers,
         [modifier.id]: { modifier, items: [...m.items.filter(mI => mI !== modifierItem)] },
       });
-    } else if (m.modifier.maxItems > m.items.length) {
+    } else {
       setSelectedModifiers({ ...selectedModifiers, [modifier.id]: { modifier, items: [...m.items, modifierItem] } });
     }
   };
@@ -99,5 +108,5 @@ const styles = {
 };
 
 export const ModifierList = withObservables<ModifierListOuterProps, ModifierListInnerProps>(['item'], ({ item }) => ({
-  modifiers: item.modifiers,
+  modifiers: item.modifiers.observeWithColumns(['minItems', 'maxItems']),
 }))(ModifierListInner);

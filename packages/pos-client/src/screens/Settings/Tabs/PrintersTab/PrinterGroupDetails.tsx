@@ -5,13 +5,13 @@ import { Formik } from 'formik';
 import React, { useEffect, useState } from 'react';
 import { ScrollView } from 'react-native';
 import * as Yup from 'yup';
-import { Loading } from '../../../components/Loading/Loading';
-import { ModalContentButton } from '../../../components/Modal/ModalContentButton';
-import { Col, Form, Input, Item, Label, List, ListItem, Row, Text } from '../../../core';
-import { PrinterGroup, PrinterGroupPrinter, tableNames } from '../../../models';
-import { Printer } from '../../../models/Printer';
+import { Loading } from '../../../../components/Loading/Loading';
+import { ModalContentButton } from '../../../../components/Modal/ModalContentButton';
+import { Col, Form, Input, Item, Label, List, ListItem, Row, Text } from '../../../../core';
+import { PrinterGroup, PrinterGroupPrinter, tableNames } from '../../../../models';
+import { Printer } from '../../../../models/Printer';
+import { commonStyles } from './../styles';
 import { PrinterRowChoice } from './PrinterRowChoice';
-import { commonStyles } from './styles';
 
 interface PrinterGroupDetailsOuterProps {
   onClose: () => void;

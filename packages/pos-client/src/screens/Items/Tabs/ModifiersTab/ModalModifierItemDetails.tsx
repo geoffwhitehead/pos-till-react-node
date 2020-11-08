@@ -10,7 +10,7 @@ import { ModalContentButton } from '../../../../components/Modal/ModalContentBut
 import { Content, Form, Input, Item, Label, Separator, Text } from '../../../../core';
 import { Modifier, ModifierItem, ModifierItemPrice, PriceGroup, tableNames } from '../../../../models';
 import { SHORT_NAME_LENGTH } from '../../../../utils/consts';
-import { commonStyles } from '../../../Settings/sub-components/styles';
+import { commonStyles } from '../../../Settings/Tabs/styles';
 
 type ModalModifierItemDetailsOuterProps = {
   database: Database;

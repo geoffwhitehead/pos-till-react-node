@@ -5,11 +5,23 @@ import { capitalize } from 'lodash';
 import React, { useState } from 'react';
 import { ScrollView } from 'react-native';
 import { Printer as StarPrinterProps, Printers } from 'react-native-star-prnt';
-import { Modal } from '../../../components/Modal/Modal';
-import { ActionSheet, Body, Button, Container, Icon, Left, List, ListItem, Right, Spinner, Text } from '../../../core';
-import { Printer, tableNames } from '../../../models';
-import { Emulations, PrinterProps } from '../../../models/Printer';
-import { portDiscovery } from '../../../services/printer/printer';
+import { Modal } from '../../../../components/Modal/Modal';
+import {
+  ActionSheet,
+  Body,
+  Button,
+  Container,
+  Icon,
+  Left,
+  List,
+  ListItem,
+  Right,
+  Spinner,
+  Text,
+} from '../../../../core';
+import { Printer, tableNames } from '../../../../models';
+import { Emulations, PrinterProps } from '../../../../models/Printer';
+import { portDiscovery } from '../../../../services/printer/printer';
 import { PrinterDetails } from './PrinterDetails';
 import { PrinterRow } from './PrinterRow';
 

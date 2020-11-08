@@ -23,7 +23,6 @@ interface ModifierGroupInnerProps {
 
 const WrappedModifierGroup: React.FC<ModifierGroupInnerProps & ModifierGroupOuterProps> = ({
   modifier,
-  priceGroup,
   modifierItems,
   onPressModifierItem,
   selectedModifierItems,
@@ -39,8 +38,12 @@ const WrappedModifierGroup: React.FC<ModifierGroupInnerProps & ModifierGroupOute
   );
   const { minItems, maxItems, name } = modifier;
 
+  console.log('modifier', modifier);
+  console.log('minItems', minItems);
+  console.log('maxItems', maxItems);
+
   const single = minItems === maxItems;
-  const range = minItems === 0 && maxItems > 0;
+  const range = minItems < maxItems;
 
   const plural = maxItems === 1 ? 'modifier' : 'modifiers';
   const singleMessage = `Choose ${minItems} ${plural}`;
@@ -60,13 +63,13 @@ const WrappedModifierGroup: React.FC<ModifierGroupInnerProps & ModifierGroupOute
         const modifierItemPrice = keyedModifierPricesByModifierItem[modifierItem.id];
         const isSelected = selectedModifierItems.includes(modifierItem);
         const isDisabled = modifierItemPrice.price === null;
+
         return (
           <ModifierItemRow
             key={modifierItem.id}
             selected={isSelected}
             modifierItem={modifierItem}
             modifierItemPrice={modifierItemPrice}
-            priceGroup={priceGroup}
             onPress={_onPressModifierItem}
             isDisabled={isDisabled}
           />
@@ -84,6 +87,7 @@ export const ModifierGroup = withDatabase(
     ['modifier', 'priceGroup'],
     ({ modifier, priceGroup, database }) => ({
       priceGroup,
+      modifier,
       modifierItems: modifier.modifierItems,
       modifierItemPrices: database.collections
         .get<ModifierItemPrice>(tableNames.modifierItemPrices)

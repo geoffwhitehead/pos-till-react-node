@@ -5,11 +5,11 @@ import withObservables from '@nozbe/with-observables';
 import { Formik } from 'formik';
 import React, { useContext, useState } from 'react';
 import * as Yup from 'yup';
-import { HeaderButtonBar } from '../../../components/HeaderButtonBar/HeaderButtonBar';
-import { Loading } from '../../../components/Loading/Loading';
-import { AuthContext } from '../../../contexts/AuthContext';
-import { OrganizationContext } from '../../../contexts/OrganizationContext';
-import { ReceiptPrinterContext } from '../../../contexts/ReceiptPrinterContext';
+import { HeaderButtonBar } from '../../../../components/HeaderButtonBar/HeaderButtonBar';
+import { Loading } from '../../../../components/Loading/Loading';
+import { AuthContext } from '../../../../contexts/AuthContext';
+import { OrganizationContext } from '../../../../contexts/OrganizationContext';
+import { ReceiptPrinterContext } from '../../../../contexts/ReceiptPrinterContext';
 import {
   ActionSheet,
   Button,
@@ -25,10 +25,10 @@ import {
   Picker,
   Text,
   View,
-} from '../../../core';
-import { Bill, BillPeriod, PriceGroup, Printer, tableNames } from '../../../models';
-import { sync } from '../../../services/sync';
-import { commonStyles } from './styles';
+} from '../../../../core';
+import { Bill, BillPeriod, PriceGroup, Printer, tableNames } from '../../../../models';
+import { sync } from '../../../../services/sync';
+import { commonStyles } from '../styles';
 
 interface SettingsTabOuterProps {
   database: Database;

@@ -2,10 +2,10 @@ import { Formik } from 'formik';
 import React from 'react';
 import { ScrollView } from 'react-native';
 import * as Yup from 'yup';
-import { ModalContentButton } from '../../../components/Modal/ModalContentButton';
-import { Form, Icon, Input, Item, Label, Picker } from '../../../core';
-import { Printer } from '../../../models';
-import { Emulations, PrinterProps } from '../../../models/Printer';
+import { ModalContentButton } from '../../../../components/Modal/ModalContentButton';
+import { Form, Icon, Input, Item, Label, Picker } from '../../../../core';
+import { Printer } from '../../../../models';
+import { Emulations, PrinterProps } from '../../../../models/Printer';
 
 interface PrinterDetailsOuterProps {
   onClose: () => void;

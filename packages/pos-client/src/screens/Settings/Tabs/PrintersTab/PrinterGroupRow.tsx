@@ -1,8 +1,8 @@
 import withObservables from '@nozbe/with-observables';
 import React from 'react';
-import { Body, Button, Left, ListItem, Text } from '../../../core';
-import { Printer, PrinterGroup } from '../../../models';
-import { commonStyles } from './styles';
+import { Body, Button, Left, ListItem, Text } from '../../../../core';
+import { Printer, PrinterGroup } from '../../../../models';
+import { commonStyles } from '../styles';
 
 interface PrinterGroupRowInnerProps {
   printers: Printer[];

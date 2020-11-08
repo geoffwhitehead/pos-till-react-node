@@ -6,7 +6,7 @@ import * as Yup from 'yup';
 import { ModalContentButton } from '../../../../components/Modal/ModalContentButton';
 import { Form, Input, Item, Label } from '../../../../core';
 import { Modifier, tableNames } from '../../../../models';
-import { commonStyles } from '../../../Settings/sub-components/styles';
+import { commonStyles } from '../../../Settings/Tabs/styles';
 
 type ModalModifierDetailsOuterProps = {
   onClose: () => void;
@@ -21,14 +21,22 @@ const modifierSchema = Yup.object().shape({
     .min(2, 'Too Short')
     .max(50, 'Too Long')
     .required('Required'),
-  minItems: Yup.number().min(0, 'Must be a positive number'),
-  maxItems: Yup.number().min(1, 'Must be number greater than 1'),
+  // minItems: Yup.number().min(0, 'Must be a positive number'),
+  minItems: Yup.number()
+    .positive('Must be positive')
+    .required('This field is required.')
+    .when(['maxItems'], (maxItems, schema) => {
+      return schema.max(maxItems);
+    }),
+  maxItems: Yup.number()
+    .positive('Must be positive')
+    .required('This field is required.'),
 });
 
 type FormValues = {
   name: string;
-  minItems: number;
-  maxItems: number;
+  minItems: string;
+  maxItems: string;
 };
 
 export const ModalModifierDetailsInner: React.FC<ModalModifierDetailsOuterProps & ModalModifierDetailsInnerProps> = ({
@@ -41,20 +49,29 @@ export const ModalModifierDetailsInner: React.FC<ModalModifierDetailsOuterProps 
 
   const update = async (values: FormValues, modifier: Modifier) => {
     setLoading(true);
+    const { name, minItems, maxItems } = values;
+
     if (modifier) {
-      await database.action(() => modifier.update(record => Object.assign(record, values)));
+      await database.action(() =>
+        modifier.updateItem({
+          name,
+          minItems: parseInt(minItems),
+          maxItems: parseInt(maxItems),
+        }),
+      );
     } else {
       const modifierCollection = database.collections.get<Modifier>(tableNames.modifiers);
       await database.action(() => modifierCollection.create(record => Object.assign(record, values)));
     }
+
     setLoading(false);
     onClose();
   };
 
   const initialValues = {
     name: modifier?.name || '',
-    minItems: modifier?.minItems || 0,
-    maxItems: modifier?.maxItems || 1,
+    minItems: modifier?.minItems.toString() || '0',
+    maxItems: modifier?.maxItems.toString() || '1',
   };
 
   const onDelete = async () => {
@@ -95,19 +112,11 @@ export const ModalModifierDetailsInner: React.FC<ModalModifierDetailsOuterProps 
               </Item>
               <Item stackedLabel error={err.minItems}>
                 <Label>Min Items</Label>
-                <Input
-                  onChangeText={handleChange('minItems')}
-                  onBlur={handleBlur('minItems')}
-                  value={minItems.toString()}
-                />
+                <Input onChangeText={handleChange('minItems')} onBlur={handleBlur('minItems')} value={minItems} />
               </Item>
               <Item stackedLabel error={err.minItems}>
                 <Label>Max Items</Label>
-                <Input
-                  onChangeText={handleChange('maxItems')}
-                  onBlur={handleBlur('maxItems')}
-                  value={maxItems.toString()}
-                />
+                <Input onChangeText={handleChange('maxItems')} onBlur={handleBlur('maxItems')} value={maxItems} />
               </Item>
             </Form>
           </ModalContentButton>

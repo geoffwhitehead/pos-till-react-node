@@ -3,6 +3,12 @@ import { action, children, field, lazy } from '@nozbe/watermelondb/decorators';
 import { ModifierItemPrice, tableNames } from '.';
 import { ModifierItem } from './ModifierItem';
 
+type UpdateValues = {
+  name: string;
+  minItems: number;
+  maxItems: number;
+};
+
 export class Modifier extends Model {
   static table = 'modifiers';
 
@@ -22,6 +28,17 @@ export class Modifier extends Model {
   @lazy modifierItemPrices = this.collections
     .get<ModifierItemPrice>(tableNames.modifierItemPrices)
     .query(Q.on(tableNames.modifierItems, 'modifier_id', this.id)) as Query<ModifierItemPrice>;
+
+  @action updateItem = async (values: UpdateValues) => {
+    const { name, minItems, maxItems } = values;
+    await this.update(record =>
+      Object.assign(record, {
+        name,
+        minItems,
+        maxItems,
+      }),
+    );
+  };
 
   @action remove = async () => {
     const [modifierItems, modifierItemPrices, itemModifiers] = await Promise.all([

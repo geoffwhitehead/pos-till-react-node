@@ -56,7 +56,7 @@ const TransactionListRowInner: React.FC<TransactionListRowOuterProps & Transacti
   const hasDiscount = summary.discountTotal > 0;
 
   return (
-    <ListItem {...props} noIndent style={isSelected && styles.selected} onPress={() => onSelectBill(bill)}>
+    <ListItem {...props} noIndent style={isSelected ? styles.selected : {}} onPress={() => onSelectBill(bill)}>
       <Left
         style={{
           flexDirection: 'column',

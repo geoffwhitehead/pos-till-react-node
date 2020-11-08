@@ -3,10 +3,10 @@ import { Formik } from 'formik';
 import React, { useContext, useState } from 'react';
 import { ScrollView } from 'react-native';
 import * as Yup from 'yup';
-import { HeaderButtonBar } from '../../../components/HeaderButtonBar/HeaderButtonBar';
-import { OrganizationContext } from '../../../contexts/OrganizationContext';
-import { Container, Form, Input, Item, Label, Text } from '../../../core';
-import { commonStyles } from './styles';
+import { HeaderButtonBar } from '../../../../components/HeaderButtonBar/HeaderButtonBar';
+import { OrganizationContext } from '../../../../contexts/OrganizationContext';
+import { Container, Form, Input, Item, Label, Text } from '../../../../core';
+import { commonStyles } from '../styles';
 
 interface OrganizationTabProps {}
 

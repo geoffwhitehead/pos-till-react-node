@@ -4,11 +4,10 @@ import React, { useContext } from 'react';
 import { SidebarHeader } from '../../components/SidebarHeader/SidebarHeader';
 import { BillPeriodContext } from '../../contexts/BillPeriodContext';
 import { SidebarDrawerStackParamList } from '../../navigators/SidebarNavigator';
-import { OrganizationTab } from './sub-components/OrganizationTab';
-import { PriceGroupsTab } from './sub-components/PriceGroupsTab';
-import { PrinterGroupsTab } from './sub-components/PrinterGroupsTab';
-import { PrintersTab } from './sub-components/PrintersTab';
-import { SettingsTab } from './sub-components/SettingsTab';
+import { DiscountsTab } from './Tabs/DiscountsTab/DiscountTab';
+import { OrganizationTab } from './Tabs/OrganizationTab/OrganizationTab';
+import { PrintersTab } from './Tabs/PrintersTab/PrintersTab';
+import { SettingsTab } from './Tabs/SettingsTab/SettingsTab';
 
 interface SettingsOuterProps {
   navigation: DrawerNavigationProp<SidebarDrawerStackParamList, 'Settings'>;
@@ -30,11 +29,8 @@ const SettingsInner: React.FC<SettingsOuterProps & SettingsInnerProps> = ({ navi
         <Tab heading="Printers">
           <PrintersTab />
         </Tab>
-        <Tab heading="Printer Groups">
-          <PrinterGroupsTab />
-        </Tab>
-        <Tab heading="Price Groups">
-          <PriceGroupsTab />
+        <Tab heading="Discounts">
+          <DiscountsTab />
         </Tab>
       </Tabs>
     </>
