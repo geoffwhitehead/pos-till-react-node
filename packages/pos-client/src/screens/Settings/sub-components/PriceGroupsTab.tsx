@@ -92,7 +92,7 @@ const PriceGroupsTabInner: React.FC<PriceGroupsTabOuterProps & PriceGroupsTabInn
                   <Text>Delete</Text>
                 </Button>
                 <Button bordered info small onPress={() => onSelect(priceGroup)}>
-                  <Text>View</Text>
+                  <Text>Edit</Text>
                 </Button>
               </ListItem>
             );

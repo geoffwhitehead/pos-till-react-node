@@ -35,7 +35,7 @@ const ItemsTabRowInner: React.FC<ItemsTabRowOuterProps & ItemsTabRowInnerProps> 
       <Body />
       <Right>
         <Button bordered info small onPress={() => onPressItem(item)} transparent>
-          <Text>View</Text>
+          <Text>Edit</Text>
         </Button>
       </Right>
     </ListItem>

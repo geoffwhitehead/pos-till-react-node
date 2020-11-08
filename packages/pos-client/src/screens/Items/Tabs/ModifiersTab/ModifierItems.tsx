@@ -48,7 +48,7 @@ const ModifierItemsInner: React.FC<ModifierItemsOuterProps & ModifierItemsInnerP
             </Left>
             <Right>
               <Button bordered info small onPress={() => onView(modifierItem)} transparent>
-                <Text>View</Text>
+                <Text>Edit</Text>
               </Button>
             </Right>
           </ListItem>

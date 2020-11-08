@@ -32,7 +32,7 @@ const PrinterRowInner: React.FC<PrinterRowOuterProps & PrinterRowInnerProps> = (
         <Text>Delete</Text>
       </Button>
       <Button bordered info small onPress={() => onSelect(printer)}>
-        <Text>View</Text>
+        <Text>Edit</Text>
       </Button>
     </ListItem>
   );

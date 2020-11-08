@@ -33,7 +33,7 @@ const ModifierRowInner: React.FC<ModifierRowOuterProps & ModifierRowInnerProps> 
       </Left>
       <Right>
         <Button bordered info small onPress={() => onView(modifier)} transparent>
-          <Text>View</Text>
+          <Text>Edit</Text>
         </Button>
       </Right>
     </ListItem>

@@ -29,7 +29,7 @@ const CategoryRowInner: React.FC<CategoryRowOuterProps & CategoryRowInnerProps> 
       </Left>
       <Right>
         <Button bordered info small onPress={() => onSelect(category)} transparent>
-          <Text>View</Text>
+          <Text>Edit</Text>
         </Button>
       </Right>
     </ListItem>

@@ -36,7 +36,7 @@ const PrinterGroupRowInner: React.FC<PrinterGroupRowOuterProps & PrinterGroupRow
         <Text>Delete</Text>
       </Button>
       <Button bordered info small onPress={() => onSelect(printerGroup)}>
-        <Text>View</Text>
+        <Text>Edit</Text>
       </Button>
     </ListItem>
   );
