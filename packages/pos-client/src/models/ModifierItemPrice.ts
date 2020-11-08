@@ -6,6 +6,10 @@ import { PriceGroup } from './PriceGroup';
 export class ModifierItemPrice extends Model {
   static table = 'modifier_item_prices';
 
+  static associations = {
+    modifier_items: { type: 'belongs_to', key: 'modifier_item_id' },
+  };
+
   @field('price') price: number;
   @field('price_group_id') priceGroupId: string;
   @field('modifier_item_id') modifierItemId: string;
@@ -17,7 +21,7 @@ export class ModifierItemPrice extends Model {
 export const modifierItemPriceSchema = tableSchema({
   name: 'modifier_item_prices',
   columns: [
-    { name: 'price', type: 'number', isOptional: true }, // null field prevents selection for this price group
+    { name: 'price', type: 'number', isOptional: true }, // null field indicates this item is not available in this price group
     { name: 'price_group_id', type: 'string' },
     { name: 'modifier_item_id', type: 'string', isIndexed: true },
   ],

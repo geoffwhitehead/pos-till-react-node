@@ -2,14 +2,14 @@ import withObservables from '@nozbe/with-observables';
 import React from 'react';
 import { StyleSheet } from 'react-native';
 import { Body, Icon, Left, ListItem, Right, Text } from '../../../../../core';
-import { Item } from '../../../../../models';
+import { Item, ItemPrice } from '../../../../../models';
 import { formatNumber } from '../../../../../utils';
 
 interface CategoryItemRowOuterProps {
   item: Item;
   isActive: boolean;
   onPressItem: (i: Item, mCount: number) => void;
-  price: number;
+  itemPrice: ItemPrice;
   currency: string;
 }
 
@@ -22,7 +22,7 @@ const CategoryItemRowInner: React.FC<CategoryItemRowOuterProps & CategoryItemRow
   item,
   modifierCount,
   onPressItem,
-  price,
+  itemPrice,
   currency,
 }) => {
   const onPress = () => onPressItem(item, modifierCount);
@@ -34,15 +34,17 @@ const CategoryItemRowInner: React.FC<CategoryItemRowOuterProps & CategoryItemRow
       </Left>
       <Body>{modifierCount > 0 ? <Icon style={{ color: 'lightgrey' }} name="ios-arrow-forward" /> : null}</Body>
       <Right>
-        <Text style={{ color: 'grey' }}>{formatNumber(price, currency)}</Text>
+        <Text style={{ color: 'grey' }}>{formatNumber(itemPrice.price, currency)}</Text>
       </Right>
     </ListItem>
   );
 };
 
 export const CategoryItemRow = withObservables<CategoryItemRowOuterProps, CategoryItemRowInnerProps>(
-  ['item'],
-  ({ item }) => ({
+  ['item', 'itemPrice'],
+  ({ item, itemPrice }) => ({
+    item,
+    itemPrice,
     modifierCount: item.modifiers.observeCount(),
   }),
 )(CategoryItemRowInner);

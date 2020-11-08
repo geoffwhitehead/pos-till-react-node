@@ -1,41 +1,42 @@
-import { Q } from '@nozbe/watermelondb';
 import withObservables from '@nozbe/with-observables';
 import { Body, Left, ListItem, Right, Text } from 'native-base';
 import React, { useContext } from 'react';
 import { OrganizationContext } from '../../../../../../contexts/OrganizationContext';
-import { ModifierItem, ModifierItemPrice, PriceGroup } from '../../../../../../models';
+import { ModifierItem, ModifierItemPrice } from '../../../../../../models';
 import { formatNumber } from '../../../../../../utils';
 
 interface ModifierItemRowOuterProps {
-  priceGroup: PriceGroup;
   modifierItem: ModifierItem;
   onPress: (mI: ModifierItem) => void;
   selected: boolean;
+  modifierItemPrice: ModifierItemPrice;
+  isDisabled: boolean;
 }
 
-interface ModifierItemRowInnerProps {
-  prices: ModifierItemPrice[];
-}
+interface ModifierItemRowInnerProps {}
 
 const ModifierItemRowInner: React.FC<ModifierItemRowOuterProps & ModifierItemRowInnerProps> = ({
   selected,
   modifierItem,
-  prices,
+  modifierItemPrice,
+  isDisabled,
   onPress,
 }) => {
-  const _onPress = () => onPress(modifierItem);
-
   const {
     organization: { currency },
   } = useContext(OrganizationContext);
 
+  const _onPress = () => onPress(modifierItem);
+  const hasPriceSet = modifierItemPrice.price !== null;
+
   return (
-    <ListItem selected={selected} onPress={_onPress}>
+    <ListItem selected={selected} onPress={_onPress} disabled={isDisabled}>
       <Left>
         <Text>{modifierItem.name}</Text>
         <Body />
         <Right>
-          <Text style={{ color: 'grey' }}>{formatNumber(prices[0].price, currency)}</Text>
+          {hasPriceSet && <Text style={{ color: 'grey' }}>{formatNumber(modifierItemPrice.price, currency)}</Text>}
+          {!hasPriceSet && <Text note>No price set</Text>}
         </Right>
       </Left>
     </ListItem>
@@ -43,8 +44,9 @@ const ModifierItemRowInner: React.FC<ModifierItemRowOuterProps & ModifierItemRow
 };
 
 export const ModifierItemRow = withObservables<ModifierItemRowOuterProps, ModifierItemRowInnerProps>(
-  ['modifierItem', 'priceGroup'],
-  ({ modifierItem, priceGroup }) => ({
-    prices: modifierItem.prices.extend(Q.where('price_group_id', priceGroup.id)),
+  ['modifierItem', 'modifierItemPrice'],
+  ({ modifierItem, modifierItemPrice }) => ({
+    modifierItemPrice,
+    modifierItem,
   }),
 )(ModifierItemRowInner);

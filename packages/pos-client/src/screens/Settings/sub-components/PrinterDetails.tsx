@@ -127,9 +127,4 @@ const PrinterDetailsInner: React.FC<PrinterDetailsOuterProps> = ({ printer, onCl
   );
 };
 
-// const enhance = withObservables<PrinterDetailsOuterProps, PrinterDetailsOuterProps>(['printer'], ({ printer }) => ({
-//   printer,
-// }));
-
-// export const PrinterDetails = enhance(PrinterDetailsInner);
 export const PrinterDetails = PrinterDetailsInner;

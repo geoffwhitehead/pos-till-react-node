@@ -4,7 +4,8 @@ import React, { useState } from 'react';
 import * as Yup from 'yup';
 import { ModalContentButton } from '../../../components/Modal/ModalContentButton';
 import { Body, CheckBox, Col, Content, Form, Input, Item, Label, ListItem, Row, Text } from '../../../core';
-import { PriceGroup, tableNames } from '../../../models';
+import { Item as ItemModel, ItemPrice, ModifierItem, ModifierItemPrice, PriceGroup, tableNames } from '../../../models';
+import { SHORT_NAME_LENGTH } from '../../../utils/consts';
 import { commonStyles } from './styles';
 
 interface PriceGroupDetailsProps {
@@ -19,7 +20,7 @@ const priceGroupDetailsSchema = Yup.object().shape({
     .required('Required'),
   shortName: Yup.string()
     .min(2, 'Too Short')
-    .max(50, 'Too Long'),
+    .max(SHORT_NAME_LENGTH, 'Too Long'),
   isPrepTimeRequired: Yup.boolean(),
 });
 
@@ -33,14 +34,43 @@ export const PriceGroupDetails: React.FC<PriceGroupDetailsProps> = ({ priceGroup
   const [loading, setLoading] = useState(false);
   const database = useDatabase();
 
-  const update = async (values: FormValues, priceGroup: PriceGroup) => {
+  const onSave = async (values: FormValues, priceGroup: PriceGroup) => {
     setLoading(true);
     if (priceGroup) {
       await database.action(() => priceGroup.updatePriceGroup(values));
     } else {
       const priceGroupCollection = database.collections.get<PriceGroup>(tableNames.priceGroups);
+      const modifierItemsCollection = database.collections.get<ModifierItem>(tableNames.modifierItems);
+      const modifierItemPricesCollection = database.collections.get<ModifierItemPrice>(tableNames.modifierItemPrices);
+      const itemPricesCollection = database.collections.get<ItemPrice>(tableNames.itemPrices);
+      const itemsCollection = database.collections.get<ItemModel>(tableNames.items);
 
-      await database.action(() => priceGroupCollection.create(record => Object.assign(record, values)));
+      const [items, modifierItems] = await Promise.all([
+        itemsCollection.query().fetch(),
+        modifierItemsCollection.query().fetch(),
+      ]);
+
+      const priceGroupToCreate = priceGroupCollection.prepareCreate(record => Object.assign(record, values));
+
+      // create null entry for all item prices
+      const itemPricesToCreate = items.map(item =>
+        itemPricesCollection.prepareCreate(record => {
+          record.item.set(item);
+          record.priceGroup.set(priceGroupToCreate);
+        }),
+      );
+
+      // create null entry for all modifier item prices
+      const modifierItemPricesToCreate = modifierItems.map(modifierItem =>
+        modifierItemPricesCollection.prepareCreate(record => {
+          record.modifierItem.set(modifierItem);
+          record.priceGroup.set(priceGroup);
+        }),
+      );
+
+      const batched = [priceGroupToCreate, ...itemPricesToCreate, ...modifierItemPricesToCreate];
+
+      await database.batch(...batched);
     }
     setLoading(false);
     onClose();
@@ -56,7 +86,7 @@ export const PriceGroupDetails: React.FC<PriceGroupDetailsProps> = ({ priceGroup
     <Formik
       initialValues={initialValues}
       validationSchema={priceGroupDetailsSchema}
-      onSubmit={values => update(values, priceGroup)}
+      onSubmit={values => onSave(values, priceGroup)}
     >
       {({ handleChange, handleBlur, handleSubmit, setFieldValue, errors, touched, values }) => {
         const { name, shortName, isPrepTimeRequired } = values;

@@ -104,12 +104,12 @@ const CategoryItemsInner: React.FC<CategoryItemsListOuterProps & CategoryItemsLi
             </ListItem>,
             ...sortedItems[key].map(item => {
               // this should always succeed
-              const { price } = keyedPrices[item.id];
+              const itemPrice = keyedPrices[item.id];
               return (
                 <CategoryItemRow
                   key={item.id}
                   item={item}
-                  price={price}
+                  itemPrice={itemPrice}
                   isActive={selectedItem === item}
                   onPressItem={onSelectItem}
                   currency={currency}
@@ -134,26 +134,23 @@ export const CategoryItems = withDatabase<any>(
     return {
       priceGroup: database.collections.get<PriceGroup>(tableNames.priceGroups).findAndObserve(priceGroupId),
       items: category.items.observeWithColumns(['name']),
-      prices: database.collections
-        .get<ItemPrice>(tableNames.itemPrices)
-        .query(Q.where('price_group_id', priceGroupId))
-        .observeWithColumns(['price']),
+      prices: database.collections.get<ItemPrice>(tableNames.itemPrices).query(Q.where('price_group_id', priceGroupId)),
+      // .observeWithColumns(['price']),
     };
   })(CategoryItemsInner),
 );
 
-export const AllItems = withDatabase<any>( // TODO: type
+export const AllItems = withDatabase(
   withObservables<CategoryItemsListOuterProps, CategoryItemsListInnerProps>(['route'], ({ database, route }) => {
     const { priceGroupId } = route.params;
     return {
       priceGroup: database.collections.get<PriceGroup>(tableNames.priceGroups).findAndObserve(priceGroupId),
       items: database.collections
         .get<Item>(tableNames.items)
-        .query()
-        .observeWithColumns(['name']),
+        .query(Q.on(tableNames.itemPrices, [Q.where('price_group_id', priceGroupId), Q.where('price', Q.notEq(null))])),
       prices: database.collections
         .get<ItemPrice>(tableNames.itemPrices)
-        .query(Q.where('price_group_id', priceGroupId))
+        .query(Q.and(Q.where('price', Q.notEq(null)), Q.where('price_group_id', priceGroupId)))
         .observeWithColumns(['price']),
     };
   })(CategoryItemsInner),

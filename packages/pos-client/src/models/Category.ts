@@ -5,14 +5,14 @@ import { Item } from './Item';
 export class Category extends Model {
   static table = 'categories';
 
+  static associations = {
+    items: { type: 'has_many', foreignKey: 'category_id' },
+  };
+
   @children('items') items: Query<Item>;
 
   @nochange @field('name') name: string;
   @field('short_name') shortName: string;
-
-  static associations = {
-    items: { type: 'has_many', foreignKey: 'category_id' },
-  };
 }
 
 export const categorySchema = tableSchema({

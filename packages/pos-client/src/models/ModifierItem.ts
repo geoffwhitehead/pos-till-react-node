@@ -12,6 +12,11 @@ type UpdateItemAndPricesValues = {
 export class ModifierItem extends Model {
   static table = 'modifier_items';
 
+  static associations = {
+    modifier_item_prices: { type: 'has_many', foreignKey: 'modifier_item_id' },
+    modifiers: { type: 'belongs_to', key: 'modifier_id' },
+  };
+
   @field('name') name: string;
   @field('short_name') shortName: string;
   @field('modifier_id') modifierId: string;
@@ -31,11 +36,6 @@ export class ModifierItem extends Model {
     const batched = [modifierItemToUpdate, ...modifierItemPricesToUpdate];
 
     await this.database.batch(...batched);
-  };
-
-  static associations = {
-    modifier_item_prices: { type: 'has_many', foreignKey: 'modifier_item_id' },
-    modifiers: { type: 'belongs_to', key: 'modifier_id' },
   };
 }
 
