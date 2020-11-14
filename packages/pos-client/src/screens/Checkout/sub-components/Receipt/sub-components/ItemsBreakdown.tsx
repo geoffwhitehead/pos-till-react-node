@@ -1,7 +1,7 @@
 import withObservables from '@nozbe/with-observables';
 import { groupBy } from 'lodash';
 import React from 'react';
-import { Left, ListItem, Right, Separator, Text } from '../../../../../core';
+import { Left, ListItem, Right, Separator, Text, View } from '../../../../../core';
 import { Bill, BillItem, BillItemPrintLog } from '../../../../../models';
 import { PrintStatus, PrintType } from '../../../../../models/BillItemPrintLog';
 import { ItemBreakdown } from './ItemBreakdown';
@@ -22,6 +22,7 @@ export const ItemsBreakdownInner: React.FC<ItemsBreakdownOuterProps & ItemsBreak
   readonly,
   onSelect,
   billItemStatusLogs,
+  ...props
 }) => {
   if (!billItems) {
     return null;
@@ -31,8 +32,8 @@ export const ItemsBreakdownInner: React.FC<ItemsBreakdownOuterProps & ItemsBreak
   const keyedLogGroups: Record<string, BillItemPrintLog[]> = groupBy(billItemStatusLogs, log => log.billItemId);
 
   return (
-    <>
-      <Separator bordered key="ib_sep">
+    <View {...props}>
+      <Separator bordered>
         <Text>Items</Text>
       </Separator>
       {Object.values(billItemGroups).map(billItemGroup => {
@@ -89,7 +90,7 @@ export const ItemsBreakdownInner: React.FC<ItemsBreakdownOuterProps & ItemsBreak
           }),
         ];
       })}
-    </>
+    </View>
   );
 };
 

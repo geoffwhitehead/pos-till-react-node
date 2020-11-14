@@ -2,7 +2,7 @@ import withObservables from '@nozbe/with-observables';
 import { capitalize } from 'lodash';
 import React, { useContext } from 'react';
 import { OrganizationContext } from '../../../../../contexts/OrganizationContext';
-import { Left, ListItem, Right, Text, View } from '../../../../../core';
+import { Badge, Left, ListItem, Right, Text, View } from '../../../../../core';
 import { BillItem, BillItemModifierItem, BillItemPrintLog } from '../../../../../models';
 import { PrintStatus } from '../../../../../models/BillItemPrintLog';
 import { formatNumber } from '../../../../../utils';
@@ -30,11 +30,13 @@ const ItemBreakdownInner: React.FC<ItemBreakdownOuterProps & ItemBreakdownInnerP
     organization: { currency },
   } = useContext(OrganizationContext);
 
-  const prefix = billItem.isVoided ? 'VOID ' : billItem.isComp ? 'COMP ' : '';
+  const { isVoided, isComp } = billItem;
+  // const prefix = billItem.isVoided ? 'VOID ' : billItem.isComp ? 'COMP ' : '';
   const style = billItem.isVoided ? styles.void : billItem.isComp ? styles.comp : {};
   const isChargable = !(billItem.isComp || billItem.isVoided);
   const itemDisplayPrice = formatNumber(isChargable ? billItem.itemPrice : 0, currency);
   const isDisabled = readonly || status === PrintStatus.processing;
+
   return (
     <ListItem
       style={status ? styles[status] : {}}
@@ -45,22 +47,42 @@ const ItemBreakdownInner: React.FC<ItemBreakdownOuterProps & ItemBreakdownInnerP
     >
       <Left>
         <View>
-          <Text style={style}>{`${prefix}${capitalize(billItem.itemName)}`}</Text>
-          {modifierItems.map(m => (
-            <Text note style={style} key={`${m.id}-name`}>{`- ${m.modifierItemName}`}</Text>
-          ))}
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <Text style={style}>{`${capitalize(billItem.itemName)}`}</Text>
+            {isVoided && (
+              <Badge danger style={{ marginLeft: 10 }}>
+                <Text>Voiding</Text>
+              </Badge>
+            )}
+            {isComp && (
+              <Badge info style={{ marginLeft: 10 }}>
+                <Text>Comp</Text>
+              </Badge>
+            )}
+          </View>
+          {modifierItems.length > 0 && (
+            <View style={{ paddingTop: 5 }}>
+              {modifierItems.map(m => (
+                <Text note style={style} key={`${m.id}-name`}>{`- ${m.modifierItemName}`}</Text>
+              ))}
+            </View>
+          )}
         </View>
       </Left>
       <Right>
         <Text style={style}>{itemDisplayPrice}</Text>
-        {modifierItems.map(m => {
-          const modifierItemDisplayPrice = formatNumber(isChargable ? m.modifierItemPrice : 0, currency);
-          return (
-            <Text note style={style} key={`${m.id}-price`}>
-              {modifierItemDisplayPrice}
-            </Text>
-          );
-        })}
+        {modifierItems.length > 0 && (
+          <View style={{ paddingTop: 5 }}>
+            {modifierItems.map(m => {
+              const modifierItemDisplayPrice = formatNumber(isChargable ? m.modifierItemPrice : 0, currency);
+              return (
+                <Text note style={style} key={`${m.id}-price`}>
+                  {modifierItemDisplayPrice}
+                </Text>
+              );
+            })}
+          </View>
+        )}
       </Right>
     </ListItem>
   );
@@ -77,15 +99,15 @@ export const ItemBreakdown = withObservables<ItemBreakdownOuterProps, ItemBreakd
 const styles = {
   [PrintStatus.succeeded]: {
     borderLeftColor: 'green',
-    borderLeftWidth: 8,
+    borderLeftWidth: 4,
   },
   [PrintStatus.processing]: {
     borderLeftColor: 'yellow',
-    borderLeftWidth: 8,
+    borderLeftWidth: 4,
   },
   [PrintStatus.errored]: {
     borderLeftColor: 'red',
-    borderLeftWidth: 8,
+    borderLeftWidth: 4,
   },
   void: {
     color: 'red',

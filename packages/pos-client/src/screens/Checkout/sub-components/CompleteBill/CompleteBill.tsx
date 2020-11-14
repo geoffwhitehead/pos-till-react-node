@@ -2,7 +2,8 @@ import { Database } from '@nozbe/watermelondb';
 import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import withObservables from '@nozbe/with-observables';
 import { useFocusEffect } from '@react-navigation/native';
-import React, { useContext } from 'react';
+import LottieView from 'lottie-react-native';
+import React, { useCallback, useContext, useEffect, useRef } from 'react';
 import { BackHandler, StyleSheet, View } from 'react-native';
 import { OrganizationContext } from '../../../../contexts/OrganizationContext';
 import { Button, Text } from '../../../../core';
@@ -21,7 +22,6 @@ import { print } from '../../../../services/printer/printer';
 import { receiptBill } from '../../../../services/printer/receiptBill';
 import { Fonts } from '../../../../theme';
 import { formatNumber } from '../../../../utils';
-
 interface CompleteBillOuterProps {
   bill: Bill;
   onCloseBill: () => void;
@@ -50,6 +50,7 @@ const CompleteBillInner: React.FC<CompleteBillOuterProps & CompleteBillInnerProp
 }) => {
   const { organization } = useContext(OrganizationContext);
   const { currency } = organization;
+  const animation = useRef();
 
   const onPrint = async () => {
     const receiptPrinter = printers.find(p => p.id === organization.receiptPrinterId);
@@ -66,8 +67,9 @@ const CompleteBillInner: React.FC<CompleteBillOuterProps & CompleteBillInnerProp
     );
     await print(commands, receiptPrinter, true);
   };
+
   useFocusEffect(
-    React.useCallback(() => {
+    useCallback(() => {
       const onBackPress = () => {
         onCloseBill();
       };
@@ -78,10 +80,21 @@ const CompleteBillInner: React.FC<CompleteBillOuterProps & CompleteBillInnerProp
     }, [onCloseBill]),
   );
 
+  useEffect(() => {
+    animation.current.play(0, 100);
+  }, []);
+
   const changePayment = billPayments.find(billPayment => billPayment.isChange).amount;
 
   return (
     <View style={styles.container}>
+      <LottieView
+        style={{ height: 250, width: 250 }}
+        source={require('../../../../animations/4914-cart-checkout-fast.json')}
+        autoPlay={false}
+        loop={false}
+        ref={animation}
+      />
       <Text style={styles.text}>{`Change due: ${formatNumber(Math.abs(changePayment), currency)}`}</Text>
       <Button style={styles.button} large onPress={onPrint}>
         <Text>Print Receipt</Text>

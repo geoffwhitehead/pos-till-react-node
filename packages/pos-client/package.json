@@ -34,6 +34,8 @@
     "formik": "^2.1.4",
     "jwt-decode": "^2.2.0",
     "lodash": "^4.17.15",
+    "lottie-ios": "3.1.8",
+    "lottie-react-native": "^3.5.0",
     "native-base": "^2.13.8",
     "observable-hooks": "^2.3.5",
     "prop-types": "^15.7.2",
