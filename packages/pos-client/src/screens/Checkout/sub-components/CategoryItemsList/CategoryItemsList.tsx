@@ -87,6 +87,8 @@ const CategoryItemsInner: React.FC<CategoryItemsListOuterProps & CategoryItemsLi
     return <Loading />;
   }
 
+  console.log('items', items);
+  console.log('prices', prices);
   return (
     <>
       <ListItem itemHeader first>
@@ -136,8 +138,17 @@ export const CategoryItems = withDatabase<any>(
     const { category, priceGroupId } = route.params as CheckoutItemStackParamList['CategoryItemsList'];
     return {
       priceGroup: database.collections.get<PriceGroup>(tableNames.priceGroups).findAndObserve(priceGroupId),
-      items: category.items.observeWithColumns(['name']),
-      prices: database.collections.get<ItemPrice>(tableNames.itemPrices).query(Q.where('price_group_id', priceGroupId)),
+      items: category.items.extend(
+        Q.on(tableNames.itemPrices, [Q.where('price_group_id', priceGroupId), Q.where('price', Q.notEq(null))]),
+      ),
+      prices: database.collections
+        .get<ItemPrice>(tableNames.itemPrices)
+        .query(
+          Q.and(Q.where('price', Q.notEq(null)), Q.where('price_group_id', priceGroupId)),
+          Q.on(tableNames.items, Q.where('category_id', category.id)),
+        ),
+
+      // .query(Q.and(Q.where('price', Q.notEq(null)), Q.where('price_group_id', priceGroupId))),
     };
   })(CategoryItemsInner),
 );
@@ -152,8 +163,7 @@ export const AllItems = withDatabase<any>(
         .query(Q.on(tableNames.itemPrices, [Q.where('price_group_id', priceGroupId), Q.where('price', Q.notEq(null))])),
       prices: database.collections
         .get<ItemPrice>(tableNames.itemPrices)
-        .query(Q.and(Q.where('price', Q.notEq(null)), Q.where('price_group_id', priceGroupId)))
-        .observeWithColumns(['price']),
+        .query(Q.and(Q.where('price', Q.notEq(null)), Q.where('price_group_id', priceGroupId))),
     };
   })(CategoryItemsInner),
 );
