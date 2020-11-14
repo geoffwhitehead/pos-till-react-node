@@ -73,7 +73,6 @@ const areYouSure = fn => {
   ActionSheet.show(
     {
       options,
-      cancelButtonIndex: options.length - 1,
       title: 'Are you sure?',
     },
     index => {

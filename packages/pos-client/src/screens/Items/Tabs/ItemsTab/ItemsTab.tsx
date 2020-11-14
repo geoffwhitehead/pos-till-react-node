@@ -7,7 +7,7 @@ import { ScrollView } from 'react-native';
 import { Loading } from '../../../../components/Loading/Loading';
 import { Modal } from '../../../../components/Modal/Modal';
 import { SearchBar } from '../../../../components/SearchBar/SearchBar';
-import { List, View } from '../../../../core';
+import { Container, Footer, List, Text } from '../../../../core';
 import { Category, Item, Modifier, PrinterGroup, tableNames } from '../../../../models';
 import { ItemsTabRow } from './ItemsTabRow';
 import { ItemDetails } from './ModalItemDetails';
@@ -50,7 +50,7 @@ const ItemsTabInner: React.FC<ItemsTabOuterProps & ItemsTabInnerProps> = ({ item
   }
 
   return (
-    <View>
+    <Container>
       <SearchBar
         value={searchValue}
         onPressCreate={() => setModalOpen(true)}
@@ -78,10 +78,14 @@ const ItemsTabInner: React.FC<ItemsTabOuterProps & ItemsTabInnerProps> = ({ item
             })}
         </List>
       </ScrollView>
+
+      <Footer>
+        <Text note>{`${items.length} Items`}</Text>
+      </Footer>
       <Modal isOpen={modalOpen} onClose={onCloseHandler}>
         <ItemDetails item={selectedItem} onClose={onCloseHandler} categories={categories} />
       </Modal>
-    </View>
+    </Container>
   );
 };
 

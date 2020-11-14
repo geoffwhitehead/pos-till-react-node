@@ -34,12 +34,14 @@ const ItemBreakdownInner: React.FC<ItemBreakdownOuterProps & ItemBreakdownInnerP
   const style = billItem.isVoided ? styles.void : billItem.isComp ? styles.comp : {};
   const isChargable = !(billItem.isComp || billItem.isVoided);
   const itemDisplayPrice = formatNumber(isChargable ? billItem.itemPrice : 0, currency);
+  const isDisabled = readonly || status === PrintStatus.processing;
   return (
     <ListItem
       style={status ? styles[status] : {}}
       noIndent
       key={billItem.id}
-      onPress={() => !readonly && onSelect(billItem)}
+      disabled={isDisabled}
+      onPress={() => onSelect(billItem)}
     >
       <Left>
         <View>

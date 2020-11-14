@@ -104,7 +104,6 @@ const PrintersTabInner: React.FC<PrintersTabOuterProps & PrintersTabInnerProps> 
     ActionSheet.show(
       {
         options,
-        cancelButtonIndex: options.length,
         title:
           'This will permanently remove this printer and remove it from all printer groups you have defined. Are you sure?',
       },

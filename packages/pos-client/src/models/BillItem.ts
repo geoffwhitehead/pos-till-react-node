@@ -94,16 +94,23 @@ export class BillItem extends Model {
       }),
     );
 
-    const arrNotifiableLogs = [PrintStatus.errored, PrintStatus.processing, PrintStatus.succeeded];
-    const arrNonNotifiableLogs = [PrintStatus.pending]; // TODO: might need cancelled aswell
+    /**
+     * Other statuses
+     * Processing: Items should never be removed while processing
+     * Cancelled: Cancelled items shouldnt be selectable
+     */
+    const arrNotifiableLogs = [PrintStatus.succeeded];
+    const arrNonNotifiableLogs = [PrintStatus.pending];
+    const arrLogsToCancel = [PrintStatus.errored];
 
     const notifiableLogs = billItemPrintLogs.filter(log => arrNotifiableLogs.includes(log.status));
     const nonNotifiableLogs = billItemPrintLogs.filter(log => arrNonNotifiableLogs.includes(log.status));
+    const toCancelLogs = billItemPrintLogs.filter(log => arrLogsToCancel.includes(log.status));
 
     /**
      * A voided item will have existing print logs created for it. Depending on whether this item has already been stored
-     * they may have different states. All pending logs should be deleted and all processed or processed will need a void log creating
-     * to send to the printer.
+     * they may have different states. All pending logs should be deleted and all processed will need a void log creating
+     * to send to each printer.
      */
 
     const printLogsToCreate = notifiableLogs.map(({ printerId }) => {
@@ -115,8 +122,22 @@ export class BillItem extends Model {
       });
     });
 
+    const printLogsToUpdate = toCancelLogs.map(log =>
+      log.prepareUpdate(record => {
+        record.status = PrintStatus.cancelled;
+      }),
+    );
+
     const printLogsToDelete = nonNotifiableLogs.map(log => log.prepareDestroyPermanently());
-    const batched = [...modifierItemsToUpdate, billItemToUpdate, ...printLogsToCreate, ...printLogsToDelete];
+    const batched = [
+      ...modifierItemsToUpdate,
+      billItemToUpdate,
+      ...printLogsToCreate,
+      ...printLogsToDelete,
+      ...printLogsToUpdate,
+    ];
+
+    console.log('batched', batched);
     await this.database.batch(...batched);
   };
 

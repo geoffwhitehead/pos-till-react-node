@@ -30,17 +30,17 @@ export const WrappedSearchHeader: React.FC<SearchHeaderOuterProps & SearchHeader
 
   const onChangePriceGroup = () => {
     const options = [...priceGroups.map(({ name }) => name), 'Cancel'];
+    const cancelIndex = options.length - 1;
     ActionSheet.show(
       {
         options,
-        cancelButtonIndex: options.length - 1,
-        title: 'Select price group',
+        title: 'Please select a price group',
       },
       index => {
         /**
          * need to use set params to allow propgation through stack navigation. Everywhere else can use context hook.
          */
-        if (index < options.length - 1) {
+        if (index !== cancelIndex) {
           navigation.setParams({
             priceGroupId: priceGroups[index].id,
           });

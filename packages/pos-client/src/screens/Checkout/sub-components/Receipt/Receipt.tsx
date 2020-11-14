@@ -200,7 +200,7 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
         />
       </Row>
       <Row style={styles.r3}>
-        <Text>{`Discount: -${formatNumber(totalDiscount, currency)}`}</Text>
+        <Text>{`Discount: ${formatNumber(0 - totalDiscount, currency)}`}</Text>
 
         <Text>{`Total: ${formatNumber(total, currency)}`}</Text>
         {complete && (

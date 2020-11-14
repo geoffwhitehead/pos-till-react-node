@@ -37,12 +37,11 @@ const PriceGroupsTabInner: React.FC<PriceGroupsTabOuterProps & PriceGroupsTabInn
   };
 
   const areYouSure = (fn, priceGroup: PriceGroup) => {
-    const options = ['Yes', 'Cancel'];
+    const options = ['Remove', 'Cancel'];
     ActionSheet.show(
       {
         options,
-        cancelButtonIndex: options.length,
-        title: 'This will permanently remove this price group and remove its prices for all items. Are you sure?',
+        title: 'Permanently remove this price group and remove its prices for all items?',
       },
       index => {
         index === 0 && fn(priceGroup);

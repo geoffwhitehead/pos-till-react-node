@@ -40,7 +40,6 @@ const DiscountTabInner: React.FC<DiscountTabOuterProps & DiscountTabInnerProps> 
     ActionSheet.show(
       {
         options,
-        cancelButtonIndex: options.length,
         title: 'Are you sure?',
       },
       index => {

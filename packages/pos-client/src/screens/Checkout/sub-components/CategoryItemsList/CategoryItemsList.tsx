@@ -124,7 +124,7 @@ const CategoryItemsInner: React.FC<CategoryItemsListOuterProps & CategoryItemsLi
           })}
         </List>
       </ScrollView>
-      <Modal onClose={onCancelHandler} isOpen={modalOpen} style={{ width: 600 }}>
+      <Modal onClose={onCancelHandler} isOpen={modalOpen}>
         <ModifierList priceGroup={priceGroup} currentBill={currentBill} onClose={onCancelHandler} item={selectedItem} />
       </Modal>
     </>

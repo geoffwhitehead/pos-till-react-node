@@ -73,7 +73,7 @@ export const WrappedSelectBill: React.FC<SelectBillOuterProps & SelectBillInnerP
         </List>
       </Content>
       <Footer>
-        <Text style={{ padding: 10 }} note>{`Open bills: ${openBills.length}`}</Text>
+        <Text style={{ padding: 10 }} note>{`Open bills: ${openBills.length} / ${bills.length}`}</Text>
       </Footer>
     </>
   );

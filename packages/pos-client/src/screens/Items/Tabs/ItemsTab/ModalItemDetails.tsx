@@ -113,11 +113,12 @@ const ItemDetailsInner: React.FC<ItemDetailsOuterProps & ItemDetailsInnerProps> 
   };
 
   const areYouSure = (fn, item: ItemModel) => {
-    const options = ['Yes', 'Cancel'];
+    const options = ['Remove', 'Cancel'];
+
     ActionSheet.show(
       {
         options,
-        cancelButtonIndex: options.length,
+        destructiveButtonIndex: 0,
         title: 'Remove this item. Are you sure?',
       },
       index => {

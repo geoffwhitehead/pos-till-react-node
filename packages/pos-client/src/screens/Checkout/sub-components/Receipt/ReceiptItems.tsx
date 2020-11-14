@@ -8,6 +8,7 @@ import { Modal } from '../../../../components/Modal/Modal';
 import { ActionSheet, Content, List } from '../../../../core';
 import { Bill, BillDiscount, BillItem, BillPayment, PaymentType, tableNames } from '../../../../models';
 import { BillSummary } from '../../../../utils';
+import { GRACE_PERIOD_MINUTES } from '../../../../utils/consts';
 import { DiscountsBreakdown } from './sub-components/DiscountsBreakdown';
 import { ItemsBreakdown } from './sub-components/ItemsBreakdown';
 import { ModalReason, ModifyReason } from './sub-components/ModalReason';
@@ -76,15 +77,15 @@ export const ReceiptItemsInner: React.FC<ReceiptItemsOuterProps & ReceiptItemsIn
     ActionSheet.show(
       {
         options,
-        cancelButtonIndex: 2,
+        destructiveButtonIndex: 1,
         title: billItem.itemName,
       },
       index => {
         if (index === 0) {
           setRemoveMode(RemoveMode.comp);
           setSelectedBillItem(billItem);
-        } else {
-          const endOfGracePeriod = dayjs(billItem.createdAt).add(5, 'minute'); // TODO: org setting
+        } else if (index === 1) {
+          const endOfGracePeriod = dayjs(billItem.createdAt).add(GRACE_PERIOD_MINUTES, 'minute');
           const hasGracePeriodExpired = dayjs().isAfter(endOfGracePeriod);
           if (hasGracePeriodExpired) {
             setRemoveMode(RemoveMode.void);
@@ -102,11 +103,11 @@ export const ReceiptItemsInner: React.FC<ReceiptItemsOuterProps & ReceiptItemsIn
     ActionSheet.show(
       {
         options,
-        cancelButtonIndex: 1,
-        title: 'Options',
+        destructiveButtonIndex: 0,
+        title: 'Are you sure?',
       },
-      () => {
-        fn(item);
+      index => {
+        index === 0 && fn(item);
       },
     );
   };
@@ -119,7 +120,7 @@ export const ReceiptItemsInner: React.FC<ReceiptItemsOuterProps & ReceiptItemsIn
   return (
     <Content ref={refContentList}>
       <List style={styles.receiptItems}>
-        <ItemsBreakdown bill={bill} key="items_breakdown" readonly={readonly} onSelect={billItemDialog} />
+        <ItemsBreakdown bill={bill} readonly={readonly} onSelect={billItemDialog} />
         <DiscountsBreakdown
           readonly={readonly}
           discountBreakdown={discountBreakdown}

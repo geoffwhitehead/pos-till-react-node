@@ -56,11 +56,10 @@ export const ReportsInner: React.FC<ReportsOuterProps & ReportsInnerProps> = ({
         duration: 5000,
       });
     } else {
-      const options = ['Yes', 'Cancel'];
+      const options = ['Close bill period', 'Cancel'];
       ActionSheet.show(
         {
           options,
-          cancelButtonIndex: options.length,
           title: 'Close current billing period and print report?',
         },
         async index => {

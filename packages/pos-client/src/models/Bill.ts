@@ -101,7 +101,10 @@ export class Bill extends Model {
     .get<BillItemPrintLog>(tableNames.billItemPrintLogs)
     .query(
       Q.experimentalJoinTables([tableNames.bills]),
-      Q.where('status', Q.oneOf([PrintStatus.succeeded, PrintStatus.errored, PrintStatus.processing])),
+      Q.where(
+        'status',
+        Q.oneOf([PrintStatus.succeeded, PrintStatus.errored, PrintStatus.processing, PrintStatus.pending]),
+      ),
       Q.on(tableNames.bills, 'id', this.id),
     );
 
