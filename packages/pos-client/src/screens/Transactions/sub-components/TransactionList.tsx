@@ -67,7 +67,7 @@ export const TransactionListInner: React.FC<TransactionListOuterProps & Transact
           {Object.entries(sortedBillsGrouped).map(([billReference, sortedBillsByReference]) => {
             return [
               <ListItem key={`${billReference}-seperator`} itemDivider>
-                <Text style={{ fontWeight: 'bold', fontSize: 20 }}>{`Ref: ${billReference}`}</Text>
+                <Text style={{ fontWeight: 'bold', fontSize: 20 }}>{`Bill: ${billReference}`}</Text>
               </ListItem>,
               ...sortedBillsByReference.map(bill => {
                 const isSelected = selectedBill && bill.id === selectedBill.id;

@@ -177,8 +177,8 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
     <Grid style={styles.grid}>
       <Row style={styles.r1}>
         <Col style={{ backgroundColor: 'whitesmoke' }}>
-          <Button style={{ margin: 5, alignSelf: 'flex-start' }} small bordered info onPress={onStore}>
-            <Text style={{ fontWeight: 'bold' }}>Bill / Table: {bill.reference || '-'}</Text>
+          <Button style={{ margin: 5, alignSelf: 'flex-start', minWidth: 150 }} small info onPress={onStore}>
+            <Text style={{ fontWeight: 'bold' }}>Bill: {bill.reference || '-'}</Text>
           </Button>
         </Col>
         <Col>

@@ -5,6 +5,7 @@ import { SidebarHeader } from '../../components/SidebarHeader/SidebarHeader';
 import { BillPeriodContext } from '../../contexts/BillPeriodContext';
 import { CurrentBillContext } from '../../contexts/CurrentBillContext';
 import { Col, Container, Grid } from '../../core';
+import { useSync } from '../../hooks/useSync';
 import { CheckoutItemNavigator } from '../../navigators/CheckoutItemNavigator';
 import { SidebarDrawerStackParamList } from '../../navigators/SidebarNavigator';
 import { SelectBill } from '../Bills/SelectBill/SelectBIll';
@@ -27,6 +28,7 @@ interface CheckoutProps {
 export const Checkout: React.FC<CheckoutProps> = ({ navigation }) => {
   const { billPeriod } = useContext(BillPeriodContext);
   const { currentBill, setCurrentBill } = useContext(CurrentBillContext);
+  const [__, doSync] = useSync();
 
   const [mode, setMode] = useState<Modes>(Modes.Items);
 
@@ -45,6 +47,9 @@ export const Checkout: React.FC<CheckoutProps> = ({ navigation }) => {
     }
   }, [currentBill]);
 
+  useEffect(() => {
+    doSync();
+  }, []);
   const completeBill = async () => {
     setMode(Modes.Complete);
   };

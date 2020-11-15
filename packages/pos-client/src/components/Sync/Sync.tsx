@@ -1,8 +1,8 @@
 import { Database } from '@nozbe/watermelondb';
 import withObservables from '@nozbe/with-observables';
 import React, { useEffect, useState } from 'react';
+import { useSync } from '../../hooks/useSync';
 import { Organization, tableNames } from '../../models';
-import { sync } from '../../services/sync';
 import { Loading } from '../Loading/Loading';
 
 type SyncOuterProps = {
@@ -20,15 +20,13 @@ export const SyncInner: React.FC<SyncOuterProps & SyncInnerProps> = ({
   organizationId,
   organizations = [],
 }) => {
-  const [isSyncDone, setIsSyncDone] = useState(false); // TODO debug: reset to true
+  const [isSyncDone, setIsSyncDone] = useState(false);
+  const [_, doSync] = useSync();
 
   useEffect(() => {
     const checkSync = async () => {
-      try {
-        await sync(database);
-      } catch (e) {
-        console.error(e);
-      }
+      await doSync();
+      // dont prevent loading if sync fails
       setIsSyncDone(true);
     };
     checkSync();
@@ -36,8 +34,6 @@ export const SyncInner: React.FC<SyncOuterProps & SyncInnerProps> = ({
 
   const hasOrganization = organizations.some(o => o.id === organizationId);
 
-  console.log('isSyncDone', isSyncDone);
-  console.log('hasOrganization', hasOrganization);
   if (!isSyncDone || !hasOrganization) {
     return <Loading />;
   }

@@ -78,7 +78,7 @@ export const PriceGroupDetails: React.FC<PriceGroupDetailsProps> = ({ priceGroup
 
       const batched = [priceGroupToCreate, ...itemPricesToCreate, ...modifierItemPricesToCreate];
 
-      await database.batch(...batched);
+      await database.action(() => database.batch(...batched));
     }
     setLoading(false);
     onClose();

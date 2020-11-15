@@ -23,6 +23,4 @@ export const sync = async (database: Database) => {
     },
     // migrationsEnabledAtVersion: 1,
   });
-
-  console.log('SYNC DONE');
 };

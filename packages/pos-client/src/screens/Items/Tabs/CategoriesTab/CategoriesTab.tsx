@@ -82,7 +82,6 @@ const CategoriesTabInner: React.FC<CategoriesTabOuterProps & CategoriesTabInnerP
           onValueChange={handleUpdateGridSize}
         >
           {options.map(({ label, value }) => {
-            console.log('object', value);
             return <Picker.Item key={value} label={label} value={value} />;
           })}
         </Picker>

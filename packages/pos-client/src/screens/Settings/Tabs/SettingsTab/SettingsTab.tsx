@@ -27,7 +27,6 @@ import {
   View,
 } from '../../../../core';
 import { Bill, BillPeriod, PriceGroup, Printer, tableNames } from '../../../../models';
-import { sync } from '../../../../services/sync';
 import { commonStyles } from '../styles';
 
 interface SettingsTabOuterProps {
@@ -122,8 +121,6 @@ const SettingsTabInner: React.FC<SettingsTabOuterProps & SettingsTabInnerProps> 
       }),
     );
 
-    // debug remove
-    await sync(database);
     setLoading(false);
   };
 

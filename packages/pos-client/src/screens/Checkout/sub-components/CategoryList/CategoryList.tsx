@@ -111,7 +111,9 @@ export const CategoriesInner: React.FC<CategoriesOuterProps & CategoriesInnerPro
                           info
                           onPress={onPressCategoryFactory({ priceGroup, category })}
                         >
-                          <Text style={{ ...styles.text, color: category.textColor }}>{category.name}</Text>
+                          <Text style={{ ...styles.text, fontSize: gridSize > 4 ? 20 : 25, color: category.textColor }}>
+                            {category.name}
+                          </Text>
                         </Button>
                       )}
                     </Col>
@@ -166,7 +168,6 @@ const styles = {
     },
   },
   text: {
-    fontSize: 25,
     width: '100%',
     textAlign: 'center',
   },

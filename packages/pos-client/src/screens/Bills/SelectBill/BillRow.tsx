@@ -86,9 +86,11 @@ export const WrappedBillRow: React.FC<BillRowInnerProps & BillRowOuterProps> = (
         </View>
       </Left>
 
-      <Body style={{ flexDirection: 'row', alignItems: 'center' }}>
-        {iconName && <Icon active name={iconName} style={styles.iconStyle} />}
-        {text && <Text note>{text}</Text>}
+      <Body>
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          {iconName && <Icon active name={iconName} style={styles.iconStyle} />}
+          {text && <Text note>{text}</Text>}
+        </View>
       </Body>
       <Right>
         <Text style={styles.totalText}>{totalText}</Text>
@@ -123,6 +125,6 @@ const styles = {
   dateText: {
     // { color: 'grey', fontSize: 22 }
   },
-  iconStyle: { marginLeft: 20, marginRight: 2, color: 'grey' },
-  totalText: { color: 'grey', fontWeight: 'bold', fontSize: 22 },
+  iconStyle: { marginRight: 5, color: 'grey' },
+  totalText: { color: 'grey', fontWeight: 'bold', fontSize: 18 },
 } as const;

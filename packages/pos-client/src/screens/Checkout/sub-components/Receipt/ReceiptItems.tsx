@@ -151,7 +151,7 @@ export const ReceiptItemsInner: React.FC<ReceiptItemsOuterProps & ReceiptItemsIn
             }
           }}
           mode={removeMode}
-          title={capitalize(selectedBillItem.itemName)}
+          title={capitalize(selectedBillItem?.itemName)}
         />
       </Modal>
     </Content>
