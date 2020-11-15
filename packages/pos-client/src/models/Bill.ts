@@ -81,9 +81,15 @@ export class Bill extends Model {
   @lazy billModifierItems: Query<BillItemModifierItem> = this._billModifierItems.extend(
     Q.where('is_voided', Q.notEq(true)),
   );
+
+  @lazy billModifierItemVoids: Query<BillItemModifierItem> = this._billModifierItems.extend(
+    Q.where('is_voided', Q.eq(true)),
+  );
+
   @lazy chargableBillItems = this.billItems.extend(
     Q.and(Q.where('is_voided', Q.notEq(true)), Q.where('is_comp', Q.notEq(true))),
   );
+
   @lazy billItemsExclVoids = this.billItems.extend(Q.where('is_voided', Q.notEq(true)));
   @lazy chargableBillItemModifierItems = this._billModifierItems.extend(
     Q.and(Q.where('is_voided', Q.notEq(true)), Q.where('is_comp', Q.notEq(true))),

@@ -38,6 +38,10 @@ export class Organization extends Model {
   @field('max_bills') maxBills: number;
   @field('last_pulled_at') lastPulledAt: string;
   @field('current_bill_period_id') currentBillPeriodId: string;
+  @field('short_name_length') shortNameLength: string;
+  @field('max_discounts') maxDiscounts: string;
+  @field('grace_period_minutes') gracePeriodMinutes: string;
+  @field('category_grid_size') categoryGridSize: string;
 
   @relation('price_groups', 'default_price_group_id') defaultPriceGroup: Relation<PriceGroup>;
   @relation('printers', 'receipt_printer_id') receiptPrinter: Relation<Printer>;
@@ -71,5 +75,9 @@ export const organizationSchema = tableSchema({
     { name: 'max_bills', type: 'number' },
     { name: 'last_pulled_at', type: 'string' },
     { name: 'current_bill_period_id', type: 'string' },
+    { name: 'shortNameLength', type: 'number' },
+    { name: 'maxDiscounts', type: 'number' },
+    { name: 'gracePeriodMinutes', type: 'number' },
+    { name: 'categoryGridSize', type: 'number' },
   ],
 });

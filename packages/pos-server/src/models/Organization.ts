@@ -1,7 +1,7 @@
-import { Schema } from 'mongoose';
-import { tenantlessModel } from './utils/multiTenant';
 import { Joi } from 'celebrate';
+import { Schema } from 'mongoose';
 import uuid from 'uuid';
+import { tenantlessModel } from './utils/multiTenant';
 
 export interface OrganizationProps {
     _id?: string;
@@ -15,6 +15,10 @@ export interface OrganizationProps {
         receiptPrinterId?: string;
         currency?: string;
         maxBills?: number;
+        shortNameLength?: number;
+        maxDiscounts?: number;
+        gracePeriodMinutes?: number;
+        categoryGridSize?: number;
     };
     address: {
         line1: string;
@@ -84,8 +88,24 @@ const OrganizationSchema: Schema<OrganizationProps> = new Schema(
                     default: CurrencyEnum.gbp,
                 },
                 maxBills: {
-                    type: String,
+                    type: Number,
                     default: 10,
+                },
+                shortNameLength: {
+                    type: Number,
+                    default: 10,
+                },
+                maxDiscounts: {
+                    type: Number,
+                    default: 10,
+                },
+                gracePeriodMinutes: {
+                    type: Number,
+                    default: 5,
+                },
+                categoryGridSize: {
+                    type: Number,
+                    default: 3,
                 },
             },
             default: {},

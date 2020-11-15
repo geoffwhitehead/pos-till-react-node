@@ -87,8 +87,6 @@ const CategoryItemsInner: React.FC<CategoryItemsListOuterProps & CategoryItemsLi
     return <Loading />;
   }
 
-  console.log('items', items);
-  console.log('prices', prices);
   return (
     <>
       <ListItem itemHeader first>

@@ -1,17 +1,44 @@
 import React from 'react';
 import { Button, Icon, Input, Item, Text } from '../../core';
+import { resolveButtonState } from '../../utils/helpers';
 
 type SearchBarProps = {
   onSearch: (value: string) => void;
   value: string;
   onPressCreate?: () => void;
+  isCreateDisabled?: boolean;
+  onPressSecondary?: () => void;
+  secondaryText?: string;
+  secondaryIconName?: string;
 };
-export const SearchBar: React.FC<SearchBarProps> = ({ onSearch, value, onPressCreate, ...props }) => {
+export const SearchBar: React.FC<SearchBarProps> = ({
+  onSearch,
+  value,
+  onPressSecondary,
+  secondaryText,
+  onPressCreate,
+  isCreateDisabled,
+  secondaryIconName,
+  ...props
+}) => {
   return (
     <Item {...props} style={styles.searchBar}>
       <Icon name="ios-search" />
       <Input placeholder="Search" onChangeText={onSearch} value={value} />
-      <Button iconLeft small success onPress={onPressCreate}>
+      {onPressSecondary && (
+        <Button iconLeft small info onPress={onPressSecondary}>
+          {secondaryIconName && <Icon name={secondaryIconName} />}
+          <Text>{secondaryText}</Text>
+        </Button>
+      )}
+      <Button
+        iconLeft
+        small
+        {...resolveButtonState(isCreateDisabled, 'success')}
+        onPress={onPressCreate}
+        disabled={isCreateDisabled}
+        style={{ marginLeft: 5 }}
+      >
         <Icon name="ios-add-circle-outline" />
         <Text>Create</Text>
       </Button>

@@ -107,7 +107,7 @@ const CompleteBillInner: React.FC<CompleteBillOuterProps & CompleteBillInnerProp
 };
 
 const enhance = component =>
-  withDatabase<any>( // TODO: fix
+  withDatabase(
     withObservables<CompleteBillOuterProps, CompleteBillInnerProps>(['bill'], ({ bill, database }) => ({
       bill,
       billPayments: bill.billPayments,

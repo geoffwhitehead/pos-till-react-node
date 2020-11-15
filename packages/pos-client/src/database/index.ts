@@ -4,7 +4,7 @@ import { models, schemas } from '../models';
 
 const adapter = new SQLiteAdapter({
   schema: appSchema({
-    version: 43,
+    version: 45,
     tables: Object.values(schemas),
   }),
 });
@@ -22,7 +22,7 @@ export const resetDatabase = async () => {
       return { success: true };
     });
   } catch (e) {
-    console.log('ERRROR resetting db :', e);
+    console.log('Error resetting db :', e);
     return {
       success: false,
       error: e,

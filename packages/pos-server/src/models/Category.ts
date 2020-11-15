@@ -1,6 +1,6 @@
-import mongoose, { Schema } from 'mongoose';
-import { tenantModel } from './utils/multiTenant';
+import { Schema } from 'mongoose';
 import uuid from 'uuid';
+import { tenantModel } from './utils/multiTenant';
 
 export interface CategoryProps {
     _id?: string;
@@ -24,6 +24,12 @@ const CategorySchema: Schema<CategoryProps> = new Schema(
         shortName: {
             type: String,
             maxlength: 10,
+        },
+        color: {
+            type: String,
+        },
+        positionIndex: {
+            type: Number,
         },
     },
     { timestamps: true, collection: CATEGORY_COLLECTION_NAME },

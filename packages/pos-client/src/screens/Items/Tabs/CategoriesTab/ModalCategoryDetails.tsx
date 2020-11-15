@@ -23,11 +23,17 @@ const categorySchema = Yup.object().shape({
   shortName: Yup.string()
     .min(2, 'Too Short')
     .max(50, 'Too Long'),
+  color: Yup.string()
+    .length(7, 'Incorrect length')
+    .required(),
+  positionIndex: Yup.number().required(),
 });
 
 type FormValues = {
   // name: string;
   shortName: string;
+  color: string;
+  positionIndex: string;
 };
 
 export const ModalCategoryDetailsInner: React.FC<ModalCategoryDetailsOuterProps & ModalCategoryDetailsInnerProps> = ({
@@ -53,6 +59,8 @@ export const ModalCategoryDetailsInner: React.FC<ModalCategoryDetailsOuterProps 
   const initialValues = {
     name: category?.name || '',
     shortName: category?.shortName || '',
+    color: category?.color || '#FFFFFF',
+    positionIndex: category?.positionIndex.toString() || '0',
   };
 
   const onDelete = async () => {
@@ -67,10 +75,12 @@ export const ModalCategoryDetailsInner: React.FC<ModalCategoryDetailsOuterProps 
       onSubmit={values => update(values, category)}
     >
       {({ handleChange, handleBlur, handleSubmit, errors, touched, values }) => {
-        const { shortName, name } = values;
+        const { shortName, name, color, positionIndex } = values;
         const err = {
           name: !!(touched.name && errors.name),
           shortName: !!(touched.shortName && errors.shortName),
+          color: !!(touched.color && errors.color),
+          positionIndex: !!(touched.positionIndex && errors.positionIndex),
         };
 
         return (
@@ -100,6 +110,18 @@ export const ModalCategoryDetailsInner: React.FC<ModalCategoryDetailsOuterProps 
               <Item stackedLabel error={err.shortName}>
                 <Label>Short Name</Label>
                 <Input onChangeText={handleChange('shortName')} onBlur={handleBlur('shortName')} value={shortName} />
+              </Item>
+              <Item stackedLabel error={err.shortName}>
+                <Label>Color</Label>
+                <Input onChangeText={handleChange('color')} onBlur={handleBlur('color')} value={color} />
+              </Item>
+              <Item stackedLabel error={err.shortName}>
+                <Label>Position Index</Label>
+                <Input
+                  onChangeText={handleChange('positionIndex')}
+                  onBlur={handleBlur('positionIndex')}
+                  value={positionIndex}
+                />
               </Item>
             </Form>
           </ModalContentButton>

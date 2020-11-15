@@ -1,25 +1,28 @@
-import { Database } from '@nozbe/watermelondb';
+import { Database, Q } from '@nozbe/watermelondb';
 import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import withObservables from '@nozbe/with-observables';
 import { DrawerNavigationProp } from '@react-navigation/drawer';
 import dayjs from 'dayjs';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { ScrollView } from 'react-native-gesture-handler';
 import { SidebarHeader } from '../../components/SidebarHeader/SidebarHeader';
 import { OrganizationContext } from '../../contexts/OrganizationContext';
+import { ReceiptPrinterContext } from '../../contexts/ReceiptPrinterContext';
 import { ActionSheet, Button, Col, Container, Grid, Left, List, ListItem, Right, Text, Toast, View } from '../../core';
 import { BillPeriod, Organization, PaymentType, Printer, tableNames } from '../../models';
 import { SidebarDrawerStackParamList } from '../../navigators/SidebarNavigator';
+import { correctionReport } from '../../services/printer/correctionReport';
 // import { Protected } from './Protected';
 import { periodReport } from '../../services/printer/periodReport';
 // import { ReportsList } from './sub-components/ReportsList/ReportsList';
 // import { ReportReceipt } from './sub-components/ReportReceipt/ReportReceipt';
 import { print } from '../../services/printer/printer';
+import { resolveButtonState } from '../../utils/helpers';
 
 // const ORG_PASSCODE = '1234'; // TODO: move to an org setting and hash
 interface ReportsInnerProps {
-  billPeriods: any;
-  paymentTypes: any; // TODO: fix type
+  billPeriods: BillPeriod[];
+  paymentTypes: PaymentType[];
 }
 
 interface ReportsOuterProps {
@@ -33,22 +36,35 @@ export const ReportsInner: React.FC<ReportsOuterProps & ReportsInnerProps> = ({
   billPeriods,
 }) => {
   const { organization } = useContext(OrganizationContext);
+  const { receiptPrinter } = useContext(ReceiptPrinterContext);
+  const [isLoading, setIsLoading] = useState(false);
 
   const openDrawer = () => navigation.openDrawer();
 
-  const onPrint = async (billPeriod: BillPeriod) => {
-    const receiptPrinter = await organization.receiptPrinter.fetch();
-    const commands = await periodReport(billPeriod, database, receiptPrinter, organization.currency);
-    print(commands, receiptPrinter);
+  const onPrintPeriodReport = async (billPeriod: BillPeriod) => {
+    setIsLoading(true);
+    const commands = await periodReport({ billPeriod, database, printer: receiptPrinter, organization });
+    await print(commands, receiptPrinter);
+    setIsLoading(false);
   };
 
   const closePeriod = async (billPeriod: BillPeriod, organization: Organization) => {
+    setIsLoading(true);
     await database.action(() => billPeriod.closePeriod(organization));
-    onPrint(billPeriod);
+    await onPrintPeriodReport(billPeriod);
+    setIsLoading(false);
+  };
+
+  const onPrintCorrectionReport = async (billPeriod: BillPeriod) => {
+    setIsLoading(true);
+    const commands = await correctionReport({ billPeriod, database, printer: receiptPrinter, organization });
+    await print(commands, receiptPrinter);
+    setIsLoading(false);
   };
 
   const confirmClosePeriod = async (billPeriod: BillPeriod, organization: Organization) => {
     const openBills = await billPeriod.openBills.fetch();
+    console.log('openBills', openBills);
     if (openBills.length > 0) {
       Toast.show({
         text: `There are currently ${openBills.length} open bills, please close these first.`,
@@ -68,18 +84,7 @@ export const ReportsInner: React.FC<ReportsOuterProps & ReportsInnerProps> = ({
       );
     }
   };
-  const sorterOpenedAtDescending = (p1: BillPeriod, p2: BillPeriod) => p2.createdAt - p1.createdAt;
 
-  const [filteredBillPeriods, setFilteredBillPeriods] = useState<BillPeriod[]>([]);
-
-  useEffect(() => {
-    setFilteredBillPeriods(
-      billPeriods
-        .slice()
-        .sort(sorterOpenedAtDescending)
-        .slice(0, 4),
-    );
-  }, [billPeriods]);
   return (
     <Container>
       <SidebarHeader title="Reports" onOpen={openDrawer} />
@@ -91,30 +96,58 @@ export const ReportsInner: React.FC<ReportsOuterProps & ReportsInnerProps> = ({
           </ListItem>
           <ScrollView>
             <List>
-              {filteredBillPeriods.map(bP => {
+              {billPeriods.map(billPeriod => {
                 return (
-                  <ListItem key={bP.id}>
+                  <ListItem key={billPeriod.id}>
                     <Left>
                       <View style={{ display: 'flex' }}>
-                        <Text>{dayjs(bP.createdAt).format('ddd DD/MM/YYYY HH:mm:ss')}</Text>
-                        <Text>{bP.closedAt ? dayjs(bP.closedAt).format('ddd DD/MM/YYYY HH:mm:ss') : ''}</Text>
+                        <Text>{`Opened: ${dayjs(billPeriod.createdAt).format('ddd DD/MM/YYYY HH:mm:ss')}`}</Text>
+                        <Text>
+                          {`Closed: ${
+                            billPeriod.closedAt ? dayjs(billPeriod.closedAt).format('ddd DD/MM/YYYY HH:mm:ss') : ''
+                          }`}
+                        </Text>
                       </View>
                     </Left>
                     <Right>
-                      {!bP.closedAt && (
-                        <View style={{ display: 'flex', flexDirection: 'row' }}>
-                          <Button small info style={{ marginRight: 2 }} onPress={() => onPrint(bP)}>
+                      {!billPeriod.closedAt && (
+                        <View>
+                          <Button
+                            small
+                            {...resolveButtonState(isLoading, 'info')}
+                            style={{ marginBottom: 2 }}
+                            onPress={() => onPrintPeriodReport(billPeriod)}
+                          >
                             <Text>Print Status Report</Text>
                           </Button>
-                          <Button small danger onPress={() => confirmClosePeriod(bP, organization)}>
+                          <Button
+                            small
+                            {...resolveButtonState(isLoading, 'danger')}
+                            onPress={() => confirmClosePeriod(billPeriod, organization)}
+                          >
                             <Text>Close Period</Text>
                           </Button>
                         </View>
                       )}
-                      {bP.closedAt && (
-                        <Button small onPress={() => onPrint(bP)}>
-                          <Text>Print End Period Report</Text>
-                        </Button>
+                      {billPeriod.closedAt && (
+                        <View>
+                          <Button
+                            small
+                            {...resolveButtonState(isLoading, 'primary')}
+                            onPress={() => onPrintPeriodReport(billPeriod)}
+                            style={{ marginBottom: 2 }}
+                          >
+                            <Text>Print End Period Report</Text>
+                          </Button>
+                          <Button
+                            small
+                            {...resolveButtonState(isLoading, 'info')}
+                            style={{ marginRight: 2 }}
+                            onPress={() => onPrintCorrectionReport(billPeriod)}
+                          >
+                            <Text>Print Correction Report</Text>
+                          </Button>
+                        </View>
                       )}
                     </Right>
                   </ListItem>
@@ -143,7 +176,9 @@ const enhance = c =>
   withDatabase<any>(
     withObservables<ReportsOuterProps, ReportsInnerProps>([], ({ database }) => ({
       paymentTypes: database.collections.get<PaymentType>(tableNames.paymentTypes).query(),
-      billPeriods: database.collections.get<Printer>(tableNames.billPeriods).query(),
+      billPeriods: database.collections
+        .get<Printer>(tableNames.billPeriods)
+        .query(Q.experimentalSortBy('created_at', Q.desc), Q.experimentalTake(4)),
     }))(c),
   );
 

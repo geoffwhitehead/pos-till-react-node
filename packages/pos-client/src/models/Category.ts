@@ -13,6 +13,8 @@ export class Category extends Model {
 
   @nochange @field('name') name: string;
   @field('short_name') shortName: string;
+  @field('color') color: string;
+  @field('position_index') positionIndex: number;
 }
 
 export const categorySchema = tableSchema({
@@ -20,5 +22,7 @@ export const categorySchema = tableSchema({
   columns: [
     { name: 'name', type: 'string' },
     { name: 'short_name', type: 'string' },
+    { name: 'color', type: 'string' },
+    { name: 'position_index', type: 'number' },
   ],
 });

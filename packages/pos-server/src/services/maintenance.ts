@@ -136,22 +136,32 @@ export const maintenanceService = ({
             {
                 name: 'Starters',
                 shortName: 'Starters',
+                positionIndex: 0,
+                color: '#FFFFFF',
             },
             {
                 name: 'Mains',
                 shortName: 'Mains',
+                positionIndex: 1,
+                color: '#FFFFFF',
             },
             {
                 name: 'Desserts',
                 shortName: 'Desserts',
+                positionIndex: 2,
+                color: '#FFFFFF',
             },
             {
                 name: 'Wine',
                 shortName: 'Wine',
+                positionIndex: 3,
+                color: '#FFFFFF',
             },
             {
                 name: 'Beer',
                 shortName: 'Beer',
+                positionIndex: 4,
+                color: '#FFFFFF',
             },
         ];
 

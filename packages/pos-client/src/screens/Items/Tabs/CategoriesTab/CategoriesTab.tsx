@@ -2,11 +2,12 @@ import { Database } from '@nozbe/watermelondb';
 import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import withObservables from '@nozbe/with-observables';
 import React, { useState } from 'react';
-import { ScrollView } from 'react-native';
+import { ScrollView } from 'react-native-gesture-handler';
 import { Modal } from '../../../../components/Modal/Modal';
 import { SearchBar } from '../../../../components/SearchBar/SearchBar';
-import { List, View } from '../../../../core';
+import { Container, Footer, List, Text } from '../../../../core';
 import { Category } from '../../../../models';
+import { MAX_CATEGORIES } from '../../../../utils/consts';
 import { CategoryRow } from './CategoryRow';
 import { ModalCategoryDetails, ModalCategoryDetailsInner } from './ModalCategoryDetails';
 
@@ -38,9 +39,32 @@ const CategoriesTabInner: React.FC<CategoriesTabOuterProps & CategoriesTabInnerP
 
   const onPressCreate = () => setModalOpen(true);
 
+  const onUpdateGridSize = () => {};
+
+  const areYouSureDialog = (fn: () => void) => {
+    const options = ['Remove', 'Cancel'];
+    ActionSheet.show(
+      {
+        options,
+        destructiveButtonIndex: 0,
+        title: 'Are you sure?',
+      },
+      index => {
+        index === 0 && fn(item);
+      },
+    );
+  };
+
   return (
-    <View>
-      <SearchBar value={searchValue} onPressCreate={onPressCreate} onSearch={value => setSearchValue(value)} />
+    <Container>
+      <SearchBar
+        value={searchValue}
+        onPressSecondary={() => {}}
+        secondaryText="Update Grid Size"
+        secondaryIconName="ios-grid"
+        onPressCreate={onPressCreate}
+        onSearch={value => setSearchValue(value)}
+      />
       <ScrollView>
         <List>
           {categories
@@ -50,6 +74,9 @@ const CategoriesTabInner: React.FC<CategoriesTabOuterProps & CategoriesTabInnerP
             })}
         </List>
       </ScrollView>
+      <Footer>
+        <Text note>{`Categories: ${categories.length} / ${MAX_CATEGORIES}`}</Text>
+      </Footer>
       <Modal isOpen={modalOpen} onClose={onCloseHandler}>
         {selectedCategory ? (
           <ModalCategoryDetails category={selectedCategory} onClose={onCloseHandler} />
@@ -57,7 +84,7 @@ const CategoriesTabInner: React.FC<CategoriesTabOuterProps & CategoriesTabInnerP
           <ModalCategoryDetailsInner category={selectedCategory} onClose={onCloseHandler} />
         )}
       </Modal>
-    </View>
+    </Container>
   );
 };
 

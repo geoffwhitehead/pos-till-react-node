@@ -1,7 +1,16 @@
 import { Database } from '@nozbe/watermelondb';
 import dayjs from 'dayjs';
 import { capitalize, flatten, sumBy } from 'lodash';
-import { BillPeriod, Category, Discount, PaymentType, PriceGroup, Printer, tableNames } from '../../models';
+import {
+  BillPeriod,
+  Category,
+  Discount,
+  Organization,
+  PaymentType,
+  PriceGroup,
+  Printer,
+  tableNames,
+} from '../../models';
 import {
   categorySummary,
   finalizedDiscountSummary,
@@ -15,37 +24,21 @@ import {
 import { addHeader, alignCenter, alignLeftRight, divider, starDivider } from './helpers';
 import { receiptTempate } from './template';
 
-// TODO: fetch from db
-const org = {
-  name: 'Nadon Thai Restaurant',
-  line1: '12a Newgate St',
-  line2: '',
-  city: 'Morpeth',
-  county: 'Northumberland',
-  postcode: 'NE61 1BA',
-  vat: '123 345 567',
+type PeriodReportProps = {
+  billPeriod: BillPeriod;
+  database: Database;
+  printer: Printer;
+  organization: Organization;
 };
 
-// const printGroupCommands: (
-//   group: Record<string, number>,
-//   nameResolver: (id: string) => string,
-//   symbol: string,
-// ) => Record<any, any>[] = (group, nameResolver, symbol) =>
-//   Object.keys(group).reduce((acc, id) => {
-//     return [
-//       ...acc,
-//       {
-//         appendBitmapText: alignLeftRight(capitalize(nameResolver(id)), formatNumber(group[id], symbol)),
-//       },
-//     ];
-//   }, []);
-
-export const periodReport = async (billPeriod: BillPeriod, database: Database, printer: Printer, currency: string) => {
+export const periodReport = async ({ billPeriod, database, printer, organization }: PeriodReportProps) => {
   let c = [];
+
+  const { currency } = organization;
 
   const [
     periodItems,
-    periodItemVoids,
+    periodItemVoidsAndCancels,
     periodDiscounts,
     periodPayments,
     bills,
@@ -55,7 +48,7 @@ export const periodReport = async (billPeriod: BillPeriod, database: Database, p
     priceGroups,
   ] = await Promise.all([
     billPeriod.periodItems.fetch(),
-    billPeriod.periodItemVoids.fetch(),
+    billPeriod.periodItemVoidsAndCancels.fetch(),
     billPeriod.periodDiscounts.fetch(),
     billPeriod.periodPayments.fetch(),
     billPeriod.bills.fetch(),
@@ -104,6 +97,7 @@ export const periodReport = async (billPeriod: BillPeriod, database: Database, p
       Math.round(printer.printWidth / 2),
     ),
   });
+
   c.push({
     appendBitmapText: alignLeftRight(
       `Closed: `,
@@ -111,6 +105,7 @@ export const periodReport = async (billPeriod: BillPeriod, database: Database, p
       Math.round(printer.printWidth / 2),
     ),
   });
+
   c.push(starDivider(printer.printWidth));
 
   addHeader(c, 'Bills', printer.printWidth);
@@ -200,10 +195,10 @@ export const periodReport = async (billPeriod: BillPeriod, database: Database, p
     ),
   });
 
-  addHeader(c, 'Voids / Corrections', printer.printWidth);
-  const voidTotal = sumBy(periodItemVoids, 'itemPrice') + sumBy(billModifierItemVoids, 'modifierItemPrice');
+  addHeader(c, 'Voids', printer.printWidth);
+  const voidTotal = sumBy(periodItemVoidsAndCancels, 'itemPrice') + sumBy(billModifierItemVoids, 'modifierItemPrice');
   // dont include modifier items in the count as these are cancelled as part od the item.
-  const voidCount = periodItemVoids.length;
+  const voidCount = periodItemVoidsAndCancels.length;
   c.push({
     appendBitmapText: alignLeftRight(
       'Total: ',
@@ -253,5 +248,5 @@ export const periodReport = async (billPeriod: BillPeriod, database: Database, p
     appendBitmapText: alignLeftRight('Sales Total: ', formatNumber(salesTotal, currency), printer.printWidth),
   });
 
-  return receiptTempate(c, org, printer.printWidth);
+  return receiptTempate(c, organization, printer.printWidth);
 };

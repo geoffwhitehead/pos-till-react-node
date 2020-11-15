@@ -21,6 +21,10 @@ export type OrganizationClientProps = {
     receiptPrinterId: string;
     currency: string;
     maxBills: number;
+    shortNameLength: number;
+    maxDiscounts: number;
+    gracePeriodMinutes: number;
+    categoryGridSize: number;
 };
 
 export const organizationFromClient = (organization: OrganizationClientProps): OrganizationProps => {
@@ -37,6 +41,10 @@ export const organizationFromClient = (organization: OrganizationClientProps): O
             receiptPrinterId: organization.receiptPrinterId,
             currency: organization.currency,
             maxBills: organization.maxBills,
+            shortNameLength: organization.shortNameLength,
+            maxDiscounts: organization.maxDiscounts,
+            gracePeriodMinutes: organization.gracePeriodMinutes,
+            categoryGridSize: organization.categoryGridSize,
         },
         address: {
             line1: organization.addressLine1,
@@ -50,6 +58,8 @@ export const organizationFromClient = (organization: OrganizationClientProps): O
 
 export const organizationToClient = (organization: OrganizationProps): OrganizationClientProps => {
     const { _id, name, email, phone, vat, address, settings = {} } = organization;
+
+    console.log('organization', organization);
     return {
         id: _id,
         name,
@@ -60,6 +70,10 @@ export const organizationToClient = (organization: OrganizationProps): Organizat
         receiptPrinterId: settings.receiptPrinterId,
         currency: settings.currency,
         maxBills: settings.maxBills,
+        shortNameLength: settings.shortNameLength,
+        maxDiscounts: settings.maxDiscounts,
+        gracePeriodMinutes: settings.gracePeriodMinutes,
+        categoryGridSize: settings.categoryGridSize,
         addressLine1: address.line1,
         addressLine2: address.line2,
         addressCity: address.city,
@@ -78,7 +92,7 @@ export const organizationService = ({
             pull(paymentTypeRepository, lastPulledAt),
         ]);
 
-        return {
+        const changes = {
             ...toClientChanges({
                 [ORGANIZATION_COLLECTION_NAME]: {
                     created: organizations.created.map(organizationToClient), // n/a
@@ -88,6 +102,9 @@ export const organizationService = ({
             }),
             ...toClientChanges({ [PAYMENT_TYPE_COLLECTION_NAME]: paymentTypes }),
         };
+
+        console.log('changes', JSON.stringify(changes, null, 4));
+        return changes;
     };
 
     const pushChanges = async ({ lastPulledAt, changes }) => {
