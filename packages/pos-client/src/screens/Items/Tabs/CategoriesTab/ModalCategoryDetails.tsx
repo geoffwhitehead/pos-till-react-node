@@ -1,7 +1,7 @@
 import { useDatabase } from '@nozbe/watermelondb/hooks';
 import withObservables from '@nozbe/with-observables';
 import { Formik } from 'formik';
-import { omit } from 'lodash';
+import { capitalize, omit } from 'lodash';
 import React, { useContext, useState } from 'react';
 import * as Yup from 'yup';
 import { ModalContentButton } from '../../../../components/Modal/ModalContentButton';
@@ -80,7 +80,7 @@ export const ModalCategoryDetailsInner: React.FC<ModalCategoryDetailsOuterProps 
   const initialValues = {
     name: category?.name || '',
     shortName: category?.shortName || '',
-    backgroundColor: category?.backgroundColor || colors.highlightBlue,
+    backgroundColor: category?.backgroundColor || colors.theme.highlightBlue,
     textColor: category?.textColor || 'white',
     positionIndex: category?.positionIndex.toString() || '0',
   };
@@ -106,13 +106,15 @@ export const ModalCategoryDetailsInner: React.FC<ModalCategoryDetailsOuterProps 
           positionIndex: !!(touched.positionIndex && errors.positionIndex),
         };
 
+        const title = category ? `${capitalize(category.name)}` : 'New Category';
+
         return (
           <ModalContentButton
             primaryButtonText="Save"
             onPressPrimaryButton={handleSubmit}
             onPressSecondaryButton={onClose}
             secondaryButtonText="Cancel"
-            title="Category Details"
+            title={title}
             isPrimaryDisabled={loading}
             size="small"
             isDeleteDisabled={category && itemsCount > 0}

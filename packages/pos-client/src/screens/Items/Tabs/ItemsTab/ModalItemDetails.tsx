@@ -2,7 +2,7 @@ import { Database } from '@nozbe/watermelondb';
 import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import withObservables from '@nozbe/with-observables';
 import { FieldArray, Formik } from 'formik';
-import { keyBy } from 'lodash';
+import { capitalize, keyBy } from 'lodash';
 import React, { useEffect, useState } from 'react';
 import { ScrollView } from 'react-native-gesture-handler';
 import * as Yup from 'yup';
@@ -220,6 +220,8 @@ const ItemDetailsInner: React.FC<ItemDetailsOuterProps & ItemDetailsInnerProps> 
           printerGroupId: !!(touched.printerGroupId && errors.printerGroupId),
           shortName: !!(touched.shortName && errors.shortName),
         };
+
+        const title = item ? `${capitalize(item.name)}` : 'New Item';
 
         return (
           <ModalContentButton

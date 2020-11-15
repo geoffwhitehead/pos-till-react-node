@@ -2,6 +2,7 @@ import { Database } from '@nozbe/watermelondb';
 import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import withObservables from '@nozbe/with-observables';
 import { Formik } from 'formik';
+import { capitalize } from 'lodash';
 import React, { useEffect, useState } from 'react';
 import { ScrollView } from 'react-native';
 import * as Yup from 'yup';
@@ -102,13 +103,15 @@ const ModalPrinterGroupDetailsInner: React.FC<ModalPrinterGroupDetailsOuterProps
           name: !!(touched.name && errors.name),
         };
 
+        const title = printerGroup ? `${capitalize(printerGroup.name)}` : 'New Printer Group';
+
         return (
           <ModalContentButton
             primaryButtonText="Save"
             onPressPrimaryButton={handleSubmit}
             onPressSecondaryButton={onClose}
             secondaryButtonText="Cancel"
-            title="Printer Group Details"
+            title={title}
             isPrimaryDisabled={loading}
             size="medium"
           >

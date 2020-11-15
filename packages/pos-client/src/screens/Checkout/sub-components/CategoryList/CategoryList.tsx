@@ -54,7 +54,9 @@ export const CategoriesInner: React.FC<CategoriesOuterProps & CategoriesInnerPro
 
   const gridSize = organization.categoryGridSize;
 
-  const groupedCategoriesByPosition = groupBy(categories, category => category.positionIndex);
+  const searchedCategories = categories.filter(category => searchFilter(category, searchValue));
+
+  const groupedCategoriesByPosition = groupBy(searchedCategories, category => category.positionIndex);
 
   return (
     <Container>
@@ -75,21 +77,19 @@ export const CategoriesInner: React.FC<CategoriesOuterProps & CategoriesInnerPro
               </Body>
               <Right />
             </ListItem>
-            {categories
-              .filter(category => searchFilter(category, searchValue))
-              .map(category => {
-                return (
-                  <ListItem key={category.id} icon onPress={onPressCategoryFactory({ category, priceGroup })}>
-                    <Left>
-                      <Text>{category.name}</Text>
-                    </Left>
-                    <Body>
-                      <Icon name="ios-arrow-forward" />
-                    </Body>
-                    <Right />
-                  </ListItem>
-                );
-              })}
+            {searchedCategories.map(category => {
+              return (
+                <ListItem key={category.id} icon onPress={onPressCategoryFactory({ category, priceGroup })}>
+                  <Left>
+                    <Text>{category.name}</Text>
+                  </Left>
+                  <Body>
+                    <Icon name="ios-arrow-forward" />
+                  </Body>
+                  <Right />
+                </ListItem>
+              );
+            })}
           </List>
         </ScrollView>
       )}
@@ -152,6 +152,18 @@ const styles = {
   button: {
     height: '100%',
     width: '100%',
+
+    borderStyle: 'solid',
+    borderWidth: 1,
+    borderColor: 'grey',
+    borderRadius: 4,
+    shadowColor: 'whitesmoke',
+    shadowOpacity: 0.8,
+    shadowRadius: 2,
+    shadowOffset: {
+      height: 2,
+      width: 4,
+    },
   },
   text: {
     fontSize: 25,

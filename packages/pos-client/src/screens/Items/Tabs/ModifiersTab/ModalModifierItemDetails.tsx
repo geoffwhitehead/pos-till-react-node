@@ -3,7 +3,7 @@ import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import { useDatabase } from '@nozbe/watermelondb/hooks';
 import withObservables from '@nozbe/with-observables';
 import { Formik } from 'formik';
-import { keyBy } from 'lodash';
+import { capitalize, keyBy } from 'lodash';
 import React, { useState } from 'react';
 import * as Yup from 'yup';
 import { ModalContentButton } from '../../../../components/Modal/ModalContentButton';
@@ -148,13 +148,15 @@ export const ModalModifierItemDetailsInner: React.FC<ModalModifierItemDetailsOut
           prices: !!(touched.prices && errors.prices),
         };
 
+        const title = modifierItem ? `${capitalize(modifierItem.name)}` : 'New Modifier Item';
+
         return (
           <ModalContentButton
             primaryButtonText="Save"
             onPressPrimaryButton={handleSubmit}
             onPressSecondaryButton={onClose}
             secondaryButtonText="Cancel"
-            title="Modifier Item Details"
+            title={title}
             isPrimaryDisabled={loading}
             isDeleteDisabled={!isValid}
             onPressDelete={onDelete}

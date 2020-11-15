@@ -1,6 +1,7 @@
 import { useDatabase } from '@nozbe/watermelondb/hooks';
 import withObservables from '@nozbe/with-observables';
 import { Formik } from 'formik';
+import { capitalize } from 'lodash';
 import React, { useState } from 'react';
 import * as Yup from 'yup';
 import { ModalContentButton } from '../../../../components/Modal/ModalContentButton';
@@ -93,13 +94,15 @@ export const ModalModifierDetailsInner: React.FC<ModalModifierDetailsOuterProps 
           maxItems: !!(touched.maxItems && errors.maxItems),
         };
 
+        const title = modifier ? `${capitalize(modifier.name)}` : 'New Modifier';
+
         return (
           <ModalContentButton
             primaryButtonText="Save"
             onPressPrimaryButton={handleSubmit}
             onPressSecondaryButton={onClose}
             secondaryButtonText="Cancel"
-            title="Modifier Details"
+            title={title}
             isPrimaryDisabled={loading}
             isDeleteDisabled={itemsCount > 0}
             onPressDelete={onDelete}

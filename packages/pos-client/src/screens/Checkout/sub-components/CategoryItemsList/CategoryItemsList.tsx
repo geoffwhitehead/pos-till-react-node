@@ -145,8 +145,6 @@ export const CategoryItems = withDatabase<any>(
           Q.and(Q.where('price', Q.notEq(null)), Q.where('price_group_id', priceGroupId)),
           Q.on(tableNames.items, Q.where('category_id', category.id)),
         ),
-
-      // .query(Q.and(Q.where('price', Q.notEq(null)), Q.where('price_group_id', priceGroupId))),
     };
   })(CategoryItemsInner),
 );

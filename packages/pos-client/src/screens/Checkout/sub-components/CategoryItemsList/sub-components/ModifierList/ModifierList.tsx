@@ -78,7 +78,7 @@ export const ModifierListInner: React.FC<ModifierListOuterProps & ModifierListIn
       onPressSecondaryButton={onClose}
       secondaryButtonText="Cancel"
       primaryButtonText="Save"
-      title={`${item.name}: Modifiers`}
+      title={`${item.name} Modifiers`}
       size="small"
     >
       <Container>

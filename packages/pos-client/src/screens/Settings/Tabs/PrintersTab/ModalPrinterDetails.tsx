@@ -1,4 +1,5 @@
 import { Formik } from 'formik';
+import { capitalize } from 'lodash';
 import React from 'react';
 import { ScrollView } from 'react-native';
 import * as Yup from 'yup';
@@ -64,13 +65,15 @@ export const ModalPrinterDetails: React.FC<ModalPrinterDetailsOuterProps> = ({
           macAddress: !!(touched.macAddress && errors.macAddress),
         };
 
+        const title = printer ? `${capitalize(printer.name)}` : 'New Printer';
+
         return (
           <ModalContentButton
             primaryButtonText="Save"
             onPressPrimaryButton={handleSubmit}
             onPressSecondaryButton={onClose}
             secondaryButtonText="Cancel"
-            title="Printer details"
+            title={title}
             isPrimaryDisabled={isLoading}
             size="small"
           >

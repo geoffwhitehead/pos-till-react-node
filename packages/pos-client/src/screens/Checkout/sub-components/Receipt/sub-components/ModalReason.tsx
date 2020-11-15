@@ -22,9 +22,10 @@ type ModalReasonProps = {
   onClose: () => void;
   onComplete: (values: ModifyReason) => void;
   mode: RemoveMode;
+  title: string;
 };
 
-export const ModalReason: React.FC<ModalReasonProps> = ({ onComplete, onClose, mode }) => {
+export const ModalReason: React.FC<ModalReasonProps> = ({ onComplete, onClose, mode, title }) => {
   const initialValues = {
     reason: '',
     name: '',
@@ -39,7 +40,6 @@ export const ModalReason: React.FC<ModalReasonProps> = ({ onComplete, onClose, m
           name: !!(touched.name && errors.name),
         };
 
-        const title = 'Reason';
         const description =
           mode === RemoveMode.comp
             ? 'Please provide a reason for making this item complimentary...'

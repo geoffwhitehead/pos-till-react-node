@@ -1,5 +1,6 @@
 import { useDatabase } from '@nozbe/watermelondb/hooks';
 import { Formik } from 'formik';
+import { capitalize } from 'lodash';
 import React, { useState } from 'react';
 import * as Yup from 'yup';
 import { ModalContentButton } from '../../../../components/Modal/ModalContentButton';
@@ -77,13 +78,15 @@ export const ModalDiscountDetails: React.FC<ModalDiscountDetailsProps> = ({ disc
           // isPercent: !!(touched.isPercent && errors.isPrepTimeRequired),
         };
 
+        const title = discount ? `${capitalize(discount.name)}` : 'New Discount';
+
         return (
           <ModalContentButton
             primaryButtonText="Save"
             onPressPrimaryButton={handleSubmit}
             onPressSecondaryButton={onClose}
             secondaryButtonText="Cancel"
-            title="Discount Details"
+            title={title}
             isPrimaryDisabled={loading}
             size="small"
           >

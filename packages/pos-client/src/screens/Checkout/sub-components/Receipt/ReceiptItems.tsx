@@ -3,6 +3,7 @@ import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import { useDatabase } from '@nozbe/watermelondb/hooks';
 import withObservables from '@nozbe/with-observables';
 import dayjs from 'dayjs';
+import { capitalize } from 'lodash';
 import React, { useEffect, useRef, useState } from 'react';
 import { Modal } from '../../../../components/Modal/Modal';
 import { ActionSheet, Content, List } from '../../../../core';
@@ -150,6 +151,7 @@ export const ReceiptItemsInner: React.FC<ReceiptItemsOuterProps & ReceiptItemsIn
             }
           }}
           mode={removeMode}
+          title={capitalize(selectedBillItem.itemName)}
         />
       </Modal>
     </Content>

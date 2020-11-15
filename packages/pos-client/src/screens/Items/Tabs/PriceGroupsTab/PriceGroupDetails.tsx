@@ -1,5 +1,6 @@
 import { useDatabase } from '@nozbe/watermelondb/hooks';
 import { Formik } from 'formik';
+import { capitalize } from 'lodash';
 import React, { useState } from 'react';
 import * as Yup from 'yup';
 import { ModalContentButton } from '../../../../components/Modal/ModalContentButton';
@@ -103,13 +104,15 @@ export const PriceGroupDetails: React.FC<PriceGroupDetailsProps> = ({ priceGroup
           // isPrepTimeRequired: !!(touched.isPrepTimeRequired && errors.isPrepTimeRequired),
         };
 
+        const title = priceGroup ? `${capitalize(priceGroup.name)}` : 'New Price Group';
+
         return (
           <ModalContentButton
             primaryButtonText="Save"
             onPressPrimaryButton={handleSubmit}
             onPressSecondaryButton={onClose}
             secondaryButtonText="Cancel"
-            title="Price Group Details"
+            title={title}
             isPrimaryDisabled={loading}
             size="small"
           >
