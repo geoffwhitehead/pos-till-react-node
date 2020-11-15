@@ -10,16 +10,7 @@ export interface OrganizationProps {
     email: string;
     phone: string;
     vat?: string;
-    settings: {
-        defaultPriceGroupId?: string;
-        receiptPrinterId?: string;
-        currency?: string;
-        maxBills?: number;
-        shortNameLength?: number;
-        maxDiscounts?: number;
-        gracePeriodMinutes?: number;
-        categoryGridSize?: number;
-    };
+    settings: OrganizationSettingsSchema;
     address: {
         line1: string;
         line2?: string;
@@ -27,6 +18,18 @@ export interface OrganizationProps {
         county: string;
         postcode: string;
     };
+}
+
+export interface OrganizationSettingsSchema {
+    defaultPriceGroupId?: string;
+    receiptPrinterId?: string;
+    currency?: CurrencyEnum;
+    maxBills?: number;
+    shortNameLength?: number;
+    maxDiscounts?: number;
+    gracePeriodMinutes?: number;
+    categoryGridSize?: number;
+    categoryViewType?: CategoryViewTypeEnum;
 }
 
 export const ORGANIZATION_COLLECTION_NAME = 'organizations';
@@ -55,6 +58,46 @@ export enum CurrencyEnum {
     gbp = 'gbp',
 }
 
+export enum CategoryViewTypeEnum {
+    list = 'list',
+    grid = 'grid',
+}
+
+const OrganizationSettingsSchema: Schema<OrganizationSettingsSchema> = new Schema({
+    defaultPriceGroupId: { type: String, ref: 'PriceGroup' },
+    receiptPrinterId: { type: String, ref: 'Printer' },
+    currency: {
+        type: String,
+        enum: [CurrencyEnum.gbp],
+        default: CurrencyEnum.gbp,
+    },
+    maxBills: {
+        type: Number,
+        default: 10,
+    },
+    shortNameLength: {
+        type: Number,
+        default: 10,
+    },
+    maxDiscounts: {
+        type: Number,
+        default: 10,
+    },
+    gracePeriodMinutes: {
+        type: Number,
+        default: 5,
+    },
+    categoryGridSize: {
+        type: Number,
+        default: 3,
+    },
+    categoryViewType: {
+        type: String,
+        enum: [CategoryViewTypeEnum.list, CategoryViewTypeEnum.grid],
+        default: CategoryViewTypeEnum.grid,
+    },
+});
+
 const OrganizationSchema: Schema<OrganizationProps> = new Schema(
     {
         _id: {
@@ -79,36 +122,8 @@ const OrganizationSchema: Schema<OrganizationProps> = new Schema(
             type: String,
         },
         settings: {
-            type: {
-                defaultPriceGroupId: { type: String, ref: 'PriceGroup' },
-                receiptPrinterId: { type: String, ref: 'Printer' },
-                currency: {
-                    type: String,
-                    enum: CurrencyEnum,
-                    default: CurrencyEnum.gbp,
-                },
-                maxBills: {
-                    type: Number,
-                    default: 10,
-                },
-                shortNameLength: {
-                    type: Number,
-                    default: 10,
-                },
-                maxDiscounts: {
-                    type: Number,
-                    default: 10,
-                },
-                gracePeriodMinutes: {
-                    type: Number,
-                    default: 5,
-                },
-                categoryGridSize: {
-                    type: Number,
-                    default: 3,
-                },
-            },
-            default: {},
+            type: OrganizationSettingsSchema,
+            default: () => ({}),
         },
         address: {
             type: {

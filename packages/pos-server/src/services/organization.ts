@@ -1,5 +1,10 @@
 import { InjectedDependencies, pull, push, SyncFns } from '.';
-import { OrganizationProps, ORGANIZATION_COLLECTION_NAME } from '../models/Organization';
+import {
+    CategoryViewTypeEnum,
+    CurrencyEnum,
+    OrganizationProps,
+    ORGANIZATION_COLLECTION_NAME,
+} from '../models/Organization';
 import { PAYMENT_TYPE_COLLECTION_NAME } from '../models/PaymentType';
 import { toClientChanges } from '../utils/sync';
 import { CommonServiceFns } from './product';
@@ -19,12 +24,13 @@ export type OrganizationClientProps = {
     addressPostcode: string;
     defaultPriceGroupId: string;
     receiptPrinterId: string;
-    currency: string;
+    currency: CurrencyEnum;
     maxBills: number;
     shortNameLength: number;
     maxDiscounts: number;
     gracePeriodMinutes: number;
     categoryGridSize: number;
+    categoryViewType: CategoryViewTypeEnum;
 };
 
 export const organizationFromClient = (organization: OrganizationClientProps): OrganizationProps => {
@@ -45,6 +51,7 @@ export const organizationFromClient = (organization: OrganizationClientProps): O
             maxDiscounts: organization.maxDiscounts,
             gracePeriodMinutes: organization.gracePeriodMinutes,
             categoryGridSize: organization.categoryGridSize,
+            categoryViewType: organization.categoryViewType,
         },
         address: {
             line1: organization.addressLine1,
@@ -74,6 +81,7 @@ export const organizationToClient = (organization: OrganizationProps): Organizat
         maxDiscounts: settings.maxDiscounts,
         gracePeriodMinutes: settings.gracePeriodMinutes,
         categoryGridSize: settings.categoryGridSize,
+        categoryViewType: settings.categoryViewType,
         addressLine1: address.line1,
         addressLine2: address.line2,
         addressCity: address.city,

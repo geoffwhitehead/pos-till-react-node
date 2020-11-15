@@ -1,8 +1,8 @@
-import { TenantModel } from '../../models/utils/multiTenant';
+import { omit } from 'lodash';
 import mongoose from 'mongoose';
 import { Container } from 'typedi';
-import { omit } from 'lodash';
-import { ChangeDocument, ServiceFns } from '../../services';
+import { TenantModel } from '../../models/utils/multiTenant';
+import { ChangeDocument } from '../../services';
 import { GenericResponseNoData } from '../../utils/types';
 
 export interface RepositoryFns<T> {
@@ -59,7 +59,7 @@ export const repository = <T, U>({
 
     const insert = async docs => {
         const filteredDocs = docs.map(doc => omit(doc, 'tenantId'));
-        const insertedDocs = await model(tenanted && getTenant()).insertMany(filteredDocs); // the mongoose type seems incorrect for this. Should return Array<T & Document>
+        const insertedDocs = await model(tenanted && getTenant()).insertMany(filteredDocs); // the type seems incorrect for this. Should return Array<T & Document>
         //@ts-ignore
         return insertedDocs.map(docs => clean(docs));
     };

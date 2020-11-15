@@ -24,6 +24,17 @@ export type OrganizationProps = {
   shortNameLength: number;
 };
 
+export enum CategoryViewTypeEnum {
+  list = 'list',
+  grid = 'grid',
+}
+
+export enum CurrencyEnum {
+  gbp = 'gbp',
+  usd = 'usd',
+  eur = 'eur',
+}
+
 export class Organization extends Model {
   static table = 'organizations';
 
@@ -38,7 +49,7 @@ export class Organization extends Model {
   @field('address_postcode') addressPostcode: string;
   @field('default_price_group_id') defaultPriceGroupId: string;
   @field('receipt_printer_id') receiptPrinterId: string;
-  @field('currency') currency: string;
+  @field('currency') currency: CurrencyEnum;
   @field('max_bills') maxBills: number;
   @field('last_pulled_at') lastPulledAt: string;
   @field('current_bill_period_id') currentBillPeriodId: string;
@@ -46,6 +57,7 @@ export class Organization extends Model {
   @field('max_discounts') maxDiscounts: number;
   @field('grace_period_minutes') gracePeriodMinutes: number;
   @field('category_grid_size') categoryGridSize: number;
+  @field('category_view_type') categoryViewType: CategoryViewTypeEnum;
 
   @relation('price_groups', 'default_price_group_id') defaultPriceGroup: Relation<PriceGroup>;
   @relation('printers', 'receipt_printer_id') receiptPrinter: Relation<Printer>;
@@ -83,5 +95,6 @@ export const organizationSchema = tableSchema({
     { name: 'max_discounts', type: 'number' },
     { name: 'grace_period_minutes', type: 'number' },
     { name: 'category_grid_size', type: 'number' },
+    { name: 'category_view_type', type: 'string' },
   ],
 });
