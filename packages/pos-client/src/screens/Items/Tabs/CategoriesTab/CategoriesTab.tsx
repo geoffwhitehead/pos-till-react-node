@@ -1,13 +1,14 @@
 import { Database } from '@nozbe/watermelondb';
 import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import withObservables from '@nozbe/with-observables';
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { ScrollView } from 'react-native-gesture-handler';
 import { Modal } from '../../../../components/Modal/Modal';
 import { SearchBar } from '../../../../components/SearchBar/SearchBar';
-import { Container, Footer, List, Text } from '../../../../core';
+import { OrganizationContext } from '../../../../contexts/OrganizationContext';
+import { Container, Footer, Icon, Label, List, Picker, Text } from '../../../../core';
 import { Category } from '../../../../models';
-import { MAX_CATEGORIES } from '../../../../utils/consts';
+import { MAX_GRID_SIZE } from '../../../../utils/consts';
 import { CategoryRow } from './CategoryRow';
 import { ModalCategoryDetails, ModalCategoryDetailsInner } from './ModalCategoryDetails';
 
@@ -23,6 +24,7 @@ const CategoriesTabInner: React.FC<CategoriesTabOuterProps & CategoriesTabInnerP
   const [searchValue, setSearchValue] = useState<string>('');
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [selectedCategory, setSelectedCategory] = useState<Category>();
+  const { organization } = useContext(OrganizationContext);
 
   const searchFilter = (category: Category, searchValue: string) =>
     category.name.toLowerCase().includes(searchValue.toLowerCase());
@@ -39,32 +41,61 @@ const CategoriesTabInner: React.FC<CategoriesTabOuterProps & CategoriesTabInnerP
 
   const onPressCreate = () => setModalOpen(true);
 
-  const onUpdateGridSize = () => {};
-
-  const areYouSureDialog = (fn: () => void) => {
-    const options = ['Remove', 'Cancel'];
-    ActionSheet.show(
-      {
-        options,
-        destructiveButtonIndex: 0,
-        title: 'Are you sure?',
-      },
-      index => {
-        index === 0 && fn(item);
-      },
+  const handleUpdateGridSize = async (size: number) => {
+    console.log('---size', size);
+    await database.action(() =>
+      organization.update(record => {
+        record.categoryGridSize = size;
+      }),
     );
   };
 
+  const minGridSize = categories.length ? Math.ceil(Math.sqrt(categories.length)) : 3;
+  const maxCategories = Math.pow(organization.categoryGridSize, 2);
+  console.log('minGridSize', minGridSize);
+  console.log('MAX_GRID_SIZE', MAX_GRID_SIZE);
+  console.log('MAX_GRID_SIZE - minGridSize', MAX_GRID_SIZE - minGridSize);
+  const options = [...Array(MAX_GRID_SIZE - minGridSize + 1)].map((_, i) => {
+    const size = i + minGridSize;
+    return {
+      label: `${size} x ${size} Grid`,
+      value: size,
+    };
+  });
+
+  console.log('options', options);
+  console.log('categories', categories);
   return (
     <Container>
       <SearchBar
         value={searchValue}
-        onPressSecondary={() => {}}
-        secondaryText="Update Grid Size"
-        secondaryIconName="ios-grid"
+        // onPressSecondary={() => selectGridSizeDialog(minGridSize)}
+        // secondaryText="Update Grid Size"
+        // secondaryIconName="ios-grid"
         onPressCreate={onPressCreate}
         onSearch={value => setSearchValue(value)}
-      />
+        isCreateDisabled={categories.length === maxCategories}
+      >
+        <Label>
+          <Text style={{ color: 'grey' }}>Category Grid Size: </Text>
+        </Label>
+        <Picker
+          mode="dropdown"
+          iosHeader="Select a grid size"
+          iosIcon={<Icon name="arrow-down" />}
+          placeholder="Select a grid size"
+          textStyle={{ color: 'grey' }}
+          placeholderIconColor="#007aff"
+          style={{ width: undefined }}
+          selectedValue={organization.categoryGridSize}
+          onValueChange={handleUpdateGridSize}
+        >
+          {options.map(({ label, value }) => {
+            console.log('object', value);
+            return <Picker.Item key={value} label={label} value={value} />;
+          })}
+        </Picker>
+      </SearchBar>
       <ScrollView>
         <List>
           {categories
@@ -75,7 +106,10 @@ const CategoriesTabInner: React.FC<CategoriesTabOuterProps & CategoriesTabInnerP
         </List>
       </ScrollView>
       <Footer>
-        <Text note>{`Categories: ${categories.length} / ${MAX_CATEGORIES}`}</Text>
+        <Text
+          note
+          style={{ color: categories.length === maxCategories ? 'red' : 'grey' }}
+        >{`Categories: ${categories.length} / ${maxCategories}`}</Text>
       </Footer>
       <Modal isOpen={modalOpen} onClose={onCloseHandler}>
         {selectedCategory ? (

@@ -18,6 +18,10 @@ export type OrganizationProps = {
   maxBills: number;
   lastPulledAt: number;
   currentBillPeriodId: string;
+  categoryGridSize: number;
+  gracePeriodMinutes: number;
+  maxDiscounts: number;
+  shortNameLength: number;
 };
 
 export class Organization extends Model {
@@ -38,10 +42,10 @@ export class Organization extends Model {
   @field('max_bills') maxBills: number;
   @field('last_pulled_at') lastPulledAt: string;
   @field('current_bill_period_id') currentBillPeriodId: string;
-  @field('short_name_length') shortNameLength: string;
-  @field('max_discounts') maxDiscounts: string;
-  @field('grace_period_minutes') gracePeriodMinutes: string;
-  @field('category_grid_size') categoryGridSize: string;
+  @field('short_name_length') shortNameLength: number;
+  @field('max_discounts') maxDiscounts: number;
+  @field('grace_period_minutes') gracePeriodMinutes: number;
+  @field('category_grid_size') categoryGridSize: number;
 
   @relation('price_groups', 'default_price_group_id') defaultPriceGroup: Relation<PriceGroup>;
   @relation('printers', 'receipt_printer_id') receiptPrinter: Relation<Printer>;
@@ -75,9 +79,9 @@ export const organizationSchema = tableSchema({
     { name: 'max_bills', type: 'number' },
     { name: 'last_pulled_at', type: 'string' },
     { name: 'current_bill_period_id', type: 'string' },
-    { name: 'shortNameLength', type: 'number' },
-    { name: 'maxDiscounts', type: 'number' },
-    { name: 'gracePeriodMinutes', type: 'number' },
-    { name: 'categoryGridSize', type: 'number' },
+    { name: 'short_name_length', type: 'number' },
+    { name: 'max_discounts', type: 'number' },
+    { name: 'grace_period_minutes', type: 'number' },
+    { name: 'category_grid_size', type: 'number' },
   ],
 });

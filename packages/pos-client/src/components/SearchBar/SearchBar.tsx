@@ -11,6 +11,7 @@ type SearchBarProps = {
   secondaryText?: string;
   secondaryIconName?: string;
 };
+
 export const SearchBar: React.FC<SearchBarProps> = ({
   onSearch,
   value,
@@ -19,12 +20,14 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   onPressCreate,
   isCreateDisabled,
   secondaryIconName,
+  children,
   ...props
 }) => {
   return (
     <Item {...props} style={styles.searchBar}>
       <Icon name="ios-search" />
       <Input placeholder="Search" onChangeText={onSearch} value={value} />
+      {children}
       {onPressSecondary && (
         <Button iconLeft small info onPress={onPressSecondary}>
           {secondaryIconName && <Icon name={secondaryIconName} />}

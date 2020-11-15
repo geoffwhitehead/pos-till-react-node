@@ -1,9 +1,11 @@
 import { useDatabase } from '@nozbe/watermelondb/hooks';
 import withObservables from '@nozbe/with-observables';
 import { Formik } from 'formik';
+import { omit } from 'lodash';
 import React, { useState } from 'react';
 import * as Yup from 'yup';
 import { ModalContentButton } from '../../../../components/Modal/ModalContentButton';
+import { ModalColorPickerContent } from '../../../../components/ModalColorPicker/ModalColorPicker';
 import { Form, Input, Item, Label } from '../../../../core';
 import { Category, tableNames } from '../../../../models';
 
@@ -23,7 +25,10 @@ const categorySchema = Yup.object().shape({
   shortName: Yup.string()
     .min(2, 'Too Short')
     .max(50, 'Too Long'),
-  color: Yup.string()
+  backgroundColor: Yup.string()
+    .length(7, 'Incorrect length')
+    .required(),
+  textColor: Yup.string()
     .length(7, 'Incorrect length')
     .required(),
   positionIndex: Yup.number().required(),
@@ -32,7 +37,8 @@ const categorySchema = Yup.object().shape({
 type FormValues = {
   // name: string;
   shortName: string;
-  color: string;
+  backgroundColor: string;
+  textColor: string;
   positionIndex: string;
 };
 
@@ -47,7 +53,7 @@ export const ModalCategoryDetailsInner: React.FC<ModalCategoryDetailsOuterProps 
   const update = async (values: FormValues, category: Category) => {
     setLoading(true);
     if (category) {
-      await database.action(() => category.update(record => Object.assign(record, { shortName: values.shortName })));
+      await database.action(() => category.update(record => Object.assign(record, omit(values, 'name'))));
     } else {
       const categoryCollection = database.collections.get<Category>(tableNames.categories);
       await database.action(() => categoryCollection.create(record => Object.assign(record, values)));
@@ -59,7 +65,8 @@ export const ModalCategoryDetailsInner: React.FC<ModalCategoryDetailsOuterProps 
   const initialValues = {
     name: category?.name || '',
     shortName: category?.shortName || '',
-    color: category?.color || '#FFFFFF',
+    backgroundColor: category?.backgroundColor || '#FFFFFF',
+    textColor: category?.textColor || '#000000',
     positionIndex: category?.positionIndex.toString() || '0',
   };
 
@@ -75,11 +82,12 @@ export const ModalCategoryDetailsInner: React.FC<ModalCategoryDetailsOuterProps 
       onSubmit={values => update(values, category)}
     >
       {({ handleChange, handleBlur, handleSubmit, errors, touched, values }) => {
-        const { shortName, name, color, positionIndex } = values;
+        const { shortName, name, backgroundColor, textColor, positionIndex } = values;
         const err = {
           name: !!(touched.name && errors.name),
           shortName: !!(touched.shortName && errors.shortName),
-          color: !!(touched.color && errors.color),
+          backgroundColor: !!(touched.backgroundColor && errors.backgroundColor),
+          textColor: !!(touched.textColor && errors.textColor),
           positionIndex: !!(touched.positionIndex && errors.positionIndex),
         };
 
@@ -111,16 +119,29 @@ export const ModalCategoryDetailsInner: React.FC<ModalCategoryDetailsOuterProps 
                 <Label>Short Name</Label>
                 <Input onChangeText={handleChange('shortName')} onBlur={handleBlur('shortName')} value={shortName} />
               </Item>
-              <Item stackedLabel error={err.shortName}>
-                <Label>Color</Label>
-                <Input onChangeText={handleChange('color')} onBlur={handleBlur('color')} value={color} />
-              </Item>
+
               <Item stackedLabel error={err.shortName}>
                 <Label>Position Index</Label>
                 <Input
                   onChangeText={handleChange('positionIndex')}
                   onBlur={handleBlur('positionIndex')}
                   value={positionIndex}
+                />
+              </Item>
+              <Item stackedLabel style={styles.colorPickerItem}>
+                <Label>Background Color</Label>
+                <ModalColorPickerContent
+                  style={styles.colorPicker}
+                  onChangeColor={handleChange('backgroundColor')}
+                  colorHex={backgroundColor}
+                />
+              </Item>
+              <Item stackedLabel style={styles.colorPickerItem}>
+                <Label>Text Color</Label>
+                <ModalColorPickerContent
+                  style={styles.colorPicker}
+                  onChangeColor={handleChange('textColor')}
+                  colorHex={textColor}
                 />
               </Item>
             </Form>
@@ -140,3 +161,14 @@ const enhance = c =>
   })(c);
 
 export const ModalCategoryDetails = enhance(ModalCategoryDetailsInner);
+
+const styles = {
+  colorPickerItem: {
+    flexDirection: 'column',
+    borderBottomWidth: 0,
+    paddingTop: 5,
+    paddingBottom: 5,
+    alignItems: 'flex-start',
+  },
+  colorPicker: { width: '100%', flex: 0 },
+} as const;

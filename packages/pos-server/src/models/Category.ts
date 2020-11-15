@@ -6,6 +6,9 @@ export interface CategoryProps {
     _id?: string;
     name: string;
     shortName: string;
+    backgroundColor?: string;
+    textColor?: string;
+    positionIndex?: number;
 }
 
 export const CATEGORY_COLLECTION_NAME = 'categories';
@@ -23,10 +26,15 @@ const CategorySchema: Schema<CategoryProps> = new Schema(
         },
         shortName: {
             type: String,
-            maxlength: 10,
+            default: 10,
         },
-        color: {
+        backgroundColor: {
             type: String,
+            default: '#FFFFFF',
+        },
+        textColor: {
+            type: String,
+            default: '#000000',
         },
         positionIndex: {
             type: Number,
