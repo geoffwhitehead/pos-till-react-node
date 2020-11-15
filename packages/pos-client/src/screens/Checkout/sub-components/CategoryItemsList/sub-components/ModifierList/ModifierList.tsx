@@ -112,5 +112,5 @@ const styles = {
 };
 
 export const ModifierList = withObservables<ModifierListOuterProps, ModifierListInnerProps>(['item'], ({ item }) => ({
-  modifiers: item.modifiers.observeWithColumns(['minItems', 'maxItems']),
+  modifiers: item.modifiers.observeWithColumns(['min_items', 'max_items']),
 }))(ModifierListInner);

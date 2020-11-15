@@ -8,6 +8,7 @@ import { CurrentBillContext } from '../../contexts/CurrentBillContext';
 import { OrganizationContext } from '../../contexts/OrganizationContext';
 import { PriceGroupContext } from '../../contexts/PriceGroupContext';
 import { ReceiptPrinterContext } from '../../contexts/ReceiptPrinterContext';
+import { RecentColorsContext, RecentColorsType } from '../../contexts/RecentColorsContext';
 import { database } from '../../database';
 import { Bill, BillPeriod, Organization, PriceGroup, Printer, tableNames } from '../../models';
 import { SidebarNavigator } from '../../navigators/SidebarNavigator';
@@ -29,6 +30,7 @@ export const MainWrapped: React.FC<MainOuterProps & MainInnerProps> = ({ priceGr
   const [priceGroup, setPriceGroup] = useState<PriceGroup>();
   const [currentBill, setCurrentBill] = useState<Bill>();
   const [receiptPrinter, setReceiptPrinter] = useState<Printer>();
+  const [recentColors, setRecentColors] = useState<RecentColorsType>([]);
   const [_, setOrganization] = useState<Organization>();
 
   useEffect(() => {
@@ -89,7 +91,9 @@ export const MainWrapped: React.FC<MainOuterProps & MainInnerProps> = ({ priceGr
         <PriceGroupContext.Provider value={{ priceGroup, setPriceGroup }}>
           <CurrentBillContext.Provider value={{ currentBill, setCurrentBill }}>
             <ReceiptPrinterContext.Provider value={{ receiptPrinter, setReceiptPrinter }}>
-              <SidebarNavigator />
+              <RecentColorsContext.Provider value={{ recentColors, setRecentColors }}>
+                <SidebarNavigator />
+              </RecentColorsContext.Provider>
             </ReceiptPrinterContext.Provider>
           </CurrentBillContext.Provider>
         </PriceGroupContext.Provider>

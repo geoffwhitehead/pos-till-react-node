@@ -30,11 +30,11 @@ const CategorySchema: Schema<CategoryProps> = new Schema(
         },
         backgroundColor: {
             type: String,
-            default: '#FFFFFF',
+            default: '#2FA8F6',
         },
         textColor: {
             type: String,
-            default: '#000000',
+            default: '#FFFFFF',
         },
         positionIndex: {
             type: Number,

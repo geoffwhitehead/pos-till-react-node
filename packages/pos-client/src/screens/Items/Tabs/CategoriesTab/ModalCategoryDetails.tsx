@@ -2,12 +2,14 @@ import { useDatabase } from '@nozbe/watermelondb/hooks';
 import withObservables from '@nozbe/with-observables';
 import { Formik } from 'formik';
 import { omit } from 'lodash';
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import * as Yup from 'yup';
 import { ModalContentButton } from '../../../../components/Modal/ModalContentButton';
 import { ModalColorPickerContent } from '../../../../components/ModalColorPicker/ModalColorPicker';
+import { RecentColorsContext } from '../../../../contexts/RecentColorsContext';
 import { Form, Input, Item, Label } from '../../../../core';
 import { Category, tableNames } from '../../../../models';
+import { colors } from '../../../../theme';
 
 type ModalCategoryDetailsOuterProps = {
   onClose: () => void;
@@ -50,13 +52,26 @@ export const ModalCategoryDetailsInner: React.FC<ModalCategoryDetailsOuterProps 
   const [loading, setLoading] = useState(false);
   const database = useDatabase();
 
+  const { recentColors, setRecentColors } = useContext(RecentColorsContext);
+
   const update = async (values: FormValues, category: Category) => {
     setLoading(true);
     if (category) {
-      await database.action(() => category.update(record => Object.assign(record, omit(values, 'name'))));
+      await database.action(() =>
+        category.update(record =>
+          Object.assign(record, { ...omit(values, 'name'), positionIndex: parseInt(values.positionIndex) }),
+        ),
+      );
     } else {
       const categoryCollection = database.collections.get<Category>(tableNames.categories);
-      await database.action(() => categoryCollection.create(record => Object.assign(record, values)));
+      await database.action(() =>
+        categoryCollection.create(record =>
+          Object.assign(record, {
+            ...values,
+            positionIndex: parseInt(values.positionIndex),
+          }),
+        ),
+      );
     }
     setLoading(false);
     onClose();
@@ -65,8 +80,8 @@ export const ModalCategoryDetailsInner: React.FC<ModalCategoryDetailsOuterProps 
   const initialValues = {
     name: category?.name || '',
     shortName: category?.shortName || '',
-    backgroundColor: category?.backgroundColor || '#FFFFFF',
-    textColor: category?.textColor || '#000000',
+    backgroundColor: category?.backgroundColor || colors.highlightBlue,
+    textColor: category?.textColor || 'white',
     positionIndex: category?.positionIndex.toString() || '0',
   };
 
@@ -134,6 +149,8 @@ export const ModalCategoryDetailsInner: React.FC<ModalCategoryDetailsOuterProps 
                   style={styles.colorPicker}
                   onChangeColor={handleChange('backgroundColor')}
                   colorHex={backgroundColor}
+                  globalRecentColors={recentColors}
+                  setGlobalRecentColors={setRecentColors}
                 />
               </Item>
               <Item stackedLabel style={styles.colorPickerItem}>
@@ -142,6 +159,8 @@ export const ModalCategoryDetailsInner: React.FC<ModalCategoryDetailsOuterProps 
                   style={styles.colorPicker}
                   onChangeColor={handleChange('textColor')}
                   colorHex={textColor}
+                  globalRecentColors={recentColors}
+                  setGlobalRecentColors={setRecentColors}
                 />
               </Item>
             </Form>

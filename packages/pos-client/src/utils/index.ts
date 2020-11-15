@@ -1,12 +1,13 @@
 import { Database, Q } from '@nozbe/watermelondb';
 import { flatten, groupBy, sumBy } from 'lodash';
 import { BillDiscount, BillItem, BillItemModifierItem, BillPayment, Discount, PriceGroup, tableNames } from '../models';
+import { CurrencyEnum } from '../models/Organization';
 
 export const getDefaultCashDenominations = (currency: string): number[] => {
   const map = {
-    gbp: [500, 1000, 2000, 3000, 5000],
-    usd: [500, 1000, 2000, 3000, 5000],
-    eur: [500, 1000, 2000, 3000, 5000],
+    [CurrencyEnum.gbp]: [500, 1000, 2000, 3000, 5000],
+    [CurrencyEnum.usd]: [500, 1000, 2000, 3000, 5000],
+    [CurrencyEnum.eur]: [500, 1000, 2000, 3000, 5000],
   };
 
   return map[currency];
@@ -14,8 +15,8 @@ export const getDefaultCashDenominations = (currency: string): number[] => {
 
 export const formatNumber = (value: number, currency = 'gbp'): string => {
   const map = {
-    gbp: 'en-GB',
-    usd: 'en-US',
+    [CurrencyEnum.gbp]: 'en-GB',
+    [CurrencyEnum.usd]: 'en-US',
   };
 
   const format = map[currency] || map.gbp;

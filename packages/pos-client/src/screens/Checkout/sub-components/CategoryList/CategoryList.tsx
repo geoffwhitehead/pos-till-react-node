@@ -3,7 +3,7 @@ import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import withObservables from '@nozbe/with-observables';
 import { RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { times } from 'lodash';
+import { groupBy, times } from 'lodash';
 import React, { useContext, useState } from 'react';
 import { ScrollView } from 'react-native';
 import { SearchHeader } from '../../../../components/SearchHeader/SearchHeader';
@@ -11,7 +11,9 @@ import { OrganizationContext } from '../../../../contexts/OrganizationContext';
 import { PriceGroupContext } from '../../../../contexts/PriceGroupContext';
 import { Body, Button, Col, Container, Grid, Icon, Left, List, ListItem, Right, Row, Text } from '../../../../core';
 import { Category, PriceGroup } from '../../../../models';
+import { CategoryViewTypeEnum } from '../../../../models/Organization';
 import { CheckoutItemStackParamList } from '../../../../navigators/CheckoutItemNavigator';
+import { GRID_SPACING } from '../../../../utils/consts';
 
 interface CategoriesInnerProps {
   categories: Category[];
@@ -47,18 +49,13 @@ export const CategoriesInner: React.FC<CategoriesOuterProps & CategoriesInnerPro
   const searchFilter = (category: Category, searchValue: string) =>
     category.name.toLowerCase().includes(searchValue.toLowerCase());
 
-  const isListView = false;
-  const isGridView = true;
+  const isListView = organization.categoryViewType === CategoryViewTypeEnum.list;
+  const isGridView = organization.categoryViewType === CategoryViewTypeEnum.grid;
 
   const gridSize = organization.categoryGridSize;
 
-  // const categoriesGrid: (Category | null)[] = categories.reduce((acc, category) => {
-  //   return [...acc, category];
-  // }, new Array(gridSize * gridSize));
-  console.log('gridSize', gridSize);
+  const groupedCategoriesByPosition = groupBy(categories, category => category.positionIndex);
 
-  console.log('organization', organization);
-  // console.log('categoriesGrid', categoriesGrid);
   return (
     <Container>
       <SearchHeader onChangeText={onSearchHandler} value={searchValue} />
@@ -99,17 +96,22 @@ export const CategoriesInner: React.FC<CategoriesOuterProps & CategoriesInnerPro
 
       {isGridView && (
         <Grid style={styles.grid}>
-          {times(gridSize, i => {
+          {times(gridSize, row => {
             return (
               <Row style={styles.row}>
-                {times(gridSize, j => {
-                  const index = gridSize * i + (j + 1);
-                  const category = categories[index];
+                {times(gridSize, column => {
+                  const position = gridSize * row + column;
+                  const group = groupedCategoriesByPosition[position];
+                  const category = group && group[0];
                   return (
                     <Col style={styles.col}>
                       {category && (
-                        <Button style={styles.button} info onPress={onPressCategoryFactory({ priceGroup, category })}>
-                          <Text>{category.name}</Text>
+                        <Button
+                          style={{ ...styles.button, backgroundColor: category.backgroundColor }}
+                          info
+                          onPress={onPressCategoryFactory({ priceGroup, category })}
+                        >
+                          <Text style={{ ...styles.text, color: category.textColor }}>{category.name}</Text>
                         </Button>
                       )}
                     </Col>
@@ -126,26 +128,34 @@ export const CategoriesInner: React.FC<CategoriesOuterProps & CategoriesInnerPro
 
 export const Categories = withDatabase<any>(
   withObservables<CategoriesOuterProps, CategoriesInnerProps>([], ({ database }) => ({
-    categories: database.collections.get('categories').query(),
+    categories: database.collections
+      .get('categories')
+      .query()
+      .observeWithColumns(['position_index']),
   }))(CategoriesInner),
 );
 
 const styles = {
   grid: {
-    padding: 5,
+    padding: GRID_SPACING,
     height: '100%',
     width: '100%',
   },
   row: {
-    paddingTop: 5,
-    paddingBottom: 5,
+    paddingTop: GRID_SPACING,
+    paddingBottom: GRID_SPACING,
   },
   col: {
-    paddingLeft: 5,
-    paddingRight: 5,
+    paddingLeft: GRID_SPACING,
+    paddingRight: GRID_SPACING,
   },
   button: {
     height: '100%',
     width: '100%',
   },
-};
+  text: {
+    fontSize: 25,
+    width: '100%',
+    textAlign: 'center',
+  },
+} as const;

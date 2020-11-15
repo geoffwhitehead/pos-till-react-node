@@ -7,10 +7,19 @@ type ModalColorPickerContentProps = {
   colorHex: string;
   onChangeColor: (color: string) => void;
   style: any;
+  globalRecentColors?: string[];
+  setGlobalRecentColors?: (colors: string[]) => void;
 };
 
-export const ModalColorPickerContent: React.FC<ModalColorPickerContentProps> = ({ onChangeColor, colorHex, style }) => {
-  const [recents, setRecents] = useState(['#247ba0', '#70c1b3', '#b2dbbf', '#f3ffbd', '#ff1654']);
+const RECENT_COLORS_SIZE = 6;
+export const ModalColorPickerContent: React.FC<ModalColorPickerContentProps> = ({
+  onChangeColor,
+  colorHex,
+  style,
+  globalRecentColors = [],
+  setGlobalRecentColors,
+}) => {
+  const [recents, setRecents] = useState(globalRecentColors);
   const [hslColor, setColor] = useState<{ h: number; s: number; l: number; a: number }>(tinycolor(colorHex).toHsl());
 
   const [modalVisible, setModalVisible] = useState(false);
@@ -32,7 +41,9 @@ export const ModalColorPickerContent: React.FC<ModalColorPickerContentProps> = (
         onOk={colorHex => {
           setModalVisible(false);
           setColor(tinycolor(colorHex).toHsl());
-          setRecents([colorHex, ...recents.filter(c => c !== colorHex).slice(0, 4)]);
+          setRecents([colorHex, ...recents.filter(c => c !== colorHex).slice(0, RECENT_COLORS_SIZE)]);
+          setGlobalRecentColors &&
+            setGlobalRecentColors([colorHex, ...recents.filter(c => c !== colorHex).slice(0, RECENT_COLORS_SIZE)]);
           onChangeColor(colorHex);
         }}
         swatches={recents}

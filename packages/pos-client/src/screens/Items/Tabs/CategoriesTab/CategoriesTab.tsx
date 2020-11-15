@@ -42,7 +42,6 @@ const CategoriesTabInner: React.FC<CategoriesTabOuterProps & CategoriesTabInnerP
   const onPressCreate = () => setModalOpen(true);
 
   const handleUpdateGridSize = async (size: number) => {
-    console.log('---size', size);
     await database.action(() =>
       organization.update(record => {
         record.categoryGridSize = size;
@@ -52,9 +51,6 @@ const CategoriesTabInner: React.FC<CategoriesTabOuterProps & CategoriesTabInnerP
 
   const minGridSize = categories.length ? Math.ceil(Math.sqrt(categories.length)) : 3;
   const maxCategories = Math.pow(organization.categoryGridSize, 2);
-  console.log('minGridSize', minGridSize);
-  console.log('MAX_GRID_SIZE', MAX_GRID_SIZE);
-  console.log('MAX_GRID_SIZE - minGridSize', MAX_GRID_SIZE - minGridSize);
   const options = [...Array(MAX_GRID_SIZE - minGridSize + 1)].map((_, i) => {
     const size = i + minGridSize;
     return {
@@ -63,15 +59,10 @@ const CategoriesTabInner: React.FC<CategoriesTabOuterProps & CategoriesTabInnerP
     };
   });
 
-  console.log('options', options);
-  console.log('categories', categories);
   return (
     <Container>
       <SearchBar
         value={searchValue}
-        // onPressSecondary={() => selectGridSizeDialog(minGridSize)}
-        // secondaryText="Update Grid Size"
-        // secondaryIconName="ios-grid"
         onPressCreate={onPressCreate}
         onSearch={value => setSearchValue(value)}
         isCreateDisabled={categories.length === maxCategories}
