@@ -152,8 +152,8 @@ export class BillItem extends Model {
       }
     });
 
-    const modsToUpdate = modifierItemsToComp.map(mI =>
-      mI.prepareUpdate(modifierItem => {
+    const modsToUpdate = modifierItemsToComp.map(modifierItem =>
+      modifierItem.prepareUpdate(modifierItem => {
         modifierItem.isComp = true;
       }),
     );

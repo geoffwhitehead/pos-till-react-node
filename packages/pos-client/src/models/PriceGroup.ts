@@ -5,6 +5,10 @@ import { Organization } from '.';
 export class PriceGroup extends Model {
   static table = 'price_groups';
 
+  static associations = {
+    bill_items: { type: 'has_many', foreignKey: 'price_group_id' },
+  };
+
   @field('name') name: string;
   @field('short_name') shortName: string;
   @field('is_prep_time_required') isPrepTimeRequired: boolean;

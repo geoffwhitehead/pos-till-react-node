@@ -37,16 +37,8 @@ export const ItemsBreakdownInner: React.FC<ItemsBreakdownOuterProps & ItemsBreak
         <Text>Items</Text>
       </Separator>
       {Object.values(billItemGroups).map(billItemGroup => {
-        return [
-          <ListItem itemDivider first key={billItemGroup[0].priceGroupId}>
-            <Left>
-              <Text style={{ fontWeight: 'bold' }}>{billItemGroup[0].priceGroupName}</Text>
-            </Left>
-            <Right>
-              <Text style={{ fontWeight: 'bold' }}>{`${billItemGroup.length} items`}</Text>
-            </Right>
-          </ListItem>,
-          ...billItemGroup.map(billItem => {
+        const filteredBillItems = billItemGroup
+          .map(billItem => {
             const logs = keyedLogGroups[billItem.id] || [];
 
             const hasSucceeded = logs.length > 0 && logs.every(log => log.status === PrintStatus.succeeded);
@@ -87,7 +79,23 @@ export const ItemsBreakdownInner: React.FC<ItemsBreakdownOuterProps & ItemsBreak
                 status={status}
               />
             );
-          }),
+          })
+          .filter(billItem => billItem !== null);
+
+        if (filteredBillItems.length === 0) {
+          return null;
+        }
+
+        return [
+          <ListItem itemDivider first key={billItemGroup[0].priceGroupId}>
+            <Left>
+              <Text style={{ fontWeight: 'bold' }}>{billItemGroup[0].priceGroupName}</Text>
+            </Left>
+            <Right>
+              <Text style={{ fontWeight: 'bold' }}>{`${billItemGroup.length} items`}</Text>
+            </Right>
+          </ListItem>,
+          ...filteredBillItems,
         ];
       })}
     </View>

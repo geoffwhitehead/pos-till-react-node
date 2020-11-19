@@ -37,10 +37,6 @@ const WrappedModifierGroup: React.FC<ModifierGroupInnerProps & ModifierGroupOute
   );
   const { minItems, maxItems, name } = modifier;
 
-  console.log('modifier', modifier);
-  console.log('minItems', minItems);
-  console.log('maxItems', maxItems);
-
   const single = minItems === maxItems;
   const range = minItems < maxItems;
 
@@ -50,6 +46,7 @@ const WrappedModifierGroup: React.FC<ModifierGroupInnerProps & ModifierGroupOute
 
   const message = single ? singleMessage : range ? rangeSelection : '';
 
+  console.log('modifierItems', modifierItems);
   const hasNoPricesSet = modifierItems.length === 0;
 
   return (
@@ -57,10 +54,16 @@ const WrappedModifierGroup: React.FC<ModifierGroupInnerProps & ModifierGroupOute
       <ListItem itemHeader>
         <Text>{name}</Text>
       </ListItem>
-      {hasNoPricesSet && <Text note>No prices have been set for this modifier in this price group.</Text>}
+      {hasNoPricesSet && (
+        <Text style={{ paddingTop: 15, paddingBottom: 15 }} note>
+          No prices have been set for this modifier in this price group. You can set modifier item prices by navigating
+          to the items sidebar menu - modifiers tab.
+        </Text>
+      )}
       {modifierItems.map(modifierItem => {
         const modifierItemPrice = keyedModifierPricesByModifierItem[modifierItem.id];
         const isSelected = selectedModifierItems.includes(modifierItem);
+        console.log('modifierItemPrice', modifierItemPrice);
         const isDisabled = modifierItemPrice.price === null;
 
         return (
@@ -87,13 +90,16 @@ export const ModifierGroup = withDatabase(
     ({ modifier, priceGroup, database }) => ({
       priceGroup,
       modifier,
-      modifierItems: modifier.modifierItems,
+      // modifierItems: modifier.modifierItems,
       modifierItemPrices: database.collections
         .get<ModifierItemPrice>(tableNames.modifierItemPrices)
         .query(Q.where('price_group_id', priceGroup.id), Q.on(tableNames.modifierItems, 'modifier_id', modifier.id)),
-      // modifierItems: modifier.modifierItems.extend(
-      //   Q.on(tableNames.modifierItemPrices, [Q.where('price_group_id', priceGroup.id), Q.where('price', Q.notEq(null))]),
-      // ),
+      modifierItems: modifier.modifierItems.extend(
+        Q.on(tableNames.modifierItemPrices, [
+          Q.where('price_group_id', priceGroup.id),
+          Q.where('price', Q.notEq(null)),
+        ]),
+      ),
     }),
   )(WrappedModifierGroup),
 );

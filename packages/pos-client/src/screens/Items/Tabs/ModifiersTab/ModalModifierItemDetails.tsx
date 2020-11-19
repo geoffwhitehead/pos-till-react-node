@@ -81,10 +81,8 @@ export const ModalModifierItemDetailsInner: React.FC<ModalModifierItemDetailsOut
         prices: reMappedPrices,
       };
 
-      console.log('remappedUpdate', remappedUpdate);
       await database.action(() => modifierItem.updateItem(remappedUpdate));
     } else {
-      console.log('creating');
       // create
       const modifierItemCollection = database.collections.get<ModifierItem>(tableNames.modifierItems);
       const modifierItemPriceCollection = database.collections.get<ModifierItemPrice>(tableNames.modifierItemPrices);

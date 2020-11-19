@@ -54,20 +54,19 @@ export const ModifierListInner: React.FC<ModifierListOuterProps & ModifierListIn
   };
 
   const onPressModifierItem = (modifier: Modifier, modifierItem: ModifierItem) => {
-    console.log('---------');
-    console.log('modifierItem', modifierItem);
+    const modifierGroup = selectedModifiers[modifier.id];
+    const containsModifier = modifierGroup.items.includes(modifierItem);
 
-    console.log('selectedModfiiers', selectedModifiers['6d69cbb9-39a0-4330-bc12-bf5403d2017f'].items);
-    const m = selectedModifiers[modifier.id];
-    const containsModifier = m.items.includes(modifierItem);
-    console.log('containsModifier', containsModifier);
     if (containsModifier) {
       setSelectedModifiers({
         ...selectedModifiers,
-        [modifier.id]: { modifier, items: [...m.items.filter(mI => mI !== modifierItem)] },
+        [modifier.id]: { modifier, items: [...modifierGroup.items.filter(mI => mI !== modifierItem)] },
       });
     } else {
-      setSelectedModifiers({ ...selectedModifiers, [modifier.id]: { modifier, items: [...m.items, modifierItem] } });
+      setSelectedModifiers({
+        ...selectedModifiers,
+        [modifier.id]: { modifier, items: [...modifierGroup.items, modifierItem] },
+      });
     }
   };
 

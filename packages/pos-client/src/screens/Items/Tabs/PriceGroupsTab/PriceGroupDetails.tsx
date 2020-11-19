@@ -44,6 +44,7 @@ export const PriceGroupDetails: React.FC<PriceGroupDetailsProps> = ({ priceGroup
 
   const onSave = async (values: FormValues, priceGroup: PriceGroup) => {
     setLoading(true);
+    console.log('values', values);
     if (priceGroup) {
       await database.action(() => priceGroup.updatePriceGroup(values));
     } else {
@@ -60,19 +61,25 @@ export const PriceGroupDetails: React.FC<PriceGroupDetailsProps> = ({ priceGroup
 
       const priceGroupToCreate = priceGroupCollection.prepareCreate(record => Object.assign(record, values));
 
+      console.log('priceGroupToCreate', priceGroupToCreate);
       // create null entry for all item prices
       const itemPricesToCreate = items.map(item =>
         itemPricesCollection.prepareCreate(record => {
           record.item.set(item);
-          record.priceGroup.set(priceGroupToCreate);
+          Object.assign(record, {
+            priceGroupId: priceGroupToCreate.id,
+          });
         }),
       );
 
       // create null entry for all modifier item prices
+
       const modifierItemPricesToCreate = modifierItems.map(modifierItem =>
         modifierItemPricesCollection.prepareCreate(record => {
           record.modifierItem.set(modifierItem);
-          record.priceGroup.set(priceGroup);
+          Object.assign(record, {
+            priceGroupId: priceGroupToCreate.id,
+          });
         }),
       );
 

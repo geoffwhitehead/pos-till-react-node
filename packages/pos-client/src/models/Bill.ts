@@ -39,6 +39,7 @@ export const billSchema = tableSchema({
     { name: 'closed_at', type: 'number', isOptional: true },
     { name: 'created_at', type: 'number' },
     { name: 'updated_at', type: 'number' },
+    { name: 'prep_at', type: 'number', isOptional: true },
   ],
 });
 
@@ -54,6 +55,7 @@ export class Bill extends Model {
   @field('is_closed') isClosed: boolean;
   @nochange @field('bill_period_id') billPeriodId: string;
   @date('closed_at') closedAt: Date;
+  @date('prep_at') prepAt: Date;
 
   @readonly @date('created_at') createdAt: string;
   @readonly @date('updated_at') updatedAt: string;
@@ -75,6 +77,10 @@ export class Bill extends Model {
     .get<BillItemModifierItem>('bill_item_modifier_items')
     .query(Q.on('bill_items', 'bill_id', this.id)) as Query<BillItemModifierItem>;
 
+  @lazy assignedPriceGroups = this.collections
+    .get<PriceGroup>(tableNames.priceGroups)
+    .query(Q.on(tableNames.billItems, 'bill_id', this.id));
+
   /**
    * Why are comps included? Because the reporting will need to account for these items when creating purchase reports.
    */
@@ -89,6 +95,12 @@ export class Bill extends Model {
   @lazy chargableBillItems = this.billItems.extend(
     Q.and(Q.where('is_voided', Q.notEq(true)), Q.where('is_comp', Q.notEq(true))),
   );
+
+  //
+  @lazy itemsRequiringPrepTimeCount = this.billItems.extend(Q.where('is_voided', Q.notEq(true))).observeCount();
+  @lazy priceGroups = this.database.collections
+    .get<PriceGroup>(tableNames.priceGroups)
+    .query(Q.on(tableNames.billItems, [Q.where('bill_id', this.id), Q.where('is_voided', Q.notEq(true))]));
 
   @lazy billItemsExclVoids = this.billItems.extend(Q.where('is_voided', Q.notEq(true)));
   @lazy chargableBillItemModifierItems = this._billModifierItems.extend(

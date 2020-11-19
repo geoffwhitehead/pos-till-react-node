@@ -7,6 +7,7 @@ import { flatten } from 'lodash';
 import React, { useContext, useEffect, useState } from 'react';
 import { StyleSheet } from 'react-native';
 import { Loading } from '../../../../components/Loading/Loading';
+import { TimePicker } from '../../../../components/TimePicker/TimePicker';
 import { OrganizationContext } from '../../../../contexts/OrganizationContext';
 import { ReceiptPrinterContext } from '../../../../contexts/ReceiptPrinterContext';
 import { Button, Col, Grid, Icon, Row, Text } from '../../../../core';
@@ -35,6 +36,8 @@ interface ReceiptInnerProps {
   chargableBillItems: BillItem[];
   discounts: Discount[];
   billModifierItemsCount: number;
+  itemsRequiringPrepTimeCount: number;
+  priceGroups: PriceGroup[];
 }
 
 interface ReceiptOuterProps {
@@ -54,15 +57,25 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
   onCheckout,
   complete,
   discounts,
+  itemsRequiringPrepTimeCount,
   billModifierItemsCount,
+  priceGroups,
 }) => {
   const [summary, setSummary] = useState<MinimalBillSummary>();
   const database = useDatabase();
   const { organization } = useContext(OrganizationContext);
   const { receiptPrinter } = useContext(ReceiptPrinterContext);
   const { currency } = organization;
+  const [isDatePickerVisible, setIsDatePickerVisible] = useState(false);
 
   const handleOnStore = async () => {
+    // check if a prep time is required and set
+    const priceGroups = await bill.assignedPriceGroups.fetch();
+
+    if (priceGroups.some(priceGroup => priceGroup.isPrepTimeRequired) && !bill.prepAt) {
+      return setIsDatePickerVisible(true);
+    }
+
     onStore();
 
     // fetch all the print logs to print
@@ -167,20 +180,41 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
     print(commands, receiptPrinter, false);
   };
 
+  const handleSetPrepTime = async (date: Date) => {
+    // dont allow the user to selcet a time in the past
+    console.log('date', date);
+    console.log('dayjs(date)', dayjs(date));
+    console.log('dayjs()', dayjs(new Date()));
+    if (dayjs(date).isBefore(dayjs())) {
+      return;
+    }
+
+    await database.action(() =>
+      bill.update(record => {
+        record.prepAt = date;
+      }),
+    );
+    setIsDatePickerVisible(false);
+    handleOnStore();
+  };
+
+  const handleCancelPrepTimeModal = () => {
+    setIsDatePickerVisible(false);
+  };
+
   if (!bill || !summary) {
     return <Loading />;
   }
 
   const { totalDiscount, total, totalPayable, balance } = summary;
-
+  const requiresPrepTime =
+    priceGroups.some(priceGroup => priceGroup.isPrepTimeRequired) && itemsRequiringPrepTimeCount > 0;
+  const dateString = bill.prepAt ? dayjs(bill.prepAt).format('HH:mm') : '';
+  console.log('bill', bill);
   return (
     <Grid style={styles.grid}>
       <Row style={styles.r1}>
-        <Col style={{ backgroundColor: 'whitesmoke' }}>
-          <Button style={{ margin: 5, alignSelf: 'flex-start', minWidth: 150 }} small info onPress={onStore}>
-            <Text style={{ fontWeight: 'bold' }}>Bill: {bill.reference || '-'}</Text>
-          </Button>
-        </Col>
+        {/* <Col style={{ backgroundColor: 'whitesmoke' }}></Col> */}
         <Col>
           <Text style={styles.dateText}>
             {dayjs(bill.createdAt)
@@ -189,7 +223,18 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
           </Text>
         </Col>
       </Row>
-
+      <Row style={{ height: 45 }}>
+        <Col>
+          <Button full info onPress={onStore}>
+            <Text style={{ fontWeight: 'bold' }}>Bill: {bill.reference || '-'}</Text>
+          </Button>
+        </Col>
+        <Col>
+          <Button full warning>
+            <Text style={{ fontWeight: 'bold' }}>{`Prep for: ${dateString}`}</Text>
+          </Button>
+        </Col>
+      </Row>
       <Row style={styles.r2}>
         <ReceiptItems
           bill={bill}
@@ -233,6 +278,13 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
           </Col>
         </Row>
       )}
+      <TimePicker
+        isVisible={isDatePickerVisible}
+        onCancel={handleCancelPrepTimeModal}
+        onConfirm={handleSetPrepTime}
+        value={bill.prepAt}
+        title="Please select a preperation time"
+      />
     </Grid>
   );
 };
@@ -243,8 +295,10 @@ const enhance = component =>
       bill,
       billPayments: bill.billPayments,
       billDiscounts: bill.billDiscounts,
-      chargableBillItems: bill.chargableBillItems, // TODO: should this be no voids too?
+      itemsRequiringPrepTimeCount: bill.itemsRequiringPrepTimeCount,
+      chargableBillItems: bill.chargableBillItems, // include any items that are send to the kitchen
       discounts: database.collections.get<Discount>(tableNames.discounts).query(),
+      priceGroups: bill.priceGroups.observeWithColumns(['isPrepTimeRequired']),
       /**
        * billModifierItems is here purely to cause a re render and recalculation of the
        * bill summary
@@ -264,7 +318,7 @@ const styles = StyleSheet.create({
     height: 40,
   },
   r2: {
-    // flexGrow: 1,
+    // height: 45,
   },
   r3: {
     borderTopColor: 'lightgrey',
