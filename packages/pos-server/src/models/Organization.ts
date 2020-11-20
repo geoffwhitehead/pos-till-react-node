@@ -10,7 +10,7 @@ export interface OrganizationProps {
     email: string;
     phone: string;
     vat?: string;
-    settings: OrganizationSettingsSchema;
+    settings: OrganizationSettings;
     address: {
         line1: string;
         line2?: string;
@@ -20,7 +20,7 @@ export interface OrganizationProps {
     };
 }
 
-export interface OrganizationSettingsSchema {
+export interface OrganizationSettings {
     defaultPriceGroupId?: string;
     receiptPrinterId?: string;
     currency?: CurrencyEnum;
@@ -30,6 +30,8 @@ export interface OrganizationSettingsSchema {
     gracePeriodMinutes?: number;
     categoryGridSize?: number;
     categoryViewType?: CategoryViewTypeEnum;
+    tranactionGrouping?: TransactionGroupingEnum;
+    transactionOrder?: TransactionOrderEnum;
 }
 
 export const ORGANIZATION_COLLECTION_NAME = 'organizations';
@@ -54,6 +56,16 @@ export const OrganizationValidation = {
     }).required(),
 };
 
+export enum TransactionOrderEnum {
+    descending = 'descending',
+    ascending = 'ascending',
+}
+
+export enum TransactionGroupingEnum {
+    grouped = 'grouped',
+    ungrouped = 'ungrouped',
+}
+
 export enum CurrencyEnum {
     gbp = 'gbp',
 }
@@ -63,12 +75,12 @@ export enum CategoryViewTypeEnum {
     grid = 'grid',
 }
 
-const OrganizationSettingsSchema: Schema<OrganizationSettingsSchema> = new Schema({
+const OrganizationSettingsSchema: Schema<OrganizationSettings> = new Schema({
     defaultPriceGroupId: { type: String, ref: 'PriceGroup' },
     receiptPrinterId: { type: String, ref: 'Printer' },
     currency: {
         type: String,
-        enum: [CurrencyEnum.gbp],
+        enum: Object.values(CurrencyEnum),
         default: CurrencyEnum.gbp,
     },
     maxBills: {
@@ -93,8 +105,18 @@ const OrganizationSettingsSchema: Schema<OrganizationSettingsSchema> = new Schem
     },
     categoryViewType: {
         type: String,
-        enum: [CategoryViewTypeEnum.list, CategoryViewTypeEnum.grid],
+        enum: Object.values(CategoryViewTypeEnum),
         default: CategoryViewTypeEnum.grid,
+    },
+    transactionOrder: {
+        type: String,
+        enum: Object.values(TransactionOrderEnum),
+        default: TransactionOrderEnum.descending,
+    },
+    transactionGrouping: {
+        type: String,
+        enum: Object.values(TransactionGroupingEnum),
+        default: TransactionGroupingEnum.ungrouped,
     },
 });
 

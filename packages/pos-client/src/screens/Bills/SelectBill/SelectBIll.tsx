@@ -1,9 +1,10 @@
 import withObservables from '@nozbe/with-observables';
 import React, { useContext, useState } from 'react';
 import { ScrollView } from 'react-native';
+import { SwitchSelector } from '../../../components/SwitchSelector/SwitchSelector';
 import { CurrentBillContext } from '../../../contexts/CurrentBillContext';
 import { OrganizationContext } from '../../../contexts/OrganizationContext';
-import { Button, Content, Footer, Left, List, ListItem, Right, Text } from '../../../core';
+import { Content, Footer, Left, List, ListItem, Right, Text } from '../../../core';
 import { Bill, BillPeriod } from '../../../models';
 import { BillRow } from './BillRow';
 import { BillRowEmpty } from './BillRowEmpty';
@@ -29,7 +30,7 @@ export const WrappedSelectBill: React.FC<SelectBillOuterProps & SelectBillInnerP
   const { setCurrentBill } = useContext(CurrentBillContext);
   const { organization } = useContext(OrganizationContext);
 
-  const [isFilterOpenOnly, setIsFilterOpenOnly] = useState<boolean>(false);
+  const [isFilterOpenSelected, setIsFilterOpenSelected] = useState(0);
 
   const bills: (Bill | null)[] = openBills.reduce((acc, bill) => {
     acc[bill.reference - 1] = bill;
@@ -41,8 +42,7 @@ export const WrappedSelectBill: React.FC<SelectBillOuterProps & SelectBillInnerP
     onSelectBill && onSelectBill(bill);
   };
 
-  const toggleOpenOnlyFilter = () => setIsFilterOpenOnly(!isFilterOpenOnly);
-  const filterOpenOnly = bill => (isFilterOpenOnly ? !!bill : true);
+  const filterOpenOnly = bill => (isFilterOpenSelected ? !!bill : true);
 
   return (
     <>
@@ -51,9 +51,15 @@ export const WrappedSelectBill: React.FC<SelectBillOuterProps & SelectBillInnerP
           <ListItem itemHeader first>
             <Left />
             <Right>
-              <Button active={isFilterOpenOnly} small info onPress={toggleOpenOnlyFilter}>
-                <Text>{isFilterOpenOnly ? 'Show all' : 'Show only open'}</Text>
-              </Button>
+              <SwitchSelector
+                options={[
+                  { label: 'Show All', value: 0 },
+                  { label: 'Show Open', value: 1 },
+                ]}
+                initial={isFilterOpenSelected}
+                onPress={value => setIsFilterOpenSelected(value as number)}
+                style={{ paddingRight: 10 }}
+              />
             </Right>
           </ListItem>
           <ScrollView>

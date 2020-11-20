@@ -7171,6 +7171,13 @@ react-native-swipe-list-view@^3.1.0:
   resolved "https://registry.yarnpkg.com/react-native-swipe-list-view/-/react-native-swipe-list-view-3.1.0.tgz#4c59a8b6358d203f406d199463e2347283ac08d1"
   integrity sha512-JVRAN3w3fOjNnpfLSWi++X+4pB2SK4+5gFhAU5NFHcsLinPBLZT8MMpfQAtAa3nFdFrbtdogDMre5mHOScLycg==
 
+react-native-switch-selector@^2.0.6:
+  version "2.0.6"
+  resolved "https://registry.yarnpkg.com/react-native-switch-selector/-/react-native-switch-selector-2.0.6.tgz#e21cf77b8c8596a83e455b54b06f60a1267e26c3"
+  integrity sha512-noBFzh5QMf3Jp/B+kg0uLmbBPID5y9bhTpZ577ZabV3p5eErSTdYSmZHqvn0XCXPraBUDKAC73/0L4ttMv+rOQ==
+  dependencies:
+    prop-types "^15.7.2"
+
 react-native-vector-icons@^6.6.0:
   version "6.6.0"
   resolved "https://registry.yarnpkg.com/react-native-vector-icons/-/react-native-vector-icons-6.6.0.tgz#66cf004918eb05d90778d64bd42077c1800d481b"

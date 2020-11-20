@@ -51,6 +51,7 @@
     "react-native-screens": "^2.0.0-beta.2",
     "react-native-star-prnt": "https://github.com/geoffwhitehead/react-native-star-prnt.git",
     "react-native-swipe-list-view": "^3.1.0",
+    "react-native-switch-selector": "^2.0.6",
     "react-native-vector-icons": "^6.6.0",
     "react-redux": "^6.0.1",
     "redux": "^4.0.1",

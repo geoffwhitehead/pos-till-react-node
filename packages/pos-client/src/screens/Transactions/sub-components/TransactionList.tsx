@@ -2,12 +2,15 @@ import { Database } from '@nozbe/watermelondb';
 import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import withObservables from '@nozbe/with-observables';
 import { groupBy } from 'lodash';
-import React, { useState } from 'react';
+import React, { useContext } from 'react';
 import { ScrollView } from 'react-native';
-import { Button, Left, List, ListItem, Right, Text } from '../../../core';
+import { SwitchSelector } from '../../../components/SwitchSelector/SwitchSelector';
+import { OrganizationContext } from '../../../contexts/OrganizationContext';
+import { Left, List, ListItem, Right, Text } from '../../../core';
+import { database } from '../../../database';
 import { Bill, PaymentType, tableNames } from '../../../models';
+import { TransactionGroupingEnum, TransactionOrderEnum } from '../../../models/Organization';
 import { TransactionListRow } from './TransactionListRow';
-
 interface TransactionListInnerProps {
   paymentTypes: PaymentType[];
 }
@@ -25,16 +28,28 @@ export const TransactionListInner: React.FC<TransactionListOuterProps & Transact
   selectedBill,
   paymentTypes,
 }) => {
+  const { organization } = useContext(OrganizationContext);
+
   const sorterClosedAtDescending = (b1: Bill, b2: Bill) => b2.closedAt - b1.closedAt;
   const sorterClosedAtAscending = (b1: Bill, b2: Bill) => b1.closedAt - b2.closedAt;
-  const [isGroupedByTable, setIsGroupedByTable] = useState(false);
-  const [isOrderedDescending, setIsOrderedDescending] = useState(true);
 
-  const sorter = isOrderedDescending ? sorterClosedAtDescending : sorterClosedAtAscending;
+  const sorter =
+    organization.transactionOrder === TransactionOrderEnum.descending
+      ? sorterClosedAtDescending
+      : sorterClosedAtAscending;
+
   const sortedBills = bills.sort(sorter);
   const sortedBillsGrouped = groupBy(sortedBills, bill => bill.reference);
   const hasNoTransactions = bills.length === 0;
 
+  const isGrouped = organization.transactionGrouping === TransactionGroupingEnum.grouped;
+
+  const updateOrganization = async value => {
+    console.log('value', value);
+    await database.action(() => organization.update(record => Object.assign(record, value)));
+  };
+
+  console.log('organization', organization);
   return (
     <List>
       <ListItem>
@@ -45,24 +60,30 @@ export const TransactionListInner: React.FC<TransactionListOuterProps & Transact
             justifyContent: 'flex-end',
           }}
         >
-          <Button
-            style={{ marginRight: 5 }}
-            active={isGroupedByTable}
-            small
-            info
-            onPress={() => setIsOrderedDescending(!isOrderedDescending)}
-          >
-            <Text>{isOrderedDescending ? 'Descending' : 'Ascending'}</Text>
-          </Button>
-          <Button active={isGroupedByTable} small info onPress={() => setIsGroupedByTable(!isGroupedByTable)}>
-            <Text>Grouped</Text>
-          </Button>
+          <SwitchSelector
+            options={[
+              { label: 'Descending', value: TransactionOrderEnum.descending },
+              { label: 'Ascending', value: TransactionOrderEnum.ascending },
+            ]}
+            initial={organization.transactionOrder}
+            onPress={value => updateOrganization({ transactionOrder: value })}
+            style={{ paddingRight: 10 }}
+          />
+
+          <SwitchSelector
+            options={[
+              { label: 'Ungrouped', value: TransactionGroupingEnum.ungrouped },
+              { label: 'Grouped', value: TransactionGroupingEnum.grouped },
+            ]}
+            initial={organization.transactionGrouping}
+            onPress={value => updateOrganization({ transactionGrouping: value })}
+          />
         </Right>
       </ListItem>
 
       {hasNoTransactions ? (
         <Text style={{ padding: 15 }}>There aren't any completed transactions ...</Text>
-      ) : isGroupedByTable ? (
+      ) : isGrouped ? (
         <ScrollView>
           {Object.entries(sortedBillsGrouped).map(([billReference, sortedBillsByReference]) => {
             return [

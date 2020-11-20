@@ -4,6 +4,8 @@ import {
     CurrencyEnum,
     OrganizationProps,
     ORGANIZATION_COLLECTION_NAME,
+    TransactionGroupingEnum,
+    TransactionOrderEnum,
 } from '../models/Organization';
 import { PAYMENT_TYPE_COLLECTION_NAME } from '../models/PaymentType';
 import { toClientChanges } from '../utils/sync';
@@ -31,6 +33,8 @@ export type OrganizationClientProps = {
     gracePeriodMinutes: number;
     categoryGridSize: number;
     categoryViewType: CategoryViewTypeEnum;
+    transactionGrouping: TransactionGroupingEnum;
+    transactionOrder: TransactionOrderEnum;
 };
 
 export const organizationFromClient = (organization: OrganizationClientProps): OrganizationProps => {
@@ -52,6 +56,8 @@ export const organizationFromClient = (organization: OrganizationClientProps): O
             gracePeriodMinutes: organization.gracePeriodMinutes,
             categoryGridSize: organization.categoryGridSize,
             categoryViewType: organization.categoryViewType,
+            tranactionGrouping: organization.transactionGrouping,
+            transactionOrder: organization.transactionOrder,
         },
         address: {
             line1: organization.addressLine1,
@@ -82,6 +88,8 @@ export const organizationToClient = (organization: OrganizationProps): Organizat
         gracePeriodMinutes: settings.gracePeriodMinutes,
         categoryGridSize: settings.categoryGridSize,
         categoryViewType: settings.categoryViewType,
+        transactionGrouping: settings.tranactionGrouping,
+        transactionOrder: settings.transactionOrder,
         addressLine1: address.line1,
         addressLine2: address.line2,
         addressCity: address.city,
