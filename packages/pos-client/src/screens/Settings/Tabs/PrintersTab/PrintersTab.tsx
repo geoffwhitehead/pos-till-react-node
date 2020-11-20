@@ -69,24 +69,26 @@ const PrintersTabInner: React.FC<PrintersTabOuterProps & PrintersTabInnerProps> 
 
     if (selectedPrinter.id) {
       await database.action(() =>
-        selectedPrinter.update(printerRecord => {
-          printerRecord.macAddress = values.macAddress;
-          printerRecord.name = values.name;
-          printerRecord.address = values.address;
-          printerRecord.printWidth = parseInt(values.printWidth);
-          printerRecord.emulation = Emulations[values.emulation];
+        selectedPrinter.update(record => {
+          record.macAddress = values.macAddress;
+          record.name = values.name;
+          record.address = values.address;
+          record.printWidth = parseInt(values.printWidth);
+          record.emulation = Emulations[values.emulation];
+          record.receivesBillCalls = values.receivesBillCalls;
         }),
       );
     } else {
       await database.action(async () => {
         const collection = database.collections.get<Printer>(tableNames.printers);
-        await collection.create(printerRecord => {
-          Object.assign(printerRecord, {
+        await collection.create(record => {
+          Object.assign(record, {
             macAddress: values.macAddress,
             name: values.name,
             address: values.address,
             printWidth: parseInt(values.printWidth),
             emulation: Emulations[values.emulation],
+            receivesBillCalls: values.receivesBillCalls,
           });
         });
       });

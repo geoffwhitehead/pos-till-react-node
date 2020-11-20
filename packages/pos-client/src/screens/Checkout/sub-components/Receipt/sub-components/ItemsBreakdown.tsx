@@ -28,8 +28,8 @@ export const ItemsBreakdownInner: React.FC<ItemsBreakdownOuterProps & ItemsBreak
     return null;
   }
 
-  const billItemGroups: Record<string, BillItem[]> = groupBy(billItems, item => item.priceGroupId);
-  const keyedLogGroups: Record<string, BillItemPrintLog[]> = groupBy(billItemStatusLogs, log => log.billItemId);
+  const billItemGroups = groupBy(billItems, item => item.priceGroupId);
+  const keyedLogGroups = groupBy(billItemStatusLogs, log => log.billItemId);
 
   return (
     <View {...props}>
@@ -46,7 +46,6 @@ export const ItemsBreakdownInner: React.FC<ItemsBreakdownOuterProps & ItemsBreak
             const isProcessing = logs.some(log => log.status === PrintStatus.processing);
             const isPending = logs.some(log => log.status === PrintStatus.pending);
 
-            console.log('logs', logs);
             const status = hasSucceeded
               ? PrintStatus.succeeded
               : hasErrored
@@ -57,7 +56,6 @@ export const ItemsBreakdownInner: React.FC<ItemsBreakdownOuterProps & ItemsBreak
               ? PrintStatus.pending
               : null;
 
-            console.log('status', status);
             const isVoidComplete =
               billItem.isVoided &&
               logs.some(log => log.type === PrintType.void && log.status === PrintStatus.succeeded);

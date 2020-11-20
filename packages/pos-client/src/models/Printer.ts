@@ -17,6 +17,7 @@ export type PrinterProps = {
   macAddress: string;
   printWidth: number;
   emulation: Emulations;
+  receivesBillCalls: boolean;
 };
 
 export class Printer extends Model {
@@ -27,6 +28,7 @@ export class Printer extends Model {
   @field('mac_address') macAddress: string;
   @field('print_width') printWidth: number;
   @field('emulation') emulation: Emulations;
+  @field('receives_bill_calls') receivesBillCalls: boolean;
 
   static associations = {
     printer_groups_printers: { type: 'has_many', foreignKey: 'printer_id' },
@@ -52,5 +54,6 @@ export const printerSchema = tableSchema({
     { name: 'mac_address', type: 'string' },
     { name: 'print_width', type: 'number' },
     { name: 'emulation', type: 'string' },
+    { name: 'receives_bill_calls', type: 'boolean' },
   ],
 });

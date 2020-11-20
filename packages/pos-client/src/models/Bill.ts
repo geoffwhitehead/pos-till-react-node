@@ -12,6 +12,7 @@ import {
 import dayjs from 'dayjs';
 import { flatten, times } from 'lodash';
 import {
+  BillCallPrintLog,
   BillItemModifier,
   BillItemPrintLog,
   Discount,
@@ -23,6 +24,7 @@ import {
   tableNames,
 } from '.';
 import { resolvePrice } from '../helpers';
+import { BillCallLog } from './BillCallLog';
 import { BillDiscount } from './BillDiscount';
 import { BillItem } from './BillItem';
 import { BillItemModifierItem } from './BillItemModifierItem';
@@ -67,11 +69,13 @@ export class Bill extends Model {
     bill_payments: { type: 'has_many', foreignKey: 'bill_id' },
     bill_items: { type: 'has_many', foreignKey: 'bill_id' },
     bill_discounts: { type: 'has_many', foreignKey: 'bill_id' },
+    bill_call_logs: { type: 'has_many', foreignKey: 'bill_id' },
   };
 
   @children('bill_payments') billPayments: Query<BillPayment>;
   @children('bill_discounts') billDiscounts: Query<BillDiscount>;
   @children('bill_items') billItems: Query<BillItem>;
+  @children('bill_call_logs') billCallLogs: Query<BillCallLog>;
 
   @lazy _billModifierItems = this.collections
     .get<BillItemModifierItem>('bill_item_modifier_items')
@@ -79,6 +83,10 @@ export class Bill extends Model {
 
   @lazy assignedPriceGroups = this.collections
     .get<PriceGroup>(tableNames.priceGroups)
+    .query(Q.on(tableNames.billItems, 'bill_id', this.id));
+
+  @lazy billCallPrintLogs = this.collections
+    .get<BillCallPrintLog>(tableNames.billCallPrintLogs)
     .query(Q.on(tableNames.billItems, 'bill_id', this.id));
 
   /**
@@ -110,28 +118,47 @@ export class Bill extends Model {
   @lazy overviewPrintLogs: Query<BillItemPrintLog> = this.collections
     .get<BillItemPrintLog>(tableNames.billItemPrintLogs)
     .query(
-      Q.experimentalJoinTables([tableNames.bills]),
+      Q.experimentalJoinTables([tableNames.billItems]),
       Q.where('status', Q.oneOf([PrintStatus.pending, PrintStatus.errored, PrintStatus.processing])),
-      Q.on(tableNames.bills, 'id', this.id),
+      Q.on(tableNames.billItems, 'bill_id', this.id),
     );
 
   @lazy billItemStatusLogs: Query<BillItemPrintLog> = this.collections
     .get<BillItemPrintLog>(tableNames.billItemPrintLogs)
     .query(
-      Q.experimentalJoinTables([tableNames.bills]),
+      Q.experimentalJoinTables([tableNames.billItems]),
       Q.where(
         'status',
         Q.oneOf([PrintStatus.succeeded, PrintStatus.errored, PrintStatus.processing, PrintStatus.pending]),
       ),
-      Q.on(tableNames.bills, 'id', this.id),
+      Q.on(tableNames.billItems, 'bill_id', this.id),
     );
 
   @lazy toPrintBillLogs: Query<BillItemPrintLog> = this.collections
     .get<BillItemPrintLog>(tableNames.billItemPrintLogs)
     .query(
-      Q.experimentalJoinTables([tableNames.bills]),
+      Q.experimentalJoinTables([tableNames.billItems]),
       Q.where('status', Q.oneOf([PrintStatus.pending, PrintStatus.errored])),
-      Q.on(tableNames.bills, 'id', this.id),
+      Q.on(tableNames.billItems, 'bill_id', this.id),
+    );
+
+  @lazy toPrintBillCallPrintLogs: Query<BillCallPrintLog> = this.collections
+    .get<BillCallPrintLog>(tableNames.billCallPrintLogs)
+    .query(
+      Q.experimentalJoinTables([tableNames.billCallLogs]),
+      Q.where('status', Q.oneOf([PrintStatus.pending, PrintStatus.errored])),
+      Q.on(tableNames.billCallLogs, 'bill_id', this.id),
+    );
+
+  @lazy overviewBillCallPrintLogs: Query<BillCallPrintLog> = this.collections
+    .get<BillCallPrintLog>(tableNames.billCallPrintLogs)
+    .query(
+      Q.experimentalJoinTables([tableNames.billCallLogs]),
+      Q.where(
+        'status',
+        Q.oneOf([PrintStatus.pending, PrintStatus.processing, PrintStatus.errored, PrintStatus.succeeded]),
+      ),
+      Q.on(tableNames.billCallLogs, 'bill_id', this.id),
     );
 
   /**
@@ -300,6 +327,19 @@ export class Bill extends Model {
       }),
     );
 
+    if (printLogsToUpdate.length > 0) {
+      await this.database.batch(...printLogsToUpdate);
+    }
+  };
+
+  @action processCallLogs = async (updates: { billCallPrintLog: BillCallPrintLog; status: PrintStatus }[]) => {
+    const printLogsToUpdate = updates.map(({ billCallPrintLog, status }) =>
+      billCallPrintLog.prepareUpdate(record => {
+        record.status = status;
+      }),
+    );
+
+    console.log('printLogsToUpdate', printLogsToUpdate);
     if (printLogsToUpdate.length > 0) {
       await this.database.batch(...printLogsToUpdate);
     }

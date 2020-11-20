@@ -1,14 +1,14 @@
 import { Schema } from 'mongoose';
-import { tenantModel } from './utils/multiTenant';
 import uuid from 'uuid';
+import { tenantModel } from './utils/multiTenant';
 
 export interface PrinterProps {
     _id?: string;
     name: string;
-    type?: 'wifi' | 'ethernet';
     address?: string;
     macAddress?: string;
     printWidth: number;
+    receivesBillCalls?: boolean;
     emulation: 'StarPRNT' | 'StarLine' | 'StarGraphic' | 'StarDotImpact' | 'EscPosMobile' | 'EscPos';
 }
 
@@ -39,6 +39,10 @@ const PrinterSchema: Schema<PrinterProps> = new Schema(
         },
         printWidth: {
             type: Number,
+        },
+        receivesBillCalls: {
+            type: Boolean,
+            default: false,
         },
     },
     { timestamps: true, collection: PRINTER_COLLECTION_NAME },

@@ -92,7 +92,6 @@ export const maintenanceService = ({
             {
                 _id: uuid(),
                 name: 'Star SP700',
-                type: 'ethernet',
                 address: 'TCP:192.168.1.84',
                 emulation: 'StarDotImpact',
                 printWidth: 14,
@@ -100,7 +99,6 @@ export const maintenanceService = ({
             {
                 _id: uuid(),
                 name: 'Star TSP100',
-                type: 'wifi',
                 address: 'TCP:192.168.1.78',
                 emulation: 'StarGraphic',
                 printWidth: 39,

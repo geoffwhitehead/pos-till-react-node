@@ -10,9 +10,11 @@ import { Loading } from '../../../../components/Loading/Loading';
 import { TimePicker } from '../../../../components/TimePicker/TimePicker';
 import { OrganizationContext } from '../../../../contexts/OrganizationContext';
 import { ReceiptPrinterContext } from '../../../../contexts/ReceiptPrinterContext';
-import { Button, Col, Grid, Icon, Row, Text } from '../../../../core';
+import { ActionSheet, Button, Col, Grid, Icon, Row, Text } from '../../../../core';
 import {
   Bill,
+  BillCallLog,
+  BillCallPrintLog,
   BillDiscount,
   BillPayment,
   Discount,
@@ -23,7 +25,7 @@ import {
 } from '../../../../models';
 import { BillItem } from '../../../../models/BillItem';
 import { PrintStatus } from '../../../../models/BillItemPrintLog';
-import { kitchenReceipt } from '../../../../services/printer/kitchenReceipt';
+import { kitchenCall, kitchenReceipt } from '../../../../services/printer/kitchenReceipt';
 import { print } from '../../../../services/printer/printer';
 import { receiptBill } from '../../../../services/printer/receiptBill';
 import { Fonts } from '../../../../theme';
@@ -67,6 +69,7 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
   const { receiptPrinter } = useContext(ReceiptPrinterContext);
   const { currency } = organization;
   const [isDatePickerVisible, setIsDatePickerVisible] = useState(false);
+  const [hasStored, setHasStored] = useState(false);
 
   const handleOnStore = async () => {
     // check if a prep time is required and set
@@ -78,16 +81,28 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
 
     onStore();
 
-    // fetch all the print logs to print
-    const billItemsPrintLogs = await bill.toPrintBillLogs.fetch();
+    // fetch print logs
+    const [billCallPrintLogs, billItemsPrintLogs] = await Promise.all([
+      bill.toPrintBillCallPrintLogs.fetch(),
+      bill.toPrintBillLogs.fetch(),
+    ]);
 
-    if (billItemsPrintLogs.length > 0) {
+    if (billItemsPrintLogs.length > 0 || billCallPrintLogs.length > 0) {
       // updates the status of the print records to processing
       const updates = billItemsPrintLogs.map(billItemPrintLog => ({
         billItemPrintLog,
         status: PrintStatus.processing,
       }));
-      await database.action(() => bill.processPrintLogs(updates));
+
+      const callUpdates = billCallPrintLogs.map(billCallPrintLog => ({
+        billCallPrintLog,
+        status: PrintStatus.processing,
+      }));
+
+      await database.action(async () => {
+        await bill.processPrintLogs(updates);
+        await bill.processCallLogs(callUpdates);
+      });
 
       // filter items not being printed and generate print commands
       const ids = billItemsPrintLogs.map(log => log.billItemId);
@@ -109,18 +124,24 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
       ]);
 
       // this will generate the print commands to fire off to all the printers.
-      const toPrint = await kitchenReceipt({
+      const toPrintBillItemLogs = await kitchenReceipt({
         billItems,
         billItemPrintLogs: billItemsPrintLogs,
         printers,
         priceGroups,
         reference: bill.reference.toString(),
-        prepTime: dayjs().add(10, 'minute'), // TODO: set prep time
+        prepTime: dayjs(bill.prepAt),
+      });
+
+      const toPrintCallLogs = await kitchenCall({
+        bill,
+        billCallPrintLogs,
+        printers,
       });
 
       // attempt to print the receipts
       const printStatuses = await Promise.all(
-        toPrint.map(async ({ billItemPrintLogs, printer, commands }) => {
+        toPrintBillItemLogs.map(async ({ billItemPrintLogs, printer, commands }) => {
           const res = await print(commands, printer, false);
           const status = res.success ? PrintStatus.succeeded : PrintStatus.errored;
 
@@ -133,7 +154,24 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
         }),
       );
 
-      await database.action(() => bill.processPrintLogs(flatten(printStatuses)));
+      // attempt to call
+      const printCallStatuses = await Promise.all(
+        toPrintCallLogs.map(async ({ billCallPrintLog, printer, commands }) => {
+          const res = await print(commands, printer, false);
+          const status = res.success ? PrintStatus.succeeded : PrintStatus.errored;
+
+          return {
+            billCallPrintLog,
+            status,
+          };
+        }),
+      );
+
+      console.log('printCallStatuses', printCallStatuses);
+      await database.action(async () => {
+        await bill.processPrintLogs(flatten(printStatuses));
+        await bill.processCallLogs(printCallStatuses);
+      });
     }
 
     await database.action(bill.storeBill);
@@ -206,15 +244,66 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
     return <Loading />;
   }
 
+  const createCallLog = async (message?: string) => {
+    // TODO: pass message
+    await database.action(async () => {
+      const billCallLog = database.collections.get<BillCallLog>(tableNames.billCallLogs).prepareCreate(record => {
+        record.bill.set(bill);
+        Object.assign(record, {
+          printMessage: message,
+        });
+      });
+
+      const printers = await database.collections
+        .get<Printer>(tableNames.printers)
+        .query(Q.where('receives_bill_calls', Q.eq(true)))
+        .fetch();
+
+      const billCallPrintLogs = printers.map(printer =>
+        database.collections.get<BillCallPrintLog>(tableNames.billCallPrintLogs).prepareCreate(record => {
+          record.printer.set(printer);
+          Object.assign(record, {
+            billCallLogId: billCallLog.id,
+            status: PrintStatus.pending,
+          });
+        }),
+      );
+
+      const batched = [billCallLog, ...billCallPrintLogs];
+
+      await database.batch(...batched);
+    });
+  };
+
+  const callConfirmDialog = () => {
+    const options = ['Call', 'Cancel'];
+    ActionSheet.show(
+      {
+        options,
+        title: 'Are you sure?',
+      },
+      index => {
+        index === 0 && createCallLog();
+      },
+    );
+  };
+
   const { totalDiscount, total, totalPayable, balance } = summary;
+
   const requiresPrepTime =
     priceGroups.some(priceGroup => priceGroup.isPrepTimeRequired) && itemsRequiringPrepTimeCount > 0;
+
   const dateString = bill.prepAt ? dayjs(bill.prepAt).format('HH:mm') : '';
-  console.log('bill', bill);
+
   return (
     <Grid style={styles.grid}>
-      <Row style={styles.r1}>
-        {/* <Col style={{ backgroundColor: 'whitesmoke' }}></Col> */}
+      <Row style={{ height: 45 }}>
+        <Col>
+          <Button full iconLeft onPress={callConfirmDialog}>
+            <Icon name="ios-print" />
+            <Text style={{ fontWeight: 'bold' }}>Call </Text>
+          </Button>
+        </Col>
         <Col>
           <Text style={styles.dateText}>
             {dayjs(bill.createdAt)
@@ -301,7 +390,7 @@ const enhance = component =>
       priceGroups: bill.priceGroups.observeWithColumns(['isPrepTimeRequired']),
       /**
        * billModifierItems is here purely to cause a re render and recalculation of the
-       * bill summary
+       * bill summary on adding a modifier item.
        */
       billModifierItemsCount: bill.billModifierItems.observeCount(),
     }))(component),

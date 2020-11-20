@@ -4,7 +4,7 @@ import React from 'react';
 import { ScrollView } from 'react-native';
 import * as Yup from 'yup';
 import { ModalContentButton } from '../../../../components/Modal/ModalContentButton';
-import { Form, Icon, Input, Item, Label, Picker } from '../../../../core';
+import { Body, CheckBox, Form, Icon, Input, Item, Label, ListItem, Picker, Text } from '../../../../core';
 import { Printer } from '../../../../models';
 import { Emulations, PrinterProps } from '../../../../models/Printer';
 
@@ -35,6 +35,7 @@ const printerDetailsSchema = Yup.object().shape({
   emulation: Yup.mixed()
     .oneOf(Object.values(Emulations))
     .required('Required'),
+  receivesBillCalls: Yup.boolean(),
 });
 
 export const ModalPrinterDetails: React.FC<ModalPrinterDetailsOuterProps> = ({
@@ -43,7 +44,7 @@ export const ModalPrinterDetails: React.FC<ModalPrinterDetailsOuterProps> = ({
   onSave,
   isLoading,
 }) => {
-  const { name, address, macAddress, emulation, printWidth } = printer;
+  const { name, address, macAddress, emulation, printWidth, receivesBillCalls } = printer;
 
   const initialValues = {
     name: name || '',
@@ -51,12 +52,13 @@ export const ModalPrinterDetails: React.FC<ModalPrinterDetailsOuterProps> = ({
     printWidth: printWidth || 80,
     emulation,
     macAddress: macAddress || '',
+    receivesBillCalls: receivesBillCalls || false,
   };
 
   return (
     <Formik initialValues={initialValues} validationSchema={printerDetailsSchema} onSubmit={onSave}>
-      {({ handleChange, handleBlur, handleSubmit, errors, touched, values }) => {
-        const { name, address, macAddress, printWidth, emulation } = values;
+      {({ handleChange, handleBlur, handleSubmit, setFieldValue, errors, touched, values }) => {
+        const { name, address, macAddress, printWidth, emulation, receivesBillCalls } = values;
         const err = {
           name: !!(touched.name && errors.name),
           address: !!(touched.address && errors.address),
@@ -103,6 +105,7 @@ export const ModalPrinterDetails: React.FC<ModalPrinterDetailsOuterProps> = ({
                     value={printWidth.toString()}
                   />
                 </Item>
+
                 <Item picker stackedLabel>
                   <Label>Emulation</Label>
                   <Picker
@@ -120,6 +123,16 @@ export const ModalPrinterDetails: React.FC<ModalPrinterDetailsOuterProps> = ({
                     ))}
                   </Picker>
                 </Item>
+                <ListItem>
+                  <CheckBox
+                    checked={receivesBillCalls}
+                    onPress={() => setFieldValue('receivesBillCalls', !receivesBillCalls)}
+                    onBlur={handleBlur('isPrepTimeRequired')}
+                  />
+                  <Body>
+                    <Text>Will this printer receive bill calls?</Text>
+                  </Body>
+                </ListItem>
               </Form>
             </ScrollView>
           </ModalContentButton>

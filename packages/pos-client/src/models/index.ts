@@ -1,5 +1,7 @@
 import { Model, TableSchema } from '@nozbe/watermelondb';
 import { Bill, billSchema } from './Bill';
+import { BillCallLog, billCallLogSchema } from './BillCallLog';
+import { BillCallPrintLog, billCallPrintLogSchema } from './BillCallPrintLog';
 import { BillDiscount, billDiscountSchema } from './BillDiscount';
 import { BillItem, billItemSchema } from './BillItem';
 import { BillItemModifier, billItemModifierSchema } from './BillItemModifier';
@@ -47,6 +49,8 @@ type TableNames = {
   billItemModifiers: string;
   billItemModifierItems: string;
   billItemPrintLogs: string;
+  billCallLogs: string;
+  billCallPrintLogs: string;
 };
 
 export const tableNames: TableNames = {
@@ -73,6 +77,8 @@ export const tableNames: TableNames = {
   billItemModifiers: billItemModifierSchema.name,
   billItemModifierItems: billItemModifierItemSchema.name,
   billItemPrintLogs: billItemPrintLogSchema.name,
+  billCallLogs: billCallLogSchema.name,
+  billCallPrintLogs: billCallPrintLogSchema.name,
 };
 
 export const schemas: Record<string, TableSchema> = {
@@ -99,6 +105,8 @@ export const schemas: Record<string, TableSchema> = {
   billItemPrintLogSchema,
   printerGroupSchema,
   printerGroupPrinterSchema,
+  billCallLogSchema,
+  billCallPrintLogSchema,
 };
 
 export const models: Record<string, typeof Model> = {
@@ -125,6 +133,8 @@ export const models: Record<string, typeof Model> = {
   BillItemPrintLog,
   PrinterGroup,
   PrinterGroupPrinter,
+  BillCallLog,
+  BillCallPrintLog,
 };
 
 export {
@@ -151,4 +161,6 @@ export {
   BillItemPrintLog,
   PrinterGroup,
   PrinterGroupPrinter,
+  BillCallLog,
+  BillCallPrintLog,
 };

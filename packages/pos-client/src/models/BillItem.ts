@@ -21,8 +21,6 @@ export const billItemSchema = tableSchema({
     { name: 'item_price', type: 'number' },
     { name: 'price_group_name', type: 'string' },
     { name: 'price_group_id', type: 'string' },
-    // { name: 'modifier_name', type: 'string' },
-    // { name: 'modifier_id', type: 'string' },
     { name: 'category_name', type: 'string' },
     { name: 'category_id', type: 'string' },
     { name: 'created_at', type: 'number' },
@@ -34,11 +32,7 @@ export const billItemSchema = tableSchema({
     { name: 'reason_name', type: 'string' },
     { name: 'is_stored', type: 'boolean' },
     { name: 'stored_at', type: 'string' },
-    /**
-     * Ideally print_status would be computed from the print logs and void logs but im not sure how performant this
-     * will be using the watermelon query builder.
-     */
-    { name: 'print_status', type: 'string' },
+    { name: 'print_message', type: 'string' },
   ],
 });
 
@@ -63,6 +57,7 @@ export class BillItem extends Model {
   @field('voided_at') voidedAt: string;
   @field('reason_description') reasonDescription: string;
   @field('reason_name') reasonName: string;
+  @field('print_message') printMessage: string;
 
   @immutableRelation('bills', 'bill_id') bill: Relation<Bill>;
   @immutableRelation('items', 'item_id') item: Relation<Item>;
@@ -137,7 +132,6 @@ export class BillItem extends Model {
       ...printLogsToUpdate,
     ];
 
-    console.log('batched', batched);
     await this.database.batch(...batched);
   };
 

@@ -1,11 +1,38 @@
 import dayjs, { Dayjs } from 'dayjs';
 import { capitalize, flatten, groupBy, keyBy } from 'lodash';
-import { BillItem, BillItemModifierItem, BillItemPrintLog, PriceGroup, Printer } from '../../models';
+import {
+  Bill,
+  BillCallPrintLog,
+  BillItem,
+  BillItemModifierItem,
+  BillItemPrintLog,
+  PriceGroup,
+  Printer,
+} from '../../models';
 import { PrintType } from '../../models/BillItemPrintLog';
 import { alignCenter, alignLeftRightSingle, starDivider } from './helpers';
 
 const MOD_PREFIX = '- ';
 const REF_NAME = 'Table';
+
+export const kitchenCall = async (p: {
+  bill: Bill;
+  billCallPrintLogs: BillCallPrintLog[];
+  printers: Printer[];
+}): Promise<{ billCallPrintLog: BillCallPrintLog; printer: Printer; commands: any[] }[]> => {
+  const { bill, printers, billCallPrintLogs } = p;
+  const keyedPrinters = keyBy(printers, printer => printer.id);
+
+  const billCallCommands = billCallPrintLogs.map(log =>
+    generateBillCallCommands({
+      printer: keyedPrinters[log.printerId],
+      reference: bill.reference,
+      billCallPrintLog: log,
+    }),
+  );
+
+  return billCallCommands;
+};
 
 export const kitchenReceipt = async (p: {
   billItems: BillItem[];
@@ -37,6 +64,7 @@ export const kitchenReceipt = async (p: {
   });
 
   const groupedByPriceGroup = groupBy(combinedFields, fields => fields.billItem.priceGroupId);
+  const keyedPrinters = keyBy(printers, printer => printer.id);
 
   const nestedGroupedByPrinterId = Object.values(groupedByPriceGroup).map(groups =>
     groupBy(groups, group => group.billItemPrintLog.printerId),
@@ -53,16 +81,16 @@ export const kitchenReceipt = async (p: {
         itemsToPrint,
         prepTime,
         reference,
-        printer: printers.find(printer => printer.id === printerId),
+        printer: keyedPrinters[printerId],
       };
     });
   });
 
   const flattenedPrintCommands = flatten(printCommands);
 
-  const commands = flattenedPrintCommands.map(generatePrintCommands);
+  const billPrintCommands = flattenedPrintCommands.map(generateBillItemCommands);
 
-  return commands;
+  return billPrintCommands;
 
   // const recieptGroupings = flatten(
   //   printers.map(printer => {
@@ -98,7 +126,22 @@ export const kitchenReceipt = async (p: {
   // return printCommands;
 };
 
-const generatePrintCommands = (p: {
+const generateBillCallCommands = (p: { printer: Printer; reference: number; billCallPrintLog: BillCallPrintLog }) => {
+  const { printer, reference, billCallPrintLog } = p;
+
+  let c = [];
+
+  c.push({ appendBitmapText: alignCenter('IN: ' + dayjs().format('HH:mm'), printer.printWidth) });
+  c.push({ appendBitmapText: alignCenter('CALL: ' + reference, printer.printWidth) });
+
+  return {
+    commands: c,
+    printer,
+    billCallPrintLog,
+  };
+};
+
+const generateBillItemCommands = (p: {
   itemsToPrint: { billItem: BillItem; mods: BillItemModifierItem[]; billItemPrintLog: BillItemPrintLog }[];
   priceGroup: PriceGroup;
   printer: Printer;
@@ -107,7 +150,7 @@ const generatePrintCommands = (p: {
 }) => {
   const { itemsToPrint, priceGroup, printer, prepTime, reference } = p;
 
-  const c = [];
+  let c = [];
 
   const pGName = priceGroup.shortName || priceGroup.name;
   c.push({ appendBitmapText: alignCenter(pGName.toUpperCase(), printer.printWidth) });

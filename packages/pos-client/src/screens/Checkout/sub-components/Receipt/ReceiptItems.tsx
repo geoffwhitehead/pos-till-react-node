@@ -4,12 +4,13 @@ import { useDatabase } from '@nozbe/watermelondb/hooks';
 import withObservables from '@nozbe/with-observables';
 import dayjs from 'dayjs';
 import { capitalize } from 'lodash';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { Modal } from '../../../../components/Modal/Modal';
+import { OrganizationContext } from '../../../../contexts/OrganizationContext';
 import { ActionSheet, Content, List } from '../../../../core';
 import { Bill, BillDiscount, BillItem, BillPayment, PaymentType, tableNames } from '../../../../models';
 import { BillSummary } from '../../../../utils';
-import { GRACE_PERIOD_MINUTES } from '../../../../utils/consts';
+import { BillCalls } from './sub-components/BillCalls';
 import { DiscountsBreakdown } from './sub-components/DiscountsBreakdown';
 import { ItemsBreakdown } from './sub-components/ItemsBreakdown';
 import { ModalReason, ModifyReason } from './sub-components/ModalReason';
@@ -47,6 +48,7 @@ export const ReceiptItemsInner: React.FC<ReceiptItemsOuterProps & ReceiptItemsIn
   const database = useDatabase();
   const [selectedBillItem, setSelectedBillItem] = useState<BillItem>();
   const [removeMode, setRemoveMode] = useState<RemoveMode>();
+  const { organization } = useContext(OrganizationContext);
 
   useEffect(() => {
     refContentList.current._root.scrollToEnd();
@@ -86,7 +88,7 @@ export const ReceiptItemsInner: React.FC<ReceiptItemsOuterProps & ReceiptItemsIn
           setRemoveMode(RemoveMode.comp);
           setSelectedBillItem(billItem);
         } else if (index === 1) {
-          const endOfGracePeriod = dayjs(billItem.createdAt).add(GRACE_PERIOD_MINUTES, 'minute');
+          const endOfGracePeriod = dayjs(billItem.createdAt).add(organization.gracePeriodMinutes, 'minute');
           const hasGracePeriodExpired = dayjs().isAfter(endOfGracePeriod);
           if (hasGracePeriodExpired) {
             setRemoveMode(RemoveMode.void);
@@ -121,6 +123,7 @@ export const ReceiptItemsInner: React.FC<ReceiptItemsOuterProps & ReceiptItemsIn
   return (
     <Content ref={refContentList}>
       <List style={styles.receiptItems}>
+        <BillCalls bill={bill} />
         <ItemsBreakdown bill={bill} readonly={readonly} onSelect={billItemDialog} />
         <DiscountsBreakdown
           readonly={readonly}
