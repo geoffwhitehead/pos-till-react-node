@@ -28,7 +28,7 @@ import { PrintStatus } from '../../../../models/BillItemPrintLog';
 import { kitchenCall, kitchenReceipt } from '../../../../services/printer/kitchenReceipt';
 import { print } from '../../../../services/printer/printer';
 import { receiptBill } from '../../../../services/printer/receiptBill';
-import { Fonts } from '../../../../theme';
+import { Fonts } from '../../../../theme/Fonts';
 import { formatNumber, minimalBillSummary, MinimalBillSummary } from '../../../../utils';
 import { ReceiptItems } from './ReceiptItems';
 
