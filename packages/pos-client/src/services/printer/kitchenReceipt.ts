@@ -21,7 +21,9 @@ export const kitchenCall = async (p: {
   printers: Printer[];
 }): Promise<{ billCallPrintLog: BillCallPrintLog; printer: Printer; commands: any[] }[]> => {
   const { bill, printers, billCallPrintLogs } = p;
-  const keyedPrinters = keyBy(printers, printer => printer.id);
+
+  const printersToPrintTo = printers.filter(printer => printer.receivesBillCalls);
+  const keyedPrinters = keyBy(printersToPrintTo, printer => printer.id);
 
   const billCallCommands = billCallPrintLogs.map(log =>
     generateBillCallCommands({

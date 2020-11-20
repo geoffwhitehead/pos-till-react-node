@@ -143,7 +143,6 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
       });
 
       // attempt to print the receipts
-      console.log('toPrintBillItemLogs', toPrintBillItemLogs);
       const printStatuses = await Promise.all(
         toPrintBillItemLogs.map(async ({ billItemPrintLogs, printer, commands }) => {
           const res = await print(commands, printer, false);
