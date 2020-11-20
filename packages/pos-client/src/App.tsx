@@ -12,7 +12,7 @@ import { database, resetDatabase } from './database';
 import { AuthNavigator } from './navigators/AuthNavigator';
 import { Main } from './screens/Main/Main';
 import { SplashScreen } from './screens/SplashScreen/SplashScreen';
-import { defaultTheme } from './theme/drawer';
+import { drawerTheme } from './theme';
 
 export const App = () => {
   const [state, dispatch] = React.useReducer(
@@ -206,7 +206,7 @@ export const App = () => {
     <Root>
       {/*  react-navigation wrapper */}
       <DatabaseProvider database={database}>
-        <NavigationContainer theme={defaultTheme}>
+        <NavigationContainer theme={drawerTheme}>
           <AuthContext.Provider value={authContext}>
             {!accessToken || !refreshToken || !organizationId || !userId ? (
               // login etc

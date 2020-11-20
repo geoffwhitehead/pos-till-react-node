@@ -28,7 +28,7 @@ import { PrintStatus } from '../../../../models/BillItemPrintLog';
 import { kitchenCall, kitchenReceipt } from '../../../../services/printer/kitchenReceipt';
 import { print } from '../../../../services/printer/printer';
 import { receiptBill } from '../../../../services/printer/receiptBill';
-import { Fonts } from '../../../../theme/Fonts';
+import { fonts } from '../../../../theme';
 import { formatNumber, minimalBillSummary, MinimalBillSummary } from '../../../../utils';
 import { ReceiptItems } from './ReceiptItems';
 
@@ -343,7 +343,7 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
             currency,
           )}`}</Text>
         )}
-        <Text style={Fonts.h3}>{`Balance: ${formatNumber(balance, currency)}`}</Text>
+        <Text style={fonts.h3}>{`Balance: ${formatNumber(balance, currency)}`}</Text>
       </Row>
       <Row style={styles.r4}>
         <Button disabled={!receiptPrinter} info iconLeft full style={{ flexGrow: 1 }} onPress={onPrint}>

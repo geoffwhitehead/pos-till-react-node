@@ -1,32 +1,31 @@
 import { StyleSheet } from 'react-native';
-import { Colors, Fonts, Helpers, Metrics } from '../../theme';
+import { colors, fonts, spacing } from '../../theme';
 
 export default StyleSheet.create({
   error: {
-    ...Fonts.normal,
-    color: Colors.error,
-    marginBottom: Metrics.tiny,
+    ...fonts.normal,
+    color: colors.error,
+    marginBottom: spacing.tiny,
     textAlign: 'center',
   },
   instructions: {
-    ...Fonts.normal,
+    ...fonts.normal,
     fontStyle: 'italic',
-    marginBottom: Metrics.tiny,
+    marginBottom: spacing.tiny,
     textAlign: 'center',
   },
   logoContainer: {
-    ...Helpers.fullWidth,
     height: 300,
     marginBottom: 25,
   },
   result: {
-    ...Fonts.normal,
-    marginBottom: Metrics.tiny,
+    ...fonts.normal,
+    marginBottom: spacing.tiny,
     textAlign: 'center',
   },
   text: {
-    ...Fonts.normal,
-    marginBottom: Metrics.tiny,
+    ...fonts.normal,
+    marginBottom: spacing.tiny,
     textAlign: 'center',
   },
 });

@@ -6,12 +6,9 @@ export const colors = {
   success: '#28a745',
   error: '#dc3545',
 
-  theme: {
-    darkBlue: '#3B4656',
-    bgGreyBlue: '#4C505D',
-    txtLightGrey: '#B1B2B5',
-    highlightBlue: '#2FA8F6',
-    highlightGrey: '#565A69',
-    white: '#FFFFFF',
-  },
+  darkBlue: '#3B4656',
+  bgGreyBlue: '#4C505D',
+  txtLightGrey: '#B1B2B5',
+  highlightBlue: '#2FA8F6',
+  highlightGrey: '#565A69',
 };

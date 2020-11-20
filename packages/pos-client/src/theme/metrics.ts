@@ -1,70 +1,67 @@
-/**
- * This file contains metric values that are global to the application.
- */
+export const spacing = {
+  tiny: 5,
+  small: 10,
+  normal: 15,
+  medium: 30,
+};
 
-// Examples of metrics you can define:
-export const tiny = 5
-export const small = tiny * 2 // 10
-export const normal = tiny * 3 // 15
-export const medium = normal * 2 // 30
-
-export default {
+export const metrics = {
   bottomMargin: {
-    marginBottom: normal,
+    marginBottom: spacing.normal,
   },
   mediumBottomMargin: {
-    marginBottom: medium,
+    marginBottom: spacing.medium,
   },
 
   tinyVerticalMargin: {
-    marginVertical: tiny,
+    marginVertical: spacing.tiny,
   },
   smallVerticalMargin: {
-    marginVertical: small,
+    marginVertical: spacing.small,
   },
   verticalMargin: {
-    marginVertical: normal,
+    marginVertical: spacing.normal,
   },
   mediumVerticalMargin: {
-    marginVertical: medium,
+    marginVertical: spacing.medium,
   },
 
   tinyHorizontalMargin: {
-    marginHorizontal: tiny,
+    marginHorizontal: spacing.tiny,
   },
   smallHorizontalMargin: {
-    marginHorizontal: small,
+    marginHorizontal: spacing.small,
   },
   horizontalMargin: {
-    marginHorizontal: normal,
+    marginHorizontal: spacing.normal,
   },
   mediumHorizontalMargin: {
-    marginHorizontal: medium,
+    marginHorizontal: spacing.medium,
   },
 
   tinyHorizontalPadding: {
-    paddingHorizontal: tiny,
+    paddingHorizontal: spacing.tiny,
   },
   smallHorizontalPadding: {
-    paddingHorizontal: small,
+    paddingHorizontal: spacing.small,
   },
   horizontalPadding: {
-    paddingHorizontal: normal,
+    paddingHorizontal: spacing.normal,
   },
   mediumHorizontalPadding: {
-    paddingHorizontal: medium,
+    paddingHorizontal: spacing.medium,
   },
 
   tinyVerticalPadding: {
-    paddingVertical: tiny,
+    paddingVertical: spacing.tiny,
   },
   smallVerticalPadding: {
-    paddingVertical: small,
+    paddingVertical: spacing.small,
   },
   verticalPadding: {
-    paddingVertical: normal,
+    paddingVertical: spacing.normal,
   },
   mediumVerticalPadding: {
-    paddingVertical: medium,
+    paddingVertical: spacing.medium,
   },
-}
+};

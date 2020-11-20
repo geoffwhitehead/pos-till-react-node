@@ -1,13 +1,13 @@
 import { colors } from './colors';
 
-export const defaultTheme = {
+export const drawerTheme = {
   dark: false,
   colors: {
-    primary: colors.theme.highlightBlue,
-    background: colors.theme.white,
+    primary: colors.highlightBlue,
+    background: colors.white,
     card: 'rgb(255, 255, 255)',
-    text: colors.theme.white,
-    border: colors.theme.white,
+    text: colors.white,
+    border: colors.white,
     notification: 'rgb(255, 69, 58)',
   },
 };

@@ -20,7 +20,7 @@ import {
 } from '../../../../models';
 import { print } from '../../../../services/printer/printer';
 import { receiptBill } from '../../../../services/printer/receiptBill';
-import { Fonts } from '../../../../theme';
+import { fonts } from '../../../../theme';
 import { formatNumber } from '../../../../utils';
 interface CompleteBillOuterProps {
   bill: Bill;
@@ -125,6 +125,6 @@ export const CompleteBill = enhance(CompleteBillInner);
 const styles = StyleSheet.create({
   container: { flex: 1, alignItems: 'center', flexDirection: 'column', justifyContent: 'center' },
   icon: { width: 50, height: 50 },
-  button: { ...Fonts.h1, margin: 5 },
-  text: { ...Fonts.h3, margin: 20 },
+  button: { ...fonts.h1, margin: 5 },
+  text: { ...fonts.h3, margin: 20 },
 });

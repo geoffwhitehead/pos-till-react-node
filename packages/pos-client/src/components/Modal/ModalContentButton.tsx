@@ -1,7 +1,7 @@
 import React from 'react';
 import { View } from 'react-native';
 import { Button, Container, H3, Icon, Text } from '../../core';
-import { colors } from '../../theme/colors';
+import { colors } from '../../theme';
 
 enum ModalSizes {
   small = 500,
@@ -73,7 +73,7 @@ const cStyles = {
     padding: 12,
     paddingLeft: 20,
     paddingRight: 20,
-    backgroundColor: colors.theme.darkBlue,
+    backgroundColor: colors.highlightBlue,
     borderBottom: 'grey',
     borderBottomWidth: 1,
     color: 'white',

@@ -80,7 +80,7 @@ export const ModalCategoryDetailsInner: React.FC<ModalCategoryDetailsOuterProps 
   const initialValues = {
     name: category?.name || '',
     shortName: category?.shortName || '',
-    backgroundColor: category?.backgroundColor || colors.theme.highlightBlue,
+    backgroundColor: category?.backgroundColor || colors.highlightBlue,
     textColor: category?.textColor || 'white',
     positionIndex: category?.positionIndex.toString() || '0',
   };
