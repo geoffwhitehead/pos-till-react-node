@@ -30,6 +30,7 @@ import { print } from '../../../../services/printer/printer';
 import { receiptBill } from '../../../../services/printer/receiptBill';
 import { fonts } from '../../../../theme';
 import { formatNumber, minimalBillSummary, MinimalBillSummary } from '../../../../utils';
+import { resolveButtonState } from '../../../../utils/helpers';
 import { ReceiptItems } from './ReceiptItems';
 
 interface ReceiptInnerProps {
@@ -40,6 +41,7 @@ interface ReceiptInnerProps {
   billModifierItemsCount: number;
   itemsRequiringPrepTimeCount: number;
   priceGroups: PriceGroup[];
+  incompleteBillCallPrintLogs: number;
 }
 
 interface ReceiptOuterProps {
@@ -62,6 +64,7 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
   itemsRequiringPrepTimeCount,
   billModifierItemsCount,
   priceGroups,
+  incompleteBillCallPrintLogs,
 }) => {
   const [summary, setSummary] = useState<MinimalBillSummary>();
   const database = useDatabase();
@@ -140,6 +143,7 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
       });
 
       // attempt to print the receipts
+      console.log('toPrintBillItemLogs', toPrintBillItemLogs);
       const printStatuses = await Promise.all(
         toPrintBillItemLogs.map(async ({ billItemPrintLogs, printer, commands }) => {
           const res = await print(commands, printer, false);
@@ -154,12 +158,14 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
         }),
       );
 
+      await database.action(async () => {
+        await bill.processPrintLogs(flatten(printStatuses));
+      });
       // attempt to call
       const printCallStatuses = await Promise.all(
         toPrintCallLogs.map(async ({ billCallPrintLog, printer, commands }) => {
           const res = await print(commands, printer, false);
           const status = res.success ? PrintStatus.succeeded : PrintStatus.errored;
-
           return {
             billCallPrintLog,
             status,
@@ -167,9 +173,7 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
         }),
       );
 
-      console.log('printCallStatuses', printCallStatuses);
       await database.action(async () => {
-        await bill.processPrintLogs(flatten(printStatuses));
         await bill.processCallLogs(printCallStatuses);
       });
     }
@@ -295,11 +299,13 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
 
   const dateString = bill.prepAt ? dayjs(bill.prepAt).format('HH:mm') : '';
 
+  const isCallButtonDisabled = incompleteBillCallPrintLogs > 0;
+
   return (
     <Grid style={styles.grid}>
       <Row style={{ height: 45 }}>
         <Col>
-          <Button full iconLeft onPress={callConfirmDialog}>
+          <Button full iconLeft {...resolveButtonState(isCallButtonDisabled, 'primary')} onPress={callConfirmDialog}>
             <Icon name="ios-print" />
             <Text style={{ fontWeight: 'bold' }}>Call </Text>
           </Button>
@@ -382,6 +388,7 @@ const enhance = component =>
   withDatabase<any>(
     withObservables<ReceiptOuterProps, ReceiptInnerProps>(['bill'], ({ bill, database }) => ({
       bill,
+      incompleteBillCallPrintLogs: bill.incompleteBillCallPrintLogs.observeCount(),
       billPayments: bill.billPayments,
       billDiscounts: bill.billDiscounts,
       itemsRequiringPrepTimeCount: bill.itemsRequiringPrepTimeCount,

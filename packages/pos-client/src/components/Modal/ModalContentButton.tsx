@@ -73,7 +73,7 @@ const cStyles = {
     padding: 12,
     paddingLeft: 20,
     paddingRight: 20,
-    backgroundColor: colors.highlightBlue,
+    backgroundColor: colors.darkBlue,
     borderBottom: 'grey',
     borderBottomWidth: 1,
     color: 'white',

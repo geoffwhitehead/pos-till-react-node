@@ -161,6 +161,14 @@ export class Bill extends Model {
       Q.on(tableNames.billCallLogs, 'bill_id', this.id),
     );
 
+  @lazy incompleteBillCallPrintLogs: Query<BillCallPrintLog> = this.collections
+    .get<BillCallPrintLog>(tableNames.billCallPrintLogs)
+    .query(
+      Q.experimentalJoinTables([tableNames.billCallLogs]),
+      Q.where('status', Q.oneOf([PrintStatus.pending, PrintStatus.processing, PrintStatus.errored])),
+      Q.on(tableNames.billCallLogs, 'bill_id', this.id),
+    );
+
   /**
    * Note: these 2 queries are mainly used in the period report. Once nested joins are available with watermelon
    * they can be moved to the periodReport model to improve performance.

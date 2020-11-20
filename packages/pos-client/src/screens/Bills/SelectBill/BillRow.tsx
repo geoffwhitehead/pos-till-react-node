@@ -5,7 +5,16 @@ import dayjs from 'dayjs';
 import React, { useContext, useEffect, useState } from 'react';
 import { OrganizationContext } from '../../../contexts/OrganizationContext';
 import { Body, Icon, Left, ListItem, Right, Text, View } from '../../../core';
-import { Bill, BillDiscount, BillItem, BillItemPrintLog, BillPayment, Discount, tableNames } from '../../../models';
+import {
+  Bill,
+  BillCallPrintLog,
+  BillDiscount,
+  BillItem,
+  BillItemPrintLog,
+  BillPayment,
+  Discount,
+  tableNames,
+} from '../../../models';
 import { PrintStatus } from '../../../models/BillItemPrintLog';
 import { formatNumber, minimalBillSummary, MinimalBillSummary } from '../../../utils';
 
@@ -15,6 +24,7 @@ interface BillRowInnerProps {
   chargableBillItems: BillItem[];
   discounts: Discount[];
   overviewPrintLogs: BillItemPrintLog[];
+  overviewBillCallPrintLogs: BillCallPrintLog[];
 }
 
 interface BillRowOuterProps {
@@ -32,6 +42,7 @@ export const WrappedBillRow: React.FC<BillRowInnerProps & BillRowOuterProps> = (
   discounts,
   overviewPrintLogs,
   database,
+  overviewBillCallPrintLogs,
 }) => {
   const [summary, setSummary] = useState<MinimalBillSummary>();
   const {
@@ -52,9 +63,10 @@ export const WrappedBillRow: React.FC<BillRowInnerProps & BillRowOuterProps> = (
     summary();
   }, [chargableBillItems, billDiscounts, billPayments, discounts]);
 
-  const hasUnstoredItems = overviewPrintLogs.some(l => l.status === PrintStatus.pending);
-  const hasPrintErrors = overviewPrintLogs.some(l => l.status === PrintStatus.errored);
-  const hasPendingPrints = overviewPrintLogs.some(l => l.status === PrintStatus.processing);
+  const combinedLogs = [...overviewPrintLogs, ...overviewBillCallPrintLogs];
+  const hasUnstoredItems = combinedLogs.some(l => l.status === PrintStatus.pending);
+  const hasPrintErrors = combinedLogs.some(l => l.status === PrintStatus.errored);
+  const hasPendingPrints = combinedLogs.some(l => l.status === PrintStatus.processing);
   const rowText = bill.reference;
 
   // const balanceText = summary ? `Balance: ${formatNumber(summary.balance, currency)}` : '...';
@@ -108,6 +120,7 @@ const enhance = component =>
       chargableBillItems: bill.chargableBillItems,
       discounts: database.collections.get<Discount>(tableNames.discounts).query(),
       overviewPrintLogs: bill.overviewPrintLogs.observeWithColumns(['status']),
+      overviewBillCallPrintLogs: bill.overviewBillCallPrintLogs.observeWithColumns(['status']),
     }))(component),
   );
 
