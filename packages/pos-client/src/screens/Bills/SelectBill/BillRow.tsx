@@ -7,6 +7,7 @@ import { OrganizationContext } from '../../../contexts/OrganizationContext';
 import { Body, Icon, Left, ListItem, Right, Text, View } from '../../../core';
 import {
   Bill,
+  BillCallLog,
   BillCallPrintLog,
   BillDiscount,
   BillItem,
@@ -25,6 +26,7 @@ interface BillRowInnerProps {
   discounts: Discount[];
   overviewPrintLogs: BillItemPrintLog[];
   overviewBillCallPrintLogs: BillCallPrintLog[];
+  billCallLogs: BillCallLog[];
 }
 
 interface BillRowOuterProps {
@@ -43,6 +45,7 @@ export const WrappedBillRow: React.FC<BillRowInnerProps & BillRowOuterProps> = (
   overviewPrintLogs,
   database,
   overviewBillCallPrintLogs,
+  billCallLogs,
 }) => {
   const [summary, setSummary] = useState<MinimalBillSummary>();
   const {
@@ -63,6 +66,7 @@ export const WrappedBillRow: React.FC<BillRowInnerProps & BillRowOuterProps> = (
     summary();
   }, [chargableBillItems, billDiscounts, billPayments, discounts]);
 
+  console.log('billCallLogs', billCallLogs);
   const combinedLogs = [...overviewPrintLogs, ...overviewBillCallPrintLogs];
   const hasUnstoredItems = combinedLogs.some(l => l.status === PrintStatus.pending);
   const hasPrintErrors = combinedLogs.some(l => l.status === PrintStatus.errored);
@@ -89,12 +93,24 @@ export const WrappedBillRow: React.FC<BillRowInnerProps & BillRowOuterProps> = (
     ? 'ios-print'
     : null;
 
+  const lastCalledAt =
+    billCallLogs.length > 0 &&
+    billCallLogs.reduce((out, log) => {
+      const date = dayjs(log.createdAt);
+      if (date.isAfter(out)) {
+        return date;
+      }
+      return out;
+    }, dayjs(billCallLogs[0].createdAt));
+
+  console.log('lastCalledAt', lastCalledAt);
   return (
     <ListItem noIndent style={styles.openBill} key={bill.id} onPress={() => onSelectBill(bill)}>
       <Left>
+        <Text style={styles.rowText}>{rowText}</Text>
         <View>
-          <Text style={styles.rowText}>{rowText}</Text>
           <Text note>{`Opened: ${dayjs(bill.createdAt).format('h:mm a')}`}</Text>
+          <Text note>{`Last Called: ${lastCalledAt ? lastCalledAt.format('h:mm a') : ''}`}</Text>
         </View>
       </Left>
 
@@ -121,6 +137,7 @@ const enhance = component =>
       discounts: database.collections.get<Discount>(tableNames.discounts).query(),
       overviewPrintLogs: bill.overviewPrintLogs.observeWithColumns(['status']),
       overviewBillCallPrintLogs: bill.overviewBillCallPrintLogs.observeWithColumns(['status']),
+      billCallLogs: bill.billCallLogs,
     }))(component),
   );
 
@@ -134,9 +151,7 @@ const styles = {
   rowText: {
     fontWeight: 'bold',
     fontSize: 18,
-  },
-  dateText: {
-    // { color: 'grey', fontSize: 22 }
+    paddingRight: 15,
   },
   iconStyle: { marginRight: 5, color: 'grey' },
   totalText: { color: 'grey', fontWeight: 'bold', fontSize: 18 },

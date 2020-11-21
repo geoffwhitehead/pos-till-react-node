@@ -1,8 +1,9 @@
 import { Formik } from 'formik';
 import React from 'react';
 import * as Yup from 'yup';
+import { ItemField } from '../../../components/ItemField/ItemField';
 import { AuthContext } from '../../../contexts/AuthContext';
-import { Button, Container, Content, Form, Header, Input, Item, Label, Text } from '../../../core';
+import { Button, Container, Content, Form, Header, Input, Text } from '../../../core';
 
 const SignupSchema = Yup.object().shape({
   firstName: Yup.string()
@@ -44,48 +45,43 @@ export const SignUp: React.FC<SignUpProps> = () => {
     >
       {({ handleChange, handleBlur, handleSubmit, errors, touched, values }) => {
         const { firstName, lastName, password, passwordConfirmation, email } = values;
-        const err = {
-          firstName: !!(touched.firstName && errors.firstName),
-          lastName: !!(touched.lastName && errors.lastName),
-          email: !!(touched.email && errors.email),
-          password: !!(touched.password && errors.password),
-          passwordConfirmation: !!(touched.passwordConfirmation && errors.passwordConfirmation),
-        };
+
         return (
           <Container>
             <Header />
             <Content>
               <Form>
-                <Item stackedLabel error={err.firstName}>
-                  <Label>First Name</Label>
+                <ItemField label="First Name" touched={touched.firstName} name="firstName" errors={errors.firstName}>
                   <Input onChangeText={handleChange('firstName')} onBlur={handleBlur('firstName')} value={firstName} />
-                </Item>
-                <Item stackedLabel error={err.lastName}>
-                  <Label>Last Name</Label>
+                </ItemField>
+                <ItemField label="Last Name" touched={touched.lastName} name="lastName" errors={errors.lastName}>
                   <Input onChangeText={handleChange('lastName')} onBlur={handleBlur('lastName')} value={lastName} />
-                </Item>
-                <Item stackedLabel error={err.email}>
-                  <Label>Email</Label>
+                </ItemField>
+                <ItemField label="Email" touched={touched.email} name="email" errors={errors.email}>
                   <Input onChangeText={handleChange('email')} onBlur={handleBlur('email')} value={email} />
-                </Item>
-                <Item stackedLabel error={err.password}>
-                  <Label>Password</Label>
+                </ItemField>
+                <ItemField label="Password" touched={touched.password} name="password" errors={errors.password}>
                   <Input
                     onChangeText={handleChange('password')}
                     onBlur={handleBlur('password')}
                     value={password}
                     secureTextEntry
                   />
-                </Item>
-                <Item stackedLabel error={err.passwordConfirmation}>
-                  <Label>Confim Password</Label>
+                </ItemField>
+                <ItemField
+                  label="Confirm Password"
+                  touched={touched.passwordConfirmation}
+                  name="passwordConfirmation"
+                  errors={errors.passwordConfirmation}
+                >
                   <Input
                     onChangeText={handleChange('passwordConfirmation')}
                     onBlur={handleBlur('passwordConfirmation')}
                     value={passwordConfirmation}
                     secureTextEntry
                   />
-                </Item>
+                </ItemField>
+
                 <Button onPress={handleSubmit}>
                   <Text>Sign Up</Text>
                 </Button>
@@ -97,12 +93,3 @@ export const SignUp: React.FC<SignUpProps> = () => {
     </Formik>
   );
 };
-
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//     backgroundColor: '#fff',
-//     alignItems: 'center',
-//     justifyContent: 'center',
-//   },
-// })

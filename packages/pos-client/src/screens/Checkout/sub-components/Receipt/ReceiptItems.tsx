@@ -3,11 +3,15 @@ import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import { useDatabase } from '@nozbe/watermelondb/hooks';
 import withObservables from '@nozbe/with-observables';
 import dayjs from 'dayjs';
+import { Formik } from 'formik';
 import { capitalize } from 'lodash';
 import React, { useContext, useEffect, useRef, useState } from 'react';
+import * as Yup from 'yup';
+import { ItemField } from '../../../../components/ItemField/ItemField';
 import { Modal } from '../../../../components/Modal/Modal';
+import { ModalContentButton } from '../../../../components/Modal/ModalContentButton';
 import { OrganizationContext } from '../../../../contexts/OrganizationContext';
-import { ActionSheet, Content, List } from '../../../../core';
+import { ActionSheet, Content, Form, Input, List } from '../../../../core';
 import { Bill, BillDiscount, BillItem, BillPayment, PaymentType, tableNames } from '../../../../models';
 import { BillSummary } from '../../../../utils';
 import { BillCalls } from './sub-components/BillCalls';
@@ -30,9 +34,10 @@ type ReceiptItemsInnerProps = {
   paymentTypes: PaymentType[];
 };
 
-export enum RemoveMode {
+export enum Action {
   void = 'void',
   comp = 'comp',
+  message = 'message',
 }
 
 export const ReceiptItemsInner: React.FC<ReceiptItemsOuterProps & ReceiptItemsInnerProps> = ({
@@ -47,8 +52,9 @@ export const ReceiptItemsInner: React.FC<ReceiptItemsOuterProps & ReceiptItemsIn
   const refContentList = useRef();
   const database = useDatabase();
   const [selectedBillItem, setSelectedBillItem] = useState<BillItem>();
-  const [removeMode, setRemoveMode] = useState<RemoveMode>();
+  const [action, setAction] = useState<Action>();
   const { organization } = useContext(OrganizationContext);
+  const [printMessage, setPrintMessage] = useState('');
 
   useEffect(() => {
     refContentList.current._root.scrollToEnd();
@@ -58,8 +64,7 @@ export const ReceiptItemsInner: React.FC<ReceiptItemsOuterProps & ReceiptItemsIn
 
   const onRemoveBillItem = async (billItem: BillItem, values?: ModifyReason) => {
     await database.action(() => billItem.void(values));
-    setSelectedBillItem(null);
-    setRemoveMode(null);
+    onCloseModalHandler();
   };
 
   const onRemoveBillDiscount = async (billDiscount: BillDiscount) => database.action(() => billDiscount.void());
@@ -71,27 +76,34 @@ export const ReceiptItemsInner: React.FC<ReceiptItemsOuterProps & ReceiptItemsIn
 
   const onMakeComplimentary = async (billItem: BillItem, values: ModifyReason) => {
     await database.action(() => billItem.makeComp(values));
-    setSelectedBillItem(null);
-    setRemoveMode(null);
+    onCloseModalHandler();
+  };
+
+  const addPrintMessage = async values => {
+    await database.action(() => selectedBillItem.update(record => Object.assign(record, values)));
+    onCloseModalHandler();
   };
 
   const billItemDialog = (billItem: BillItem) => {
-    const options = ['Make complimentary', 'Remove', 'Cancel'];
+    const options = ['Add Message', 'Make complimentary', 'Remove', 'Cancel'];
     ActionSheet.show(
       {
         options,
-        destructiveButtonIndex: 1,
+        destructiveButtonIndex: 2,
         title: billItem.itemName,
       },
       index => {
         if (index === 0) {
-          setRemoveMode(RemoveMode.comp);
           setSelectedBillItem(billItem);
+          setAction(Action.message);
         } else if (index === 1) {
+          setAction(Action.comp);
+          setSelectedBillItem(billItem);
+        } else if (index === 2) {
           const endOfGracePeriod = dayjs(billItem.createdAt).add(organization.gracePeriodMinutes, 'minute');
           const hasGracePeriodExpired = dayjs().isAfter(endOfGracePeriod);
           if (hasGracePeriodExpired) {
-            setRemoveMode(RemoveMode.void);
+            setAction(Action.void);
             setSelectedBillItem(billItem);
           } else {
             onRemoveBillItem(billItem);
@@ -115,10 +127,13 @@ export const ReceiptItemsInner: React.FC<ReceiptItemsOuterProps & ReceiptItemsIn
     );
   };
 
-  const onCloseReasonModalHandler = () => {
+  const onCloseModalHandler = () => {
     setSelectedBillItem(null);
-    setRemoveMode(null);
+    setAction(null);
   };
+
+  const isReasonModalOpen = !!selectedBillItem && (action === Action.comp || action === Action.void);
+  const isPrintMessageModalOpen = !!selectedBillItem && action === Action.message;
 
   return (
     <Content ref={refContentList}>
@@ -138,24 +153,62 @@ export const ReceiptItemsInner: React.FC<ReceiptItemsOuterProps & ReceiptItemsIn
           paymentTypes={paymentTypes}
         />
       </List>
-      <Modal
-        style={{ width: 600, height: '60%' }}
-        onClose={onCloseReasonModalHandler}
-        isOpen={!!selectedBillItem && !!removeMode}
-      >
+      <Modal style={{ width: 500 }} onClose={onCloseModalHandler} isOpen={isReasonModalOpen}>
         <ModalReason
-          onClose={onCloseReasonModalHandler}
+          onClose={onCloseModalHandler}
           onComplete={values => {
-            if (removeMode === RemoveMode.void) {
+            if (action === Action.void) {
               onRemoveBillItem(selectedBillItem, values);
             }
-            if (removeMode === RemoveMode.comp) {
+            if (action === Action.comp) {
               onMakeComplimentary(selectedBillItem, values);
             }
           }}
-          mode={removeMode}
+          mode={action}
           title={capitalize(selectedBillItem?.itemName)}
         />
+      </Modal>
+      <Modal style={{ width: 500 }} onClose={onCloseModalHandler} isOpen={isPrintMessageModalOpen}>
+        <Formik
+          initialValues={{ printMessage }}
+          validationSchema={Yup.object().shape({
+            printMessage: Yup.string()
+              .min(1, 'Too Short')
+              .max(30, 'Too Long')
+              .required('Required'),
+          })}
+          onSubmit={addPrintMessage}
+        >
+          {({ handleChange, handleBlur, handleSubmit, errors, touched, values }) => {
+            const { printMessage } = values;
+
+            return (
+              <ModalContentButton
+                onPressPrimaryButton={handleSubmit}
+                onPressSecondaryButton={onCloseModalHandler}
+                secondaryButtonText="Cancel"
+                primaryButtonText="Save"
+                title={`${selectedBillItem.itemName}: Add a print message`}
+                size="small"
+              >
+                <Form>
+                  <ItemField
+                    label="Print Message"
+                    touched={touched.printMessage as boolean}
+                    name="printMessage"
+                    errors={errors.printMessage}
+                  >
+                    <Input
+                      onChangeText={handleChange('printMessage')}
+                      onBlur={handleBlur('printMessage')}
+                      value={printMessage}
+                    />
+                  </ItemField>
+                </Form>
+              </ModalContentButton>
+            );
+          }}
+        </Formik>
       </Modal>
     </Content>
   );

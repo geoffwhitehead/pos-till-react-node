@@ -6,6 +6,7 @@ import { Formik } from 'formik';
 import React, { useContext, useState } from 'react';
 import * as Yup from 'yup';
 import { HeaderButtonBar } from '../../../../components/HeaderButtonBar/HeaderButtonBar';
+import { ItemField } from '../../../../components/ItemField/ItemField';
 import { Loading } from '../../../../components/Loading/Loading';
 import { AuthContext } from '../../../../contexts/AuthContext';
 import { OrganizationContext } from '../../../../contexts/OrganizationContext';
@@ -20,8 +21,6 @@ import {
   Grid,
   Icon,
   Input,
-  Item,
-  Label,
   Picker,
   Text,
   View,
@@ -133,12 +132,6 @@ const SettingsTabInner: React.FC<SettingsTabOuterProps & SettingsTabInnerProps> 
       >
         {({ handleChange, handleBlur, handleSubmit, errors, touched, values }) => {
           const { defaultPriceGroupId, receiptPrinterId, currency, maxBills } = values;
-          const err = {
-            defaultPriceGroupId: !!(touched.defaultPriceGroupId && errors.defaultPriceGroupId),
-            receiptPrinterId: !!(touched.receiptPrinterId && errors.receiptPrinterId),
-            currency: !!(touched.currency && errors.currency),
-            maxBills: !!(touched.maxBills && errors.maxBills),
-          };
 
           const hasOpenBills = openBills.length > 0;
 
@@ -148,8 +141,13 @@ const SettingsTabInner: React.FC<SettingsTabOuterProps & SettingsTabInnerProps> 
               <Content style={commonStyles.content}>
                 <Grid>
                   <Form>
-                    <Item picker stackedLabel>
-                      <Label style={err.receiptPrinterId ? styles.errorLabel : {}}>Receipt Printer</Label>
+                    <ItemField
+                      picker
+                      label="Receipt Printer"
+                      touched={touched.receiptPrinterId}
+                      name="receiptPrinterId"
+                      errors={errors.receiptPrinterId}
+                    >
                       <Picker
                         mode="dropdown"
                         iosIcon={<Icon name="arrow-down" />}
@@ -164,9 +162,15 @@ const SettingsTabInner: React.FC<SettingsTabOuterProps & SettingsTabInnerProps> 
                           <Picker.Item key={printer.id} label={printer.name} value={printer.id} />
                         ))}
                       </Picker>
-                    </Item>
-                    <Item picker stackedLabel>
-                      <Label style={err.defaultPriceGroupId ? styles.errorLabel : {}}>Default Price Group</Label>
+                    </ItemField>
+
+                    <ItemField
+                      picker
+                      label="Default Price Group"
+                      touched={touched.defaultPriceGroupId}
+                      name="defaultPriceGroupId"
+                      errors={errors.defaultPriceGroupId}
+                    >
                       <Picker
                         mode="dropdown"
                         iosIcon={<Icon name="arrow-down" />}
@@ -181,34 +185,35 @@ const SettingsTabInner: React.FC<SettingsTabOuterProps & SettingsTabInnerProps> 
                           <Picker.Item key={priceGroup.id} label={priceGroup.name} value={priceGroup.id} />
                         ))}
                       </Picker>
-                    </Item>
-                    <View
-                      style={{
-                        marginLeft: 15,
-                        marginTop: 20,
-                        marginBottom: 20,
-                        padding: 10,
-                        paddingLeft: 30,
-                        borderLeftWidth: 1,
-                        borderRadius: 5,
-                        borderColor: 'lightgrey',
-                      }}
-                    >
+                    </ItemField>
+
+                    <View style={styles.noEditFields}>
                       <Text style={{ color: 'grey', paddingBottom: 10 }}>
                         Note: Can only be changed when there are no active bills
                       </Text>
 
-                      <Item disabled={hasOpenBills} stackedLabel error={err.maxBills}>
-                        <Label>Max open bills</Label>
+                      <ItemField
+                        label="Max open bills"
+                        touched={touched.maxBills}
+                        name="maxBills"
+                        errors={errors.maxBills}
+                        disabled={hasOpenBills}
+                      >
                         <Input
                           onChangeText={handleChange('maxBills')}
                           onBlur={handleBlur('maxBills')}
                           value={maxBills.toString()}
                           disabled={hasOpenBills}
                         />
-                      </Item>
-                      <Item picker stackedLabel error={err.currency}>
-                        <Label>Currency</Label>
+                      </ItemField>
+
+                      <ItemField
+                        picker
+                        label="Currency"
+                        touched={touched.currency}
+                        name="currency"
+                        errors={errors.currency}
+                      >
                         <Picker
                           mode="dropdown"
                           iosIcon={<Icon name="arrow-down" />}
@@ -223,7 +228,7 @@ const SettingsTabInner: React.FC<SettingsTabOuterProps & SettingsTabInnerProps> 
                             <Picker.Item key={currency.id} label={currency.name} value={currency.id} />
                           ))}
                         </Picker>
-                      </Item>
+                      </ItemField>
                     </View>
                   </Form>
                 </Grid>
@@ -264,5 +269,15 @@ const styles = {
   },
   row: {
     padding: 5,
+  },
+  noEditFields: {
+    marginLeft: 15,
+    marginTop: 20,
+    marginBottom: 20,
+    padding: 10,
+    paddingLeft: 30,
+    borderLeftWidth: 1,
+    borderRadius: 5,
+    borderColor: 'lightgrey',
   },
 };

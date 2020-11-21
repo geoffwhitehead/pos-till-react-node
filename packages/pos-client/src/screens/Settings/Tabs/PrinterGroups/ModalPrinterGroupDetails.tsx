@@ -6,9 +6,10 @@ import { capitalize } from 'lodash';
 import React, { useEffect, useState } from 'react';
 import { ScrollView } from 'react-native';
 import * as Yup from 'yup';
+import { ItemField } from '../../../../components/ItemField/ItemField';
 import { Loading } from '../../../../components/Loading/Loading';
 import { ModalContentButton } from '../../../../components/Modal/ModalContentButton';
-import { Col, Form, Input, Item, Label, List, ListItem, Row, Text } from '../../../../core';
+import { Col, Form, Input, List, ListItem, Row, Text } from '../../../../core';
 import { PrinterGroup, PrinterGroupPrinter, tableNames } from '../../../../models';
 import { Printer } from '../../../../models/Printer';
 import { PrinterRowChoice } from '../PrintersTab/PrinterRowChoice';
@@ -99,9 +100,6 @@ const ModalPrinterGroupDetailsInner: React.FC<ModalPrinterGroupDetailsOuterProps
     >
       {({ handleChange, handleBlur, handleSubmit, errors, touched, values }) => {
         const { name } = values;
-        const err = {
-          name: !!(touched.name && errors.name),
-        };
 
         const title = printerGroup ? `${capitalize(printerGroup.name)}` : 'New Printer Group';
 
@@ -119,10 +117,9 @@ const ModalPrinterGroupDetailsInner: React.FC<ModalPrinterGroupDetailsOuterProps
               <Row>
                 <Col>
                   <Form style={commonStyles.form}>
-                    <Item stackedLabel error={err.name}>
-                      <Label>Name</Label>
+                    <ItemField label="Name" touched={touched.name} name="name" errors={errors.name}>
                       <Input onChangeText={handleChange('name')} onBlur={handleBlur('name')} value={name} />
-                    </Item>
+                    </ItemField>
                   </Form>
                 </Col>
               </Row>

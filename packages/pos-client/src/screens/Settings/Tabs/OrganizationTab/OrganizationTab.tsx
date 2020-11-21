@@ -4,8 +4,9 @@ import React, { useContext, useState } from 'react';
 import { ScrollView } from 'react-native';
 import * as Yup from 'yup';
 import { HeaderButtonBar } from '../../../../components/HeaderButtonBar/HeaderButtonBar';
+import { ItemField } from '../../../../components/ItemField/ItemField';
 import { OrganizationContext } from '../../../../contexts/OrganizationContext';
-import { Container, Form, Input, Item, Label, Text } from '../../../../core';
+import { Container, Form, Input, Text } from '../../../../core';
 import { commonStyles } from '../styles';
 
 interface OrganizationTabProps {}
@@ -96,16 +97,6 @@ export const OrganizationTab: React.FC<OrganizationTabProps> = () => {
             addressCounty,
             addressPostcode,
           } = values;
-          const err = {
-            name: !!(touched.name && errors.name),
-            phone: !!(touched.phone && errors.phone),
-            vat: !!(touched.vat && errors.vat),
-            addressLine1: !!(touched.addressLine1 && errors.addressLine1),
-            addressLine2: !!(touched.addressLine2 && errors.addressLine2),
-            addressCity: !!(touched.addressCity && errors.addressCity),
-            addressCounty: !!(touched.addressCounty && errors.addressCounty),
-            addressPostcode: !!(touched.addressPostcode && errors.addressPostcode),
-          };
 
           return (
             <>
@@ -119,66 +110,82 @@ export const OrganizationTab: React.FC<OrganizationTabProps> = () => {
                   <Text style={commonStyles.text} note>
                     General company details.
                   </Text>
-                  <Item stackedLabel error={err.name}>
-                    <Label>Name</Label>
+                  <ItemField label="Name" touched={touched.name} name="name" errors={errors.name}>
                     <Input onChangeText={handleChange('name')} onBlur={handleBlur('name')} value={name} />
-                  </Item>
-                  <Item stackedLabel>
-                    <Label>Email</Label>
-                    <Label>{email}</Label>
-                  </Item>
-                  <Item stackedLabel error={err.phone}>
-                    <Label>Phone</Label>
+                  </ItemField>
+
+                  <ItemField label="Email" touched={touched.email} name="email" errors={errors.email}>
+                    <Input onChangeText={handleChange('email')} onBlur={handleBlur('email')} value={email} />
+                  </ItemField>
+
+                  <ItemField label="Phone" touched={touched.phone} name="phone" errors={errors.phone}>
                     <Input onChangeText={handleChange('phone')} onBlur={handleBlur('phone')} value={phone} />
-                  </Item>
-                  <Item stackedLabel error={err.vat}>
-                    <Label>VAT</Label>
+                  </ItemField>
+
+                  <ItemField label="VAT" touched={touched.vat} name="vat" errors={errors.vat}>
                     <Input onChangeText={handleChange('vat')} onBlur={handleBlur('vat')} value={vat} />
-                  </Item>
-                  {/* <H2 style={styles.heading}>Address</H2> */}
+                  </ItemField>
+
                   <Text style={commonStyles.text} note>
                     Address
                   </Text>
-                  <Item stackedLabel error={err.addressLine1}>
-                    <Label>Line 1</Label>
+
+                  <ItemField
+                    label="Line 1"
+                    touched={touched.addressLine1}
+                    name="addressLine1"
+                    errors={errors.addressLine1}
+                  >
                     <Input
                       onChangeText={handleChange('addressLine1')}
                       onBlur={handleBlur('addressLine1')}
                       value={addressLine1}
                     />
-                  </Item>
-                  <Item stackedLabel error={err.addressLine2}>
-                    <Label>Line 2</Label>
+                  </ItemField>
+
+                  <ItemField
+                    label="Line 2"
+                    touched={touched.addressLine2}
+                    name="addressLine2"
+                    errors={errors.addressLine2}
+                  >
                     <Input
                       onChangeText={handleChange('addressLine2')}
                       onBlur={handleBlur('addressLine2')}
                       value={addressLine2}
                     />
-                  </Item>
-                  <Item stackedLabel error={err.addressCity}>
-                    <Label>City</Label>
+                  </ItemField>
+                  <ItemField label="City" touched={touched.addressCity} name="addressCity" errors={errors.addressCity}>
                     <Input
                       onChangeText={handleChange('addressCity')}
                       onBlur={handleBlur('addressCity')}
                       value={addressCity}
                     />
-                  </Item>
-                  <Item stackedLabel error={err.addressCounty}>
-                    <Label>County</Label>
+                  </ItemField>
+                  <ItemField
+                    label="County"
+                    touched={touched.addressCounty}
+                    name="addressCounty"
+                    errors={errors.addressCounty}
+                  >
                     <Input
                       onChangeText={handleChange('addressCounty')}
                       onBlur={handleBlur('addressCounty')}
                       value={addressCounty}
                     />
-                  </Item>
-                  <Item stackedLabel error={err.addressPostcode}>
-                    <Label>Postcode</Label>
+                  </ItemField>
+                  <ItemField
+                    label="Post Code"
+                    touched={touched.addressPostcode}
+                    name="addressPostcode"
+                    errors={errors.addressPostcode}
+                  >
                     <Input
                       onChangeText={handleChange('addressPostcode')}
                       onBlur={handleBlur('addressPostcode')}
                       value={addressPostcode}
                     />
-                  </Item>
+                  </ItemField>
                 </Form>
               </ScrollView>
             </>

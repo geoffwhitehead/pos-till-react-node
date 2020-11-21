@@ -1,10 +1,12 @@
 import { useDatabase } from '@nozbe/watermelondb/hooks';
 import { Formik } from 'formik';
 import { capitalize } from 'lodash';
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import * as Yup from 'yup';
+import { ItemField } from '../../../../components/ItemField/ItemField';
 import { ModalContentButton } from '../../../../components/Modal/ModalContentButton';
-import { Body, CheckBox, Form, Input, Item, Label, ListItem, Text, View } from '../../../../core';
+import { OrganizationContext } from '../../../../contexts/OrganizationContext';
+import { Body, CheckBox, Form, Input, ListItem, Text, View } from '../../../../core';
 import {
   Item as ItemModel,
   ItemPrice,
@@ -13,7 +15,6 @@ import {
   PriceGroup,
   tableNames,
 } from '../../../../models';
-import { SHORT_NAME_LENGTH } from '../../../../utils/consts';
 import { commonStyles } from '../../../Settings/Tabs/styles';
 
 interface PriceGroupDetailsProps {
@@ -21,16 +22,17 @@ interface PriceGroupDetailsProps {
   priceGroup?: PriceGroup;
 }
 
-const priceGroupDetailsSchema = Yup.object().shape({
-  name: Yup.string()
-    .min(2, 'Too Short')
-    .max(50, 'Too Long')
-    .required('Required'),
-  shortName: Yup.string()
-    .min(2, 'Too Short')
-    .max(SHORT_NAME_LENGTH, 'Too Long'),
-  isPrepTimeRequired: Yup.boolean(),
-});
+const generatePriceGroupDetailsSchema = (shortNameLength: number) =>
+  Yup.object().shape({
+    name: Yup.string()
+      .min(2, 'Too Short')
+      .max(50, 'Too Long')
+      .required('Required'),
+    shortName: Yup.string()
+      .min(2, 'Too Short')
+      .max(shortNameLength, 'Too Long'),
+    isPrepTimeRequired: Yup.boolean(),
+  });
 
 type FormValues = {
   name: string;
@@ -41,7 +43,9 @@ type FormValues = {
 export const PriceGroupDetails: React.FC<PriceGroupDetailsProps> = ({ priceGroup, onClose }) => {
   const [loading, setLoading] = useState(false);
   const database = useDatabase();
+  const { organization } = useContext(OrganizationContext);
 
+  const priceGroupDetailsSchema = generatePriceGroupDetailsSchema(organization.shortNameLength);
   const onSave = async (values: FormValues, priceGroup: PriceGroup) => {
     setLoading(true);
     console.log('values', values);
@@ -105,11 +109,6 @@ export const PriceGroupDetails: React.FC<PriceGroupDetailsProps> = ({ priceGroup
     >
       {({ handleChange, handleBlur, handleSubmit, setFieldValue, errors, touched, values }) => {
         const { name, shortName, isPrepTimeRequired } = values;
-        const err = {
-          name: !!(touched.name && errors.name),
-          shortName: !!(touched.shortName && errors.shortName),
-          // isPrepTimeRequired: !!(touched.isPrepTimeRequired && errors.isPrepTimeRequired),
-        };
 
         const title = priceGroup ? `${capitalize(priceGroup.name)}` : 'New Price Group';
 
@@ -125,14 +124,14 @@ export const PriceGroupDetails: React.FC<PriceGroupDetailsProps> = ({ priceGroup
           >
             <View>
               <Form style={commonStyles.form}>
-                <Item stackedLabel error={err.name}>
-                  <Label>Name</Label>
+                <ItemField label="Name" touched={touched.name} name="name" errors={errors.name}>
                   <Input onChangeText={handleChange('name')} onBlur={handleBlur('name')} value={name} />
-                </Item>
-                <Item stackedLabel error={err.shortName}>
-                  <Label>Short Name</Label>
+                </ItemField>
+
+                <ItemField label="Short Name" touched={touched.shortName} name="shortName" errors={errors.shortName}>
                   <Input onChangeText={handleChange('shortName')} onBlur={handleBlur('shortName')} value={shortName} />
-                </Item>
+                </ItemField>
+
                 <ListItem>
                   <CheckBox
                     checked={isPrepTimeRequired}

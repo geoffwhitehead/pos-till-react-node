@@ -27,12 +27,12 @@ export const billItemSchema = tableSchema({
     { name: 'updated_at', type: 'number' },
     { name: 'is_comp', type: 'boolean' },
     { name: 'is_voided', type: 'boolean' },
-    { name: 'voided_at', type: 'string' },
-    { name: 'reason_description', type: 'string' },
-    { name: 'reason_name', type: 'string' },
+    { name: 'voided_at', type: 'string', isOptional: true },
+    { name: 'reason_description', type: 'string', isOptional: true },
+    { name: 'reason_name', type: 'string', isOptional: true },
     { name: 'is_stored', type: 'boolean' },
     { name: 'stored_at', type: 'string' },
-    { name: 'print_message', type: 'string' },
+    { name: 'print_message', type: 'string', isOptional: true },
   ],
 });
 

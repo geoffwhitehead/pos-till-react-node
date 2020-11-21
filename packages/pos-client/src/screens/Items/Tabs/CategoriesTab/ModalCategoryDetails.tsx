@@ -4,10 +4,12 @@ import { Formik } from 'formik';
 import { capitalize, omit } from 'lodash';
 import React, { useContext, useState } from 'react';
 import * as Yup from 'yup';
+import { ItemField } from '../../../../components/ItemField/ItemField';
 import { ModalContentButton } from '../../../../components/Modal/ModalContentButton';
 import { ModalColorPickerContent } from '../../../../components/ModalColorPicker/ModalColorPicker';
+import { OrganizationContext } from '../../../../contexts/OrganizationContext';
 import { RecentColorsContext } from '../../../../contexts/RecentColorsContext';
-import { Form, Input, Item, Label } from '../../../../core';
+import { Form, Input } from '../../../../core';
 import { Category, tableNames } from '../../../../models';
 import { colors } from '../../../../theme';
 
@@ -19,22 +21,6 @@ type ModalCategoryDetailsOuterProps = {
 type ModalCategoryDetailsInnerProps = {
   itemsCount?: number;
 };
-const categorySchema = Yup.object().shape({
-  name: Yup.string()
-    .min(2, 'Too Short')
-    .max(50, 'Too Long')
-    .required('Required'),
-  shortName: Yup.string()
-    .min(2, 'Too Short')
-    .max(50, 'Too Long'),
-  backgroundColor: Yup.string()
-    .length(7, 'Incorrect length')
-    .required(),
-  textColor: Yup.string()
-    .length(7, 'Incorrect length')
-    .required(),
-  positionIndex: Yup.number().required(),
-});
 
 type FormValues = {
   // name: string;
@@ -44,15 +30,37 @@ type FormValues = {
   positionIndex: string;
 };
 
+const generateCategorySchema = (shortNameLength: number) =>
+  Yup.object().shape({
+    name: Yup.string()
+      .min(2, 'Too Short')
+      .max(50, 'Too Long')
+      .required('Required'),
+    shortName: Yup.string()
+      .min(2, 'Too Short')
+      .max(shortNameLength, 'Too Long'),
+    backgroundColor: Yup.string()
+      .length(7, 'Incorrect length')
+      .required(),
+    textColor: Yup.string()
+      .length(7, 'Incorrect length')
+      .required(),
+    positionIndex: Yup.number().required(),
+  });
+
 export const ModalCategoryDetailsInner: React.FC<ModalCategoryDetailsOuterProps & ModalCategoryDetailsInnerProps> = ({
   category,
   onClose,
   itemsCount,
 }) => {
-  const [loading, setLoading] = useState(false);
+  const { organization } = useContext(OrganizationContext);
+  const { recentColors, setRecentColors } = useContext(RecentColorsContext);
   const database = useDatabase();
 
-  const { recentColors, setRecentColors } = useContext(RecentColorsContext);
+  const [loading, setLoading] = useState(false);
+
+  console.log('organization', organization);
+  const categorySchema = generateCategorySchema(organization.shortNameLength);
 
   const update = async (values: FormValues, category: Category) => {
     setLoading(true);
@@ -98,13 +106,6 @@ export const ModalCategoryDetailsInner: React.FC<ModalCategoryDetailsOuterProps 
     >
       {({ handleChange, handleBlur, handleSubmit, errors, touched, values }) => {
         const { shortName, name, backgroundColor, textColor, positionIndex } = values;
-        const err = {
-          name: !!(touched.name && errors.name),
-          shortName: !!(touched.shortName && errors.shortName),
-          backgroundColor: !!(touched.backgroundColor && errors.backgroundColor),
-          textColor: !!(touched.textColor && errors.textColor),
-          positionIndex: !!(touched.positionIndex && errors.positionIndex),
-        };
 
         const title = category ? `${capitalize(category.name)}` : 'New Category';
 
@@ -122,31 +123,35 @@ export const ModalCategoryDetailsInner: React.FC<ModalCategoryDetailsOuterProps 
           >
             <Form>
               {!category && (
-                <Item stackedLabel error={err.name}>
-                  <Label>Name</Label>
-                  <Input
-                    onChangeText={handleChange('name')}
-                    onBlur={handleBlur('name')}
-                    value={name}
-                    disabled={!!category}
-                  />
-                </Item>
+                <ItemField label="Name" touched={touched.name} name="name" errors={errors.name}>
+                  <Input onChangeText={handleChange('name')} onBlur={handleBlur('name')} value={name} />
+                </ItemField>
               )}
-              <Item stackedLabel error={err.shortName}>
-                <Label>Short Name</Label>
-                <Input onChangeText={handleChange('shortName')} onBlur={handleBlur('shortName')} value={shortName} />
-              </Item>
 
-              <Item stackedLabel error={err.shortName}>
-                <Label>Position Index</Label>
+              <ItemField label="Short Name" touched={touched.shortName} name="shortName" errors={errors.shortName}>
+                <Input onChangeText={handleChange('shortName')} onBlur={handleBlur('shortName')} value={shortName} />
+              </ItemField>
+
+              <ItemField
+                label="Grid Position"
+                touched={touched.positionIndex}
+                name="positionIndex"
+                errors={errors.positionIndex}
+              >
                 <Input
                   onChangeText={handleChange('positionIndex')}
                   onBlur={handleBlur('positionIndex')}
                   value={positionIndex}
                 />
-              </Item>
-              <Item stackedLabel style={styles.colorPickerItem}>
-                <Label>Background Color</Label>
+              </ItemField>
+
+              <ItemField
+                style={styles.colorPickerItem}
+                label="Background Color"
+                touched={touched.backgroundColor}
+                name="backgroundColor"
+                errors={errors.backgroundColor}
+              >
                 <ModalColorPickerContent
                   style={styles.colorPicker}
                   onChangeColor={handleChange('backgroundColor')}
@@ -154,9 +159,15 @@ export const ModalCategoryDetailsInner: React.FC<ModalCategoryDetailsOuterProps 
                   globalRecentColors={recentColors}
                   setGlobalRecentColors={setRecentColors}
                 />
-              </Item>
-              <Item stackedLabel style={styles.colorPickerItem}>
-                <Label>Text Color</Label>
+              </ItemField>
+
+              <ItemField
+                style={styles.colorPickerItem}
+                label="Text Color"
+                touched={touched.textColor}
+                name="textColor"
+                errors={errors.textColor}
+              >
                 <ModalColorPickerContent
                   style={styles.colorPicker}
                   onChangeColor={handleChange('textColor')}
@@ -164,7 +175,7 @@ export const ModalCategoryDetailsInner: React.FC<ModalCategoryDetailsOuterProps 
                   globalRecentColors={recentColors}
                   setGlobalRecentColors={setRecentColors}
                 />
-              </Item>
+              </ItemField>
             </Form>
           </ModalContentButton>
         );

@@ -3,27 +3,13 @@ import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import withObservables from '@nozbe/with-observables';
 import { FieldArray, Formik } from 'formik';
 import { capitalize, keyBy } from 'lodash';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { ScrollView } from 'react-native-gesture-handler';
 import * as Yup from 'yup';
+import { ItemField } from '../../../../components/ItemField/ItemField';
 import { Loading } from '../../../../components/Loading/Loading';
 import { ModalContentButton } from '../../../../components/Modal/ModalContentButton';
-import {
-  ActionSheet,
-  Col,
-  Form,
-  Grid,
-  H2,
-  Icon,
-  Input,
-  Item,
-  Label,
-  List,
-  ListItem,
-  Picker,
-  Row,
-  Text,
-} from '../../../../core';
+import { ActionSheet, Col, Form, Grid, H2, Icon, Input, List, ListItem, Picker, Row, Text } from '../../../../core';
 import {
   Category,
   Item as ItemModel,
@@ -35,7 +21,6 @@ import {
   tableNames,
 } from '../../../../models';
 import { styles } from '../../../../styles';
-import { SHORT_NAME_LENGTH } from '../../../../utils/consts';
 import { ModifierRow } from './ModifierRow';
 
 interface ItemDetailsOuterProps {
@@ -55,29 +40,30 @@ interface ItemDetailsInnerProps {
   priceGroups: PriceGroup[];
 }
 
-const ItemSchema = Yup.object().shape({
-  name: Yup.string()
-    .min(2, 'Too Short')
-    .max(50, 'Too Long')
-    .required('Required'),
-  shortName: Yup.string()
-    .min(2, 'Too Short')
-    .max(SHORT_NAME_LENGTH, 'Too Long')
-    .required('Required'),
-  categoryId: Yup.string()
-    .min(2, 'Too Short')
-    .max(50, 'Too Long')
-    .required('Required'),
-  printerGroupId: Yup.string()
-    .min(2, 'Too Short')
-    .max(50, 'Too Long'),
-  prices: Yup.array().of(
-    Yup.object().shape({
-      priceGroup: Yup.object(),
-      price: Yup.string(),
-    }),
-  ),
-});
+const generateItemSchema = (shortNameLength: number) =>
+  Yup.object().shape({
+    name: Yup.string()
+      .min(2, 'Too Short')
+      .max(50, 'Too Long')
+      .required('Required'),
+    shortName: Yup.string()
+      .min(2, 'Too Short')
+      .max(shortNameLength, 'Too Long')
+      .required('Required'),
+    categoryId: Yup.string()
+      .min(2, 'Too Short')
+      .max(50, 'Too Long')
+      .required('Required'),
+    printerGroupId: Yup.string()
+      .min(2, 'Too Short')
+      .max(50, 'Too Long'),
+    prices: Yup.array().of(
+      Yup.object().shape({
+        priceGroup: Yup.object(),
+        price: Yup.string(),
+      }),
+    ),
+  });
 
 const ItemDetailsInner: React.FC<ItemDetailsOuterProps & ItemDetailsInnerProps> = ({
   item,
@@ -95,7 +81,9 @@ const ItemDetailsInner: React.FC<ItemDetailsOuterProps & ItemDetailsInnerProps> 
   }
   const [selectedModifiers, setSelectedModifiers] = useState<Modifier[]>([]);
   const [loading, setLoading] = useState(false);
+  const { organization } = useContext(OrganizationContext);
 
+  const itemSchema = generateItemSchema(organization.shortNameLength);
   const keyedItemPricesByPriceGroup = keyBy(itemPrices, itemPrice => itemPrice.priceGroupId);
 
   useEffect(() => {
@@ -210,22 +198,15 @@ const ItemDetailsInner: React.FC<ItemDetailsOuterProps & ItemDetailsInnerProps> 
   };
 
   return (
-    <Formik initialValues={initialValues} validationSchema={ItemSchema} onSubmit={values => updateItem(values)}>
+    <Formik initialValues={initialValues} validationSchema={itemSchema} onSubmit={values => updateItem(values)}>
       {({ handleChange, handleBlur, handleSubmit, errors, touched, values }) => {
         const { name, shortName, prices, categoryId, printerGroupId } = values;
-        const err = {
-          name: !!(touched.name && errors.name),
-          prices: !!(touched.prices && errors.prices),
-          categoryId: !!(touched.categoryId && errors.categoryId),
-          printerGroupId: !!(touched.printerGroupId && errors.printerGroupId),
-          shortName: !!(touched.shortName && errors.shortName),
-        };
 
         const title = item ? `${capitalize(item.name)}` : 'New Item';
 
         return (
           <ModalContentButton
-            title="Item details"
+            title={title}
             onPressPrimaryButton={handleSubmit}
             primaryButtonText="Save"
             isPrimaryDisabled={loading}
@@ -239,23 +220,33 @@ const ItemDetailsInner: React.FC<ItemDetailsOuterProps & ItemDetailsInnerProps> 
                 <Row>
                   <Col style={styles.columnLeft}>
                     <Form>
-                      <Item stackedLabel error={err.name}>
-                        <Label>Name</Label>
+                      <ItemField label="Name" touched={touched.name} name="name" errors={errors.name}>
                         <Input onChangeText={handleChange('name')} onBlur={handleBlur('name')} value={name} />
-                      </Item>
+                      </ItemField>
+
                       <Text style={styles.text} note>
                         A shortname will be used on printers where space is restricted.
                       </Text>
-                      <Item stackedLabel error={err.shortName}>
-                        <Label>ShortName</Label>
+                      <ItemField
+                        label="Short Name"
+                        touched={touched.shortName}
+                        name="shortName"
+                        errors={errors.shortName}
+                      >
                         <Input
                           onChangeText={handleChange('shortName')}
                           onBlur={handleBlur('shortName')}
                           value={shortName}
                         />
-                      </Item>
-                      <Item picker stackedLabel>
-                        <Label>Category</Label>
+                      </ItemField>
+
+                      <ItemField
+                        picker
+                        label="Category"
+                        touched={touched.categoryId}
+                        name="categoryId"
+                        errors={errors.categoryId}
+                      >
                         <Picker
                           mode="dropdown"
                           iosIcon={<Icon name="arrow-down" />}
@@ -270,12 +261,19 @@ const ItemDetailsInner: React.FC<ItemDetailsOuterProps & ItemDetailsInnerProps> 
                             <Picker.Item key={id} label={name} value={id} />
                           ))}
                         </Picker>
-                      </Item>
+                      </ItemField>
+
                       <Text style={styles.text} note>
                         On storing a bill, this item will be sent to all printers associated with this printer group.
                       </Text>
-                      <Item picker stackedLabel>
-                        <Label>Printer Group</Label>
+
+                      <ItemField
+                        picker
+                        label="Printer Group"
+                        touched={touched.printerGroupId}
+                        name="printerGroupId"
+                        errors={errors.printerGroupId}
+                      >
                         <Picker
                           mode="dropdown"
                           iosIcon={<Icon name="arrow-down" />}
@@ -290,7 +288,7 @@ const ItemDetailsInner: React.FC<ItemDetailsOuterProps & ItemDetailsInnerProps> 
                             <Picker.Item key={id} label={name} value={id} />
                           ))}
                         </Picker>
-                      </Item>
+                      </ItemField>
                     </Form>
                   </Col>
                   <Col style={styles.columnRight}>
@@ -304,14 +302,18 @@ const ItemDetailsInner: React.FC<ItemDetailsOuterProps & ItemDetailsInnerProps> 
                         render={() => {
                           return priceGroups.map((priceGroup, i) => {
                             return (
-                              <Item key={priceGroup.id} stackedLabel error={err?.prices[i]?.price}>
-                                <Label>{priceGroup.name}</Label>
+                              <ItemField
+                                label={capitalize(priceGroup.name)}
+                                touched={touched?.prices[i]?.price}
+                                name={`prices[${i}].price`}
+                                errors={errors?.prices[i]}
+                              >
                                 <Input
                                   onChangeText={handleChange(`prices[${i}].price`)}
                                   onBlur={handleBlur(`prices[${i}]`)}
                                   value={prices[i].price}
                                 />
-                              </Item>
+                              </ItemField>
                             );
                           });
                         }}

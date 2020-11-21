@@ -4,8 +4,9 @@ import { Formik } from 'formik';
 import { capitalize } from 'lodash';
 import React, { useState } from 'react';
 import * as Yup from 'yup';
+import { ItemField } from '../../../../components/ItemField/ItemField';
 import { ModalContentButton } from '../../../../components/Modal/ModalContentButton';
-import { Form, Input, Item, Label } from '../../../../core';
+import { Form, Input } from '../../../../core';
 import { Modifier, tableNames } from '../../../../models';
 import { commonStyles } from '../../../Settings/Tabs/styles';
 
@@ -88,11 +89,6 @@ export const ModalModifierDetailsInner: React.FC<ModalModifierDetailsOuterProps 
     >
       {({ handleChange, handleBlur, handleSubmit, errors, touched, values }) => {
         const { name, minItems, maxItems } = values;
-        const err = {
-          name: !!(touched.name && errors.name),
-          minItems: !!(touched.minItems && errors.minItems),
-          maxItems: !!(touched.maxItems && errors.maxItems),
-        };
 
         const title = modifier ? `${capitalize(modifier.name)}` : 'New Modifier';
 
@@ -109,18 +105,15 @@ export const ModalModifierDetailsInner: React.FC<ModalModifierDetailsOuterProps 
             size="small"
           >
             <Form style={commonStyles.form}>
-              <Item stackedLabel error={err.name}>
-                <Label>Name</Label>
+              <ItemField label="Name" touched={touched.name} name="name" errors={errors.name}>
                 <Input onChangeText={handleChange('name')} onBlur={handleBlur('name')} value={name} />
-              </Item>
-              <Item stackedLabel error={err.minItems}>
-                <Label>Min Items</Label>
+              </ItemField>
+              <ItemField label="Min Items" touched={touched.minItems} name="minItems" errors={errors.minItems}>
                 <Input onChangeText={handleChange('minItems')} onBlur={handleBlur('minItems')} value={minItems} />
-              </Item>
-              <Item stackedLabel error={err.minItems}>
-                <Label>Max Items</Label>
+              </ItemField>
+              <ItemField label="Max Items" touched={touched.maxItems} name="maxItems" errors={errors.maxItems}>
                 <Input onChangeText={handleChange('maxItems')} onBlur={handleBlur('maxItems')} value={maxItems} />
-              </Item>
+              </ItemField>
             </Form>
           </ModalContentButton>
         );

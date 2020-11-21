@@ -1,9 +1,10 @@
 import { Formik } from 'formik';
 import React from 'react';
 import * as Yup from 'yup';
+import { ItemField } from '../../../../../components/ItemField/ItemField';
 import { ModalContentButton } from '../../../../../components/Modal/ModalContentButton';
-import { Form, Input, Item, Label, Text, Textarea } from '../../../../../core';
-import { RemoveMode } from '../ReceiptItems';
+import { Form, Input, Textarea } from '../../../../../core';
+import { Action } from '../ReceiptItems';
 
 const modalReasonSchema = Yup.object().shape({
   name: Yup.string().required('Required'),
@@ -21,7 +22,7 @@ export type ModifyReason = {
 type ModalReasonProps = {
   onClose: () => void;
   onComplete: (values: ModifyReason) => void;
-  mode: RemoveMode;
+  mode: Action;
   title: string;
 };
 
@@ -35,15 +36,11 @@ export const ModalReason: React.FC<ModalReasonProps> = ({ onComplete, onClose, m
     <Formik initialValues={initialValues} validationSchema={modalReasonSchema} onSubmit={values => onComplete(values)}>
       {({ handleChange, handleBlur, handleSubmit, errors, touched, values }) => {
         const { reason, name } = values;
-        const err = {
-          reason: !!(touched.reason && errors.reason),
-          name: !!(touched.name && errors.name),
-        };
 
         const description =
-          mode === RemoveMode.comp
+          mode === Action.comp
             ? 'Please provide a reason for making this item complimentary...'
-            : mode === RemoveMode.void
+            : mode === Action.void
             ? 'Please provide a reason why this item is being voided...'
             : 'Please provide a reason... ';
 
@@ -57,13 +54,12 @@ export const ModalReason: React.FC<ModalReasonProps> = ({ onComplete, onClose, m
             size="medium"
           >
             <Form>
-              <Text style={{ paddingBottom: 20 }}>{description}</Text>
-              <Item stackedLabel error={err.name}>
-                <Label>Name</Label>
+              <ItemField label="Name" touched={touched.name} name="name" errors={errors.name}>
                 <Input onChangeText={handleChange('name')} onBlur={handleBlur('name')} value={name} />
-              </Item>
-              <Item stackedLabel error={err.reason}>
-                <Label style={{ paddingBottom: 10 }}>Reason</Label>
+              </ItemField>
+
+              <ItemField label="Reason" touched={touched.reason} name="reason" errors={errors.reason}>
+                <Input onChangeText={handleChange('reason')} onBlur={handleBlur('reason')} value={reason} />
                 <Textarea
                   style={{ width: '100%' }}
                   underline
@@ -73,7 +69,7 @@ export const ModalReason: React.FC<ModalReasonProps> = ({ onComplete, onClose, m
                   rowSpan={5}
                   bordered
                 />
-              </Item>
+              </ItemField>
             </Form>
           </ModalContentButton>
         );

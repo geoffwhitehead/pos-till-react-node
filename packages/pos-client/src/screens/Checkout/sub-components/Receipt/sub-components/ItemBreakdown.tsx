@@ -36,7 +36,7 @@ const ItemBreakdownInner: React.FC<ItemBreakdownOuterProps & ItemBreakdownInnerP
   const isChargable = !(billItem.isComp || billItem.isVoided);
   const itemDisplayPrice = formatNumber(isChargable ? billItem.itemPrice : 0, currency);
   const isDisabled = readonly || status === PrintStatus.processing;
-
+  console.log('billItem', billItem);
   return (
     <ListItem
       style={status ? styles[status] : {}}
@@ -67,6 +67,9 @@ const ItemBreakdownInner: React.FC<ItemBreakdownOuterProps & ItemBreakdownInnerP
               ))}
             </View>
           )}
+          {billItem.printMessage ? (
+            <Text note style={{ ...style, fontWeight: 'bold' }}>{`msg: ${billItem.printMessage}`}</Text>
+          ) : null}
         </View>
       </Left>
       <Right>

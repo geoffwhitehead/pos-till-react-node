@@ -3,8 +3,9 @@ import { Formik } from 'formik';
 import { capitalize } from 'lodash';
 import React, { useState } from 'react';
 import * as Yup from 'yup';
+import { ItemField } from '../../../../components/ItemField/ItemField';
 import { ModalContentButton } from '../../../../components/Modal/ModalContentButton';
-import { Body, CheckBox, Form, Input, Item, Label, ListItem, Text, View } from '../../../../core';
+import { Body, CheckBox, Form, Input, ListItem, Text, View } from '../../../../core';
 import { Discount, tableNames } from '../../../../models';
 import { commonStyles } from '../styles';
 
@@ -72,11 +73,6 @@ export const ModalDiscountDetails: React.FC<ModalDiscountDetailsProps> = ({ disc
     >
       {({ handleChange, handleBlur, handleSubmit, setFieldValue, errors, touched, values }) => {
         const { name, amount, isPercent } = values;
-        const err = {
-          name: !!(touched.name && errors.name),
-          amount: !!(touched.amount && errors.amount),
-          // isPercent: !!(touched.isPercent && errors.isPrepTimeRequired),
-        };
 
         const title = discount ? `${capitalize(discount.name)}` : 'New Discount';
 
@@ -92,14 +88,14 @@ export const ModalDiscountDetails: React.FC<ModalDiscountDetailsProps> = ({ disc
           >
             <View>
               <Form style={commonStyles.form}>
-                <Item stackedLabel error={err.name}>
-                  <Label>Name</Label>
+                <ItemField label="Name" touched={touched.name} name="name" errors={errors.name}>
                   <Input onChangeText={handleChange('name')} onBlur={handleBlur('name')} value={name} />
-                </Item>
-                <Item stackedLabel error={err.amount}>
-                  <Label>Amount</Label>
+                </ItemField>
+
+                <ItemField label="Amount" touched={touched.amount} name="amount" errors={errors.amount}>
                   <Input onChangeText={handleChange('amount')} onBlur={handleBlur('amount')} value={amount} />
-                </Item>
+                </ItemField>
+
                 <ListItem>
                   <CheckBox
                     checked={isPercent}

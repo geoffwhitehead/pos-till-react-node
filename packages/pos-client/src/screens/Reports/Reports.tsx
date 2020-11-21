@@ -8,7 +8,21 @@ import { ScrollView } from 'react-native-gesture-handler';
 import { SidebarHeader } from '../../components/SidebarHeader/SidebarHeader';
 import { OrganizationContext } from '../../contexts/OrganizationContext';
 import { ReceiptPrinterContext } from '../../contexts/ReceiptPrinterContext';
-import { ActionSheet, Button, Col, Container, Grid, Left, List, ListItem, Right, Text, Toast, View } from '../../core';
+import {
+  ActionSheet,
+  Button,
+  Col,
+  Container,
+  Grid,
+  Left,
+  List,
+  ListItem,
+  Right,
+  Spinner,
+  Text,
+  Toast,
+  View,
+} from '../../core';
 import { BillPeriod, Organization, PaymentType, Printer, tableNames } from '../../models';
 import { SidebarDrawerStackParamList } from '../../navigators/SidebarNavigator';
 import { correctionReport } from '../../services/printer/correctionReport';
@@ -154,6 +168,7 @@ export const ReportsInner: React.FC<ReportsOuterProps & ReportsInnerProps> = ({
                 );
               })}
             </List>
+            {isLoading && <Spinner />}
           </ScrollView>
         </Col>
         {/* {selectedBillPeriod && (

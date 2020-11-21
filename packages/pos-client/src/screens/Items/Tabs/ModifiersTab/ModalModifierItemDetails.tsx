@@ -2,14 +2,15 @@ import { Database } from '@nozbe/watermelondb';
 import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import { useDatabase } from '@nozbe/watermelondb/hooks';
 import withObservables from '@nozbe/with-observables';
-import { Formik } from 'formik';
+import { FieldArray, Formik } from 'formik';
 import { capitalize, keyBy } from 'lodash';
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import * as Yup from 'yup';
+import { ItemField } from '../../../../components/ItemField/ItemField';
 import { ModalContentButton } from '../../../../components/Modal/ModalContentButton';
-import { Content, Form, Input, Item, Label, Separator, Text } from '../../../../core';
+import { OrganizationContext } from '../../../../contexts/OrganizationContext';
+import { Content, Form, Input, Separator, Text } from '../../../../core';
 import { Modifier, ModifierItem, ModifierItemPrice, PriceGroup, tableNames } from '../../../../models';
-import { SHORT_NAME_LENGTH } from '../../../../utils/consts';
 import { commonStyles } from '../../../Settings/Tabs/styles';
 
 type ModalModifierItemDetailsOuterProps = {
@@ -24,24 +25,25 @@ type ModalModifierItemDetailsInnerProps = {
   priceGroups: PriceGroup[];
 };
 
-const modifierItemSchema = Yup.object().shape({
-  name: Yup.string()
-    .min(2, 'Too Short')
-    .max(50, 'Too Long')
-    .required('Required'),
-  shortName: Yup.string()
-    .min(2, 'Too Short')
-    .max(SHORT_NAME_LENGTH, 'Too Long')
-    .required('Required'),
-  prices: Yup.array()
-    .of(
-      Yup.object().shape({
-        modifierItemPrice: Yup.object(),
-        price: Yup.number(),
-      }),
-    )
-    .required(),
-});
+const generateModifierItemSchema = (shortNameLength: number) =>
+  Yup.object().shape({
+    name: Yup.string()
+      .min(2, 'Too Short')
+      .max(50, 'Too Long')
+      .required('Required'),
+    shortName: Yup.string()
+      .min(2, 'Too Short')
+      .max(shortNameLength, 'Too Long')
+      .required('Required'),
+    prices: Yup.array()
+      .of(
+        Yup.object().shape({
+          modifierItemPrice: Yup.object(),
+          price: Yup.number(),
+        }),
+      )
+      .required(),
+  });
 
 type FormValues = {
   name: string;
@@ -53,7 +55,9 @@ export const ModalModifierItemDetailsInner: React.FC<ModalModifierItemDetailsOut
   ModalModifierItemDetailsInnerProps> = ({ modifierItem, onClose, priceGroups, modifier, modifierItemPrices = [] }) => {
   const [loading, setLoading] = useState(false);
   const database = useDatabase();
+  const { organization } = useContext(OrganizationContext);
 
+  const modifierItemSchema = generateModifierItemSchema(organization.shortNameLength);
   const keyedMofifierItemPricesByPriceGroup = keyBy(
     modifierItemPrices,
     modifierItemPrice => modifierItemPrice.priceGroupId,
@@ -140,11 +144,6 @@ export const ModalModifierItemDetailsInner: React.FC<ModalModifierItemDetailsOut
     <Formik initialValues={initialValues} validationSchema={modifierItemSchema} onSubmit={values => onSave(values)}>
       {({ handleChange, handleBlur, handleSubmit, errors, touched, values, isValid }) => {
         const { name, prices, shortName } = values;
-        const err = {
-          name: !!(touched.name && errors.name),
-          shortName: !!(touched.shortName && errors.shortName),
-          prices: !!(touched.prices && errors.prices),
-        };
 
         const title = modifierItem ? `${capitalize(modifierItem.name)}` : 'New Modifier Item';
 
@@ -162,29 +161,39 @@ export const ModalModifierItemDetailsInner: React.FC<ModalModifierItemDetailsOut
           >
             <Content>
               <Form style={commonStyles.form}>
-                <Item stackedLabel error={err.name}>
-                  <Label>Name</Label>
+                <ItemField label="Name" touched={touched.name} name="name" errors={errors.name}>
                   <Input onChangeText={handleChange('name')} onBlur={handleBlur('name')} value={name} />
-                </Item>
-                <Item stackedLabel error={err.name}>
-                  <Label>Short Name</Label>
+                </ItemField>
+
+                <ItemField label="Short Name" touched={touched.shortName} name="shortName" errors={errors.shortName}>
                   <Input onChangeText={handleChange('shortName')} onBlur={handleBlur('shortName')} value={shortName} />
-                </Item>
+                </ItemField>
+
                 <Separator bordered style={{ marginTop: 30, padding: 10 }}>
                   <Text>Prices</Text>
                 </Separator>
-                {prices.map(({ price, priceGroup }, index) => {
-                  return (
-                    <Item key={priceGroup.id} stackedLabel error={err.prices}>
-                      <Label>{priceGroup.name}</Label>
-                      <Input
-                        onChangeText={handleChange(`prices[${index}].price`)}
-                        onBlur={handleBlur(`prices[${index}].price`)}
-                        value={price.toString()}
-                      />
-                    </Item>
-                  );
-                })}
+
+                <FieldArray
+                  name="prices"
+                  render={() => {
+                    return prices.map(({ price, priceGroup }, index) => {
+                      return (
+                        <ItemField
+                          label={capitalize(priceGroup.name)}
+                          touched={touched.prices[index].price}
+                          name={`prices[${index}].price`}
+                          errors={errors?.prices[index]}
+                        >
+                          <Input
+                            onChangeText={handleChange(`prices[${index}].price`)}
+                            onBlur={handleBlur(`prices[${index}].price`)}
+                            value={price.toString()}
+                          />
+                        </ItemField>
+                      );
+                    });
+                  }}
+                />
               </Form>
             </Content>
           </ModalContentButton>

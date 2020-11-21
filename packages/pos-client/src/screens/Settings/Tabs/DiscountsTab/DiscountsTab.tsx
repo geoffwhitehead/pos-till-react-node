@@ -8,7 +8,6 @@ import { OrganizationContext } from '../../../../contexts/OrganizationContext';
 import { ActionSheet, Body, Button, Icon, Left, List, ListItem, Right, Spinner, Text, View } from '../../../../core';
 import { Discount, tableNames } from '../../../../models';
 import { formatNumber } from '../../../../utils';
-import { MAX_DISCOUNTS } from '../../../../utils/consts';
 import { resolveButtonState } from '../../../../utils/helpers';
 import { commonStyles } from '../styles';
 import { ModalDiscountDetails } from './ModalDiscountDetails';
@@ -52,7 +51,7 @@ const DiscountTabInner: React.FC<DiscountTabOuterProps & DiscountTabInnerProps> 
     return <Spinner />;
   }
 
-  const isCreateDisabled = discounts.length >= MAX_DISCOUNTS;
+  const isCreateDisabled = discounts.length >= organization.maxDiscounts;
 
   return (
     <View>

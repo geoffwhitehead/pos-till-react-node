@@ -3,8 +3,9 @@ import { capitalize } from 'lodash';
 import React from 'react';
 import { ScrollView } from 'react-native';
 import * as Yup from 'yup';
+import { ItemField } from '../../../../components/ItemField/ItemField';
 import { ModalContentButton } from '../../../../components/Modal/ModalContentButton';
-import { Body, CheckBox, Form, Icon, Input, Item, Label, ListItem, Picker, Text } from '../../../../core';
+import { Body, CheckBox, Form, Icon, Input, ListItem, Picker, Text } from '../../../../core';
 import { Printer } from '../../../../models';
 import { Emulations, PrinterProps } from '../../../../models/Printer';
 
@@ -59,13 +60,6 @@ export const ModalPrinterDetails: React.FC<ModalPrinterDetailsOuterProps> = ({
     <Formik initialValues={initialValues} validationSchema={printerDetailsSchema} onSubmit={onSave}>
       {({ handleChange, handleBlur, handleSubmit, setFieldValue, errors, touched, values }) => {
         const { name, address, macAddress, printWidth, emulation, receivesBillCalls } = values;
-        const err = {
-          name: !!(touched.name && errors.name),
-          address: !!(touched.address && errors.address),
-          printWidth: !!(touched.printWidth && errors.printWidth),
-          emulation: !!(touched.emulation && errors.emulation),
-          macAddress: !!(touched.macAddress && errors.macAddress),
-        };
 
         const title = printer ? `${capitalize(printer.name)}` : 'New Printer';
 
@@ -81,33 +75,44 @@ export const ModalPrinterDetails: React.FC<ModalPrinterDetailsOuterProps> = ({
           >
             <ScrollView>
               <Form>
-                <Item stackedLabel error={err.name}>
-                  <Label>Name</Label>
+                <ItemField label="Name" touched={touched.name} name="name" errors={errors.name}>
                   <Input onChangeText={handleChange('name')} onBlur={handleBlur('name')} value={name} />
-                </Item>
-                <Item stackedLabel error={err.address}>
-                  <Label>Address</Label>
-                  <Input onChangeText={handleChange('address')} onBlur={handleBlur('vat')} value={address} />
-                </Item>
-                <Item stackedLabel error={err.macAddress}>
-                  <Label>MAC Address</Label>
+                </ItemField>
+                <ItemField label="Address" touched={touched.address} name="address" errors={errors.address}>
+                  <Input onChangeText={handleChange('address')} onBlur={handleBlur('address')} value={address} />
+                </ItemField>
+                <ItemField
+                  label="MAC Address"
+                  touched={touched.macAddress}
+                  name="macAddress"
+                  errors={errors.macAddress}
+                >
                   <Input
                     onChangeText={handleChange('macAddress')}
                     onBlur={handleBlur('macAddress')}
                     value={macAddress}
                   />
-                </Item>
-                <Item stackedLabel error={err.printWidth}>
-                  <Label>Print Width</Label>
+                </ItemField>
+                <ItemField
+                  label="Print Width"
+                  touched={touched.printWidth}
+                  name="printWidth"
+                  errors={errors.printWidth}
+                >
                   <Input
                     onChangeText={handleChange('printWidth')}
                     onBlur={handleBlur('printWidth')}
                     value={printWidth.toString()}
                   />
-                </Item>
+                </ItemField>
 
-                <Item picker stackedLabel>
-                  <Label>Emulation</Label>
+                <ItemField
+                  picker
+                  label="Emulation"
+                  touched={touched.emulation}
+                  name="emulation"
+                  errors={errors.emulation}
+                >
                   <Picker
                     mode="dropdown"
                     iosIcon={<Icon name="arrow-down" />}
@@ -122,7 +127,8 @@ export const ModalPrinterDetails: React.FC<ModalPrinterDetailsOuterProps> = ({
                       <Picker.Item key={emulation} label={emulation} value={emulation} />
                     ))}
                   </Picker>
-                </Item>
+                </ItemField>
+
                 <ListItem>
                   <CheckBox
                     checked={receivesBillCalls}
