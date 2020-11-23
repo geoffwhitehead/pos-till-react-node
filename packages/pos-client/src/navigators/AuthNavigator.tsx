@@ -29,7 +29,7 @@ export const AuthNavigatorInner: React.FC<AuthNavigatorInnerProps> = ({ database
   const Stack = createStackNavigator();
 
   return (
-    <Stack.Navigator initialRouteName="SignIn">
+    <Stack.Navigator initialRouteName="SignIn" headerMode="none">
       <Stack.Screen
         name="SignIn"
         component={SignIn}
@@ -37,7 +37,6 @@ export const AuthNavigatorInner: React.FC<AuthNavigatorInnerProps> = ({ database
           organization: organizations.length ? organizations[0] : null,
         }}
         options={{
-          title: 'SignIn',
           animationTypeForReplace: 'pop',
         }}
       />

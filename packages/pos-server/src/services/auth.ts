@@ -1,14 +1,13 @@
-import Container from 'typedi';
-import jwt from 'jsonwebtoken';
 // import MailerService from './mailer';
 import argon2 from 'argon2';
 import { randomBytes } from 'crypto';
+import jwt from 'jsonwebtoken';
+import { omit } from 'lodash';
+import Container from 'typedi';
 import { InjectedDependencies, ServiceResponse } from '.';
+import { createLoggerContext } from '../loaders/logger';
 import { OrganizationProps } from '../models/Organization';
 import { UserProps, UserPropsFull } from '../models/User';
-import { createLoggerContext } from '../loaders/logger';
-import { omit } from 'lodash';
-import uuid from 'uuid';
 
 export interface AuthService {
     signUp: (
@@ -136,7 +135,11 @@ export const authService = ({
 
         return {
             success: true,
-            data: { ...omit(userRecord, 'refreshToken'), organizationId: organizationRecord._id },
+            data: {
+                ...omit(userRecord, 'refreshToken', '_id'),
+                userId: userRecord._id,
+                organizationId: organizationRecord._id,
+            },
             accessToken,
             refreshToken,
         };
@@ -201,7 +204,7 @@ export const authService = ({
             firstName: user.firstName,
             lastName: user.lastName,
             email: user.email,
-            _id: user._id,
+            userId: user._id,
             organizationId: organization._id,
         };
 

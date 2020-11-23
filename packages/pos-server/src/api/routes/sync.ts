@@ -37,7 +37,7 @@ export default (app: Router) => {
             priceGroup: priceGroupService,
         } = Container.get('productService') as ProductService;
         const printerService = Container.get('printerService') as PrinterService;
-        const printerGroupService = Container.get('printerGroupService') as PrinterService;
+        // const printerGroupService = Container.get('printerGroupService') as PrinterService;
         const organizationService = Container.get('organizationService') as OrganizationService;
 
         const { lastPulledAt: lastPulledAtUnix, schemaVersion, migration = null } = req.query;
@@ -51,7 +51,7 @@ export default (app: Router) => {
             discountChanges,
             priceGroupChanges,
             printerChanges,
-            printerGroupChanges,
+            // printerGroupChanges,
             organizationChanges,
         ] = await Promise.all([
             categoryService.pullChanges({ lastPulledAt, schemaVersion, migration }),
@@ -60,7 +60,7 @@ export default (app: Router) => {
             discountService.pullChanges({ lastPulledAt, schemaVersion, migration }),
             priceGroupService.pullChanges({ lastPulledAt, schemaVersion, migration }),
             printerService.pullChanges({ lastPulledAt, schemaVersion, migration }),
-            printerGroupService.pullChanges({ lastPulledAt, schemaVersion, migration }),
+            // printerGroupService.pullChanges({ lastPulledAt, schemaVersion, migration }),
             organizationService.pullChanges({ lastPulledAt, schemaVersion, migration }),
         ]);
 
@@ -71,7 +71,7 @@ export default (app: Router) => {
             ...discountChanges,
             ...priceGroupChanges,
             ...printerChanges,
-            ...printerGroupChanges,
+            // ...printerGroupChanges,
             ...organizationChanges,
         };
         const timestamp = getUnixTime(new Date());
@@ -129,15 +129,16 @@ export default (app: Router) => {
                 ,
                 printerService.pushChanges({
                     lastPulledAt,
-                    changes: deconstructChanges(changes, PRINTER_COLLECTION_NAME),
-                }),
-                printerGroupService.pushChanges({
-                    lastPulledAt,
                     changes: {
+                        ...deconstructChanges(changes, PRINTER_COLLECTION_NAME),
                         ...deconstructChanges(changes, PRINTER_GROUP_COLLECTION_NAME),
                         ...deconstructChanges(changes, PRINTER_GROUP_PRINTER_COLLECTION_NAME),
                     },
                 }),
+                // printerGroupService.pushChanges({
+                //     lastPulledAt,
+                //     changes: {},
+                // }),
                 organizationService.pushChanges({
                     lastPulledAt,
                     changes: deconstructChanges(changes, ORGANIZATION_COLLECTION_NAME),

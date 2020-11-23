@@ -1,9 +1,8 @@
-import { UserProps, UserPropsFull } from '../models/User';
-import { InjectedRepositoryDependencies } from '.';
-import { Container } from 'typedi';
 import { pick } from 'lodash';
+import { Container } from 'typedi';
+import { InjectedRepositoryDependencies } from '.';
+import { UserProps, UserPropsFull } from '../models/User';
 import { repository } from './utils';
-import mongoose from 'mongoose';
 
 export type UserRepository = {
     findAll: () => Promise<UserProps[]>;
@@ -15,7 +14,7 @@ export type UserRepository = {
 };
 
 const clean = (userRecord: UserPropsFull): UserProps => {
-    return pick(userRecord, 'id', 'firstName', 'lastName', 'email', 'token');
+    return pick(userRecord, '_id', 'firstName', 'lastName', 'email', 'token');
 };
 
 export const userRepository = ({ models: { UserModel } }: InjectedRepositoryDependencies): UserRepository =>

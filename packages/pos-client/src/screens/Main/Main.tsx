@@ -95,6 +95,20 @@ export const MainWrapped: React.FC<MainOuterProps & MainInnerProps> = ({ priceGr
       const defaultPriceGroup = priceGroups.find(({ id }) => id === organization.defaultPriceGroupId);
       const [firstPriceGroup] = priceGroups;
 
+      // TODO: replace this with seeding organization correctly
+      const createDefaultPriceGroup = async () =>
+        await database.action(() =>
+          database.collections
+            .get<PriceGroup>(tableNames.priceGroups)
+            .create(record =>
+              Object.assign(record, { name: 'Default', shortName: 'Default', isPrepTimeRequired: false }),
+            ),
+        );
+
+      if (!firstPriceGroup) {
+        createDefaultPriceGroup();
+      }
+
       setPriceGroup(defaultPriceGroup || firstPriceGroup || null);
     }
   }, [priceGroups, organization, setPriceGroup]);

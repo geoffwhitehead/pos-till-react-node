@@ -77,7 +77,7 @@ const DiscountTabInner: React.FC<DiscountTabOuterProps & DiscountTabInnerProps> 
             const isSelected = selectedDiscount === discount;
             const amountString = discount.isPercent
               ? `${discount.amount}%`
-              : formatNumber(discount.amount / 100, organization.currency);
+              : formatNumber(discount.amount, organization.currency);
 
             return (
               <ListItem key={discount.id} noIndent style={isSelected ? commonStyles.selectedRow : {}}>

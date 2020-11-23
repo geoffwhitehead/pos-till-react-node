@@ -17,13 +17,14 @@ import {
   BillItemPrintLog,
   Discount,
   Item,
+  ItemPrice,
   Modifier,
   ModifierItem,
+  ModifierItemPrice,
   PaymentType,
   PriceGroup,
   tableNames,
 } from '.';
-import { resolvePrice } from '../helpers';
 import { BillCallLog } from './BillCallLog';
 import { BillDiscount } from './BillDiscount';
 import { BillItem } from './BillItem';
@@ -49,6 +50,9 @@ type SelectedModifier = {
   modifier: Modifier;
   items: ModifierItem[];
 };
+
+const resolvePrice = (priceGroup: PriceGroup, prices: ItemPrice[] | ModifierItemPrice[]): number =>
+  prices.find(p => p.priceGroupId === priceGroup.id)?.price;
 
 export class Bill extends Model {
   static table = 'bills';

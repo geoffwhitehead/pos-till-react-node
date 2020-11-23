@@ -41,19 +41,13 @@ export const OrganizationValidation = {
     email: Joi.string().required(),
     phone: Joi.string().required(),
     vat: Joi.string(),
-    settings: Joi.object({
-        defaultPriceGroupId: Joi.string(),
-        receiptPrinterId: Joi.string(),
-        currency: Joi.string(),
-        maxBills: Joi.number(),
-    }),
     address: Joi.object({
-        line1: Joi.string().required(),
+        line1: Joi.string(),
         line2: Joi.string(),
-        city: Joi.string().required(),
-        county: Joi.string().required(),
-        postcode: Joi.string().required(),
-    }).required(),
+        city: Joi.string(),
+        county: Joi.string(),
+        postcode: Joi.string(),
+    }),
 };
 
 export enum TransactionOrderEnum {

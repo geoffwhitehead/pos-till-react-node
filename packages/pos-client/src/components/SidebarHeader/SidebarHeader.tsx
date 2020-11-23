@@ -14,7 +14,6 @@ export const SidebarHeader: React.FC<SidebarHeaderProps> = ({ title, onOpen, dis
   const animation = useRef();
   const { lastSyncedAt } = useContext(LastSyncedAtContext);
   const [isSyncing, doSync] = useSync();
-  console.log('lastSyncedAt', lastSyncedAt);
 
   useEffect(() => {
     if (isSyncing) {

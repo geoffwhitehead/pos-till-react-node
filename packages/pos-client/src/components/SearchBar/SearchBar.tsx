@@ -40,7 +40,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
         {...resolveButtonState(isCreateDisabled, 'success')}
         onPress={onPressCreate}
         disabled={isCreateDisabled}
-        style={{ marginLeft: 5 }}
+        style={{ marginLeft: 5, alignSelf: 'center' }}
       >
         <Icon name="ios-add-circle-outline" />
         <Text>Create</Text>

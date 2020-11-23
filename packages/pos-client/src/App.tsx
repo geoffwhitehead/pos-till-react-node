@@ -5,7 +5,7 @@ import decode from 'jwt-decode';
 import { Root } from 'native-base';
 import React from 'react';
 import { api } from './api';
-import { signIn, signUp } from './api/auth';
+import { signIn, SignInParams, signUp, SignUpParams } from './api/auth';
 import { Sync } from './components/Sync/Sync';
 import { AuthContext } from './contexts/AuthContext';
 import { database, resetDatabase } from './database';
@@ -13,6 +13,7 @@ import { AuthNavigator } from './navigators/AuthNavigator';
 import { Main } from './screens/Main/Main';
 import { SplashScreen } from './screens/SplashScreen/SplashScreen';
 import { drawerTheme } from './theme';
+import { toast } from './utils/toast';
 
 export const App = () => {
   const [state, dispatch] = React.useReducer(
@@ -125,12 +126,11 @@ export const App = () => {
       ['userId', userId],
       ['organizationId', organizationId],
     ]);
-    dispatch({ type: 'SIGN_IN', accessToken, refreshToken, organizationId, userId });
   };
 
   const authContext = React.useMemo(
     () => ({
-      signIn: async params => {
+      signIn: async (params: SignInParams) => {
         try {
           const response = await signIn(params);
 
@@ -138,33 +138,35 @@ export const App = () => {
             const accessToken = response.headers['authorization'];
             const refreshToken = response.headers['x-refresh-token'];
 
+            const organizationId = response.data.data.organizationId;
+            const userId = response.data.data.userId;
+
             await setAuth({
               accessToken,
               refreshToken,
-              organizationId: response.data.data.organizationId,
-              userId: response.data.data._id,
+              organizationId,
+              userId,
             });
+
+            dispatch({ type: 'SIGN_IN', accessToken, refreshToken, organizationId, userId });
           } else {
             throw new Error('Sign in failed');
           }
         } catch (err) {
-          // TODO: alert the user
-          console.log('Error signing in', err);
+          toast({ message: 'Failed to sign in' });
         }
       },
       signOut: async () => {
         try {
           await unsetAuth();
         } catch (err) {
-          console.error('sign out failed', err);
+          toast({ message: 'Failed to sign out' });
         }
       },
-      signUp: async data => {
+      signUp: async (bodyData: SignUpParams) => {
         // TODO: handle errors
-
         try {
-          const response = await signUp(data);
-
+          const response = await signUp(bodyData);
           if (response.data.success) {
             const accessToken = response.headers['authorization'];
             const refreshToken = response.headers['x-refresh-token'];
@@ -172,13 +174,14 @@ export const App = () => {
               accessToken,
               refreshToken,
               organizationId: response.data.data.organizationId,
-              userId: response.data.data._id,
+              userId: response.data.data.userId,
             });
+            toast({ message: 'Successfully signed up, please login.', type: 'success' });
           } else {
             throw new Error('Sign up failed');
           }
         } catch (err) {
-          console.error('Sign up failed', err);
+          toast({ message: 'Failed to sign up' });
         }
       },
       unlink: async () => {
@@ -186,7 +189,7 @@ export const App = () => {
           await resetDatabase();
           await unsetAuth();
         } catch (err) {
-          console.error('sign out failed', err);
+          toast({ message: 'Failed to sign out' });
         }
       },
     }),
@@ -201,23 +204,16 @@ export const App = () => {
   }
 
   return (
-    // {/* native base wrapper */}
-
     <Root>
-      {/*  react-navigation wrapper */}
       <DatabaseProvider database={database}>
         <NavigationContainer theme={drawerTheme}>
           <AuthContext.Provider value={authContext}>
             {!accessToken || !refreshToken || !organizationId || !userId ? (
-              // login etc
               <AuthNavigator />
             ) : (
-              // user is authenticated
-              // <AuthContext.Provider value={authContext}>
               <Sync database={database} organizationId={organizationId}>
                 <Main organizationId={organizationId} userId={userId} />
               </Sync>
-              // </AuthContext.Provider>
             )}
           </AuthContext.Provider>
         </NavigationContainer>

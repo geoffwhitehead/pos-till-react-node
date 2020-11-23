@@ -104,12 +104,6 @@ export const OrganizationTab: React.FC<OrganizationTabProps> = () => {
 
               <ScrollView style={commonStyles.content}>
                 <Form>
-                  <Text style={commonStyles.text} note>
-                    * This information will also be printed on receipt and report headers
-                  </Text>
-                  <Text style={commonStyles.text} note>
-                    General company details.
-                  </Text>
                   <ItemField label="Name" touched={touched.name} name="name" errors={errors.name}>
                     <Input onChangeText={handleChange('name')} onBlur={handleBlur('name')} value={name} />
                   </ItemField>

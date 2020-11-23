@@ -1,9 +1,9 @@
-import jwt from 'jsonwebtoken';
-import config from '../../config';
-import Container from 'typedi';
-import { AuthService } from '../../services/auth';
-import { Logger } from 'winston';
 import { Request } from 'express';
+import jwt from 'jsonwebtoken';
+import Container from 'typedi';
+import { Logger } from 'winston';
+import config from '../../config';
+import { AuthService } from '../../services/auth';
 
 export interface AuthorizedRequest extends Request {
     organizationId: string;
@@ -21,14 +21,8 @@ export const getTokenFromHeader = req => {
 };
 
 const extendAuthorize = async (req, res, next) => {
-    console.log(' ---------- req.headers', req.headers);
-
     const { url, method } = req;
 
-    console.log('**************');
-    console.log('**************');
-    console.log('url', url);
-    console.log('method', method);
     const unprotectedRoutes = [
         { url: '/api/auth/signup', method: 'POST' },
         { url: '/api/auth/signin', method: 'POST' },
@@ -36,9 +30,12 @@ const extendAuthorize = async (req, res, next) => {
 
     const logger = Container.get('logger') as Logger;
 
+    console.log('HEREHREHRHE');
+    console.log('url', url);
+    console.log('method', method);
     if (!unprotectedRoutes.some(route => route.url === url && route.method === method)) {
+        console.log('NOOOOO');
         const accessToken = getTokenFromHeader(req);
-        console.log('------ accessToken', accessToken);
         if (!accessToken) {
             res.status(401).json('Unauthorized');
             return;

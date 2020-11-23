@@ -10,6 +10,8 @@ type ItemFieldProps = {
   style?: Record<string, any>;
   picker?: boolean;
   disabled?: boolean;
+  styleLabel?: Object;
+  // textColor?: string
 };
 
 export const ItemField: React.FC<ItemFieldProps> = ({
@@ -21,6 +23,7 @@ export const ItemField: React.FC<ItemFieldProps> = ({
   children,
   style = {},
   disabled = false,
+  styleLabel = {},
 }) => {
   return (
     <>
@@ -31,7 +34,7 @@ export const ItemField: React.FC<ItemFieldProps> = ({
         style={style}
         error={touched && (errors?.length > 0 || errors)}
       >
-        <Label>{label}</Label>
+        <Label style={styleLabel}>{label}</Label>
         {children}
       </Item>
       <ErrorMessage name={name} />

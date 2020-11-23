@@ -10,15 +10,13 @@
 
 // export default router;
 
-import { Container, ContainerInstance } from 'typedi';
-import mongoose from 'mongoose';
-
-import { Router, Request, Response, NextFunction } from 'express';
-import { UserProps, CreateUserValidation } from '../../models/User';
-import { AuthService } from '../../services/auth';
 import { celebrate, Joi } from 'celebrate';
+import { NextFunction, Request, Response, Router } from 'express';
+import { Container } from 'typedi';
+import { Logger } from 'winston';
 import { OrganizationValidation } from '../../models/Organization';
-import { Logger, loggers } from 'winston';
+import { CreateUserValidation } from '../../models/User';
+import { AuthService } from '../../services/auth';
 import { getTokenFromHeader } from '../middlewares/extendAuthorize';
 
 // import middlewares from '../middlewares';
@@ -35,12 +33,10 @@ export default (app: Router) => {
         async (req: Request, res: Response, next: NextFunction) => {
             const logger = Container.get('logger') as Logger;
             logger.debug('Calling Sign-Up endpoint with body: %o', req.body);
-
             try {
                 const authService = Container.get('authService') as AuthService;
                 const response = await authService.signUp(req.body);
                 if (response.success) {
-                    console.log('user', response);
                     res.set('authorization', 'Bearer ' + response.accessToken);
                     res.set('x-refresh-token', response.refreshToken);
                     res.status(200).send({ success: response.success, data: response.data });

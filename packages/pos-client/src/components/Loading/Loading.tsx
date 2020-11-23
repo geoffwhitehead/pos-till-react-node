@@ -1,13 +1,16 @@
+import LottieView from 'lottie-react-native';
 import React from 'react';
-import { Container, Header, Spinner, Text } from '../../core';
+import { Container } from '../../core';
 
-// TODO: update this
 export const Loading: React.FC = () => {
   return (
-    <Container>
-      <Header />
-      <Spinner />
-      <Text>Loading ... </Text>
+    <Container style={{}}>
+      <LottieView
+        style={{ height: 400, width: 600, alignSelf: 'center' }}
+        source={require('../../animations/201-simple-loader.json')}
+        autoPlay={true}
+        loop={true}
+      />
     </Container>
   );
 };

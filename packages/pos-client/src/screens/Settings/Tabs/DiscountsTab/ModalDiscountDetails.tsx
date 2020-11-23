@@ -2,10 +2,11 @@ import { useDatabase } from '@nozbe/watermelondb/hooks';
 import { Formik } from 'formik';
 import { capitalize } from 'lodash';
 import React, { useState } from 'react';
+import SwitchSelector from 'react-native-switch-selector';
 import * as Yup from 'yup';
 import { ItemField } from '../../../../components/ItemField/ItemField';
 import { ModalContentButton } from '../../../../components/Modal/ModalContentButton';
-import { Body, CheckBox, Form, Input, ListItem, Text, View } from '../../../../core';
+import { Form, Input, ListItem, View } from '../../../../core';
 import { Discount, tableNames } from '../../../../models';
 import { commonStyles } from '../styles';
 
@@ -97,14 +98,15 @@ export const ModalDiscountDetails: React.FC<ModalDiscountDetailsProps> = ({ disc
                 </ItemField>
 
                 <ListItem>
-                  <CheckBox
-                    checked={isPercent}
-                    onPress={() => setFieldValue('isPercent', !isPercent)}
-                    onBlur={handleBlur('isPercent')}
+                  <SwitchSelector
+                    options={[
+                      { label: 'Fixed Amount', value: 0 },
+                      { label: 'Percentage', value: 1 },
+                    ]}
+                    initial={isPercent ? 1 : 0}
+                    onPress={value => setFieldValue('isPercent', !!value)}
+                    style={{ paddingRight: 10 }}
                   />
-                  <Body>
-                    <Text>Is this a fixed or percentage discount?</Text>
-                  </Body>
                 </ListItem>
               </Form>
             </View>
