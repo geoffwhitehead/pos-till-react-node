@@ -1,9 +1,11 @@
-import { CategoryProps, CATEGORY_COLLECTION_NAME } from '../../models/Category';
-import { InjectedDependencies, pull, push } from '..';
 import { CommonServiceFns } from '.';
+import { InjectedDependencies, pull, push } from '..';
+import { CategoryProps, CATEGORY_COLLECTION_NAME } from '../../models/Category';
 import { toClientChanges } from '../../utils/sync';
 
-export type CategoryService = CommonServiceFns<CategoryProps>;
+export type CategoryService = CommonServiceFns<CategoryProps> & {
+    seed: () => Promise<{ categories: CategoryProps[] }>;
+};
 
 export type CategoryClientProps = {
     name: string;
@@ -51,7 +53,47 @@ export const categoryService = ({
         await push(categoryRepository, changes[CATEGORY_COLLECTION_NAME], lastPulledAt);
     };
 
+    const seed = async () => {
+        const defaultCategories = [
+            {
+                name: 'Starters',
+                shortName: 'Starters',
+                positionIndex: 0,
+                color: 'blue',
+            },
+            {
+                name: 'Mains',
+                shortName: 'Mains',
+                positionIndex: 1,
+                color: 'red',
+            },
+            {
+                name: 'Desserts',
+                shortName: 'Desserts',
+                positionIndex: 2,
+                color: 'purple',
+            },
+            {
+                name: 'Wine',
+                shortName: 'Wine',
+                positionIndex: 3,
+                color: 'red',
+            },
+            {
+                name: 'Beer',
+                shortName: 'Beer',
+                positionIndex: 4,
+                color: 'brown',
+            },
+        ];
+
+        const categories = await categoryRepository.insert(defaultCategories);
+
+        return { categories };
+    };
+
     return {
+        seed,
         findAll,
         create,
         findByIdAndUpdate,

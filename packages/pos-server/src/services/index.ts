@@ -4,10 +4,8 @@ import { RepositoryService } from '../repositories';
 import { RepositoryFns } from '../repositories/utils';
 import { authService } from './auth';
 import { MailerService } from './mailer';
-import { maintenanceService } from './maintenance';
 import { organizationService } from './organization';
 import { printerService } from './printer';
-import { printerGroupService } from './printerGroup';
 import { productService } from './product';
 import { userService } from './user';
 
@@ -75,6 +73,14 @@ export const push = async <T extends RepositoryFns<any>>(repo: T, changes: Chang
     await Promise.all(changes.deleted.map(repo.deleteOneById));
 };
 
+export enum Services {
+    userService = 'userService',
+    authService = 'authService',
+    productService = 'productService',
+    printerService = 'printerService',
+    organizationService = 'organizationService',
+}
+
 type Service = { name: string; service: any }; // TODO: figure out how to tpye thiss
 const services = [
     {
@@ -90,16 +96,8 @@ const services = [
         service: productService,
     },
     {
-        name: 'maintenanceService',
-        service: maintenanceService,
-    },
-    {
         name: 'printerService',
         service: printerService,
-    },
-    {
-        name: 'printerGroupService',
-        service: printerGroupService,
     },
     {
         name: 'organizationService',

@@ -1,11 +1,11 @@
-import { Container } from 'typedi';
-import logger from './logger';
-import agendaFactory from './agenda';
-import config from '../config';
 import mail from '@sendgrid/mail';
-import { registerServices } from '../services';
+import { Container } from 'typedi';
+import config from '../config';
 import { registerRepositories } from '../repositories';
+import { registerServices } from '../services';
 import { mailerService } from '../services/mailer';
+import agendaFactory from './agenda';
+import logger from './logger';
 
 export default ({ mongoConnection }: { mongoConnection }) => {
     try {
@@ -23,6 +23,7 @@ export default ({ mongoConnection }: { mongoConnection }) => {
         Container.set('mailer', mail);
 
         services.map(s => {
+            console.log('s', s);
             Container.set(s.name, s.service);
         });
         logger.info('✌️ Agenda injected into container');

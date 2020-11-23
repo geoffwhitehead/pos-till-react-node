@@ -180,9 +180,9 @@ export const ModalModifierItemDetailsInner: React.FC<ModalModifierItemDetailsOut
                       return (
                         <ItemField
                           label={capitalize(priceGroup.name)}
-                          touched={touched.prices[index].price}
+                          touched={touched.prices && touched.prices[index]?.price}
                           name={`prices[${index}].price`}
-                          errors={errors?.prices[index]}
+                          errors={errors.prices && errors.prices[index]}
                         >
                           <Input
                             onChangeText={handleChange(`prices[${index}].price`)}

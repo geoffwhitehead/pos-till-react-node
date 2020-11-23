@@ -129,9 +129,11 @@ export const SignUp: React.FC<SignUpProps> = ({ navigation, route }) => {
         postcode: addressPostcode,
       },
     };
-    await signUp(apiValues);
+    const { success } = await signUp(apiValues);
 
-    navigation.navigate('SignIn');
+    if (success) {
+      navigation.navigate('SignIn');
+    }
   };
   return (
     <Formik initialValues={initialValues} validationSchema={SignupSchema} onSubmit={handleSubmit}>

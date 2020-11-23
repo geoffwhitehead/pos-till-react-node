@@ -1,19 +1,20 @@
-import { Router, Request, Response, NextFunction } from 'express';
+import { NextFunction, Request, Response, Router } from 'express';
 import { Container } from 'typedi';
 import { LoggerService } from '../../loaders/logger';
-import { objectId } from '../../utils/objectId';
-import { PrinterGroupService } from '../../services/printerGroup';
+import { PrinterService } from '../../services/printer';
 
 export default (app: Router) => {
     const route = Router();
     app.use('/printer-groups', route);
 
+    // TODO: fix all of this. Printer groups are now nested in printer service
+    /******** */
     route.get('/', async (req: Request, res: Response, next: NextFunction) => {
         const logger = Container.get('logger') as LoggerService;
-        const printerGroupService = Container.get('printerGroupService') as PrinterGroupService;
+        const printerService = Container.get('printerService') as PrinterService;
 
         try {
-            const printerGroups = await printerGroupService.findAll();
+            const printerGroups = await printerService.findAll();
             res.status(200).json({ success: true, data: printerGroups });
         } catch (err) {
             logger.error(`🔥 error: ${err}`);
@@ -23,10 +24,10 @@ export default (app: Router) => {
 
     route.post('/', async (req: Request, res: Response, next: NextFunction) => {
         const logger = Container.get('logger') as LoggerService;
-        const printerGroupService = Container.get('printerGroupService') as PrinterGroupService;
+        const printerService = Container.get('printerService') as PrinterService;
 
         try {
-            const printerGroup = await printerGroupService.create(req.body);
+            const printerGroup = await printerService.create(req.body);
             res.status(200).json({ success: true, data: printerGroup });
         } catch (err) {
             logger.error(`🔥 error: ${err}`);
@@ -36,10 +37,10 @@ export default (app: Router) => {
 
     route.put('/:id', async (req: Request, res: Response, next: NextFunction) => {
         const logger = Container.get('logger') as LoggerService;
-        const printerGroupService = Container.get('printerGroupService') as PrinterGroupService;
+        const printerService = Container.get('printerService') as PrinterService;
 
         try {
-            const printerGroup = await printerGroupService.findByIdAndUpdate(req.params.id, req.body);
+            const printerGroup = await printerService.findByIdAndUpdate(req.params.id, req.body);
             res.status(200).json({ success: true, data: printerGroup });
         } catch (err) {
             logger.error(`🔥 error: ${err}`);
@@ -49,10 +50,10 @@ export default (app: Router) => {
 
     route.get('/:id', async (req: Request, res: Response, next: NextFunction) => {
         const logger = Container.get('logger') as LoggerService;
-        const printerGroupService = Container.get('printerGroupService') as PrinterGroupService;
+        const printerService = Container.get('printerService') as PrinterService;
 
         try {
-            const printerGroup = await printerGroupService.findById(req.params.id);
+            const printerGroup = await printerService.findById(req.params.id);
             res.status(200).json({ success: true, data: printerGroup });
         } catch (err) {
             logger.error(`🔥 error: ${err}`);

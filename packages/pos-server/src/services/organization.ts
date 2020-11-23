@@ -1,4 +1,5 @@
-import { InjectedDependencies, pull, push, SyncFns } from '.';
+import uuid from 'uuid';
+import { InjectedDependencies, pull, push } from '.';
 import {
     CategoryViewTypeEnum,
     CurrencyEnum,
@@ -11,7 +12,7 @@ import { PAYMENT_TYPE_COLLECTION_NAME } from '../models/PaymentType';
 import { toClientChanges } from '../utils/sync';
 import { CommonServiceFns } from './product';
 
-export type OrganizationService = CommonServiceFns<OrganizationProps> & SyncFns;
+export type OrganizationService = CommonServiceFns<OrganizationProps> & { seed: () => Promise<void> };
 
 export type OrganizationClientProps = {
     id: string;
@@ -119,7 +120,6 @@ export const organizationService = ({
             ...toClientChanges({ [PAYMENT_TYPE_COLLECTION_NAME]: paymentTypes }),
         };
 
-        console.log('changes', JSON.stringify(changes, null, 4));
         return changes;
     };
 
@@ -135,7 +135,25 @@ export const organizationService = ({
         await push(organizationRepository, _changes, lastPulledAt);
     };
 
+    const seed = async () => {
+        const defaultPaymentTypes = [
+            {
+                _id: uuid(),
+                name: 'cash',
+            },
+            {
+                _id: uuid(),
+                name: 'card',
+            },
+            {
+                _id: uuid(),
+                name: 'voucher',
+            },
+        ];
+        await paymentTypeRepository.insert(defaultPaymentTypes);
+    };
     return {
+        seed,
         ...organizationRepository, //TODO
         pullChanges,
         pushChanges,

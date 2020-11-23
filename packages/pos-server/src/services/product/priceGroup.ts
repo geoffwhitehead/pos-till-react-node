@@ -1,9 +1,11 @@
-import { PriceGroupProps, PRICE_GROUP_COLLECTION_NAME } from '../../models/PriceGroup';
-import { InjectedDependencies, pull, push } from '..';
 import { CommonServiceFns } from '.';
+import { InjectedDependencies, pull, push } from '..';
+import { PriceGroupProps, PRICE_GROUP_COLLECTION_NAME } from '../../models/PriceGroup';
 import { toClientChanges } from '../../utils/sync';
 
-export type PriceGroupService = CommonServiceFns<PriceGroupProps>;
+export type PriceGroupService = CommonServiceFns<PriceGroupProps> & {
+    seed: () => Promise<{ priceGroups: PriceGroupProps[] }>;
+};
 
 export const priceGroupService = ({
     repositories: { priceGroupRepository },
@@ -42,7 +44,14 @@ export const priceGroupService = ({
         await push(priceGroupRepository, changes[PRICE_GROUP_COLLECTION_NAME], lastPulledAt);
     };
 
+    const seed = async () => {
+        const defaultPriceGroups = [{ name: 'Standard' }, { name: 'Take Away' }];
+        const priceGroups = await priceGroupRepository.insert(defaultPriceGroups);
+        return { priceGroups };
+    };
+
     return {
+        seed,
         findAll,
         create,
         findByIdAndUpdate,

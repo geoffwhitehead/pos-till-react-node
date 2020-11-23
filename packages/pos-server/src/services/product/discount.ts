@@ -1,9 +1,9 @@
-import { DiscountProps, DISCOUNT_COLLECTION_NAME } from '../../models/Discount';
-import { InjectedDependencies, pull, push } from '..';
 import { CommonServiceFns } from '.';
+import { InjectedDependencies, pull, push } from '..';
+import { DiscountProps, DISCOUNT_COLLECTION_NAME } from '../../models/Discount';
 import { toClientChanges } from '../../utils/sync';
 
-export type DiscountService = CommonServiceFns<DiscountProps>;
+export type DiscountService = CommonServiceFns<DiscountProps> & { seed: () => Promise<{ discounts: DiscountProps[] }> };
 
 export const discountService = ({
     repositories: { discountRepository },
@@ -38,7 +38,28 @@ export const discountService = ({
         await push(discountRepository, changes[DISCOUNT_COLLECTION_NAME], lastPulledAt);
     };
 
+    const seed = async () => {
+        const discounts = [
+            {
+                name: 'Student',
+                amount: 10,
+                isPercent: true,
+            },
+            {
+                name: 'Staff',
+                amount: 15,
+                isPercent: true,
+            },
+        ];
+
+        const seededDiscounts = await discountRepository.insert(discounts);
+
+        return {
+            discounts: seededDiscounts,
+        };
+    };
     return {
+        seed,
         findAll,
         create,
         findByIdAndUpdate,

@@ -1,11 +1,39 @@
+import faker from 'faker';
+import { flatten } from 'lodash';
+import uuid from 'uuid';
 import { CommonServiceFns } from '.';
 import { InjectedDependencies, pull, push } from '..';
 import { ModifierProps, MODIFIER_COLLECTION_NAME } from '../../models/Modifier';
-import { MODIFIER_ITEM_COLLECTION_NAME } from '../../models/ModifierItem';
-import { MODIFIER_ITEM_PRICE_COLLECTION_NAME } from '../../models/ModifierItemPrice';
+import { ModifierItemProps, MODIFIER_ITEM_COLLECTION_NAME } from '../../models/ModifierItem';
+import { ModifierItemPriceProps, MODIFIER_ITEM_PRICE_COLLECTION_NAME } from '../../models/ModifierItemPrice';
+import { PriceGroupProps } from '../../models/PriceGroup';
 import { toClientChanges } from '../../utils/sync';
 
-export type ModifierService = CommonServiceFns<ModifierProps>;
+type SeedProps = {
+    priceGroups: PriceGroupProps[];
+};
+
+export type ModifierService = CommonServiceFns<ModifierProps> & {
+    seed: (params: SeedProps) => Promise<{ modifiers: ModifierProps[] }>;
+};
+
+const generateModifierItemPrices: (
+    priceGroups: PriceGroupProps[],
+    modifierItemId: string,
+) => ModifierItemPriceProps[] = (priceGroups, modifierItemId) => {
+    return priceGroups.map((group, i) => {
+        return {
+            _id: uuid(),
+            priceGroupId: group._id,
+            price:
+                faker.random.number({
+                    min: 1,
+                    max: 15,
+                }) * 100,
+            modifierItemId,
+        };
+    });
+};
 
 export const modifierService = ({
     repositories: { modifierRepository, modifierItemRepository, modifierItemPriceRepository },
@@ -54,7 +82,50 @@ export const modifierService = ({
         ]);
     };
 
+    const seed = async ({ priceGroups }: SeedProps) => {
+        const modifier: ModifierProps = {
+            _id: uuid(),
+            name: 'Mains',
+            minItems: 1,
+            maxItems: 1,
+        };
+
+        const modifierItems: ModifierItemProps[] = [
+            {
+                _id: uuid(),
+                modifierId: modifier._id,
+                name: 'Chicken',
+                shortName: 'Chicken',
+            },
+            {
+                _id: uuid(),
+                modifierId: modifier._id,
+                name: 'Beef',
+                shortName: 'Beef',
+            },
+            {
+                _id: uuid(),
+                modifierId: modifier._id,
+                name: 'Pork',
+                shortName: 'Pork',
+            },
+        ];
+
+        const modifierItemPrices: ModifierItemPriceProps[] = flatten(
+            modifierItems.map(mItem => generateModifierItemPrices(priceGroups, mItem._id)),
+        );
+
+        const defaultModifier = await modifierRepository.create(modifier);
+        await modifierItemRepository.insert(modifierItems);
+        await modifierItemPriceRepository.insert(modifierItemPrices);
+
+        return {
+            modifiers: [defaultModifier],
+        };
+    };
+
     return {
+        seed,
         findAll,
         create,
         findByIdAndUpdate,

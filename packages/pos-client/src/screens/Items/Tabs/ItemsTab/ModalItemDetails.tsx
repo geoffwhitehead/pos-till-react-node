@@ -304,18 +304,18 @@ const ItemDetailsInner: React.FC<ItemDetailsOuterProps & ItemDetailsInnerProps> 
                       <FieldArray
                         name="prices"
                         render={() => {
-                          return priceGroups.map((priceGroup, i) => {
+                          return priceGroups.map((priceGroup, index) => {
                             return (
                               <ItemField
                                 label={capitalize(priceGroup.name)}
-                                touched={touched.prices && touched.prices[i]?.price}
-                                name={`prices[${i}].price`}
-                                errors={errors.prices && errors.prices[i]}
+                                touched={touched.prices && touched.prices[index]?.price}
+                                name={`prices[${index}].price`}
+                                errors={errors.prices && errors.prices[index]}
                               >
                                 <Input
-                                  onChangeText={handleChange(`prices[${i}].price`)}
-                                  onBlur={handleBlur(`prices[${i}]`)}
-                                  value={prices[i].price}
+                                  onChangeText={handleChange(`prices[${index}].price`)}
+                                  onBlur={handleBlur(`prices[${index}]`)}
+                                  value={prices[index].price}
                                 />
                               </ItemField>
                             );

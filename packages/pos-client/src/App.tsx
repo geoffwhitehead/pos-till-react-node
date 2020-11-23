@@ -177,11 +177,13 @@ export const App = () => {
               userId: response.data.data.userId,
             });
             toast({ message: 'Successfully signed up, please login.', type: 'success' });
+            return { success: true };
           } else {
             throw new Error('Sign up failed');
           }
         } catch (err) {
           toast({ message: 'Failed to sign up' });
+          return { success: false };
         }
       },
       unlink: async () => {

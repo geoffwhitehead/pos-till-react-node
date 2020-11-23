@@ -1,11 +1,46 @@
-import { ItemProps, ITEM_COLLECTION_NAME } from '../../models/Item';
-import { InjectedDependencies, pull, push, SyncFns } from '..';
+import faker from 'faker';
+import { flatten, random } from 'lodash';
+import uuid from 'uuid';
 import { CommonServiceFns } from '.';
-import { toClientChanges } from '../../utils/sync';
-import { ITEM_PRICE_COLLECTION_NAME } from '../../models/ItemPrice';
+import { InjectedDependencies, pull, push } from '..';
+import { CategoryProps } from '../../models/Category';
+import { ItemProps, ITEM_COLLECTION_NAME } from '../../models/Item';
 import { ITEM_MODIFIER_COLLECTION_NAME } from '../../models/ItemModifier';
+import { ItemPriceProps, ITEM_PRICE_COLLECTION_NAME } from '../../models/ItemPrice';
+import { ModifierProps } from '../../models/Modifier';
+import { PriceGroupProps } from '../../models/PriceGroup';
+import { PrinterGroupProps } from '../../models/PrinterGroup';
+import { toClientChanges } from '../../utils/sync';
 
-export type ItemService = CommonServiceFns<ItemProps> & SyncFns;
+type SeedProps = {
+    itemsToSeed: number;
+    categories: CategoryProps[];
+    printerGroups: PrinterGroupProps[];
+    priceGroups: PriceGroupProps[];
+    modifiers: ModifierProps[];
+};
+
+export type ItemService = CommonServiceFns<ItemProps> & {
+    seed: (props: SeedProps) => Promise<{ items: ItemProps[] }>;
+};
+
+const generateItemPrices: (priceGroups: PriceGroupProps[], itemId: string) => ItemPriceProps[] = (
+    priceGroups,
+    itemId,
+) => {
+    return priceGroups.map((group, i) => {
+        return {
+            _id: uuid(),
+            priceGroupId: group._id,
+            price:
+                faker.random.number({
+                    min: 1,
+                    max: 15,
+                }) * 100,
+            itemId,
+        };
+    });
+};
 
 export const itemService = ({
     repositories: { itemRepository, itemModifierRepository, itemPriceRepository },
@@ -53,7 +88,46 @@ export const itemService = ({
         ]);
     };
 
+    const seed = async ({ itemsToSeed = 25, categories, printerGroups, modifiers, priceGroups }) => {
+        const items: ItemProps[] = [...Array(itemsToSeed)].map(() => {
+            const productName = faker.commerce.product();
+            const randomPrinterGroupId = printerGroups[random(1)]._id;
+            const randomCategoryId = categories[random(categories.length - 1)]._id;
+            return {
+                _id: uuid(),
+                name: productName,
+                shortName: productName.slice(0, 9),
+                categoryId: randomCategoryId,
+                printerGroupId: randomPrinterGroupId,
+            };
+        });
+
+        const itemPrices: ItemPriceProps[] = flatten(items.map(item => generateItemPrices(priceGroups, item._id)));
+
+        const itemModifiers = items
+            .map(item => {
+                const hasMod = random(1);
+                if (hasMod) {
+                    const randomModifierId = modifiers[random(modifiers.length - 1)]._id;
+                    return {
+                        itemId: item._id,
+                        modifierId: randomModifierId,
+                    };
+                }
+                return null;
+            })
+            .filter(i => i != null);
+
+        const seededItems = await itemRepository.insert(items);
+        await itemPriceRepository.insert(itemPrices);
+        await itemModifierRepository.insert(itemModifiers);
+
+        return {
+            items: seededItems,
+        };
+    };
     return {
+        seed,
         findAll,
         create,
         findByIdAndUpdate,

@@ -16,7 +16,11 @@ import { Container } from 'typedi';
 import { Logger } from 'winston';
 import { OrganizationValidation } from '../../models/Organization';
 import { CreateUserValidation } from '../../models/User';
+import { Services } from '../../services';
 import { AuthService } from '../../services/auth';
+import { OrganizationService } from '../../services/organization';
+import { PrinterService } from '../../services/printer';
+import { ProductService } from '../../services/product';
 import { getTokenFromHeader } from '../middlewares/extendAuthorize';
 
 // import middlewares from '../middlewares';
@@ -32,13 +36,37 @@ export default (app: Router) => {
         }),
         async (req: Request, res: Response, next: NextFunction) => {
             const logger = Container.get('logger') as Logger;
+            const organizationService = Container.get(Services.organizationService) as OrganizationService;
+            const printerService = Container.get(Services.printerService) as PrinterService;
+            const productService = Container.get(Services.productService) as ProductService;
+            const authService = Container.get(Services.authService) as AuthService;
+
             logger.debug('Calling Sign-Up endpoint with body: %o', req.body);
             try {
-                const authService = Container.get('authService') as AuthService;
+                console.log('product.category', productService.category);
                 const response = await authService.signUp(req.body);
                 if (response.success) {
                     res.set('authorization', 'Bearer ' + response.accessToken);
                     res.set('x-refresh-token', response.refreshToken);
+
+                    await organizationService.seed();
+                    const [{ printerGroups }, { categories }, _, { priceGroups }] = await Promise.all([
+                        printerService.seed(),
+                        productService.category.seed(),
+                        productService.discount.seed(),
+                        productService.priceGroup.seed(),
+                    ]);
+
+                    const { modifiers } = await productService.modifier.seed({ priceGroups });
+
+                    await productService.item.seed({
+                        itemsToSeed: 10,
+                        priceGroups,
+                        categories,
+                        modifiers,
+                        printerGroups,
+                    });
+
                     res.status(200).send({ success: response.success, data: response.data });
                 } else {
                     res.status(200).send({ success: response.success });

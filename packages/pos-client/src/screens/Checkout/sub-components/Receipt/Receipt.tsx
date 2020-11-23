@@ -391,7 +391,7 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
           </Row>
           <Row style={styles.printRow}>
             <Button disabled={!receiptPrinter} info iconLeft full style={styles.printButton} onPress={onPrint}>
-              <Icon name="receipt" />
+              <Icon name="receipt" style={{ color: 'white' }} />
               <Text>Print</Text>
             </Button>
           </Row>

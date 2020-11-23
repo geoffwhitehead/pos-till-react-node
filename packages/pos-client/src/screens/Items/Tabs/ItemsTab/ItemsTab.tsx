@@ -4,6 +4,7 @@ import withObservables from '@nozbe/with-observables';
 import { keyBy } from 'lodash';
 import React, { useEffect, useState } from 'react';
 import { ScrollView } from 'react-native';
+import { Loading } from '../../../../components/Loading/Loading';
 import { Modal } from '../../../../components/Modal/Modal';
 import { SearchBar } from '../../../../components/SearchBar/SearchBar';
 import { Container, Footer, List, Text } from '../../../../core';
@@ -44,9 +45,9 @@ const ItemsTabInner: React.FC<ItemsTabOuterProps & ItemsTabInnerProps> = ({ item
     setModalOpen(true);
   };
 
-  // if (!keyedCategories) {
-  //   return <Loading />;
-  // }
+  if (!keyedCategories) {
+    return <Loading />;
+  }
 
   return (
     <Container>
