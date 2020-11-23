@@ -31,7 +31,7 @@ export const SidebarHeader: React.FC<SidebarHeaderProps> = ({ title, onOpen, dis
       <Left>
         {!disableNav && (
           <Button transparent onPress={onOpen}>
-            <Icon name="menu" />
+            <Icon name="ios-menu" />
           </Button>
         )}
       </Left>

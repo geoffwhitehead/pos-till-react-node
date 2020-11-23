@@ -39,7 +39,6 @@ target 'Positive' do
 
   
   pod 'RNVectorIcons', :path => '../node_modules/react-native-vector-icons'
-
   pod 'RNStarPrnt', :path => '../node_modules/react-native-star-prnt'
 
   

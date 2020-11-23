@@ -54,10 +54,10 @@ export class BillItem extends Model {
   @field('is_stored') isStored: boolean;
   @field('stored_at') storedAt: string;
   @field('is_voided') isVoided: boolean;
-  @field('voided_at') voidedAt: string;
-  @field('reason_description') reasonDescription: string;
-  @field('reason_name') reasonName: string;
-  @field('print_message') printMessage: string;
+  @field('voided_at') voidedAt?: string;
+  @field('reason_description') reasonDescription?: string;
+  @field('reason_name') reasonName?: string;
+  @field('print_message') printMessage?: string;
 
   @immutableRelation('bills', 'bill_id') bill: Relation<Bill>;
   @immutableRelation('items', 'item_id') item: Relation<Item>;

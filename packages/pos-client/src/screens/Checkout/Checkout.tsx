@@ -8,6 +8,7 @@ import { Col, Container, Grid } from '../../core';
 import { useSync } from '../../hooks/useSync';
 import { CheckoutItemNavigator } from '../../navigators/CheckoutItemNavigator';
 import { SidebarDrawerStackParamList } from '../../navigators/SidebarNavigator';
+import { RECEIPT_PANEL_WIDTH } from '../../utils/consts';
 import { SelectBill } from '../Bills/SelectBill/SelectBIll';
 import { CompleteBill } from './sub-components/CompleteBill/CompleteBill';
 import { Payments } from './sub-components/Payments/Payments';
@@ -77,7 +78,7 @@ export const Checkout: React.FC<CheckoutProps> = ({ navigation }) => {
       <Grid>
         <Col>{renderMainPanel()}</Col>
         {!isSelectBillMode && (
-          <Col style={{ width: 350 }}>
+          <Col style={{ width: RECEIPT_PANEL_WIDTH }}>
             {currentBill && (
               <Receipt
                 bill={currentBill}

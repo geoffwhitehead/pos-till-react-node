@@ -164,12 +164,15 @@ const generateBillItemCommands = (p: {
   const groupedIntoQuantities = Object.values(
     groupBy(itemsToPrint, ({ billItem, mods, billItemPrintLog }) => {
       const isVoid = billItemPrintLog.type === PrintType.void;
+      const itemId = billItem.itemId;
+      const modifierIds = mods.map(m => m.modifierItemId).toString();
+      const msg = billItem.printMessage;
       /**
-       * the below string is used to uniquely distinguish items based on the item id, modifier ids, and
-       * whether its a void or not. This is done so items can be grouped by quanity on the receipts.
+       * the below string is used to uniquely distinguish items based on the item id, modifier ids, print message, and
+       * whether its a void or not. This is done so items can be grouped by quanity correctly on the receipts. An item
+       * with a print message will more often than not - not be able to be grouped
        */
-
-      const uniqueString = [billItem.itemId, ...mods.map(m => m.modifierItemId), isVoid].toString();
+      const uniqueString = `${itemId}-${modifierIds}-${msg}-${isVoid}`;
 
       return uniqueString;
     }),
@@ -180,9 +183,10 @@ const generateBillItemCommands = (p: {
     isVoided: group[0].billItemPrintLog.type === PrintType.void,
     billItem: group[0].billItem,
     mods: group[0].mods,
+    printMessage: group[0].billItem.printMessage,
   }));
 
-  quantifiedItems.map(({ quantity, billItem, mods, isVoided }) => {
+  quantifiedItems.map(({ quantity, billItem, mods, isVoided, printMessage }) => {
     if (isVoided) {
       c.push({
         appendBitmapText: alignLeftRightSingle(
@@ -199,6 +203,10 @@ const generateBillItemCommands = (p: {
     mods.map(mod => {
       c.push({ appendBitmapText: MOD_PREFIX + capitalize(mod.modifierItemShortName) });
     });
+    printMessage &&
+      c.push({
+        appendBitmapText: printMessage,
+      });
   });
 
   return {

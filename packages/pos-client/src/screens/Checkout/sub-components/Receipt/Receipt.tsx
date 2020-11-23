@@ -28,7 +28,7 @@ import { PrintStatus } from '../../../../models/BillItemPrintLog';
 import { kitchenCall, kitchenReceipt } from '../../../../services/printer/kitchenReceipt';
 import { print } from '../../../../services/printer/printer';
 import { receiptBill } from '../../../../services/printer/receiptBill';
-import { fonts } from '../../../../theme';
+import { buttons, fonts } from '../../../../theme';
 import { formatNumber, minimalBillSummary, MinimalBillSummary } from '../../../../utils';
 import { resolveButtonState } from '../../../../utils/helpers';
 import { ReceiptItems } from './ReceiptItems';
@@ -296,89 +296,111 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
   const requiresPrepTime =
     priceGroups.some(priceGroup => priceGroup.isPrepTimeRequired) && itemsRequiringPrepTimeCount > 0;
 
-  const dateString = bill.prepAt ? dayjs(bill.prepAt).format('HH:mm') : '';
+  const dateString = bill.prepAt ? dayjs(bill.prepAt).format('h:mm A') : '';
 
   const isCallButtonDisabled = incompleteBillCallPrintLogs > 0;
 
   return (
     <Grid style={styles.grid}>
-      <Row style={{ height: 45 }}>
-        <Col>
-          <Button full iconLeft {...resolveButtonState(isCallButtonDisabled, 'primary')} onPress={callConfirmDialog}>
-            <Icon name="ios-print" />
-            <Text style={{ fontWeight: 'bold' }}>Call </Text>
-          </Button>
-        </Col>
-        <Col>
-          <Text style={styles.dateText}>
-            {dayjs(bill.createdAt)
-              .format('DD/MM/YYYY HH:mm')
-              .toString()}
-          </Text>
-        </Col>
-      </Row>
-      <Row style={{ height: 45 }}>
-        <Col>
-          <Button full info onPress={onStore}>
-            <Text style={{ fontWeight: 'bold' }}>Bill: {bill.reference || '-'}</Text>
-          </Button>
-        </Col>
-        <Col>
-          <Button full warning>
-            <Text style={{ fontWeight: 'bold' }}>{`Prep for: ${dateString}`}</Text>
-          </Button>
-        </Col>
-      </Row>
-      <Row style={styles.r2}>
-        <ReceiptItems
-          bill={bill}
-          readonly={complete}
-          discountBreakdown={summary.discountBreakdown}
-          billPayments={billPayments}
-          billDiscounts={billDiscounts}
-        />
-      </Row>
-      <Row style={styles.r3}>
-        <Text>{`Discount: ${formatNumber(0 - totalDiscount, currency)}`}</Text>
-
-        <Text>{`Total: ${formatNumber(total, currency)}`}</Text>
-        {complete && (
-          <Text>{`Change Due: ${formatNumber(
-            Math.abs(billPayments.find(payment => payment.isChange).amount),
-            currency,
-          )}`}</Text>
+      <Row>
+        {!complete && (
+          <Col style={styles.columnMainButtons}>
+            <Row style={{ height: buttons.large }}>
+              <Button style={styles.buttonLeft} full info onPress={onStore}>
+                <Icon name="ios-layers" />
+                <Text>Bills</Text>
+              </Button>
+            </Row>
+            <Row style={{ height: buttons.large }}>
+              <Button
+                full
+                {...resolveButtonState(isCallButtonDisabled, 'warning')}
+                onPress={callConfirmDialog}
+                style={styles.buttonLeft}
+              >
+                <Icon name="ios-notifications" />
+                <Text>Call </Text>
+              </Button>
+            </Row>
+            <Row />
+            <Row>
+              <Button full success onPress={onCheckout} style={styles.buttonLeft}>
+                <Icon name="ios-cart" />
+                <Text>Pay</Text>
+              </Button>
+            </Row>
+            <Row style={{}}>
+              <Button block onPress={handleOnStore} full style={styles.buttonLeft}>
+                <Icon name="ios-download" />
+                <Text>Store</Text>
+              </Button>
+            </Row>
+          </Col>
         )}
-        <Text style={fonts.h3}>{`Balance: ${formatNumber(balance, currency)}`}</Text>
-      </Row>
-      <Row style={styles.r4}>
-        <Button disabled={!receiptPrinter} info iconLeft full style={{ flexGrow: 1 }} onPress={onPrint}>
-          <Icon name="ios-print" />
-          <Text>Print</Text>
-        </Button>
-      </Row>
-      {!complete && (
-        <Row style={styles.r5}>
-          <Col>
-            <Button block iconLeft onPress={handleOnStore} full style={{ height: '100%' }}>
-              <Icon name="ios-save" />
-              <Text>Store</Text>
+        <Col style={styles.colummMain}>
+          <Row style={styles.rowTimes}>
+            <Col style={styles.columnsTimes}>
+              <Text note>Prep</Text>
+              <Text style={styles.textTimes}>{dateString}</Text>
+            </Col>
+            <Col style={styles.columnsTimes}>
+              <Text note>Open</Text>
+              <Text style={styles.textTimes}>
+                {dayjs(bill.createdAt)
+                  .format('DD/MM/YY h:mm A')
+                  .toString()}
+              </Text>
+            </Col>
+          </Row>
+          {/* <Row style={{ height: 45 }}>
+            <Col>
+              <Button full info onPress={onStore}>
+                <Text style={{ fontWeight: 'bold' }}>Bill: {bill.reference || '-'}</Text>
+              </Button>
+            </Col>
+            <Col>
+              <Button full warning>
+               
+              </Button>
+            </Col>
+          </Row> */}
+          <Row style={styles.itemsRow}>
+            <ReceiptItems
+              bill={bill}
+              readonly={complete}
+              discountBreakdown={summary.discountBreakdown}
+              billPayments={billPayments}
+              billDiscounts={billDiscounts}
+            />
+          </Row>
+          <Row style={styles.subTotalRow}>
+            <Text>{`Discount: ${formatNumber(0 - totalDiscount, currency)}`}</Text>
+
+            <Text>{`Total: ${formatNumber(total, currency)}`}</Text>
+            {complete && (
+              <Text>{`Change Due: ${formatNumber(
+                Math.abs(billPayments.find(payment => payment.isChange).amount),
+                currency,
+              )}`}</Text>
+            )}
+            <Text style={fonts.h3}>{`Balance: ${formatNumber(balance, currency)}`}</Text>
+          </Row>
+          <Row style={styles.printRow}>
+            <Button disabled={!receiptPrinter} info iconLeft full style={styles.printButton} onPress={onPrint}>
+              <Icon name="receipt" />
+              <Text>Print</Text>
             </Button>
-          </Col>
-          <Col>
-            <Button full success onPress={onCheckout} iconLeft style={{ height: '100%' }}>
-              <Icon name="ios-cart" />
-              <Text>Checkout</Text>
-            </Button>
-          </Col>
-        </Row>
-      )}
-      <TimePicker
-        isVisible={isDatePickerVisible}
-        onCancel={handleCancelPrepTimeModal}
-        onConfirm={handleSetPrepTime}
-        value={bill.prepAt}
-        title="Please select a preperation time"
-      />
+          </Row>
+
+          <TimePicker
+            isVisible={isDatePickerVisible}
+            onCancel={handleCancelPrepTimeModal}
+            onConfirm={handleSetPrepTime}
+            value={bill.prepAt}
+            title="Please select a preperation time"
+          />
+        </Col>
+      </Row>
     </Grid>
   );
 };
@@ -409,34 +431,40 @@ const styles = StyleSheet.create({
     borderLeftWidth: 1,
     borderLeftColor: 'lightgrey',
   },
-  r1: {
-    height: 40,
+  columnMainButtons: { width: 100, backgroundColor: 'whitesmoke' },
+  colummMain: {},
+  buttonLeft: {
+    height: '100%',
+    width: '100%',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    // alignContent: 'center',
+    // alignItems: 'center',
   },
-  r2: {
-    // height: 45,
-  },
-  r3: {
+  rowTimes: { height: 60, backgroundColor: 'whitesmoke', borderLeftWidth: 1, borderLeftColor: 'lightgrey' },
+  textTimes: { fontWeight: 'bold', paddingTop: 5 },
+  columnsTimes: { padding: 5, display: 'flex', flexDirection: 'column', justifyContent: 'center' },
+  itemsRow: { borderLeftWidth: 1, borderLeftColor: 'lightgrey' },
+  subTotalRow: {
     borderTopColor: 'lightgrey',
     borderTopWidth: 1,
     height: 110,
     flexDirection: 'column',
     padding: 10,
+    borderLeftWidth: 1,
+    borderLeftColor: 'lightgrey',
     // flexGrow: 1,
   },
-  r4: {
-    height: 45,
-  },
-  r5: {
-    height: 60,
+  printRow: {
+    height: buttons.medium,
   },
   printButton: {
     height: '100%',
     width: '100%',
     textAlign: 'center',
   },
-  dateText: {
+  receiptTextHeaders: {
     textAlign: 'center',
-    lineHeight: 45,
-    backgroundColor: 'whitesmoke',
+    lineHeight: 60,
   },
 });

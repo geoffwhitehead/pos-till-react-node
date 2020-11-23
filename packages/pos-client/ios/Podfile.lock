@@ -237,7 +237,7 @@ PODS:
     - React
   - RNStarPrnt (1.0.0):
     - React
-  - RNVectorIcons (6.6.0):
+  - RNVectorIcons (7.1.0):
     - React
   - WatermelonDB (0.20.0):
     - React
@@ -402,10 +402,10 @@ SPEC CHECKSUMS:
   RNReanimated: 031fe8d9ea93c2bd689a40f05320ef9d96f74d7f
   RNScreens: b9ea46d65967a1f74b9aaa1229d0f74f58d216b5
   RNStarPrnt: decb5f37e9d77c2785e09ff3614d25a29d1ea5d1
-  RNVectorIcons: 0bb4def82230be1333ddaeee9fcba45f0b288ed4
+  RNVectorIcons: bc69e6a278b14842063605de32bec61f0b251a59
   WatermelonDB: b7f3cca7aa0da789cd2e04c9a516ff04f08be2c3
   Yoga: f2a7cd4280bfe2cca5a7aed98ba0eb3d1310f18b
 
-PODFILE CHECKSUM: 4e3f145a7ca90fa6122ec265c873c9373a5eb59f
+PODFILE CHECKSUM: b99dafb36cfe3d37202d581402f65c349ba8cf38
 
 COCOAPODS: 1.9.3
