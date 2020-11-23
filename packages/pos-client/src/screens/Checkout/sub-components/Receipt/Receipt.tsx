@@ -30,6 +30,7 @@ import { print } from '../../../../services/printer/printer';
 import { receiptBill } from '../../../../services/printer/receiptBill';
 import { buttons, fonts } from '../../../../theme';
 import { formatNumber, minimalBillSummary, MinimalBillSummary } from '../../../../utils';
+import { RECEIPT_PANEL_BUTTONS_WIDTH } from '../../../../utils/consts';
 import { resolveButtonState } from '../../../../utils/helpers';
 import { ReceiptItems } from './ReceiptItems';
 
@@ -49,7 +50,8 @@ interface ReceiptOuterProps {
   onCheckout?: () => void;
   bill: Bill;
   database: Database;
-  complete: boolean;
+  isComplete: boolean;
+  hideFunctionButtons?: boolean;
 }
 
 export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
@@ -59,12 +61,13 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
   billPayments,
   onStore,
   onCheckout,
-  complete,
+  isComplete,
   discounts,
   itemsRequiringPrepTimeCount,
   billModifierItemsCount,
   priceGroups,
   incompleteBillCallPrintLogs,
+  hideFunctionButtons,
 }) => {
   const [summary, setSummary] = useState<MinimalBillSummary>();
   const database = useDatabase();
@@ -74,6 +77,7 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
   const [isDatePickerVisible, setIsDatePickerVisible] = useState(false);
   const [hasStored, setHasStored] = useState(false);
 
+  console.log('hideFunctionButtons', hideFunctionButtons);
   const handleOnStore = async () => {
     // check if a prep time is required and set
     const priceGroups = await bill.assignedPriceGroups.fetch();
@@ -303,7 +307,7 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
   return (
     <Grid style={styles.grid}>
       <Row>
-        {!complete && (
+        {!(isComplete || hideFunctionButtons) && (
           <Col style={styles.columnMainButtons}>
             <Row style={{ height: buttons.large }}>
               <Button style={styles.buttonLeft} full info onPress={onStore}>
@@ -367,7 +371,7 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
           <Row style={styles.itemsRow}>
             <ReceiptItems
               bill={bill}
-              readonly={complete}
+              readonly={isComplete}
               discountBreakdown={summary.discountBreakdown}
               billPayments={billPayments}
               billDiscounts={billDiscounts}
@@ -377,7 +381,7 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
             <Text>{`Discount: ${formatNumber(0 - totalDiscount, currency)}`}</Text>
 
             <Text>{`Total: ${formatNumber(total, currency)}`}</Text>
-            {complete && (
+            {isComplete && (
               <Text>{`Change Due: ${formatNumber(
                 Math.abs(billPayments.find(payment => payment.isChange).amount),
                 currency,
@@ -431,7 +435,7 @@ const styles = StyleSheet.create({
     borderLeftWidth: 1,
     borderLeftColor: 'lightgrey',
   },
-  columnMainButtons: { width: 100, backgroundColor: 'whitesmoke' },
+  columnMainButtons: { width: RECEIPT_PANEL_BUTTONS_WIDTH, backgroundColor: 'whitesmoke' },
   colummMain: {},
   buttonLeft: {
     height: '100%',

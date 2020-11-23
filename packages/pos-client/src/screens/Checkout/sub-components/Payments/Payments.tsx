@@ -6,7 +6,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { StyleSheet } from 'react-native';
 import { paymentTypeNames } from '../../../../api/paymentType';
 import { OrganizationContext } from '../../../../contexts/OrganizationContext';
-import { Button, Col, Grid, Input, Item, Label, Row, Text, View } from '../../../../core';
+import { Button, Col, Grid, Icon, Input, Item, Label, Row, Text } from '../../../../core';
 import { Bill, BillDiscount, BillItem, BillPayment, Discount, PaymentType, tableNames } from '../../../../models';
 import { formatNumber, getDefaultCashDenominations, minimalBillSummary, MinimalBillSummary } from '../../../../utils';
 
@@ -14,6 +14,7 @@ interface PaymentOuterProps {
   bill: Bill;
   onCompleteBill: () => Promise<void>;
   database: Database;
+  onBack: () => void;
 }
 
 interface PaymentInnerProps {
@@ -33,6 +34,7 @@ const PaymentsInner: React.FC<PaymentOuterProps & PaymentInnerProps> = ({
   paymentTypes,
   onCompleteBill,
   database,
+  onBack,
 }) => {
   const [value, setValue] = useState<string>('');
   // TODO: this / payment types will need refactoring so not having to use find
@@ -89,54 +91,64 @@ const PaymentsInner: React.FC<PaymentOuterProps & PaymentInnerProps> = ({
   return (
     <Grid>
       <Col style={styles.leftPanel} />
-      <Col>
-        <View style={styles.rightPanel}>
-          <Row style={styles.rowCustomAmount}>
-            <Item stackedLabel style={{ width: '100%', height: 40 }}>
-              <Label>Custom amount</Label>
-              <Input value={value} onChangeText={onValueChange} keyboardType="number-pad" />
-            </Item>
-          </Row>
-          <Row style={styles.row}>
-            <Col style={styles.buttonColumn}>
-              {discounts.map(discount => {
-                return (
-                  <Button
-                    key={discount.id}
-                    onPress={() => addDiscount(discount)}
-                    style={{ ...styles.button, backgroundColor: 'purple' }}
-                  >
-                    <Text>{discount.name}</Text>
-                  </Button>
-                );
-              })}
-            </Col>
-            {/* <Col /> */}
-            <Col style={styles.denomButtonColumn}>
-              {denominations.map(amt => {
-                return (
-                  <Button key={amt} bordered style={styles.button} onPress={() => addPayment(cashType, amt)}>
-                    <Text>{`${formatNumber(amt, currency)}`}</Text>
-                  </Button>
-                );
-              })}
-            </Col>
-            <Col style={styles.buttonColumn}>
-              {paymentTypes.map(paymentType => {
-                return (
-                  <Button
-                    large
-                    key={paymentType.id}
-                    style={styles.button}
-                    onPress={() => addPayment(paymentType, parseFloat(value))}
-                  >
-                    <Text>{capitalize(paymentType.name)}</Text>
-                  </Button>
-                );
-              })}
-            </Col>
-          </Row>
-        </View>
+      <Col style={styles.rightPanel}>
+        <Row style={styles.backRow}>
+          <Button bordered info onPress={onBack} iconLeft>
+            <Icon name="ios-arrow-back" />
+            <Text style={{ fontWeight: 'bold' }}>Back</Text>
+          </Button>
+        </Row>
+        <Row style={styles.rowCustomAmount}>
+          <Item stackedLabel style={{ width: '100%', height: 150 }}>
+            <Label>Custom amount</Label>
+            <Input
+              value={value}
+              onChangeText={onValueChange}
+              keyboardType="number-pad"
+              style={{ lineHeight: 125, fontSize: 100 }}
+            />
+          </Item>
+        </Row>
+        <Row style={styles.row}>
+          <Col style={styles.buttonColumn}>
+            {discounts.map(discount => {
+              return (
+                <Button
+                  key={discount.id}
+                  full
+                  onPress={() => addDiscount(discount)}
+                  style={{ ...styles.button, backgroundColor: 'purple' }}
+                >
+                  <Text>{discount.name}</Text>
+                </Button>
+              );
+            })}
+          </Col>
+          <Col style={styles.denomButtonColumn}>
+            {denominations.map(amt => {
+              return (
+                <Button key={amt} full bordered style={styles.button} onPress={() => addPayment(cashType, amt)}>
+                  <Text>{`${formatNumber(amt, currency)}`}</Text>
+                </Button>
+              );
+            })}
+          </Col>
+          <Col style={styles.buttonColumn}>
+            {paymentTypes.map(paymentType => {
+              return (
+                <Button
+                  large
+                  full
+                  key={paymentType.id}
+                  style={styles.button}
+                  onPress={() => addPayment(paymentType, parseFloat(value))}
+                >
+                  <Text>{capitalize(paymentType.name)}</Text>
+                </Button>
+              );
+            })}
+          </Col>
+        </Row>
       </Col>
     </Grid>
   );
@@ -163,8 +175,11 @@ const enhance = component =>
 export const Payments = enhance(PaymentsInner);
 
 const styles = StyleSheet.create({
+  backRow: {
+    height: 50,
+  },
   rowCustomAmount: {
-    height: 80,
+    height: 200,
   },
   row: {
     padding: 10,

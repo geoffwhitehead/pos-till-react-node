@@ -96,9 +96,6 @@ const CompleteBillInner: React.FC<CompleteBillOuterProps & CompleteBillInnerProp
         ref={animation}
       />
       <Text style={styles.text}>{`Change due: ${formatNumber(Math.abs(changePayment), currency)}`}</Text>
-      <Button style={styles.button} large onPress={onPrint}>
-        <Text>Print Receipt</Text>
-      </Button>
       <Button style={styles.button} large bordered success onPress={onCloseBill}>
         <Text>Close</Text>
       </Button>
@@ -123,7 +120,13 @@ const enhance = component =>
 export const CompleteBill = enhance(CompleteBillInner);
 
 const styles = StyleSheet.create({
-  container: { flex: 1, alignItems: 'center', flexDirection: 'column', justifyContent: 'center' },
+  container: {
+    flex: 1,
+    alignItems: 'center',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignContent: 'center',
+  },
   icon: { width: 50, height: 50 },
   button: { ...fonts.h1, margin: 5 },
   text: { ...fonts.h3, margin: 20 },

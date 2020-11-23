@@ -9,6 +9,7 @@ import * as Yup from 'yup';
 import { ItemField } from '../../../../components/ItemField/ItemField';
 import { Loading } from '../../../../components/Loading/Loading';
 import { ModalContentButton } from '../../../../components/Modal/ModalContentButton';
+import { OrganizationContext } from '../../../../contexts/OrganizationContext';
 import { ActionSheet, Col, Form, Grid, H2, Icon, Input, List, ListItem, Picker, Row, Text } from '../../../../core';
 import {
   Category,
@@ -204,6 +205,9 @@ const ItemDetailsInner: React.FC<ItemDetailsOuterProps & ItemDetailsInnerProps> 
 
         const title = item ? `${capitalize(item.name)}` : 'New Item';
 
+        console.log('touched', touched);
+        console.log('errors', errors);
+        console.log('values', values);
         return (
           <ModalContentButton
             title={title}
@@ -304,9 +308,9 @@ const ItemDetailsInner: React.FC<ItemDetailsOuterProps & ItemDetailsInnerProps> 
                             return (
                               <ItemField
                                 label={capitalize(priceGroup.name)}
-                                touched={touched?.prices[i]?.price}
+                                touched={touched.prices && touched.prices[i]?.price}
                                 name={`prices[${i}].price`}
-                                errors={errors?.prices[i]}
+                                errors={errors.prices && errors.prices[i]}
                               >
                                 <Input
                                   onChangeText={handleChange(`prices[${i}].price`)}

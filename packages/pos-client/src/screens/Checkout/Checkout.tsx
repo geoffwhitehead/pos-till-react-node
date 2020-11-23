@@ -8,7 +8,7 @@ import { Col, Container, Grid } from '../../core';
 import { useSync } from '../../hooks/useSync';
 import { CheckoutItemNavigator } from '../../navigators/CheckoutItemNavigator';
 import { SidebarDrawerStackParamList } from '../../navigators/SidebarNavigator';
-import { RECEIPT_PANEL_WIDTH } from '../../utils/consts';
+import { RECEIPT_PANEL_BUTTONS_WIDTH, RECEIPT_PANEL_WIDTH } from '../../utils/consts';
 import { SelectBill } from '../Bills/SelectBill/SelectBIll';
 import { CompleteBill } from './sub-components/CompleteBill/CompleteBill';
 import { Payments } from './sub-components/Payments/Payments';
@@ -60,7 +60,7 @@ export const Checkout: React.FC<CheckoutProps> = ({ navigation }) => {
       case Modes.Loading:
         return <Loading />;
       case Modes.Payments:
-        return <Payments bill={currentBill} onCompleteBill={completeBill} />;
+        return <Payments bill={currentBill} onCompleteBill={completeBill} onBack={() => setMode(Modes.Items)} />;
       case Modes.Bills:
         return <SelectBill billPeriod={billPeriod} />;
       case Modes.Items:
@@ -78,13 +78,18 @@ export const Checkout: React.FC<CheckoutProps> = ({ navigation }) => {
       <Grid>
         <Col>{renderMainPanel()}</Col>
         {!isSelectBillMode && (
-          <Col style={{ width: RECEIPT_PANEL_WIDTH }}>
+          <Col
+            style={{
+              width: mode === Modes.Payments ? RECEIPT_PANEL_WIDTH - RECEIPT_PANEL_BUTTONS_WIDTH : RECEIPT_PANEL_WIDTH,
+            }}
+          >
             {currentBill && (
               <Receipt
                 bill={currentBill}
                 onStore={clearBill}
                 onCheckout={onCheckout}
-                complete={mode === Modes.Complete}
+                isComplete={mode === Modes.Complete}
+                hideFunctionButtons={mode === Modes.Payments}
               />
             )}
           </Col>

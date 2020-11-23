@@ -36,7 +36,7 @@ export const TransactionsInner: React.FC<TransactionsOuterProps & TransactionsIn
         </Col>
         {selectedBill && (
           <Col style={{ width: 350 }}>
-            <Receipt bill={selectedBill} complete={true} />
+            <Receipt bill={selectedBill} isComplete={true} />
           </Col>
         )}
       </Grid>
