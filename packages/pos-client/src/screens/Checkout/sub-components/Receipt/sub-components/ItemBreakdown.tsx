@@ -3,17 +3,15 @@ import { capitalize } from 'lodash';
 import React, { useContext } from 'react';
 import { OrganizationContext } from '../../../../../contexts/OrganizationContext';
 import { Badge, Left, ListItem, Right, Text, View } from '../../../../../core';
-import { BillItem, BillItemModifierItem, BillItemPrintLog } from '../../../../../models';
+import { BillItem, BillItemModifierItem } from '../../../../../models';
 import { PrintStatus } from '../../../../../models/BillItemPrintLog';
 import { formatNumber } from '../../../../../utils';
 
-interface ItemBreakdownInnerProps {
-  modifierItems: BillItemModifierItem[];
-  printLogs: BillItemPrintLog[];
-}
+interface ItemBreakdownInnerProps {}
 
 interface ItemBreakdownOuterProps {
   billItem: BillItem;
+  modifierItems: BillItemModifierItem[];
   readonly: boolean;
   onSelect: (i: BillItem) => void;
   status: PrintStatus;
@@ -31,12 +29,11 @@ const ItemBreakdownInner: React.FC<ItemBreakdownOuterProps & ItemBreakdownInnerP
   } = useContext(OrganizationContext);
 
   const { isVoided, isComp } = billItem;
-  // const prefix = billItem.isVoided ? 'VOID ' : billItem.isComp ? 'COMP ' : '';
   const style = billItem.isVoided ? styles.void : billItem.isComp ? styles.comp : {};
   const isChargable = !(billItem.isComp || billItem.isVoided);
   const itemDisplayPrice = formatNumber(isChargable ? billItem.itemPrice : 0, currency);
   const isDisabled = readonly || status === PrintStatus.processing;
-  console.log('billItem', billItem);
+
   return (
     <ListItem
       style={status ? styles[status] : {}}
@@ -95,7 +92,6 @@ export const ItemBreakdown = withObservables<ItemBreakdownOuterProps, ItemBreakd
   ['billItem'],
   ({ billItem }) => ({
     billItem,
-    modifierItems: billItem.billItemModifierItems,
   }),
 )(ItemBreakdownInner);
 

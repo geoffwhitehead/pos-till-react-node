@@ -2,7 +2,7 @@ import withObservables from '@nozbe/with-observables';
 import { groupBy } from 'lodash';
 import React from 'react';
 import { Left, ListItem, Right, Separator, Text, View } from '../../../../../core';
-import { Bill, BillItem, BillItemPrintLog } from '../../../../../models';
+import { Bill, BillItem, BillItemModifierItem, BillItemPrintLog } from '../../../../../models';
 import { PrintStatus, PrintType } from '../../../../../models/BillItemPrintLog';
 import { ItemBreakdown } from './ItemBreakdown';
 
@@ -15,6 +15,7 @@ type ItemsBreakdownOuterProps = {
 type ItemsBreakdownInnerProps = {
   billItems: BillItem[];
   billItemStatusLogs: BillItemPrintLog[];
+  billItemModifierItems: BillItemModifierItem[];
 };
 
 export const ItemsBreakdownInner: React.FC<ItemsBreakdownOuterProps & ItemsBreakdownInnerProps> = ({
@@ -22,6 +23,7 @@ export const ItemsBreakdownInner: React.FC<ItemsBreakdownOuterProps & ItemsBreak
   readonly,
   onSelect,
   billItemStatusLogs,
+  billItemModifierItems,
   ...props
 }) => {
   if (!billItems) {
@@ -30,6 +32,7 @@ export const ItemsBreakdownInner: React.FC<ItemsBreakdownOuterProps & ItemsBreak
 
   const billItemGroups = groupBy(billItems, item => item.priceGroupId);
   const keyedLogGroups = groupBy(billItemStatusLogs, log => log.billItemId);
+  const groupedModifierItemsByItem = groupBy(billItemModifierItems, item => item.billItemId);
 
   return (
     <View {...props}>
@@ -68,10 +71,13 @@ export const ItemsBreakdownInner: React.FC<ItemsBreakdownOuterProps & ItemsBreak
               return null;
             }
 
+            const modifierItems = groupedModifierItemsByItem[billItem.id] || [];
+
             return (
               <ItemBreakdown
                 key={billItem.id}
                 billItem={billItem}
+                modifierItems={modifierItems}
                 readonly={readonly}
                 onSelect={onSelect}
                 status={status}
@@ -105,6 +111,7 @@ const enhance = component =>
     bill,
     billItemStatusLogs: bill.billItemStatusLogs.observeWithColumns(['status']),
     billItems: bill.billItems,
+    billItemModifierItems: bill._billModifierItems,
   }))(component);
 
 export const ItemsBreakdown = enhance(ItemsBreakdownInner);
