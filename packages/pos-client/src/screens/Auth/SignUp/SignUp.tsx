@@ -3,6 +3,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { Formik } from 'formik';
 import React, { useState } from 'react';
 import { StatusBar } from 'react-native';
+import { ScrollView } from 'react-native-gesture-handler';
 import { Bar } from 'react-native-progress';
 import * as Yup from 'yup';
 import { ItemField } from '../../../components/ItemField/ItemField';
@@ -157,214 +158,216 @@ export const SignUp: React.FC<SignUpProps> = ({ navigation, route }) => {
           <Container style={styles.container}>
             <StatusBar barStyle="dark-content" backgroundColor={colors.bgGreyBlue} />
 
-            <Bar progress={page === 1 ? 0.3 : page === 2 ? 0.6 : 1} width={300} color="white" />
-            <View style={styles.content}>
-              <Form style={styles.form}>
-                {page === 1 && (
-                  <>
-                    <ItemField
-                      styleLabel={styles.text}
-                      label="First Name"
-                      touched={touched.firstName}
-                      name="firstName"
-                      errors={errors.firstName}
-                    >
-                      <Input
-                        style={styles.text}
-                        onChangeText={handleChange('firstName')}
-                        onBlur={handleBlur('firstName')}
-                        value={firstName}
-                      />
-                    </ItemField>
-                    <ItemField
-                      styleLabel={styles.text}
-                      label="Last Name"
-                      touched={touched.lastName}
-                      name="lastName"
-                      errors={errors.lastName}
-                    >
-                      <Input
-                        style={styles.text}
-                        onChangeText={handleChange('lastName')}
-                        onBlur={handleBlur('lastName')}
-                        value={lastName}
-                      />
-                    </ItemField>
-                    <ItemField
-                      styleLabel={styles.text}
-                      label="Email"
-                      touched={touched.email}
-                      name="email"
-                      errors={errors.email}
-                    >
-                      <Input
-                        style={styles.text}
-                        onChangeText={handleChange('email')}
-                        onBlur={handleBlur('email')}
-                        value={email}
-                        autoCapitalize="none"
-                      />
-                    </ItemField>
-                  </>
-                )}
+            <ScrollView style={{ padding: 20 }}>
+              <Bar progress={page === 1 ? 0.3 : page === 2 ? 0.6 : 1} width={300} color="white" />
+              <View style={styles.content}>
+                <Form style={styles.form}>
+                  {page === 1 && (
+                    <>
+                      <ItemField
+                        styleLabel={styles.text}
+                        label="First Name"
+                        touched={touched.firstName}
+                        name="firstName"
+                        errors={errors.firstName}
+                      >
+                        <Input
+                          style={styles.text}
+                          onChangeText={handleChange('firstName')}
+                          onBlur={handleBlur('firstName')}
+                          value={firstName}
+                        />
+                      </ItemField>
+                      <ItemField
+                        styleLabel={styles.text}
+                        label="Last Name"
+                        touched={touched.lastName}
+                        name="lastName"
+                        errors={errors.lastName}
+                      >
+                        <Input
+                          style={styles.text}
+                          onChangeText={handleChange('lastName')}
+                          onBlur={handleBlur('lastName')}
+                          value={lastName}
+                        />
+                      </ItemField>
+                      <ItemField
+                        styleLabel={styles.text}
+                        label="Email"
+                        touched={touched.email}
+                        name="email"
+                        errors={errors.email}
+                      >
+                        <Input
+                          style={styles.text}
+                          onChangeText={handleChange('email')}
+                          onBlur={handleBlur('email')}
+                          value={email}
+                          autoCapitalize="none"
+                        />
+                      </ItemField>
+                    </>
+                  )}
 
-                {page === 2 && (
-                  <>
-                    <ItemField
-                      styleLabel={styles.text}
-                      label="Company Name"
-                      touched={touched.name}
-                      name="name"
-                      errors={errors.name}
-                    >
-                      <Input
-                        style={styles.text}
-                        onChangeText={handleChange('name')}
-                        onBlur={handleBlur('name')}
-                        value={name}
-                      />
-                    </ItemField>
-                    <ItemField
-                      styleLabel={styles.text}
-                      label="Phone"
-                      touched={touched.phone}
-                      name="phone"
-                      errors={errors.phone}
-                    >
-                      <Input
-                        style={styles.text}
-                        onChangeText={handleChange('phone')}
-                        onBlur={handleBlur('phone')}
-                        value={phone}
-                      />
-                    </ItemField>
-                    <ItemField
-                      styleLabel={styles.text}
-                      label="Address Line 1"
-                      touched={touched.addressLine1}
-                      name="addressLine1"
-                      errors={errors.addressLine1}
-                    >
-                      <Input
-                        style={styles.text}
-                        onChangeText={handleChange('addressLine1')}
-                        onBlur={handleBlur('addressLine1')}
-                        value={addressLine1}
-                      />
-                    </ItemField>
-                    <ItemField
-                      styleLabel={styles.text}
-                      label="Address Line 2"
-                      touched={touched.addressLine2}
-                      name="addressLine2"
-                      errors={errors.addressLine2}
-                    >
-                      <Input
-                        style={styles.text}
-                        onChangeText={handleChange('addressLine2')}
-                        onBlur={handleBlur('addressLine2')}
-                        value={addressLine2}
-                      />
-                    </ItemField>
-                    <ItemField
-                      styleLabel={styles.text}
-                      label="Address City"
-                      touched={touched.addressCity}
-                      name="addressCity"
-                      errors={errors.addressCity}
-                    >
-                      <Input
-                        style={styles.text}
-                        onChangeText={handleChange('addressCity')}
-                        onBlur={handleBlur('addressCity')}
-                        value={addressCity}
-                      />
-                    </ItemField>
+                  {page === 2 && (
+                    <>
+                      <ItemField
+                        styleLabel={styles.text}
+                        label="Company Name"
+                        touched={touched.name}
+                        name="name"
+                        errors={errors.name}
+                      >
+                        <Input
+                          style={styles.text}
+                          onChangeText={handleChange('name')}
+                          onBlur={handleBlur('name')}
+                          value={name}
+                        />
+                      </ItemField>
+                      <ItemField
+                        styleLabel={styles.text}
+                        label="Phone"
+                        touched={touched.phone}
+                        name="phone"
+                        errors={errors.phone}
+                      >
+                        <Input
+                          style={styles.text}
+                          onChangeText={handleChange('phone')}
+                          onBlur={handleBlur('phone')}
+                          value={phone}
+                        />
+                      </ItemField>
+                      <ItemField
+                        styleLabel={styles.text}
+                        label="Address Line 1"
+                        touched={touched.addressLine1}
+                        name="addressLine1"
+                        errors={errors.addressLine1}
+                      >
+                        <Input
+                          style={styles.text}
+                          onChangeText={handleChange('addressLine1')}
+                          onBlur={handleBlur('addressLine1')}
+                          value={addressLine1}
+                        />
+                      </ItemField>
+                      <ItemField
+                        styleLabel={styles.text}
+                        label="Address Line 2"
+                        touched={touched.addressLine2}
+                        name="addressLine2"
+                        errors={errors.addressLine2}
+                      >
+                        <Input
+                          style={styles.text}
+                          onChangeText={handleChange('addressLine2')}
+                          onBlur={handleBlur('addressLine2')}
+                          value={addressLine2}
+                        />
+                      </ItemField>
+                      <ItemField
+                        styleLabel={styles.text}
+                        label="Address City"
+                        touched={touched.addressCity}
+                        name="addressCity"
+                        errors={errors.addressCity}
+                      >
+                        <Input
+                          style={styles.text}
+                          onChangeText={handleChange('addressCity')}
+                          onBlur={handleBlur('addressCity')}
+                          value={addressCity}
+                        />
+                      </ItemField>
 
-                    <ItemField
-                      styleLabel={styles.text}
-                      label="Address County"
-                      touched={touched.addressCounty}
-                      name="addressCounty"
-                      errors={errors.addressCounty}
-                    >
-                      <Input
-                        style={styles.text}
-                        onChangeText={handleChange('addressCounty')}
-                        onBlur={handleBlur('addressCounty')}
-                        value={addressCounty}
-                      />
-                    </ItemField>
+                      <ItemField
+                        styleLabel={styles.text}
+                        label="Address County"
+                        touched={touched.addressCounty}
+                        name="addressCounty"
+                        errors={errors.addressCounty}
+                      >
+                        <Input
+                          style={styles.text}
+                          onChangeText={handleChange('addressCounty')}
+                          onBlur={handleBlur('addressCounty')}
+                          value={addressCounty}
+                        />
+                      </ItemField>
 
-                    <ItemField
-                      styleLabel={styles.text}
-                      label="Address Postcode"
-                      touched={touched.addressPostcode}
-                      name="addressPostcode"
-                      errors={errors.addressPostcode}
-                    >
-                      <Input
-                        style={styles.text}
-                        onChangeText={handleChange('addressPostcode')}
-                        onBlur={handleBlur('addressPostcode')}
-                        value={addressPostcode}
-                      />
-                    </ItemField>
-                  </>
-                )}
-                {page === 3 && (
-                  <Form>
-                    <ItemField
-                      styleLabel={styles.text}
-                      label="Password"
-                      touched={touched.password}
-                      name="password"
-                      errors={errors.password}
-                    >
-                      <Input
-                        style={styles.text}
-                        onChangeText={handleChange('password')}
-                        onBlur={handleBlur('password')}
-                        value={password}
-                        secureTextEntry
-                      />
-                    </ItemField>
-                    <ItemField
-                      styleLabel={styles.text}
-                      label="Confirm Password"
-                      touched={touched.passwordConfirmation}
-                      name="passwordConfirmation"
-                      errors={errors.passwordConfirmation}
-                    >
-                      <Input
-                        style={styles.text}
-                        onChangeText={handleChange('passwordConfirmation')}
-                        onBlur={handleBlur('passwordConfirmation')}
-                        value={passwordConfirmation}
-                        secureTextEntry
-                      />
-                    </ItemField>
-                  </Form>
-                )}
-              </Form>
-              <View style={styles.navButtons}>
-                {page > 1 && (
-                  <Button full info onPress={handlePrevious} style={{ flexGrow: 1 }}>
-                    <Icon name="arrow-back-outline" />
-                  </Button>
-                )}
-                {page !== 3 && (
-                  <Button full info onPress={handleNext} style={{ flexGrow: 3, marginLeft: 5 }}>
-                    <Text>Continue</Text>
-                  </Button>
-                )}
-                {page === 3 && (
-                  <Button full info onPress={handleSubmit} style={{ flexGrow: 3, marginLeft: 5 }}>
-                    <Text>Sign Up</Text>
-                  </Button>
-                )}
+                      <ItemField
+                        styleLabel={styles.text}
+                        label="Address Postcode"
+                        touched={touched.addressPostcode}
+                        name="addressPostcode"
+                        errors={errors.addressPostcode}
+                      >
+                        <Input
+                          style={styles.text}
+                          onChangeText={handleChange('addressPostcode')}
+                          onBlur={handleBlur('addressPostcode')}
+                          value={addressPostcode}
+                        />
+                      </ItemField>
+                    </>
+                  )}
+                  {page === 3 && (
+                    <Form>
+                      <ItemField
+                        styleLabel={styles.text}
+                        label="Password"
+                        touched={touched.password}
+                        name="password"
+                        errors={errors.password}
+                      >
+                        <Input
+                          style={styles.text}
+                          onChangeText={handleChange('password')}
+                          onBlur={handleBlur('password')}
+                          value={password}
+                          secureTextEntry
+                        />
+                      </ItemField>
+                      <ItemField
+                        styleLabel={styles.text}
+                        label="Confirm Password"
+                        touched={touched.passwordConfirmation}
+                        name="passwordConfirmation"
+                        errors={errors.passwordConfirmation}
+                      >
+                        <Input
+                          style={styles.text}
+                          onChangeText={handleChange('passwordConfirmation')}
+                          onBlur={handleBlur('passwordConfirmation')}
+                          value={passwordConfirmation}
+                          secureTextEntry
+                        />
+                      </ItemField>
+                    </Form>
+                  )}
+                </Form>
+                <View style={styles.navButtons}>
+                  {page > 1 && (
+                    <Button full info onPress={handlePrevious} style={{ flexGrow: 1 }}>
+                      <Icon name="arrow-back-outline" />
+                    </Button>
+                  )}
+                  {page !== 3 && (
+                    <Button full info onPress={handleNext} style={{ flexGrow: 3, marginLeft: 5 }}>
+                      <Text>Continue</Text>
+                    </Button>
+                  )}
+                  {page === 3 && (
+                    <Button full info onPress={handleSubmit} style={{ flexGrow: 3, marginLeft: 5 }}>
+                      <Text>Sign Up</Text>
+                    </Button>
+                  )}
+                </View>
               </View>
-            </View>
+            </ScrollView>
           </Container>
         );
       }}

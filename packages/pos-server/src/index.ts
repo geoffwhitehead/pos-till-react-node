@@ -1,8 +1,8 @@
 import express from 'express';
-import config from './config';
-import Logger from './loaders/logger';
 import 'reflect-metadata'; // We need this in order to use @Decorators - remove once refactored to  use functions
+import config from './config';
 import loaders from './loaders';
+import Logger from './loaders/logger';
 // Promise = require('bluebird'); // eslint-disable-line
 // import bodyParser from 'body-parser';
 // import cors from 'cors';
@@ -19,6 +19,10 @@ const startServer = async () => {
 
     await loaders({ expressApp: app });
 
+    process.on('uncaughtException', function(err) {
+        console.log('Caught exception: ' + err);
+    });
+
     app.listen(config.port, err => {
         if (err) {
             Logger.error(err);
@@ -33,6 +37,9 @@ const startServer = async () => {
     });
 };
 
+process.on('uncaughtException', function(err) {
+    console.log('Caught exception: ' + err);
+});
 startServer();
 
 // database

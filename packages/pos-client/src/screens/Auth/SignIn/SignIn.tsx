@@ -4,7 +4,7 @@ import LottieView from 'lottie-react-native';
 import React, { useContext, useRef, useState } from 'react';
 import { StatusBar, View } from 'react-native';
 import { AuthContext } from '../../../contexts/AuthContext';
-import { Button, Container, Form, Input, Item, Label, Text } from '../../../core';
+import { ActionSheet, Button, Container, Form, Input, Item, Label, Text } from '../../../core';
 import { AuthStackParamList } from '../../../navigators/AuthNavigator';
 import { colors } from '../../../theme';
 
@@ -16,10 +16,24 @@ interface SignInProps {
 export const SignIn: React.FC<SignInProps> = ({ navigation, route }) => {
   const [email, setEmail] = useState(route.params.organization?.email || 'geoff1012@gmail.com');
   const [password, setPassword] = useState('geoff');
+  const { organization } = useContextm;
   const organization = route.params.organization;
   const animation = useRef();
 
-  const { signIn } = useContext(AuthContext);
+  const { signIn, unlink } = useContext(AuthContext);
+
+  const areYouSure = fn => {
+    const options = ['Yes', 'Cancel'];
+    ActionSheet.show(
+      {
+        options,
+        title: 'Are you sure?',
+      },
+      index => {
+        index === 0 && fn();
+      },
+    );
+  };
 
   return (
     <Container style={styles.container}>
@@ -49,15 +63,26 @@ export const SignIn: React.FC<SignInProps> = ({ navigation, route }) => {
           <Button info full style={styles.button} onPress={() => signIn({ email, password })}>
             <Text>Sign in</Text>
           </Button>
-          <Button
-            full
-            style={{ ...styles.button, backgroundColor: 'white' }}
-            disabled={!!organization}
-            light
-            onPress={() => navigation.navigate('SignUp')}
-          >
-            <Text>Register</Text>
-          </Button>
+          {!organization && (
+            <Button
+              full
+              style={{ ...styles.button, backgroundColor: 'white' }}
+              light
+              onPress={() => navigation.navigate('SignUp')}
+            >
+              <Text>Register</Text>
+            </Button>
+          )}
+          {organization && (
+            <Button
+              full
+              style={{ ...styles.button, backgroundColor: 'white' }}
+              light
+              onPress={() => areYouSure(unlink)}
+            >
+              <Text>Unlink</Text>
+            </Button>
+          )}
           {organization && (
             <Text style={{ padding: 20 }} note>
               * This terminal is currently linked with {organization.name}.

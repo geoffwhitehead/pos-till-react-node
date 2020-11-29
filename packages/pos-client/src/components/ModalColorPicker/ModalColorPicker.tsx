@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SlidersColorPicker } from 'react-native-color';
 import tinycolor from 'tinycolor2';
+import { fontSizes, spacing } from '../../theme';
 
 type ModalColorPickerContentProps = {
   colorHex: string;
@@ -60,13 +61,12 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   colorPreview: {
-    // marginLeft: 12,
-    marginTop: 12,
+    marginTop: spacing[5],
     flexDirection: 'column',
     alignItems: 'flex-end',
     justifyContent: 'flex-end',
-    paddingVertical: 16,
-    paddingHorizontal: 32,
+    paddingVertical: spacing[5],
+    paddingHorizontal: spacing[9],
     borderRadius: 3,
     shadowColor: 'black',
     shadowOffset: { width: 0, height: 2 },
@@ -74,8 +74,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
   },
   colorString: {
-    fontSize: 20,
-    lineHeight: 22,
+    fontSize: fontSizes[5],
     ...Platform.select({
       android: {
         fontFamily: 'monospace',

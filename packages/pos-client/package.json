@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "android": "react-native run-android",
-    "dev:ios": "react-native run-ios --simulator='iPad Pro (12.9-inch) (4th generation)'",
+    "dev:ios": "yarn set:production && react-native run-ios --simulator='iPad Pro (9.7-inch)'",
+    "dev:ios:device": "yarn set:local && react-native run-ios --device='iPad'",
     "dev:app": "concurrently \"yarn start\" \"yarn dev:ios\"",
     "pod": "cd ./ios && pod install && cd .. ",
     "start": "react-native start",
@@ -15,9 +16,10 @@
     "lint-check": "eslint .",
     "rename": "react-native-rename",
     "postinstall": "npx jetify",
-    "find:realm": "find ~/Library -type f -name 'default.realm'",
     "find:watermelon": "find ~/Library -type f -name 'watermelon.db'",
-    "reset:cache": "watchman watch-del-all && react-native start --reset-cache"
+    "reset:cache": "watchman watch-del-all && react-native start --reset-cache",
+    "set:local": "rm -rf ./build.env.js && echo 'export default \"local\";' >> build.env.js",
+    "set:production": "rm -rf ./build.env.js && echo 'export default \"production\";' >> build.env.js"
   },
   "dependencies": {
     "@nozbe/watermelondb": "^0.20.0",
@@ -74,7 +76,6 @@
     "@types/react": "^16.9.19",
     "@types/react-native": "^0.61.12",
     "@types/react-navigation": "^3.4.0",
-    "@types/realm": "^1.13.0",
     "@types/yup": "^0.26.32",
     "@typescript-eslint/eslint-plugin": "^2.20.0",
     "@typescript-eslint/parser": "^2.20.0",

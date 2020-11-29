@@ -28,7 +28,7 @@ import { PrintStatus } from '../../../../models/BillItemPrintLog';
 import { kitchenCall, kitchenReceipt } from '../../../../services/printer/kitchenReceipt';
 import { print } from '../../../../services/printer/printer';
 import { receiptBill } from '../../../../services/printer/receiptBill';
-import { buttons, fonts } from '../../../../theme';
+import { buttons, fonts, spacing } from '../../../../theme';
 import { formatNumber, minimalBillSummary, MinimalBillSummary } from '../../../../utils';
 import { RECEIPT_PANEL_BUTTONS_WIDTH } from '../../../../utils/consts';
 import { resolveButtonState } from '../../../../utils/helpers';
@@ -299,10 +299,9 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
 
   const requiresPrepTime =
     priceGroups.some(priceGroup => priceGroup.isPrepTimeRequired) && itemsRequiringPrepTimeCount > 0;
-
   const dateString = bill.prepAt ? dayjs(bill.prepAt).format('h:mm A') : '';
-
   const isCallButtonDisabled = incompleteBillCallPrintLogs > 0;
+  const hasDiscount = totalDiscount > 0;
 
   return (
     <Grid style={styles.grid}>
@@ -351,7 +350,7 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
               <Text note>Open</Text>
               <Text style={styles.textTimes}>
                 {dayjs(bill.createdAt)
-                  .format('DD/MM/YY h:mm A')
+                  .format('DD/MM/YY h:mm')
                   .toString()}
               </Text>
             </Col>
@@ -378,7 +377,7 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
             />
           </Row>
           <Row style={styles.subTotalRow}>
-            <Text>{`Discount: ${formatNumber(0 - totalDiscount, currency)}`}</Text>
+            {hasDiscount && <Text>{`Discount: ${formatNumber(0 - totalDiscount, currency)}`}</Text>}
 
             <Text>{`Total: ${formatNumber(total, currency)}`}</Text>
             {isComplete && (
@@ -387,7 +386,7 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
                 currency,
               )}`}</Text>
             )}
-            <Text style={fonts.h3}>{`Balance: ${formatNumber(balance, currency)}`}</Text>
+            <Text style={fonts.h2}>{`Balance: ${formatNumber(balance, currency)}`}</Text>
           </Row>
           <Row style={styles.printRow}>
             <Button disabled={!receiptPrinter} info iconLeft full style={styles.printButton} onPress={onPrint}>
@@ -442,22 +441,20 @@ const styles = StyleSheet.create({
     width: '100%',
     flexDirection: 'column',
     justifyContent: 'center',
-    // alignContent: 'center',
-    // alignItems: 'center',
   },
-  rowTimes: { height: 60, backgroundColor: 'whitesmoke', borderLeftWidth: 1, borderLeftColor: 'lightgrey' },
-  textTimes: { fontWeight: 'bold', paddingTop: 5 },
-  columnsTimes: { padding: 5, display: 'flex', flexDirection: 'column', justifyContent: 'center' },
+  textTimes: { fontWeight: 'bold', paddingTop: spacing[4] },
+  columnsTimes: { padding: spacing[4], display: 'flex', flexDirection: 'column', justifyContent: 'center' },
+  rowTimes: { backgroundColor: '#fcf6ae', borderLeftWidth: 1, borderLeftColor: 'lightgrey', flex: 0 },
   itemsRow: { borderLeftWidth: 1, borderLeftColor: 'lightgrey' },
   subTotalRow: {
+    backgroundColor: '#fcf6ae',
+    flex: 0,
     borderTopColor: 'lightgrey',
     borderTopWidth: 1,
-    height: 110,
     flexDirection: 'column',
-    padding: 10,
+    padding: spacing[4],
     borderLeftWidth: 1,
     borderLeftColor: 'lightgrey',
-    // flexGrow: 1,
   },
   printRow: {
     height: buttons.medium,
@@ -469,6 +466,5 @@ const styles = StyleSheet.create({
   },
   receiptTextHeaders: {
     textAlign: 'center',
-    lineHeight: 60,
   },
 });

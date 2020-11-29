@@ -128,6 +128,6 @@ export const ReportReceipt: React.FC<ReportReceiptProps> = ({
 
 const styles = StyleSheet.create({
   rightColumn: { width: 350, borderLeftWidth: 1, borderLeftColor: 'lightgrey' },
-  rowPrintButton: { height: 60, padding: 5 },
+  rowPrintButton: { height: 10, padding: 5 },
   printButton: { width: '100%', textAlign: 'center', height: '100%' },
 });

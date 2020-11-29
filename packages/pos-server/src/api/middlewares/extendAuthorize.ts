@@ -30,11 +30,7 @@ const extendAuthorize = async (req, res, next) => {
 
     const logger = Container.get('logger') as Logger;
 
-    console.log('HEREHREHRHE');
-    console.log('url', url);
-    console.log('method', method);
     if (!unprotectedRoutes.some(route => route.url === url && route.method === method)) {
-        console.log('NOOOOO');
         const accessToken = getTokenFromHeader(req);
         if (!accessToken) {
             res.status(401).json('Unauthorized');

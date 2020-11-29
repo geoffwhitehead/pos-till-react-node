@@ -1,14 +1,9 @@
-import { create, ApiResponse } from 'apisauce';
 import AsyncStorage from '@react-native-community/async-storage';
-
-// TODO: learn how to use env vars in react native ios builds
-const base = {
-  local: 'http://localhost:5000/api',
-  prod: 'https://positive-server.herokuapp.com/api',
-};
+import { create } from 'apisauce';
+import { config } from '../../env';
 
 const api = create({
-  baseURL: base.local,
+  baseURL: config.BASE_URL,
   headers: { Accept: 'application/json' },
 });
 
@@ -29,7 +24,7 @@ api.addMonitor(async response => {
 });
 
 // TODO: refactor this ...
-export const okResponse = (response)  => {
+export const okResponse = response => {
   if (response.ok && response.data?.success) {
     return response.data.data;
   } else {

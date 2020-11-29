@@ -20,8 +20,11 @@ export const BillCallsInner: React.FC<BillCallOuterProps & BillCallInnerProps> =
   billCallPrintLogs,
 }) => {
   const keyedLogs = groupBy(billCallPrintLogs, log => log.billCallLogId);
-  console.log('billCallLogs', billCallLogs);
-  console.log('billCallPrintLogs', billCallPrintLogs);
+
+  if (billCallLogs.length == 0) {
+    return null;
+  }
+
   return (
     <>
       <Separator bordered>
@@ -35,7 +38,6 @@ export const BillCallsInner: React.FC<BillCallOuterProps & BillCallInnerProps> =
         const isProcessing = logs.some(log => log.status === PrintStatus.processing);
         const isPending = logs.some(log => log.status === PrintStatus.pending);
 
-        console.log('logs', logs);
         const status = hasSucceeded
           ? PrintStatus.succeeded
           : hasErrored

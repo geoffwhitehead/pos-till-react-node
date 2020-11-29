@@ -1,7 +1,7 @@
 import withObservables from '@nozbe/with-observables';
 import { groupBy } from 'lodash';
 import React from 'react';
-import { Left, ListItem, Right, Separator, Text, View } from '../../../../../core';
+import { ListItem, Separator, Text, View } from '../../../../../core';
 import { Bill, BillItem, BillItemModifierItem, BillItemPrintLog } from '../../../../../models';
 import { PrintStatus, PrintType } from '../../../../../models/BillItemPrintLog';
 import { ItemBreakdown } from './ItemBreakdown';
@@ -92,12 +92,8 @@ export const ItemsBreakdownInner: React.FC<ItemsBreakdownOuterProps & ItemsBreak
 
         return [
           <ListItem itemDivider first key={billItemGroup[0].priceGroupId}>
-            <Left>
-              <Text style={{ fontWeight: 'bold' }}>{billItemGroup[0].priceGroupName}</Text>
-            </Left>
-            <Right>
-              <Text style={{ fontWeight: 'bold' }}>{`${billItemGroup.length} items`}</Text>
-            </Right>
+            <Text style={{ fontWeight: 'bold' }}>{billItemGroup[0].priceGroupName}</Text>
+            <Text>{` (${billItemGroup.length} items) `}</Text>
           </ListItem>,
           ...filteredBillItems,
         ];
