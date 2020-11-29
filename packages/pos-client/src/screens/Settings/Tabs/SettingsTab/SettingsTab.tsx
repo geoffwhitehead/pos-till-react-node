@@ -4,6 +4,7 @@ import { useDatabase } from '@nozbe/watermelondb/hooks';
 import withObservables from '@nozbe/with-observables';
 import { Formik } from 'formik';
 import React, { useContext, useState } from 'react';
+import { StyleSheet } from 'react-native';
 import * as Yup from 'yup';
 import { HeaderButtonBar } from '../../../../components/HeaderButtonBar/HeaderButtonBar';
 import { ItemField } from '../../../../components/ItemField/ItemField';
@@ -263,7 +264,7 @@ const enhance = c =>
 
 export const SettingsTab = enhance(SettingsTabInner);
 
-const styles = {
+const styles = StyleSheet.create({
   errorLabel: {
     color: 'red',
   },
@@ -280,4 +281,4 @@ const styles = {
     borderRadius: 5,
     borderColor: 'lightgrey',
   },
-};
+});

@@ -42,7 +42,7 @@ export const kitchenReceipt = async (p: {
   printers: Printer[];
   priceGroups: PriceGroup[];
   reference: string;
-  prepTime: Dayjs;
+  prepTime?: Dayjs;
 }): Promise<{ billItemPrintLogs: BillItemPrintLog[]; printer: Printer; commands: any[] }[]> => {
   const { billItems, printers, priceGroups, reference, prepTime, billItemPrintLogs } = p;
 
@@ -147,7 +147,7 @@ const generateBillItemCommands = (p: {
   itemsToPrint: { billItem: BillItem; mods: BillItemModifierItem[]; billItemPrintLog: BillItemPrintLog }[];
   priceGroup: PriceGroup;
   printer: Printer;
-  prepTime: Dayjs;
+  prepTime?: Dayjs;
   reference: string;
 }) => {
   const { itemsToPrint, priceGroup, printer, prepTime, reference } = p;
@@ -157,7 +157,7 @@ const generateBillItemCommands = (p: {
   const pGName = priceGroup.shortName || priceGroup.name;
   c.push({ appendBitmapText: alignCenter(pGName.toUpperCase(), printer.printWidth) });
   c.push({ appendBitmapText: alignCenter('IN: ' + dayjs().format('HH:mm'), printer.printWidth) });
-  c.push({ appendBitmapText: alignCenter('PREP: ' + prepTime.format('HH:mm'), printer.printWidth) });
+  prepTime && c.push({ appendBitmapText: alignCenter('PREP: ' + prepTime.format('HH:mm'), printer.printWidth) });
   c.push({ appendBitmapText: alignCenter(REF_NAME.toUpperCase() + ': ' + reference, printer.printWidth) });
   c.push(starDivider(printer.printWidth));
 

@@ -5,7 +5,7 @@ import { RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { groupBy, times } from 'lodash';
 import React, { useContext, useState } from 'react';
-import { ScrollView } from 'react-native';
+import { ScrollView, StyleSheet } from 'react-native';
 import { SearchHeader } from '../../../../components/SearchHeader/SearchHeader';
 import { OrganizationContext } from '../../../../contexts/OrganizationContext';
 import { PriceGroupContext } from '../../../../contexts/PriceGroupContext';
@@ -143,7 +143,7 @@ export const Categories = withDatabase<any>(
   }))(CategoriesInner),
 );
 
-const styles = {
+const styles = StyleSheet.create({
   grid: {
     padding: GRID_SPACING,
     height: '100%',
@@ -181,4 +181,4 @@ const styles = {
     textShadowOffset: { width: -1, height: 1 },
     textShadowRadius: 10,
   },
-} as const;
+} as const);

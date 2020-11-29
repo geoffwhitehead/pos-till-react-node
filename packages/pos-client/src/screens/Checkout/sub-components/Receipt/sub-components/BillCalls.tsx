@@ -3,6 +3,7 @@ import dayjs from 'dayjs';
 import { groupBy } from 'lodash';
 import { Left, ListItem, Right, Separator, Text } from 'native-base';
 import React from 'react';
+import { StyleSheet } from 'react-native';
 import { Bill, BillCallLog, BillCallPrintLog } from '../../../../../models';
 import { PrintStatus } from '../../../../../models/BillItemPrintLog';
 
@@ -68,7 +69,7 @@ export const BillCalls = withObservables<BillCallOuterProps, BillCallInnerProps>
   billCallLogs: bill.billCallLogs,
 }))(BillCallsInner);
 
-const styles = {
+const styles = StyleSheet.create({
   [PrintStatus.succeeded]: {
     borderLeftColor: 'green',
     borderLeftWidth: 4,
@@ -87,4 +88,4 @@ const styles = {
   comp: {
     color: 'grey',
   },
-};
+});

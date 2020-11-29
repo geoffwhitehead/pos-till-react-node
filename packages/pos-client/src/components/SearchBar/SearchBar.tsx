@@ -1,4 +1,5 @@
 import React from 'react';
+import { StyleSheet } from 'react-native';
 import { Button, Icon, Input, Item, Text } from '../../core';
 import { resolveButtonState } from '../../utils/helpers';
 
@@ -49,9 +50,9 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   );
 };
 
-const styles = {
+const styles = StyleSheet.create({
   searchBar: {
     paddingLeft: 15,
     paddingRight: 15,
   },
-};
+});

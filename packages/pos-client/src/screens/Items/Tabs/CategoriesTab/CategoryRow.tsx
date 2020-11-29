@@ -1,5 +1,6 @@
 import withObservables from '@nozbe/with-observables';
 import React from 'react';
+import { StyleSheet } from 'react-native';
 import { Button, Left, ListItem, Right, Text, View } from '../../../../core';
 import { Category } from '../../../../models';
 
@@ -55,7 +56,7 @@ const enhance = c =>
 
 export const CategoryRow = enhance(CategoryRowInner);
 
-const styles = {
+const styles = StyleSheet.create({
   text: { alignSelf: 'flex-start' },
   name: { borderRadius: 5, padding: 3, paddingLeft: 6, paddingRight: 6 },
-} as const;
+} as const);

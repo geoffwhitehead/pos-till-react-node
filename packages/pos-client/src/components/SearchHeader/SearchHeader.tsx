@@ -3,6 +3,7 @@ import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import withObservables from '@nozbe/with-observables';
 import { useNavigation } from '@react-navigation/native';
 import React, { useContext } from 'react';
+import { StyleSheet } from 'react-native';
 import { PriceGroupContext } from '../../contexts/PriceGroupContext';
 import { Icon, Input, Item, Label, Picker, Text } from '../../core';
 import { PriceGroup, tableNames } from '../../models';
@@ -93,9 +94,9 @@ export const SearchHeader = withDatabase(
   }))(WrappedSearchHeader),
 );
 
-const styles = {
+const styles = StyleSheet.create({
   searchBar: {
     paddingLeft: 15,
     paddingRight: 15,
   },
-};
+});

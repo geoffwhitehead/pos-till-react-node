@@ -1,4 +1,6 @@
-export const styles = {
+import { StyleSheet } from 'react-native';
+
+export const styles = StyleSheet.create({
   heading: {
     marginBottom: 20,
   },
@@ -33,4 +35,4 @@ export const styles = {
     marginTop: 10,
     marginBottom: 10,
   },
-} as const;
+} as const);

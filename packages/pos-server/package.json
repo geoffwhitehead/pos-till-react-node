@@ -20,7 +20,8 @@
         "heroku:logs": "heroku logs -a positive-server --tail",
         "heroku:deploy": "git push -f git@heroku.com:positive-server.git master",
         "heroku:up": "heroku ps:scale web=1 -a positive-server",
-        "heroku:down": "heroku ps:scale web=0 -a positive-server"
+        "heroku:down": "heroku ps:scale web=0 -a positive-server",
+        "heroku:restart": "heroku restart -a positive-server"
     },
     "license": "MIT",
     "dependencies": {

@@ -6,6 +6,7 @@ import dayjs from 'dayjs';
 import { Formik } from 'formik';
 import { capitalize } from 'lodash';
 import React, { useContext, useEffect, useRef, useState } from 'react';
+import { StyleSheet } from 'react-native';
 import * as Yup from 'yup';
 import { ItemField } from '../../../../components/ItemField/ItemField';
 import { Modal } from '../../../../components/Modal/Modal';
@@ -225,8 +226,8 @@ const enhance = component =>
 
 export const ReceiptItems = enhance(ReceiptItemsInner);
 
-const styles = {
+const styles = StyleSheet.create({
   receiptItems: {
     paddingBottom: 60,
   },
-};
+});

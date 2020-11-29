@@ -2,6 +2,7 @@ import { Database } from '@nozbe/watermelondb';
 import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import withObservables from '@nozbe/with-observables';
 import React, { useContext, useState } from 'react';
+import { StyleSheet } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { Modal } from '../../../../components/Modal/Modal';
 import { SearchBar } from '../../../../components/SearchBar/SearchBar';
@@ -118,9 +119,9 @@ export const CategoriesTab = withDatabase(
   }))(CategoriesTabInner),
 );
 
-const styles = {
+const styles = StyleSheet.create({
   modal: {
     width: 500,
     height: 500,
   },
-};
+});

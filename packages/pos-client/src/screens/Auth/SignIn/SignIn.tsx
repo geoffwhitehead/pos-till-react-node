@@ -1,23 +1,44 @@
+import { Database } from '@nozbe/watermelondb';
+import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
+import withObservables from '@nozbe/with-observables';
 import { RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import LottieView from 'lottie-react-native';
-import React, { useContext, useRef, useState } from 'react';
-import { StatusBar, View } from 'react-native';
+import React, { useContext, useEffect, useRef, useState } from 'react';
+import { StatusBar, StyleSheet, View } from 'react-native';
 import { AuthContext } from '../../../contexts/AuthContext';
 import { ActionSheet, Button, Container, Form, Input, Item, Label, Text } from '../../../core';
+import { Organization, tableNames } from '../../../models';
 import { AuthStackParamList } from '../../../navigators/AuthNavigator';
 import { colors } from '../../../theme';
 
-interface SignInProps {
+interface SignInOuterProps {
   navigation: StackNavigationProp<AuthStackParamList, 'SignIn'>;
   route: RouteProp<AuthStackParamList, 'SignIn'>;
+  database: Database;
 }
 
-export const SignIn: React.FC<SignInProps> = ({ navigation, route }) => {
-  const [email, setEmail] = useState(route.params.organization?.email || 'geoff1012@gmail.com');
-  const [password, setPassword] = useState('geoff');
-  const organization = route.params.organization;
+interface SignInInnerProps {
+  organizations: Organization[];
+}
+
+export const SignInInner: React.FC<SignInOuterProps & SignInInnerProps> = ({ navigation, route, organizations }) => {
+  const [organization, setOrganization] = useState<Organization | null>();
+  const [email, setEmail] = useState('geoff1012@gmail.com');
+  const [password, setPassword] = useState('geoffgeoff');
   const animation = useRef();
+
+  console.log('organizations', organizations);
+  useEffect(() => {
+    const org = organizations?.[0];
+    if (org) {
+      setOrganization(org);
+      setEmail(org.email);
+    } else {
+      setOrganization(null);
+      setEmail(null);
+    }
+  }, [organizations]);
 
   const { signIn, unlink } = useContext(AuthContext);
 
@@ -34,6 +55,10 @@ export const SignIn: React.FC<SignInProps> = ({ navigation, route }) => {
     );
   };
 
+  const handleUnlink = () => {
+    unlink();
+    navigation.navigate('SignIn');
+  };
   return (
     <Container style={styles.container}>
       <StatusBar barStyle="light-content" />
@@ -77,7 +102,7 @@ export const SignIn: React.FC<SignInProps> = ({ navigation, route }) => {
               full
               style={{ ...styles.button, backgroundColor: 'white' }}
               light
-              onPress={() => areYouSure(unlink)}
+              onPress={() => areYouSure(handleUnlink)}
             >
               <Text>Unlink</Text>
             </Button>
@@ -93,7 +118,16 @@ export const SignIn: React.FC<SignInProps> = ({ navigation, route }) => {
   );
 };
 
-const styles = {
+const enhance = c =>
+  withDatabase<any>(
+    withObservables<SignInOuterProps, SignInInnerProps>(null, ({ database }) => ({
+      organizations: database.collections.get<Organization>(tableNames.organizations).query(),
+    }))(c),
+  );
+
+export const SignIn = enhance(SignInInner);
+
+const styles = StyleSheet.create({
   container: {
     backgroundColor: colors.darkBlue,
   },
@@ -116,4 +150,4 @@ const styles = {
   text: {
     color: 'white',
   },
-} as const;
+} as const);

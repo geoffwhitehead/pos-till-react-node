@@ -2,7 +2,7 @@ import { Database } from '@nozbe/watermelondb';
 import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import withObservables from '@nozbe/with-observables';
 import React, { useState } from 'react';
-import { ScrollView } from 'react-native';
+import { ScrollView, StyleSheet } from 'react-native';
 import { Modal } from '../../../../components/Modal/Modal';
 import { SearchBar } from '../../../../components/SearchBar/SearchBar';
 import { Col, Container, Grid, List, Row, Separator, Text } from '../../../../core';
@@ -108,8 +108,8 @@ export const ModifiersTab = withDatabase(
   }))(ModifierTabInner),
 );
 
-const styles = {
+const styles = StyleSheet.create({
   separator: {
     maxHeight: 45,
   },
-};
+});

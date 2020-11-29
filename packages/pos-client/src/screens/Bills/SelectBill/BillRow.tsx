@@ -3,6 +3,7 @@ import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import withObservables from '@nozbe/with-observables';
 import dayjs from 'dayjs';
 import React, { useContext, useEffect, useState } from 'react';
+import { StyleSheet } from 'react-native';
 import { OrganizationContext } from '../../../contexts/OrganizationContext';
 import { Body, Icon, Left, ListItem, Right, Text, View } from '../../../core';
 import {
@@ -143,7 +144,7 @@ const enhance = component =>
 
 export const BillRow = enhance(WrappedBillRow);
 
-const styles = {
+const styles = StyleSheet.create({
   openBill: {
     borderLeftColor: 'green',
     borderLeftWidth: 8,
@@ -155,4 +156,4 @@ const styles = {
   },
   iconStyle: { marginRight: 5, color: 'grey' },
   totalText: { color: 'grey', fontWeight: 'bold', fontSize: 18 },
-} as const;
+} as const);

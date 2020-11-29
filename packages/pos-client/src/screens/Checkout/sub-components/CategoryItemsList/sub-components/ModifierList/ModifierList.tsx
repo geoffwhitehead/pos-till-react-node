@@ -2,6 +2,7 @@ import { useDatabase } from '@nozbe/watermelondb/hooks';
 import withObservables from '@nozbe/with-observables';
 import { keyBy } from 'lodash';
 import React, { useState } from 'react';
+import { StyleSheet } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { ModalContentButton } from '../../../../../../components/Modal/ModalContentButton';
 import { NumberPicker } from '../../../../../../components/NumberPicker/NumberPicker';
@@ -103,12 +104,12 @@ export const ModifierListInner: React.FC<ModifierListOuterProps & ModifierListIn
   );
 };
 
-const styles = {
+const styles = StyleSheet.create({
   content: {
     textAlign: 'center',
     display: 'flex',
   } as const,
-};
+});
 
 export const ModifierList = withObservables<ModifierListOuterProps, ModifierListInnerProps>(['item'], ({ item }) => ({
   modifiers: item.modifiers.observeWithColumns(['min_items', 'max_items']),

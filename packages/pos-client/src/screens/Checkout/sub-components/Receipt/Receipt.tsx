@@ -137,7 +137,7 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
         printers,
         priceGroups,
         reference: bill.reference.toString(),
-        prepTime: dayjs(bill.prepAt),
+        prepTime: bill.prepAt ? dayjs(bill.prepAt) : null,
       });
 
       const toPrintCallLogs = await kitchenCall({

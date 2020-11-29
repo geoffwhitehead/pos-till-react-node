@@ -3,6 +3,7 @@ import withObservables from '@nozbe/with-observables';
 import { Formik } from 'formik';
 import { capitalize, omit } from 'lodash';
 import React, { useContext, useState } from 'react';
+import { StyleSheet } from 'react-native';
 import * as Yup from 'yup';
 import { ItemField } from '../../../../components/ItemField/ItemField';
 import { ModalContentButton } from '../../../../components/Modal/ModalContentButton';
@@ -194,7 +195,7 @@ const enhance = c =>
 
 export const ModalCategoryDetails = enhance(ModalCategoryDetailsInner);
 
-const styles = {
+const styles = StyleSheet.create({
   colorPickerItem: {
     flexDirection: 'column',
     borderBottomWidth: 0,
@@ -203,4 +204,4 @@ const styles = {
     alignItems: 'flex-start',
   },
   colorPicker: { width: '100%', flex: 0 },
-} as const;
+} as const);

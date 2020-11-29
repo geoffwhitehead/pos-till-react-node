@@ -2,7 +2,7 @@ import { RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { Formik } from 'formik';
 import React, { useState } from 'react';
-import { StatusBar } from 'react-native';
+import { StatusBar, StyleSheet } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { Bar } from 'react-native-progress';
 import * as Yup from 'yup';
@@ -375,7 +375,7 @@ export const SignUp: React.FC<SignUpProps> = ({ navigation, route }) => {
   );
 };
 
-const styles = {
+const styles = StyleSheet.create({
   content: {
     width: 300,
   },
@@ -404,4 +404,4 @@ const styles = {
   text: {
     color: 'white',
   },
-} as const;
+} as const);

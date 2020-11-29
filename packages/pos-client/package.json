@@ -5,7 +5,7 @@
   "scripts": {
     "android": "react-native run-android",
     "dev:ios": "yarn set:production && react-native run-ios --simulator='iPad Pro (9.7-inch)'",
-    "dev:ios:device": "yarn set:local && react-native run-ios --device='iPad'",
+    "dev:ios:device": "yarn set:local && react-native run-ios --device='Nemo'",
     "dev:app": "concurrently \"yarn start\" \"yarn dev:ios\"",
     "pod": "cd ./ios && pod install && cd .. ",
     "start": "react-native start",

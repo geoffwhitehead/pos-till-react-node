@@ -1,6 +1,7 @@
 import withObservables from '@nozbe/with-observables';
 import { capitalize } from 'lodash';
 import React, { useContext } from 'react';
+import { StyleSheet } from 'react-native';
 import { OrganizationContext } from '../../../../../contexts/OrganizationContext';
 import { Badge, Left, ListItem, Right, Text, View } from '../../../../../core';
 import { BillItem, BillItemModifierItem } from '../../../../../models';
@@ -95,7 +96,7 @@ export const ItemBreakdown = withObservables<ItemBreakdownOuterProps, ItemBreakd
   }),
 )(ItemBreakdownInner);
 
-const styles = {
+const styles = StyleSheet.create({
   [PrintStatus.succeeded]: {
     borderLeftColor: 'green',
     borderLeftWidth: 4,
@@ -114,4 +115,4 @@ const styles = {
   comp: {
     color: 'grey',
   },
-};
+});

@@ -1,4 +1,5 @@
 import React from 'react';
+import { StyleSheet } from 'react-native';
 import { Body, Left, ListItem, Right, Text } from '../../../core';
 import { Bill, BillPeriod } from '../../../models';
 
@@ -25,7 +26,7 @@ export const BillRowEmpty: React.FC<BillRowEmptyProps> = ({ onSelectBill, refere
   );
 };
 
-const styles = {
+const styles = StyleSheet.create({
   closedBill: {
     borderLeftColor: 'red',
     borderLeftWidth: 8,
@@ -33,4 +34,4 @@ const styles = {
   rowText: {
     fontSize: 18,
   },
-} as const;
+} as const);
