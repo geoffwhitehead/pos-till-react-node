@@ -435,7 +435,7 @@ const styles = StyleSheet.create({
     borderLeftColor: 'lightgrey',
   },
   columnMainButtons: { width: RECEIPT_PANEL_BUTTONS_WIDTH, backgroundColor: 'whitesmoke' },
-  colummMain: {},
+  colummMain: { minWidth: 1 },
   buttonLeft: {
     height: '100%',
     width: '100%',
@@ -452,7 +452,7 @@ const styles = StyleSheet.create({
     borderTopColor: 'lightgrey',
     borderTopWidth: 1,
     flexDirection: 'column',
-    padding: spacing[4],
+    padding: spacing[5],
     borderLeftWidth: 1,
     borderLeftColor: 'lightgrey',
   },

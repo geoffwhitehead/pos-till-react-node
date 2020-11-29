@@ -47,7 +47,6 @@ const CategoryItemsInner: React.FC<CategoryItemsListOuterProps & CategoryItemsLi
   const [searchValue, setSearchValue] = useState<string>('');
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [selectedItem, setSelectedItem] = useState<Item>();
-  const [searchedItems, setSearchedItems] = useState<Item[]>([]);
   const [sortedItems, setSortedItems] = useState<Record<string, Item[]>>({});
   const [keyedPrices, setKeyedPrices] = useState<Record<string, ItemPrice>>({});
   const {
@@ -75,13 +74,11 @@ const CategoryItemsInner: React.FC<CategoryItemsListOuterProps & CategoryItemsLi
   };
 
   useEffect(() => {
-    console.log('PRICES RENDER');
     const keyedPrices = keyBy(prices, price => price.itemId);
     setKeyedPrices(keyedPrices);
   }, [prices]);
 
   useEffect(() => {
-    console.log('SORTED RENDER');
     const searchedItems = items.filter(item => searchFilter(item, searchValue));
     const filteredItems = searchedItems.filter(item => !!keyedPrices[item.id]);
     const filteredSortedItems = sortBy(filteredItems, item => item.name);

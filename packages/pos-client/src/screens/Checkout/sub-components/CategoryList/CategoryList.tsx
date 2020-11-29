@@ -98,13 +98,13 @@ export const CategoriesInner: React.FC<CategoriesOuterProps & CategoriesInnerPro
         <Grid style={styles.grid}>
           {times(gridSize, row => {
             return (
-              <Row style={styles.row}>
+              <Row key={row} style={styles.row}>
                 {times(gridSize, column => {
                   const position = gridSize * row + column;
                   const group = groupedCategoriesByPosition[position];
                   const category = group && group[0];
                   return (
-                    <Col style={styles.col}>
+                    <Col key={`${row}-${column}`} style={styles.col}>
                       {category && (
                         <Button
                           style={{ ...styles.button, backgroundColor: category.backgroundColor }}

@@ -114,7 +114,14 @@ export class Bill extends Model {
     .get<PriceGroup>(tableNames.priceGroups)
     .query(Q.on(tableNames.billItems, [Q.where('bill_id', this.id), Q.where('is_voided', Q.notEq(true))]));
 
+  @lazy priceGroupsInUse = this.database.collections
+    .get<PriceGroup>(tableNames.priceGroups)
+    .query(Q.on(tableNames.billItems, Q.where('bill_id', this.id)));
+
+  @lazy billItemsByPriceGroup = priceGroupId => this.billItems.extend(Q.where('price_group_id', Q.eq(priceGroupId)));
+
   @lazy billItemsExclVoids = this.billItems.extend(Q.where('is_voided', Q.notEq(true)));
+
   @lazy chargableBillItemModifierItems = this._billModifierItems.extend(
     Q.and(Q.where('is_voided', Q.notEq(true)), Q.where('is_comp', Q.notEq(true))),
   );

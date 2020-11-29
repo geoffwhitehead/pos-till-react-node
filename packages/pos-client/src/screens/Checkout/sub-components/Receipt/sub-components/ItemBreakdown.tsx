@@ -1,43 +1,78 @@
 import withObservables from '@nozbe/with-observables';
 import { capitalize } from 'lodash';
-import React, { useContext } from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet } from 'react-native';
-import { OrganizationContext } from '../../../../../contexts/OrganizationContext';
 import { Badge, Left, ListItem, Right, Text, View } from '../../../../../core';
 import { BillItem, BillItemModifierItem } from '../../../../../models';
-import { PrintStatus } from '../../../../../models/BillItemPrintLog';
+import { BillItemPrintLog, PrintStatus, PrintType } from '../../../../../models/BillItemPrintLog';
+import { CurrencyEnum } from '../../../../../models/Organization';
 import { formatNumber } from '../../../../../utils';
 
-interface ItemBreakdownInnerProps {}
+interface ItemBreakdownInnerProps {
+  billItemModifierItems: BillItemModifierItem[];
+  billItemPrintLogs: BillItemPrintLog[];
+}
 
 interface ItemBreakdownOuterProps {
   billItem: BillItem;
-  modifierItems: BillItemModifierItem[];
   readonly: boolean;
   onSelect: (i: BillItem) => void;
-  status: PrintStatus;
+  currency: CurrencyEnum;
 }
 
 const ItemBreakdownInner: React.FC<ItemBreakdownOuterProps & ItemBreakdownInnerProps> = ({
   billItem,
-  modifierItems,
+  billItemModifierItems,
   readonly,
   onSelect,
-  status,
+  billItemPrintLogs,
+  currency,
 }) => {
-  const {
-    organization: { currency },
-  } = useContext(OrganizationContext);
+  const [printStatus, setPrintStatus] = useState<PrintStatus>();
+  const [isVoidComplete, setIsVoidComplete] = useState(false);
+
+  useEffect(() => {
+    const hasSucceeded =
+      billItemPrintLogs.length > 0 && billItemPrintLogs.every(log => log.status === PrintStatus.succeeded);
+    const hasErrored = billItemPrintLogs.some(log => log.status === PrintStatus.errored);
+    const isProcessing = billItemPrintLogs.some(log => log.status === PrintStatus.processing);
+    const isPending = billItemPrintLogs.some(log => log.status === PrintStatus.pending);
+
+    const status = hasSucceeded
+      ? PrintStatus.succeeded
+      : hasErrored
+      ? PrintStatus.errored
+      : isProcessing
+      ? PrintStatus.processing
+      : isPending
+      ? PrintStatus.pending
+      : null;
+
+    setPrintStatus(status);
+  }, [billItemPrintLogs, setPrintStatus]);
+
+  useEffect(() => {
+    const voidedWithVoidLogs =
+      billItem.isVoided &&
+      billItemPrintLogs.some(log => log.type === PrintType.void && log.status === PrintStatus.succeeded);
+    const voidedWithNoLogs = billItem.isVoided && billItemPrintLogs.length === 0;
+
+    (voidedWithVoidLogs || voidedWithNoLogs) && setIsVoidComplete(true);
+  }, [billItem.isVoided, billItemPrintLogs, printStatus]);
+
+  if (isVoidComplete) {
+    return null;
+  }
 
   const { isVoided, isComp } = billItem;
   const style = billItem.isVoided ? styles.void : billItem.isComp ? styles.comp : {};
   const isChargable = !(billItem.isComp || billItem.isVoided);
   const itemDisplayPrice = formatNumber(isChargable ? billItem.itemPrice : 0, currency);
-  const isDisabled = readonly || status === PrintStatus.processing;
+  const isDisabled = readonly || printStatus === PrintStatus.processing;
 
   return (
     <ListItem
-      style={status ? styles[status] : {}}
+      style={printStatus ? styles[printStatus] : {}}
       noIndent
       key={billItem.id}
       disabled={isDisabled}
@@ -58,9 +93,9 @@ const ItemBreakdownInner: React.FC<ItemBreakdownOuterProps & ItemBreakdownInnerP
               </Badge>
             )}
           </View>
-          {modifierItems.length > 0 && (
+          {billItemModifierItems.length > 0 && (
             <View style={{ paddingTop: 5 }}>
-              {modifierItems.map(m => (
+              {billItemModifierItems.map(m => (
                 <Text note style={style} key={`${m.id}-name`}>{`- ${m.modifierItemName}`}</Text>
               ))}
             </View>
@@ -72,9 +107,10 @@ const ItemBreakdownInner: React.FC<ItemBreakdownOuterProps & ItemBreakdownInnerP
       </Left>
       <Right>
         <Text style={style}>{itemDisplayPrice}</Text>
-        {modifierItems.length > 0 && (
+        {billItemModifierItems.length > 0 && (
           <View style={{ paddingTop: 5 }}>
-            {modifierItems.map(m => {
+            {billItemModifierItems.map(m => {
+              console.log('m', m);
               const modifierItemDisplayPrice = formatNumber(isChargable ? m.modifierItemPrice : 0, currency);
               return (
                 <Text note style={style} key={`${m.id}-price`}>
@@ -93,6 +129,8 @@ export const ItemBreakdown = withObservables<ItemBreakdownOuterProps, ItemBreakd
   ['billItem'],
   ({ billItem }) => ({
     billItem,
+    billItemPrintLogs: billItem.billItemPrintLogs.observeWithColumns(['status']),
+    billItemModifierItems: billItem.billItemModifierItems,
   }),
 )(ItemBreakdownInner);
 
