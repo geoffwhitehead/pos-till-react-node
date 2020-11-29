@@ -67,7 +67,6 @@ export const WrappedBillRow: React.FC<BillRowInnerProps & BillRowOuterProps> = (
     summary();
   }, [chargableBillItems, billDiscounts, billPayments, discounts]);
 
-  console.log('billCallLogs', billCallLogs);
   const combinedLogs = [...overviewPrintLogs, ...overviewBillCallPrintLogs];
   const hasUnstoredItems = combinedLogs.some(l => l.status === PrintStatus.pending);
   const hasPrintErrors = combinedLogs.some(l => l.status === PrintStatus.errored);
@@ -104,7 +103,6 @@ export const WrappedBillRow: React.FC<BillRowInnerProps & BillRowOuterProps> = (
       return out;
     }, dayjs(billCallLogs[0].createdAt));
 
-  console.log('lastCalledAt', lastCalledAt);
   return (
     <ListItem noIndent style={styles.openBill} key={bill.id} onPress={() => onSelectBill(bill)}>
       <Left>

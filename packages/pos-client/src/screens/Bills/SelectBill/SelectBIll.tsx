@@ -1,5 +1,5 @@
 import withObservables from '@nozbe/with-observables';
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { ScrollView } from 'react-native';
 import { SwitchSelector } from '../../../components/SwitchSelector/SwitchSelector';
 import { CurrentBillContext } from '../../../contexts/CurrentBillContext';
@@ -29,20 +29,24 @@ export const WrappedSelectBill: React.FC<SelectBillOuterProps & SelectBillInnerP
 }) => {
   const { setCurrentBill } = useContext(CurrentBillContext);
   const { organization } = useContext(OrganizationContext);
-
+  const [bills, setBills] = useState<(Bill | null)[]>([]);
   const [isFilterOpenSelected, setIsFilterOpenSelected] = useState(0);
 
-  const bills: (Bill | null)[] = openBills.reduce((acc, bill) => {
-    acc[bill.reference - 1] = bill;
-    return [...acc];
-  }, Array(organization.maxBills).fill(null));
+  useEffect(() => {
+    const filterOpenOnly = bill => (isFilterOpenSelected ? !!bill : true);
+
+    const billsArr = openBills.reduce((acc, bill) => {
+      acc[bill.reference - 1] = bill;
+      return [...acc];
+    }, Array(organization.maxBills).fill(null));
+
+    setBills(billsArr.filter(filterOpenOnly));
+  }, [openBills, isFilterOpenSelected]);
 
   const _onSelectBill = (bill: Bill) => {
     setCurrentBill(bill);
     onSelectBill && onSelectBill(bill);
   };
-
-  const filterOpenOnly = bill => (isFilterOpenSelected ? !!bill : true);
 
   return (
     <>
@@ -63,7 +67,7 @@ export const WrappedSelectBill: React.FC<SelectBillOuterProps & SelectBillInnerP
             </Right>
           </ListItem>
           <ScrollView>
-            {bills.filter(filterOpenOnly).map((bill, index) => {
+            {bills.map((bill, index) => {
               return bill ? (
                 <BillRow key={bill.id} bill={bill} onSelectBill={_onSelectBill} />
               ) : (

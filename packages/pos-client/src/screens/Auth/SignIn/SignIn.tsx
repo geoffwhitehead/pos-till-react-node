@@ -7,10 +7,11 @@ import LottieView from 'lottie-react-native';
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { StatusBar, StyleSheet, View } from 'react-native';
 import { AuthContext } from '../../../contexts/AuthContext';
-import { ActionSheet, Button, Container, Form, Input, Item, Label, Text } from '../../../core';
+import { Button, Container, Form, Input, Item, Label, Text } from '../../../core';
 import { Organization, tableNames } from '../../../models';
 import { AuthStackParamList } from '../../../navigators/AuthNavigator';
 import { colors } from '../../../theme';
+import { areYouSure } from '../../../utils/helpers';
 
 interface SignInOuterProps {
   navigation: StackNavigationProp<AuthStackParamList, 'SignIn'>;
@@ -41,19 +42,6 @@ export const SignInInner: React.FC<SignInOuterProps & SignInInnerProps> = ({ nav
   }, [organizations]);
 
   const { signIn, unlink } = useContext(AuthContext);
-
-  const areYouSure = fn => {
-    const options = ['Yes', 'Cancel'];
-    ActionSheet.show(
-      {
-        options,
-        title: 'Are you sure?',
-      },
-      index => {
-        index === 0 && fn();
-      },
-    );
-  };
 
   const handleUnlink = () => {
     unlink();

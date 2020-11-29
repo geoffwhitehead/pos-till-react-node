@@ -375,6 +375,7 @@ export const SignUp: React.FC<SignUpProps> = ({ navigation, route }) => {
   );
 };
 
+SignUp.whyDidYouRender = true;
 const styles = StyleSheet.create({
   content: {
     width: 300,

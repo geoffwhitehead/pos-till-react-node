@@ -17,6 +17,13 @@ import { drawerTheme } from './theme';
 import { toast } from './utils/toast';
 
 export const App = () => {
+  // if (env === 'local') {
+  //   const whyDidYouRender = require('@welldone-software/why-did-you-render');
+  //   whyDidYouRender(React, {
+  //     trackAllPureComponents: true,
+  //   });
+  // }
+
   const [state, dispatch] = React.useReducer(
     (prevState, action) => {
       switch (action.type) {

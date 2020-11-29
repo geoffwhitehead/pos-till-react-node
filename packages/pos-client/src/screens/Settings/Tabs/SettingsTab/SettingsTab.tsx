@@ -12,21 +12,9 @@ import { Loading } from '../../../../components/Loading/Loading';
 import { AuthContext } from '../../../../contexts/AuthContext';
 import { OrganizationContext } from '../../../../contexts/OrganizationContext';
 import { ReceiptPrinterContext } from '../../../../contexts/ReceiptPrinterContext';
-import {
-  ActionSheet,
-  Button,
-  Container,
-  Content,
-  Footer,
-  Form,
-  Grid,
-  Icon,
-  Input,
-  Picker,
-  Text,
-  View,
-} from '../../../../core';
+import { Button, Container, Content, Footer, Form, Grid, Icon, Input, Picker, Text, View } from '../../../../core';
 import { Bill, BillPeriod, PriceGroup, Printer, tableNames } from '../../../../models';
+import { areYouSure } from '../../../../utils/helpers';
 import { commonStyles } from '../styles';
 
 interface SettingsTabOuterProps {
@@ -66,19 +54,6 @@ const currencies = [
     name: 'EUR',
   },
 ];
-
-const areYouSure = fn => {
-  const options = ['Yes', 'Cancel'];
-  ActionSheet.show(
-    {
-      options,
-      title: 'Are you sure?',
-    },
-    index => {
-      index === 0 && fn();
-    },
-  );
-};
 
 const SettingsTabInner: React.FC<SettingsTabOuterProps & SettingsTabInnerProps> = ({
   printers,
