@@ -16,7 +16,6 @@ interface SignInProps {
 export const SignIn: React.FC<SignInProps> = ({ navigation, route }) => {
   const [email, setEmail] = useState(route.params.organization?.email || 'geoff1012@gmail.com');
   const [password, setPassword] = useState('geoff');
-  const { organization } = useContextm;
   const organization = route.params.organization;
   const animation = useRef();
 
