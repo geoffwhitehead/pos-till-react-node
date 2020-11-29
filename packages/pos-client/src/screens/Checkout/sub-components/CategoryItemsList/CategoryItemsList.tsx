@@ -4,14 +4,14 @@ import withObservables from '@nozbe/with-observables';
 import { RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { groupBy, keyBy, sortBy } from 'lodash';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { memo, useContext, useEffect, useState } from 'react';
 import { ScrollView } from 'react-native-gesture-handler';
 import { Loading } from '../../../../components/Loading/Loading';
 import { Modal } from '../../../../components/Modal/Modal';
 import { SearchHeader } from '../../../../components/SearchHeader/SearchHeader';
 import { CurrentBillContext } from '../../../../contexts/CurrentBillContext';
 import { OrganizationContext } from '../../../../contexts/OrganizationContext';
-import { Button, Icon, Left, List, ListItem, Text } from '../../../../core';
+import { Button, Icon, Left, List, ListItem, Text, View } from '../../../../core';
 import { Category, Item, ItemPrice, Modifier, PriceGroup, tableNames } from '../../../../models';
 import { CheckoutItemStackParamList } from '../../../../navigators/CheckoutItemNavigator';
 import { CategoryItemRow } from './sub-components/CategoryItemRow';
@@ -47,8 +47,9 @@ const CategoryItemsInner: React.FC<CategoryItemsListOuterProps & CategoryItemsLi
   const [searchValue, setSearchValue] = useState<string>('');
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [selectedItem, setSelectedItem] = useState<Item>();
-  const [sortedItems, setSortedItems] = useState<Record<string, Item[]>>();
-  const [keyedPrices, setKeyedPrices] = useState<Record<string, ItemPrice>>();
+  const [searchedItems, setSearchedItems] = useState<Item[]>([]);
+  const [sortedItems, setSortedItems] = useState<Record<string, Item[]>>({});
+  const [keyedPrices, setKeyedPrices] = useState<Record<string, ItemPrice>>({});
   const {
     organization: { currency },
   } = useContext(OrganizationContext);
@@ -74,14 +75,19 @@ const CategoryItemsInner: React.FC<CategoryItemsListOuterProps & CategoryItemsLi
   };
 
   useEffect(() => {
+    console.log('PRICES RENDER');
     const keyedPrices = keyBy(prices, price => price.itemId);
+    setKeyedPrices(keyedPrices);
+  }, [prices]);
+
+  useEffect(() => {
+    console.log('SORTED RENDER');
     const searchedItems = items.filter(item => searchFilter(item, searchValue));
     const filteredItems = searchedItems.filter(item => !!keyedPrices[item.id]);
     const filteredSortedItems = sortBy(filteredItems, item => item.name);
     const groupedSorteditems = groupBy(filteredSortedItems, item => item.name[0]);
     setSortedItems(groupedSorteditems);
-    setKeyedPrices(keyedPrices);
-  }, [items, prices, setKeyedPrices, setSortedItems, searchValue]);
+  }, [items, prices, setSortedItems, keyedPrices, searchValue]);
 
   if (!keyedPrices || !sortedItems) {
     return <Loading />;
@@ -102,8 +108,8 @@ const CategoryItemsInner: React.FC<CategoryItemsListOuterProps & CategoryItemsLi
         <List>
           {Object.keys(sortedItems).map(key => {
             return (
-              <>
-                <ListItem key={`${key}-divider`} itemDivider style={{ backgroundColor: 'lightgrey' }}>
+              <View key={`${key}-divider`}>
+                <ListItem itemDivider style={{ backgroundColor: 'lightgrey' }}>
                   <Text>{key}</Text>
                 </ListItem>
                 {sortedItems[key].map(item => {
@@ -119,7 +125,7 @@ const CategoryItemsInner: React.FC<CategoryItemsListOuterProps & CategoryItemsLi
                     />
                   );
                 })}
-              </>
+              </View>
             );
           })}
         </List>
@@ -130,6 +136,8 @@ const CategoryItemsInner: React.FC<CategoryItemsListOuterProps & CategoryItemsLi
     </>
   );
 };
+
+const MemoCategoryItemsInner = memo(CategoryItemsInner);
 
 export const CategoryItems = withDatabase<any>(
   withObservables<CategoryItemsListOuterProps, CategoryItemsListInnerProps>(['route'], ({ route, database }) => {
@@ -146,7 +154,7 @@ export const CategoryItems = withDatabase<any>(
           Q.on(tableNames.items, Q.where('category_id', category.id)),
         ),
     };
-  })(CategoryItemsInner),
+  })(MemoCategoryItemsInner),
 );
 
 export const AllItems = withDatabase<any>(
@@ -161,5 +169,5 @@ export const AllItems = withDatabase<any>(
         .get<ItemPrice>(tableNames.itemPrices)
         .query(Q.and(Q.where('price', Q.notEq(null)), Q.where('price_group_id', priceGroupId))),
     };
-  })(CategoryItemsInner),
+  })(MemoCategoryItemsInner),
 );

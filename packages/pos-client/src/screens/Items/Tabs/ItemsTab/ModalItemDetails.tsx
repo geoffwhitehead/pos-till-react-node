@@ -307,6 +307,7 @@ const ItemDetailsInner: React.FC<ItemDetailsOuterProps & ItemDetailsInnerProps> 
                           return priceGroups.map((priceGroup, index) => {
                             return (
                               <ItemField
+                                key={priceGroup.id}
                                 label={capitalize(priceGroup.name)}
                                 touched={touched.prices && touched.prices[index]?.price}
                                 name={`prices[${index}].price`}

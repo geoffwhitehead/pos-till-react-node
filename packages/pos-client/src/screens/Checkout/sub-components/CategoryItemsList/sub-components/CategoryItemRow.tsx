@@ -24,11 +24,18 @@ const CategoryItemRowInner: React.FC<CategoryItemRowOuterProps & CategoryItemRow
   onPressItem,
   itemPrice,
   currency,
+  ...props
 }) => {
   const onPress = () => onPressItem(item, modifierCount);
 
   return (
-    <ListItem style={isActive ? styles.activeRow : { backgroundColor: 'white' }} icon key={item.id} onPress={onPress}>
+    <ListItem
+      {...props}
+      style={isActive ? styles.activeRow : { backgroundColor: 'white' }}
+      icon
+      key={item.id}
+      onPress={onPress}
+    >
       <Left>
         <Text>{item.name}</Text>
       </Left>
