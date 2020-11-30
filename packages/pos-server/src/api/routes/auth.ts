@@ -60,7 +60,7 @@ export default (app: Router) => {
                     const { modifiers } = await productService.modifier.seed({ priceGroups });
 
                     await productService.item.seed({
-                        itemsToSeed: 10,
+                        itemsToSeed: 400,
                         priceGroups,
                         categories,
                         modifiers,

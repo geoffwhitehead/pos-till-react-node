@@ -2,13 +2,13 @@ import { RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { Formik } from 'formik';
 import React, { useState } from 'react';
-import { StatusBar, StyleSheet } from 'react-native';
+import { KeyboardAvoidingView, StatusBar, StyleSheet } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { Bar } from 'react-native-progress';
 import * as Yup from 'yup';
 import { ItemField } from '../../../components/ItemField/ItemField';
 import { AuthContext } from '../../../contexts/AuthContext';
-import { Button, Container, Form, Icon, Input, Text, View } from '../../../core';
+import { Button, Container, Form, Icon, Input, Text } from '../../../core';
 import { AuthStackParamList } from '../../../navigators/AuthNavigator';
 import { colors } from '../../../theme';
 import { moderateScale } from '../../../utils/scaling';
@@ -161,7 +161,7 @@ export const SignUp: React.FC<SignUpProps> = ({ navigation, route }) => {
 
             <ScrollView style={{ padding: 20 }}>
               <Bar progress={page === 1 ? 0.3 : page === 2 ? 0.6 : 1} width={300} color="white" />
-              <View style={styles.content}>
+              <KeyboardAvoidingView style={styles.content}>
                 <Form style={styles.form}>
                   {page === 1 && (
                     <>
@@ -350,7 +350,7 @@ export const SignUp: React.FC<SignUpProps> = ({ navigation, route }) => {
                     </Form>
                   )}
                 </Form>
-                <View style={styles.navButtons}>
+                <KeyboardAvoidingView style={styles.navButtons}>
                   {page > 1 && (
                     <Button full info onPress={handlePrevious} style={{ flexGrow: 1 }}>
                       <Icon name="arrow-back-outline" />
@@ -366,8 +366,8 @@ export const SignUp: React.FC<SignUpProps> = ({ navigation, route }) => {
                       <Text>Sign Up</Text>
                     </Button>
                   )}
-                </View>
-              </View>
+                </KeyboardAvoidingView>
+              </KeyboardAvoidingView>
             </ScrollView>
           </Container>
         );

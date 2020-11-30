@@ -5,10 +5,10 @@ import { RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import LottieView from 'lottie-react-native';
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { StatusBar, StyleSheet } from 'react-native';
+import { KeyboardAvoidingView, StatusBar, StyleSheet } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { AuthContext } from '../../../contexts/AuthContext';
-import { Button, Container, Form, Input, Item, Label, Text, View } from '../../../core';
+import { Button, Container, Form, Input, Item, Label, Text } from '../../../core';
 import { Organization, tableNames } from '../../../models';
 import { AuthStackParamList } from '../../../navigators/AuthNavigator';
 import { colors } from '../../../theme';
@@ -52,7 +52,7 @@ export const SignInInner: React.FC<SignInOuterProps & SignInInnerProps> = ({ nav
     <Container style={styles.container}>
       <StatusBar barStyle="light-content" />
       <ScrollView>
-        <View style={styles.signin}>
+        <KeyboardAvoidingView style={styles.signin}>
           <LottieView
             style={{ height: 300, width: 300 }}
             source={require('../../../animations/9788-add-new.json')}
@@ -103,7 +103,7 @@ export const SignInInner: React.FC<SignInOuterProps & SignInInnerProps> = ({ nav
               </Text>
             )}
           </Form>
-        </View>
+        </KeyboardAvoidingView>
       </ScrollView>
     </Container>
   );
