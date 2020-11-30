@@ -31,18 +31,12 @@ export const CategoriesInner: React.FC<CategoriesOuterProps & CategoriesInnerPro
   const { priceGroup } = useContext(PriceGroupContext);
   const { organization } = useContext(OrganizationContext);
 
-  const onPressCategoryFactory = (params: { category?: Category; priceGroup: PriceGroup }) => () => {
+  const onPressCategoryFactory = (params: { category: Category; priceGroup: PriceGroup }) => () => {
     const { category, priceGroup } = params;
-    if (!category) {
-      navigation.navigate('AllItemsList', {
-        priceGroupId: priceGroup.id,
-      });
-    } else {
-      navigation.navigate('CategoryItemsList', {
-        category,
-        priceGroupId: priceGroup.id,
-      });
-    }
+    navigation.navigate('CategoryItemsList', {
+      category,
+      priceGroupId: priceGroup.id,
+    });
   };
 
   const onSearchHandler = (value: string) => setSearchValue(value);
@@ -69,15 +63,6 @@ export const CategoriesInner: React.FC<CategoriesOuterProps & CategoriesInnerPro
       {isListView && (
         <ScrollView>
           <List>
-            <ListItem key={'cat.all'} icon onPress={onPressCategoryFactory({ priceGroup })}>
-              <Left>
-                <Text>All</Text>
-              </Left>
-              <Body>
-                <Icon name="ios-arrow-forward" />
-              </Body>
-              <Right />
-            </ListItem>
             {searchedCategories.map(category => {
               return (
                 <ListItem key={category.id} icon onPress={onPressCategoryFactory({ category, priceGroup })}>
