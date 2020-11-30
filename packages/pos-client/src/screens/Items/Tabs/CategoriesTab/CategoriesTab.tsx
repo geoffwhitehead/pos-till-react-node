@@ -10,6 +10,7 @@ import { OrganizationContext } from '../../../../contexts/OrganizationContext';
 import { Container, Footer, Icon, Label, List, Picker, Text } from '../../../../core';
 import { Category } from '../../../../models';
 import { MAX_GRID_SIZE } from '../../../../utils/consts';
+import { moderateScale } from '../../../../utils/scaling';
 import { CategoryRow } from './CategoryRow';
 import { ModalCategoryDetails, ModalCategoryDetailsInner } from './ModalCategoryDetails';
 
@@ -121,7 +122,7 @@ export const CategoriesTab = withDatabase(
 
 const styles = StyleSheet.create({
   modal: {
-    width: 500,
-    height: 500,
+    width: moderateScale(500),
+    height: moderateScale(500),
   },
 });

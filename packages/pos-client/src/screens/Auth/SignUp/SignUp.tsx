@@ -11,6 +11,7 @@ import { AuthContext } from '../../../contexts/AuthContext';
 import { Button, Container, Form, Icon, Input, Text, View } from '../../../core';
 import { AuthStackParamList } from '../../../navigators/AuthNavigator';
 import { colors } from '../../../theme';
+import { moderateScale } from '../../../utils/scaling';
 
 const SignupSchema = Yup.object().shape({
   firstName: Yup.string()
@@ -378,11 +379,11 @@ export const SignUp: React.FC<SignUpProps> = ({ navigation, route }) => {
 SignUp.whyDidYouRender = true;
 const styles = StyleSheet.create({
   content: {
-    width: 300,
+    width: moderateScale(300),
   },
   form: {
-    paddingTop: 30,
-    paddingBottom: 20,
+    paddingTop: moderateScale(30),
+    paddingBottom: moderateScale(20),
   },
   navButtons: {
     flexDirection: 'row',
@@ -396,11 +397,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     alignContent: 'center',
 
-    marginTop: 50,
+    marginTop: moderateScale(50),
   },
   button: {
-    marginLeft: 15,
-    marginTop: 10,
+    marginLeft: moderateScale(15),
+    marginTop: moderateScale(10),
   },
   text: {
     color: 'white',

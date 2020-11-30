@@ -7,6 +7,7 @@ import { Modal } from '../../../../components/Modal/Modal';
 import { SearchBar } from '../../../../components/SearchBar/SearchBar';
 import { Col, Container, Grid, List, Row, Separator, Text } from '../../../../core';
 import { Modifier } from '../../../../models';
+import { moderateScale } from '../../../../utils/scaling';
 import { ModalModifierDetails, ModalModifierDetailsInner } from './ModalModifierDetails';
 import { ModifierItems } from './ModifierItems';
 import { ModifierRow } from './ModifierRow';
@@ -110,6 +111,6 @@ export const ModifiersTab = withDatabase(
 
 const styles = StyleSheet.create({
   separator: {
-    maxHeight: 45,
+    maxHeight: moderateScale(45),
   },
 });

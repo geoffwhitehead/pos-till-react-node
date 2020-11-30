@@ -452,7 +452,7 @@ const styles = StyleSheet.create({
     borderTopColor: 'lightgrey',
     borderTopWidth: 1,
     flexDirection: 'column',
-    padding: spacing[5],
+    padding: spacing[4],
     borderLeftWidth: 1,
     borderLeftColor: 'lightgrey',
   },

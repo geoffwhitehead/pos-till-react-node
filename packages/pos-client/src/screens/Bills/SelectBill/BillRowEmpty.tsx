@@ -2,6 +2,7 @@ import React from 'react';
 import { StyleSheet } from 'react-native';
 import { Body, Left, ListItem, Right, Text } from '../../../core';
 import { Bill, BillPeriod } from '../../../models';
+import { fontSizes } from '../../../theme';
 
 interface BillRowEmptyProps {
   reference: number;
@@ -32,6 +33,6 @@ const styles = StyleSheet.create({
     borderLeftWidth: 8,
   },
   rowText: {
-    fontSize: 18,
+    fontSize: fontSizes[3],
   },
 } as const);

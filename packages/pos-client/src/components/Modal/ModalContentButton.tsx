@@ -2,6 +2,7 @@ import React from 'react';
 import { View } from 'react-native';
 import { Button, Container, H3, Icon, Text } from '../../core';
 import { colors } from '../../theme';
+import { moderateScale } from '../../utils/scaling';
 
 enum ModalSizes {
   small = 500,
@@ -41,45 +42,45 @@ export const ModalContentButton: React.FC<ModalContentButtonProps> = ({
   const width = size ? ModalSizes[size] : 'auto';
 
   return (
-    <View {...props} style={{ ...cStyles.modal, ...style, width }}>
-      <View style={cStyles.heading}>
+    <View {...props} style={{ ...styles.modal, ...style, width }}>
+      <View style={styles.heading}>
         <H3 style={{ color: 'white' }}>{title}</H3>
-        <View style={cStyles.buttons}>
+        <View style={styles.buttons}>
           <Button light disabled={isSecondaryDisabled} onPress={onPressSecondaryButton}>
             <Text>{secondaryButtonText}</Text>
           </Button>
-          <Button success style={cStyles.buttonSpacingLeft} disabled={isPrimaryDisabled} onPress={onPressPrimaryButton}>
+          <Button success style={styles.buttonSpacingLeft} disabled={isPrimaryDisabled} onPress={onPressPrimaryButton}>
             <Text>{primaryButtonText}</Text>
           </Button>
           {onPressDelete && (
-            <Button style={cStyles.buttonSpacingLeft} danger disabled={isDeleteDisabled} onPress={onPressDelete}>
+            <Button style={styles.buttonSpacingLeft} danger disabled={isDeleteDisabled} onPress={onPressDelete}>
               <Icon name="ios-trash" />
             </Button>
           )}
         </View>
       </View>
-      <Container style={cStyles.content}>{children}</Container>
+      <Container style={styles.content}>{children}</Container>
     </View>
   );
 };
 
-const cStyles = {
+const styles = {
   heading: {
-    marginBottom: 20,
+    marginBottom: moderateScale(20),
     display: 'flex',
     justifyContent: 'space-between',
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 12,
-    paddingLeft: 20,
-    paddingRight: 20,
+    padding: moderateScale(12),
+    paddingLeft: moderateScale(20),
+    paddingRight: moderateScale(20),
     backgroundColor: colors.darkBlue,
     borderBottom: 'grey',
     borderBottomWidth: 1,
     color: 'white',
   },
   content: {
-    padding: 30,
+    padding: moderateScale(30),
   },
 
   modal: {
@@ -104,6 +105,6 @@ const cStyles = {
     flexDirection: 'row',
   },
   buttonSpacingLeft: {
-    marginLeft: 10,
+    marginLeft: moderateScale(10),
   },
 } as const;

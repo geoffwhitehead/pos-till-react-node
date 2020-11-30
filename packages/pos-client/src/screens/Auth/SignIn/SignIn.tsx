@@ -12,6 +12,7 @@ import { Organization, tableNames } from '../../../models';
 import { AuthStackParamList } from '../../../navigators/AuthNavigator';
 import { colors } from '../../../theme';
 import { areYouSure } from '../../../utils/helpers';
+import { moderateScale } from '../../../utils/scaling';
 
 interface SignInOuterProps {
   navigation: StackNavigationProp<AuthStackParamList, 'SignIn'>;
@@ -120,7 +121,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.darkBlue,
   },
   form: {
-    width: 300,
+    width: moderateScale(300),
   },
   signin: {
     display: 'flex',
@@ -129,11 +130,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     alignContent: 'center',
 
-    marginTop: 50,
+    marginTop: moderateScale(50),
   },
   button: {
-    marginLeft: 15,
-    marginTop: 10,
+    marginLeft: moderateScale(15),
+    marginTop: moderateScale(10),
   },
   text: {
     color: 'white',

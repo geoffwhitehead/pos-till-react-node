@@ -1,5 +1,6 @@
 import React from 'react';
 import { StyleSheet } from 'react-native';
+import { moderateScale } from '../../../../utils/scaling';
 
 const sumObject: (obj: Record<string, number>) => number = obj =>
   Object.keys(obj).reduce((acc, id) => acc + obj[id], 0);
@@ -127,7 +128,7 @@ export const ReportReceipt: React.FC<ReportReceiptProps> = ({
 };
 
 const styles = StyleSheet.create({
-  rightColumn: { width: 350, borderLeftWidth: 1, borderLeftColor: 'lightgrey' },
+  rightColumn: { width: moderateScale(350), borderLeftWidth: 1, borderLeftColor: 'lightgrey' },
   rowPrintButton: { height: 10, padding: 5 },
   printButton: { width: '100%', textAlign: 'center', height: '100%' },
 });

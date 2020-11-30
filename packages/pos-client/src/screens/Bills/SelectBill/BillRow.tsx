@@ -18,7 +18,9 @@ import {
   tableNames,
 } from '../../../models';
 import { PrintStatus } from '../../../models/BillItemPrintLog';
+import { fontSizes } from '../../../theme';
 import { formatNumber, minimalBillSummary, MinimalBillSummary } from '../../../utils';
+import { moderateScale } from '../../../utils/scaling';
 
 interface BillRowInnerProps {
   billPayments: BillPayment[];
@@ -149,9 +151,9 @@ const styles = StyleSheet.create({
   },
   rowText: {
     fontWeight: 'bold',
-    fontSize: 18,
-    paddingRight: 15,
+    fontSize: fontSizes[3],
+    paddingRight: moderateScale(15),
   },
   iconStyle: { marginRight: 5, color: 'grey' },
-  totalText: { color: 'grey', fontWeight: 'bold', fontSize: 18 },
+  totalText: { color: 'grey', fontWeight: 'bold', fontSize: fontSizes[3] },
 } as const);

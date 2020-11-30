@@ -1,6 +1,8 @@
 import { Icon, Input, View } from 'native-base';
 import React, { useState } from 'react';
 import { StyleSheet } from 'react-native';
+import { fontSizes } from '../../theme';
+import { moderateScale } from '../../utils/scaling';
 
 export const NumberPicker: React.FC<{ value?: number; onPress?: (v: number) => void }> = ({ value, onPress }) => {
   const [_value, _setValue] = useState(value || 1);
@@ -21,8 +23,8 @@ export const NumberPicker: React.FC<{ value?: number; onPress?: (v: number) => v
 
 const styles = StyleSheet.create({
   numberPicker: {
-    maxWidth: 200,
-    marginTop: 30,
+    maxWidth: moderateScale(200),
+    marginTop: moderateScale(30),
     marginLeft: 'auto',
     marginRight: 'auto',
     justifyContent: 'space-between',
@@ -32,10 +34,10 @@ const styles = StyleSheet.create({
   },
   numberInput: {
     textAlign: 'center',
-    width: 60,
-    maxWidth: 120,
-    fontSize: 26,
+    width: moderateScale(60),
+    maxWidth: moderateScale(120),
+    fontSize: fontSizes[5],
     fontWeight: 'bold',
   },
-  icon: { fontSize: 50 },
+  icon: { fontSize: fontSizes[8] },
 });

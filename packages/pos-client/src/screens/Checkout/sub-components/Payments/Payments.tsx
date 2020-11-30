@@ -6,9 +6,10 @@ import React, { useContext, useEffect, useState } from 'react';
 import { StyleSheet } from 'react-native';
 import { paymentTypeNames } from '../../../../api/paymentType';
 import { OrganizationContext } from '../../../../contexts/OrganizationContext';
-import { Button, Col, Grid, Icon, Input, Item, Label, Row, Text } from '../../../../core';
+import { Button, Col, Grid, Input, Item, Label, Row, Text } from '../../../../core';
 import { Bill, BillDiscount, BillItem, BillPayment, Discount, PaymentType, tableNames } from '../../../../models';
 import { formatNumber, getDefaultCashDenominations, minimalBillSummary, MinimalBillSummary } from '../../../../utils';
+import { moderateScale } from '../../../../utils/scaling';
 
 interface PaymentOuterProps {
   bill: Bill;
@@ -93,19 +94,18 @@ const PaymentsInner: React.FC<PaymentOuterProps & PaymentInnerProps> = ({
       <Col style={styles.leftPanel} />
       <Col style={styles.rightPanel}>
         <Row style={styles.backRow}>
-          <Button bordered info onPress={onBack} iconLeft>
-            <Icon name="ios-arrow-back" />
+          <Button small bordered info onPress={onBack}>
             <Text style={{ fontWeight: 'bold' }}>Back</Text>
           </Button>
         </Row>
         <Row style={styles.rowCustomAmount}>
-          <Item stackedLabel style={{ width: '100%', height: 150 }}>
+          <Item stackedLabel style={{ width: '100%', height: moderateScale(120) }}>
             <Label>Custom amount</Label>
             <Input
               value={value}
               onChangeText={onValueChange}
               keyboardType="number-pad"
-              style={{ lineHeight: 125, fontSize: 100 }}
+              style={{ lineHeight: moderateScale(100), fontSize: moderateScale(80) }}
             />
           </Item>
         </Row>
@@ -176,13 +176,13 @@ export const Payments = enhance(PaymentsInner);
 
 const styles = StyleSheet.create({
   backRow: {
-    height: 50,
+    height: moderateScale(40),
   },
   rowCustomAmount: {
-    height: 200,
+    height: moderateScale(130),
   },
   row: {
-    padding: 10,
+    padding: moderateScale(10),
   },
   leftPanel: {
     borderRightColor: 'lightgrey',
@@ -190,19 +190,20 @@ const styles = StyleSheet.create({
     backgroundColor: 'whitesmoke',
   },
   rightPanel: {
-    padding: 10,
+    padding: moderateScale(10),
+    width: moderateScale(600),
   },
   buttonColumn: {
     flexDirection: 'column',
-    padding: 5,
+    padding: moderateScale(5),
   },
   denomButtonColumn: {
     flexDirection: 'column',
-    padding: 5,
-    paddingLeft: 80,
+    padding: moderateScale(5),
+    paddingLeft: moderateScale(80),
   },
   button: {
-    marginBottom: 5,
+    marginBottom: moderateScale(5),
     textAlign: 'center',
     alignContent: 'center',
   },

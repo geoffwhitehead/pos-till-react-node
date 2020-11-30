@@ -7,6 +7,7 @@ import { StyleSheet } from 'react-native';
 import { PriceGroupContext } from '../../contexts/PriceGroupContext';
 import { Icon, Input, Item, Label, Picker, Text } from '../../core';
 import { PriceGroup, tableNames } from '../../models';
+import { moderateScale } from '../../utils/scaling';
 
 interface SearchHeaderOuterProps {
   onChangeText: (value: string) => void;
@@ -96,7 +97,7 @@ export const SearchHeader = withDatabase(
 
 const styles = StyleSheet.create({
   searchBar: {
-    paddingLeft: 15,
-    paddingRight: 15,
+    paddingLeft: moderateScale(15),
+    paddingRight: moderateScale(15),
   },
 });

@@ -42,7 +42,7 @@ export const MainWrapped: React.FC<MainOuterProps & MainInnerProps> = ({ priceGr
   useEffect(() => {
     const interval = setInterval(() => {
       setMinutes(minutes => minutes + 1);
-    }, 1000 * 60);
+    }, 1000 * 60 * 60 * 4); // every 4 hours
     return () => clearInterval(interval);
   }, []);
 

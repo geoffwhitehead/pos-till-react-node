@@ -4,7 +4,6 @@ import { NavigationContainer } from '@react-navigation/native';
 import decode from 'jwt-decode';
 import { Root } from 'native-base';
 import React from 'react';
-import { config } from '../env';
 import { api } from './api';
 import { signIn, SignInParams, signUp, SignUpParams } from './api/auth';
 import { Sync } from './components/Sync/Sync';
@@ -175,7 +174,6 @@ export const App = () => {
         // TODO: handle errors
         try {
           const response = await signUp(bodyData);
-          console.log('-------------------', response);
           if (response.data.success) {
             const accessToken = response.headers['authorization'];
             const refreshToken = response.headers['x-refresh-token'];
@@ -188,13 +186,10 @@ export const App = () => {
             toast({ message: 'Successfully signed up, please login.', type: 'success' });
             return { success: true };
           } else {
-            console.log('respone.data', response.data);
             toast({ message: `Sign up failed` });
             return { success: false };
           }
         } catch (err) {
-          console.log('env', config);
-          console.log('err', err);
           toast({ message: `Sign up failed` });
           return { success: false };
         }

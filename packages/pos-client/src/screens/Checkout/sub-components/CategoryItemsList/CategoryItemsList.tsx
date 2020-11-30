@@ -11,7 +11,7 @@ import { Modal } from '../../../../components/Modal/Modal';
 import { SearchHeader } from '../../../../components/SearchHeader/SearchHeader';
 import { CurrentBillContext } from '../../../../contexts/CurrentBillContext';
 import { OrganizationContext } from '../../../../contexts/OrganizationContext';
-import { Button, Icon, Left, List, ListItem, Text, View } from '../../../../core';
+import { Button, Left, List, ListItem, Text, View } from '../../../../core';
 import { Category, Item, ItemPrice, Modifier, PriceGroup, tableNames } from '../../../../models';
 import { CheckoutItemStackParamList } from '../../../../navigators/CheckoutItemNavigator';
 import { CategoryItemRow } from './sub-components/CategoryItemRow';
@@ -94,9 +94,8 @@ const CategoryItemsInner: React.FC<CategoryItemsListOuterProps & CategoryItemsLi
     <>
       <ListItem itemHeader first>
         <Left>
-          <Button bordered info onPress={goBack} iconLeft>
-            <Icon name="ios-arrow-back" />
-            <Text style={{ fontWeight: 'bold' }}>{`${category ? category.name : 'All'} / Items`}</Text>
+          <Button small bordered info onPress={goBack} iconLeft>
+            <Text style={{ fontWeight: 'bold' }}>Back</Text>
           </Button>
         </Left>
       </ListItem>

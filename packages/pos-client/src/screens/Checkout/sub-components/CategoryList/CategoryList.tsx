@@ -13,6 +13,7 @@ import { Body, Button, Col, Container, Grid, Icon, Left, List, ListItem, Right, 
 import { Category, PriceGroup } from '../../../../models';
 import { CategoryViewTypeEnum } from '../../../../models/Organization';
 import { CheckoutItemStackParamList } from '../../../../navigators/CheckoutItemNavigator';
+import { fontSizes } from '../../../../theme';
 import { GRID_SPACING } from '../../../../utils/consts';
 
 interface CategoriesInnerProps {
@@ -114,7 +115,7 @@ export const CategoriesInner: React.FC<CategoriesOuterProps & CategoriesInnerPro
                           <Text
                             style={{
                               ...styles.buttonText,
-                              fontSize: gridSize > 4 ? 20 : 25,
+                              fontSize: gridSize > 4 ? fontSizes[4] : fontSizes[5],
                               color: category.textColor,
                             }}
                           >

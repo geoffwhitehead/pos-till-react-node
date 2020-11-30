@@ -1,8 +1,8 @@
 import { moderateScale } from '../utils/scaling';
 
 export const buttons = {
-  small: 45,
-  medium: moderateScale(80),
-  large: 105,
-  xl: 160,
+  small: moderateScale(45),
+  medium: moderateScale(70),
+  large: moderateScale(105),
+  xl: moderateScale(160),
 };

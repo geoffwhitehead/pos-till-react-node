@@ -74,7 +74,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
   },
   colorString: {
-    fontSize: fontSizes[5],
+    fontSize: fontSizes[4],
     ...Platform.select({
       android: {
         fontFamily: 'monospace',

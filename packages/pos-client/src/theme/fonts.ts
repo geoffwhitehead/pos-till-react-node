@@ -1,4 +1,3 @@
-import { map } from 'lodash';
 import { StyleSheet } from 'react-native';
 import { moderateScale } from '../utils/scaling';
 
@@ -28,6 +27,7 @@ export const fonts = StyleSheet.create({
   small: {},
 });
 
-const sizes = [8, 12, 16, 20, 24, 28, 32];
+//             0  1   2   3   4   5   6   7   8
+const sizes = [8, 12, 16, 20, 24, 28, 32, 40, 50];
 
-export const fontSizes = map(sizes, moderateScale);
+export const fontSizes = sizes.map(v => moderateScale(v));

@@ -22,6 +22,7 @@ import { print } from '../../../../services/printer/printer';
 import { receiptBill } from '../../../../services/printer/receiptBill';
 import { fonts } from '../../../../theme';
 import { formatNumber } from '../../../../utils';
+import { moderateScale } from '../../../../utils/scaling';
 interface CompleteBillOuterProps {
   bill: Bill;
   onCloseBill: () => void;
@@ -127,7 +128,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignContent: 'center',
   },
-  icon: { width: 50, height: 50 },
-  button: { ...fonts.h1, margin: 5 },
-  text: { ...fonts.h3, margin: 20 },
+  icon: { width: moderateScale(50), height: moderateScale(50) },
+  button: { ...fonts.h1, margin: moderateScale(5), alignSelf: 'center' },
+  text: { ...fonts.h3, margin: moderateScale(20) },
 });

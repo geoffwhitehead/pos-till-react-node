@@ -2,6 +2,7 @@ import React from 'react';
 import { StyleSheet } from 'react-native';
 import { Button, Icon, Input, Item, Text } from '../../core';
 import { resolveButtonState } from '../../utils/helpers';
+import { moderateScale } from '../../utils/scaling';
 
 type SearchBarProps = {
   onSearch: (value: string) => void;
@@ -52,7 +53,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
 
 const styles = StyleSheet.create({
   searchBar: {
-    paddingLeft: 15,
-    paddingRight: 15,
+    paddingLeft: moderateScale(15),
+    paddingRight: moderateScale(15),
   },
 });

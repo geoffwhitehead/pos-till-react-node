@@ -1,38 +1,39 @@
 import { StyleSheet } from 'react-native';
+import { moderateScale } from '../utils/scaling';
 
 export const styles = StyleSheet.create({
   heading: {
-    marginBottom: 20,
+    marginBottom: moderateScale(20),
   },
   text: {
-    paddingTop: 20,
-    paddingBottom: 5,
+    paddingTop: moderateScale(20),
+    paddingBottom: moderateScale(5),
   },
-  form: { width: 400, margin: 30 },
+  form: { width: moderateScale(400), margin: moderateScale(30) },
   selectedRow: { backgroundColor: '#cde1f9' },
   modal: {
     borderRadius: 5,
     backgroundColor: 'white',
     // width: 400,
-    padding: 30,
+    padding: moderateScale(30),
   },
   indent: {
-    marginLeft: 30,
+    marginLeft: moderateScale(30),
   },
   container: {
-    margin: 30,
+    margin: moderateScale(30),
   },
   columnLeft: {
-    marginRight: 20,
+    marginRight: moderateScale(20),
   },
   columnRight: {
-    marginLeft: 20,
+    marginLeft: moderateScale(20),
   },
   button: {
     margin: 3,
   },
   row: {
-    marginTop: 10,
-    marginBottom: 10,
+    marginTop: moderateScale(10),
+    marginBottom: moderateScale(10),
   },
 } as const);

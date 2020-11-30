@@ -15,6 +15,7 @@ import { OrganizationContext } from '../../../../contexts/OrganizationContext';
 import { ActionSheet, Content, Form, Input, List } from '../../../../core';
 import { Bill, BillDiscount, BillItem, BillPayment, PaymentType, tableNames } from '../../../../models';
 import { BillSummary } from '../../../../utils';
+import { moderateScale } from '../../../../utils/scaling';
 import { BillCalls } from './sub-components/BillCalls';
 import { DiscountsBreakdown } from './sub-components/DiscountsBreakdown';
 import { ItemsBreakdown } from './sub-components/ItemsBreakdown';
@@ -233,6 +234,6 @@ export const ReceiptItems = enhance(ReceiptItemsInner);
 
 const styles = StyleSheet.create({
   receiptItems: {
-    paddingBottom: 60,
+    paddingBottom: moderateScale(60),
   },
 });

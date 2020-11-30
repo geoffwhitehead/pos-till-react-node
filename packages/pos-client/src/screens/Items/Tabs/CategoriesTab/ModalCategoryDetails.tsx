@@ -13,6 +13,7 @@ import { RecentColorsContext } from '../../../../contexts/RecentColorsContext';
 import { Form, Input } from '../../../../core';
 import { Category, tableNames } from '../../../../models';
 import { colors } from '../../../../theme';
+import { moderateScale } from '../../../../utils/scaling';
 
 type ModalCategoryDetailsOuterProps = {
   onClose: () => void;
@@ -199,8 +200,8 @@ const styles = StyleSheet.create({
   colorPickerItem: {
     flexDirection: 'column',
     borderBottomWidth: 0,
-    paddingTop: 5,
-    paddingBottom: 5,
+    paddingTop: moderateScale(5),
+    paddingBottom: moderateScale(5),
     alignItems: 'flex-start',
   },
   colorPicker: { width: '100%', flex: 0 },

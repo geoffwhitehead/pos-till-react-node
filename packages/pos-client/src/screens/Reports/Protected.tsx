@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Input, Item, Label } from '../../core';
+import { moderateScale } from '../../utils/scaling';
 
 const InputPasscode: React.FC<{ value: string; onChange: any }> = ({ value, onChange }) => {
   return (
@@ -21,7 +22,7 @@ export const Protected: React.FC<{ code: string; navigation }> = ({ children, co
 
 const styles = StyleSheet.create({
   item: {
-    width: 300,
+    width: moderateScale(300),
   },
   content: {
     width: '100%',

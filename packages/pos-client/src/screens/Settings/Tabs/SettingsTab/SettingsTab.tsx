@@ -15,6 +15,7 @@ import { ReceiptPrinterContext } from '../../../../contexts/ReceiptPrinterContex
 import { Button, Container, Content, Footer, Form, Grid, Icon, Input, Picker, Text, View } from '../../../../core';
 import { Bill, BillPeriod, PriceGroup, Printer, tableNames } from '../../../../models';
 import { areYouSure } from '../../../../utils/helpers';
+import { moderateScale } from '../../../../utils/scaling';
 import { commonStyles } from '../styles';
 
 interface SettingsTabOuterProps {
@@ -247,11 +248,11 @@ const styles = StyleSheet.create({
     padding: 5,
   },
   noEditFields: {
-    marginLeft: 15,
-    marginTop: 20,
-    marginBottom: 20,
-    padding: 10,
-    paddingLeft: 30,
+    marginLeft: moderateScale(15),
+    marginTop: moderateScale(20),
+    marginBottom: moderateScale(20),
+    padding: moderateScale(10),
+    paddingLeft: moderateScale(30),
     borderLeftWidth: 1,
     borderRadius: 5,
     borderColor: 'lightgrey',
