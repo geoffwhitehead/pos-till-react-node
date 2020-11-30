@@ -78,7 +78,6 @@ export const ReportsInner: React.FC<ReportsOuterProps & ReportsInnerProps> = ({
 
   const confirmClosePeriod = async (billPeriod: BillPeriod, organization: Organization) => {
     const openBills = await billPeriod.openBills.fetch();
-    console.log('openBills', openBills);
     if (openBills.length > 0) {
       Toast.show({
         text: `There are currently ${openBills.length} open bills, please close these first.`,

@@ -77,7 +77,6 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
   const [isDatePickerVisible, setIsDatePickerVisible] = useState(false);
   const [hasStored, setHasStored] = useState(false);
 
-  console.log('hideFunctionButtons', hideFunctionButtons);
   const handleOnStore = async () => {
     // check if a prep time is required and set
     const priceGroups = await bill.assignedPriceGroups.fetch();
@@ -227,9 +226,6 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
 
   const handleSetPrepTime = async (date: Date) => {
     // dont allow the user to selcet a time in the past
-    console.log('date', date);
-    console.log('dayjs(date)', dayjs(date));
-    console.log('dayjs()', dayjs(new Date()));
     if (dayjs(date).isBefore(dayjs())) {
       return;
     }

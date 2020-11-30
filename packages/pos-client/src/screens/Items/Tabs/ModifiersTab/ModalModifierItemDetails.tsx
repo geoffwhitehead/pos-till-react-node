@@ -110,7 +110,6 @@ export const ModalModifierItemDetailsInner: React.FC<ModalModifierItemDetailsOut
 
         const batched = [modifierItemToCreate, ...modifierItemPricesToCreate];
 
-        console.log('batched', batched);
         await database.batch(...batched);
       });
     }

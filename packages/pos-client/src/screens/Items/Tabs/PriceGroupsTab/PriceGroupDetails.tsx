@@ -48,7 +48,6 @@ export const PriceGroupDetails: React.FC<PriceGroupDetailsProps> = ({ priceGroup
   const priceGroupDetailsSchema = generatePriceGroupDetailsSchema(organization.shortNameLength);
   const onSave = async (values: FormValues, priceGroup: PriceGroup) => {
     setLoading(true);
-    console.log('values', values);
     if (priceGroup) {
       await database.action(() => priceGroup.updatePriceGroup(values));
     } else {
@@ -65,7 +64,6 @@ export const PriceGroupDetails: React.FC<PriceGroupDetailsProps> = ({ priceGroup
 
       const priceGroupToCreate = priceGroupCollection.prepareCreate(record => Object.assign(record, values));
 
-      console.log('priceGroupToCreate', priceGroupToCreate);
       // create null entry for all item prices
       const itemPricesToCreate = items.map(item =>
         itemPricesCollection.prepareCreate(record => {

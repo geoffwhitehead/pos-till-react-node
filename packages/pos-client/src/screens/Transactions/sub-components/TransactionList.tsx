@@ -45,11 +45,9 @@ export const TransactionListInner: React.FC<TransactionListOuterProps & Transact
   const isGrouped = organization.transactionGrouping === TransactionGroupingEnum.grouped;
 
   const updateOrganization = async value => {
-    console.log('value', value);
     await database.action(() => organization.update(record => Object.assign(record, value)));
   };
 
-  console.log('organization', organization);
   return (
     <List>
       <ListItem>

@@ -29,7 +29,6 @@ export class ModifierItem extends Model {
     const { name, prices, shortName } = values;
     const modifierItemToUpdate = this.prepareUpdate(record => Object.assign(record, { name, shortName }));
 
-    console.log('values', values);
     const modifierItemPricesToUpdate = prices.map(({ modifierItemPrice, price }) =>
       modifierItemPrice.prepareUpdate(record => Object.assign(record, { price })),
     );

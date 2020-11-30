@@ -110,7 +110,6 @@ const ItemBreakdownInner: React.FC<ItemBreakdownOuterProps & ItemBreakdownInnerP
         {billItemModifierItems.length > 0 && (
           <View style={{ paddingTop: 5 }}>
             {billItemModifierItems.map(m => {
-              console.log('m', m);
               const modifierItemDisplayPrice = formatNumber(isChargable ? m.modifierItemPrice : 0, currency);
               return (
                 <Text note style={style} key={`${m.id}-price`}>

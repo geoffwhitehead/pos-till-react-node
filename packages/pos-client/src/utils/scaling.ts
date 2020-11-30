@@ -5,12 +5,7 @@ const { width, height } = Dimensions.get('window');
 const guidelineBaseWidth = 2224;
 const guidelineBaseHeight = 1668;
 
-console.log('width', width);
-console.log('heighaaat', height);
 const scale = size => {
-  console.log('width', width);
-  console.log('height', height);
-  console.log('size', size);
   return (width / guidelineBaseWidth) * size;
 };
 const verticalScale = size => (height / guidelineBaseHeight) * size;

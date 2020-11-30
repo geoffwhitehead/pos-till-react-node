@@ -24,7 +24,6 @@ const ModifierRowInner: React.FC<ModifierRowOuterProps & ModifierRowInnerProps> 
   selected,
   ...props
 }) => {
-  console.log('modifier', modifier);
   return (
     <ListItem {...props} onPress={() => onSelect(modifier)} selected={selected}>
       <Left style={{ flexDirection: 'column' }}>

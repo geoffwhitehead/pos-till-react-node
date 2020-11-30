@@ -46,7 +46,6 @@ const WrappedModifierGroup: React.FC<ModifierGroupInnerProps & ModifierGroupOute
 
   const message = single ? singleMessage : range ? rangeSelection : '';
 
-  console.log('modifierItems', modifierItems);
   const hasNoPricesSet = modifierItems.length === 0;
 
   return (
@@ -63,7 +62,6 @@ const WrappedModifierGroup: React.FC<ModifierGroupInnerProps & ModifierGroupOute
       {modifierItems.map(modifierItem => {
         const modifierItemPrice = keyedModifierPricesByModifierItem[modifierItem.id];
         const isSelected = selectedModifierItems.includes(modifierItem);
-        console.log('modifierItemPrice', modifierItemPrice);
         const isDisabled = modifierItemPrice.price === null;
 
         return (

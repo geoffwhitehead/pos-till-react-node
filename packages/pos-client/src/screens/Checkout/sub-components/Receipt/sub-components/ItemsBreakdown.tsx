@@ -21,7 +21,6 @@ export const ItemsBreakdownInner: React.FC<ItemsBreakdownOuterProps & ItemsBreak
   bill,
   ...props
 }) => {
-  console.log('priceGroupsInUse', priceGroupsInUse);
   return (
     <View {...props}>
       <Separator bordered>

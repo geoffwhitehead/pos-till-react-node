@@ -22,7 +22,6 @@ export const resetDatabase = async () => {
       return { success: true };
     });
   } catch (e) {
-    console.log('Error resetting db :', e);
     return {
       success: false,
       error: e,

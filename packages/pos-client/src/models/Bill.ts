@@ -358,7 +358,6 @@ export class Bill extends Model {
       }),
     );
 
-    console.log('printLogsToUpdate', printLogsToUpdate);
     if (printLogsToUpdate.length > 0) {
       await this.database.batch(...printLogsToUpdate);
     }

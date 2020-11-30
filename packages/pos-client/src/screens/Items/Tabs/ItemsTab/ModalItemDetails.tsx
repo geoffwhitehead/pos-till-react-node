@@ -205,9 +205,6 @@ const ItemDetailsInner: React.FC<ItemDetailsOuterProps & ItemDetailsInnerProps> 
 
         const title = item ? `${capitalize(item.name)}` : 'New Item';
 
-        console.log('touched', touched);
-        console.log('errors', errors);
-        console.log('values', values);
         return (
           <ModalContentButton
             title={title}

@@ -61,7 +61,6 @@ export const ModalCategoryDetailsInner: React.FC<ModalCategoryDetailsOuterProps 
 
   const [loading, setLoading] = useState(false);
 
-  console.log('organization', organization);
   const categorySchema = generateCategorySchema(organization.shortNameLength);
 
   const update = async (values: FormValues, category: Category) => {

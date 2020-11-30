@@ -14,7 +14,6 @@ export const useSync = () => {
     try {
       setIsSyncing(true);
       await sync(database);
-      console.log('DONE');
       setLastSyncedAt(dayjs());
       setIsSyncing(false);
     } catch (err) {

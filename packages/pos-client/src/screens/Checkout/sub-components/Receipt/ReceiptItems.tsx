@@ -58,7 +58,6 @@ export const ReceiptItemsInner: React.FC<ReceiptItemsOuterProps & ReceiptItemsIn
   const { organization } = useContext(OrganizationContext);
   const [printMessage, setPrintMessage] = useState('');
 
-  console.log('RENDER REEIPT ITEMS INNER');
   useEffect(() => {
     refContentList.current._root.scrollToEnd();
   }, [billItemsCount, billDiscounts, billPayments]);
@@ -138,7 +137,6 @@ export const ReceiptItemsInner: React.FC<ReceiptItemsOuterProps & ReceiptItemsIn
   const isReasonModalOpen = !!selectedBillItem && (action === Action.comp || action === Action.void);
   const isPrintMessageModalOpen = !!selectedBillItem && action === Action.message;
 
-  console.log('RECEIPT ITEMS');
   return (
     <Content ref={refContentList}>
       <List style={styles.receiptItems}>
