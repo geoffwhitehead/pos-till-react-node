@@ -7,6 +7,7 @@ import { groupBy, times } from 'lodash';
 import React, { useContext, useState } from 'react';
 import { ScrollView, StyleSheet } from 'react-native';
 import { SearchHeader } from '../../../../components/SearchHeader/SearchHeader';
+import { ItemsContext } from '../../../../contexts/ItemsContext';
 import { OrganizationContext } from '../../../../contexts/OrganizationContext';
 import { PriceGroupContext } from '../../../../contexts/PriceGroupContext';
 import { Body, Button, Col, Container, Grid, Icon, Left, List, ListItem, Right, Row, Text } from '../../../../core';
@@ -30,11 +31,12 @@ export const CategoriesInner: React.FC<CategoriesOuterProps & CategoriesInnerPro
   const [searchValue, setSearchValue] = useState<string>('');
   const { priceGroup } = useContext(PriceGroupContext);
   const { organization } = useContext(OrganizationContext);
+  const { groupedSortedItems, setCategoryItems } = useContext(ItemsContext);
 
   const onPressCategoryFactory = (params: { category: Category; priceGroup: PriceGroup }) => () => {
     const { category, priceGroup } = params;
+    setCategoryItems(groupedSortedItems[category.id]);
     navigation.navigate('CategoryItemsList', {
-      category,
       priceGroupId: priceGroup.id,
     });
   };

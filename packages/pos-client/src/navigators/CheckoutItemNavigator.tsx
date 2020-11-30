@@ -1,6 +1,5 @@
 import { createStackNavigator } from '@react-navigation/stack';
 import React from 'react';
-import { Category } from '../models';
 import { CategoryItems } from '../screens/Checkout/sub-components/CategoryItemsList/CategoryItemsList';
 import { Categories } from '../screens/Checkout/sub-components/CategoryList/CategoryList';
 
@@ -13,7 +12,7 @@ export const routes = {
 
 export type CheckoutItemStackParamList = {
   CategoryList: undefined;
-  CategoryItemsList: { category: Category; priceGroupId: string };
+  CategoryItemsList: { priceGroupId: string };
 };
 
 export const CheckoutItemNavigator: React.FC = () => {
