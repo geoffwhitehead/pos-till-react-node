@@ -18,8 +18,6 @@ import {
   Printer,
   tableNames,
 } from '../../../../models';
-import { print } from '../../../../services/printer/printer';
-import { receiptBill } from '../../../../services/printer/receiptBill';
 import { fonts } from '../../../../theme';
 import { formatNumber } from '../../../../utils';
 import { moderateScale } from '../../../../utils/scaling';
@@ -53,21 +51,21 @@ const CompleteBillInner: React.FC<CompleteBillOuterProps & CompleteBillInnerProp
   const { currency } = organization;
   const animation = useRef();
 
-  const onPrint = async () => {
-    const receiptPrinter = printers.find(p => p.id === organization.receiptPrinterId);
+  // const onPrint = async () => {
+  //   const receiptPrinter = printers.find(p => p.id === organization.receiptPrinterId);
 
-    const commands = await receiptBill(
-      billItems,
-      billDiscounts,
-      billPayments,
-      discounts,
-      priceGroups,
-      paymentTypes,
-      receiptPrinter,
-      organization,
-    );
-    await print(commands, receiptPrinter, true);
-  };
+  //   const commands = await receiptBill(
+  //     billItems,
+  //     billDiscounts,
+  //     billPayments,
+  //     discounts,
+  //     priceGroups,
+  //     paymentTypes,
+  //     receiptPrinter,
+  //     organization,
+  //   );
+  //   await print({ commands, printer: receiptPrinter, openDrawer: true });
+  // };
 
   useFocusEffect(
     useCallback(() => {

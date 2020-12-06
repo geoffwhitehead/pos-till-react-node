@@ -60,7 +60,7 @@ export const ReportsInner: React.FC<ReportsOuterProps & ReportsInnerProps> = ({
   const onPrintPeriodReport = async (billPeriod: BillPeriod) => {
     setIsLoading(true);
     const commands = await periodReport({ billPeriod, database, printer: receiptPrinter, organization });
-    await print(commands, receiptPrinter);
+    await print({ commands, printer: receiptPrinter });
     setIsLoading(false);
   };
 
@@ -74,7 +74,7 @@ export const ReportsInner: React.FC<ReportsOuterProps & ReportsInnerProps> = ({
   const onPrintCorrectionReport = async (billPeriod: BillPeriod) => {
     setIsLoading(true);
     const commands = await correctionReport({ billPeriod, database, printer: receiptPrinter, organization });
-    await print(commands, receiptPrinter);
+    await print({ commands, printer: receiptPrinter });
     setIsLoading(false);
   };
 

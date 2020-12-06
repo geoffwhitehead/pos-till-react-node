@@ -10,7 +10,7 @@ import { Loading } from '../../../../components/Loading/Loading';
 import { TimePicker } from '../../../../components/TimePicker/TimePicker';
 import { OrganizationContext } from '../../../../contexts/OrganizationContext';
 import { ReceiptPrinterContext } from '../../../../contexts/ReceiptPrinterContext';
-import { ActionSheet, Button, Col, Grid, Icon, Row, Text } from '../../../../core';
+import { ActionSheet, Button, Col, Grid, Icon, Row, Spinner, Text } from '../../../../core';
 import {
   Bill,
   BillCallLog,
@@ -76,6 +76,7 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
   const { currency } = organization;
   const [isDatePickerVisible, setIsDatePickerVisible] = useState(false);
   const [hasStored, setHasStored] = useState(false);
+  const [isPrinting, setIsPrinting] = useState(false);
 
   const handleOnStore = async () => {
     // check if a prep time is required and set
@@ -148,7 +149,7 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
       // attempt to print the receipts
       const printStatuses = await Promise.all(
         toPrintBillItemLogs.map(async ({ billItemPrintLogs, printer, commands }) => {
-          const res = await print(commands, printer, false);
+          const res = await print({ commands, printer });
           const status = res.success ? PrintStatus.succeeded : PrintStatus.errored;
 
           return billItemPrintLogs.map(billItemPrintLog => {
@@ -166,7 +167,7 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
       // attempt to call
       const printCallStatuses = await Promise.all(
         toPrintCallLogs.map(async ({ billCallPrintLog, printer, commands }) => {
-          const res = await print(commands, printer, false);
+          const res = await print({ commands, printer });
           const status = res.success ? PrintStatus.succeeded : PrintStatus.errored;
           return {
             billCallPrintLog,
@@ -198,6 +199,7 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
   }, [chargableBillItems, billDiscounts, billPayments, billModifierItemsCount]);
 
   const onPrint = async () => {
+    setIsPrinting(true);
     const [billItems, paymentTypes, priceGroups] = await Promise.all([
       bill.billItemsExclVoids.fetch(), // include comps - receipts will show comps but not voids
       database.collections
@@ -221,7 +223,8 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
       organization,
     );
 
-    print(commands, receiptPrinter, false);
+    await print({ commands, printer: receiptPrinter });
+    setIsPrinting(false);
   };
 
   const handleSetPrepTime = async (date: Date) => {
@@ -385,8 +388,16 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
             <Text style={fonts.h2}>{`Balance: ${formatNumber(balance, currency)}`}</Text>
           </Row>
           <Row style={styles.printRow}>
-            <Button disabled={!receiptPrinter} info iconLeft full style={styles.printButton} onPress={onPrint}>
-              <Icon name="receipt" style={{ color: 'white' }} />
+            <Button
+              disabled={!receiptPrinter}
+              {...resolveButtonState(!receiptPrinter || isPrinting, 'info')}
+              iconLeft
+              full
+              style={styles.printButton}
+              onPress={onPrint}
+            >
+              {!isPrinting && <Icon name="receipt" style={{ color: 'white' }} />}
+              {isPrinting && <Spinner color="white" />}
               <Text>Print</Text>
             </Button>
           </Row>

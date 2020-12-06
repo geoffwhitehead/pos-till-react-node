@@ -4,11 +4,11 @@ import withObservables from '@nozbe/with-observables';
 import { capitalize } from 'lodash';
 import React, { useContext, useEffect, useState } from 'react';
 import { StyleSheet } from 'react-native';
-import { paymentTypeNames } from '../../../../api/paymentType';
 import { OrganizationContext } from '../../../../contexts/OrganizationContext';
 import { Button, Col, Grid, Input, Item, Label, Row, Text } from '../../../../core';
 import { Bill, BillDiscount, BillItem, BillPayment, Discount, PaymentType, tableNames } from '../../../../models';
 import { formatNumber, getDefaultCashDenominations, minimalBillSummary, MinimalBillSummary } from '../../../../utils';
+import { paymentTypeNames } from '../../../../utils/consts';
 import { moderateScale } from '../../../../utils/scaling';
 
 interface PaymentOuterProps {
