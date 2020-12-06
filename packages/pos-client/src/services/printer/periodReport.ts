@@ -2,6 +2,9 @@ import { Database } from '@nozbe/watermelondb';
 import dayjs from 'dayjs';
 import { capitalize, flatten, sumBy } from 'lodash';
 import {
+  Bill,
+  BillItem,
+  BillItemModifierItem,
   BillPeriod,
   Category,
   Discount,
@@ -31,13 +34,30 @@ type PeriodReportProps = {
   organization: Organization;
 };
 
-export const periodReport = async ({ billPeriod, database, printer, organization }: PeriodReportProps) => {
-  let c = [];
+type PeriodReportDataProps = {
+  billPeriod: BillPeriod;
+  database: Database;
+};
 
-  const { currency } = organization;
+export type PeriodReportData = {
+  bills: Bill[];
+  billItems: BillItem[];
+  categories: Category[];
+  categoryTotals: ReturnType<typeof categorySummary>;
+  modifierTotals: ReturnType<typeof modifierSummary>;
+  discountTotals: ReturnType<typeof finalizedDiscountSummary>;
+  paymentTotals: ReturnType<typeof paymentSummary>;
+  voidTotal: number;
+  voidCount: number;
+  priceGroupTotals: ReturnType<typeof priceGroupSummmary>;
+  salesTotal: number;
+  compBillItems: BillItem[];
+  compBillItemModifierItems: BillItemModifierItem[];
+};
 
+export const periodReportData = async ({ billPeriod, database }: PeriodReportDataProps): Promise<PeriodReportData> => {
   const [
-    periodItems,
+    billItems,
     periodItemVoidsAndCancels,
     periodDiscounts,
     periodPayments,
@@ -79,8 +99,57 @@ export const periodReport = async ({ billPeriod, database, printer, organization
     flatten(await Promise.all(bills.map(async b => await b.billModifierItemVoids.fetch()))),
   ]);
 
-  const categoryTotals = categorySummary(periodItems);
+  const categoryTotals = categorySummary(billItems);
   const modifierTotals = modifierSummary(billModifierItems);
+  const discountTotals = finalizedDiscountSummary(periodDiscounts, discounts);
+  const paymentTotals = paymentSummary(periodPayments, paymentTypes);
+  const voidTotal = sumBy(periodItemVoidsAndCancels, 'itemPrice') + sumBy(billModifierItemVoids, 'modifierItemPrice');
+  // dont include modifier items in the count as these are cancelled as part od the item.
+  const voidCount = periodItemVoidsAndCancels.length;
+  const priceGroupTotals = priceGroupSummmary(billItems, billModifierItems, priceGroups);
+  const billItemsTotal = sumBy(billItems, item => getItemPrice(item));
+  const billModifierItemsTotal = sumBy(billModifierItems, mod => getModifierItemPrice(mod));
+  const salesTotal = billItemsTotal + billModifierItemsTotal - discountTotals.total;
+  const compBillItems = billItems.filter(item => item.isComp);
+  const compBillItemModifierItems = billModifierItems.filter(mod => mod.isComp);
+
+  return {
+    bills,
+    billItems,
+    categories,
+    categoryTotals,
+    modifierTotals,
+    discountTotals,
+    paymentTotals,
+    voidTotal,
+    voidCount,
+    priceGroupTotals,
+    salesTotal,
+    compBillItems,
+    compBillItemModifierItems,
+  };
+};
+
+export const periodReport = async ({ billPeriod, database, printer, organization }: PeriodReportProps) => {
+  let c = [];
+
+  const {
+    bills,
+    billItems,
+    categories,
+    categoryTotals,
+    modifierTotals,
+    discountTotals,
+    paymentTotals,
+    voidTotal,
+    voidCount,
+    priceGroupTotals,
+    salesTotal,
+    compBillItems,
+    compBillItemModifierItems,
+  } = await periodReportData({ billPeriod, database });
+
+  const { currency } = organization;
 
   c.push(starDivider(printer.printWidth));
   c.push({
@@ -107,9 +176,6 @@ export const periodReport = async ({ billPeriod, database, printer, organization
   });
 
   c.push(starDivider(printer.printWidth));
-
-  addHeader(c, 'Bills', printer.printWidth);
-  c.push({ appendBitmapText: alignLeftRight('Total: ', bills.length.toString(), printer.printWidth) });
 
   addHeader(c, 'Category Totals', printer.printWidth);
   c.push(
@@ -156,8 +222,29 @@ export const periodReport = async ({ billPeriod, database, printer, organization
     ),
   });
 
+  addHeader(c, 'Price Group Totals (excl discounts)', printer.printWidth);
+  c.push(
+    ...priceGroupTotals.map(priceGroupTotal => {
+      return {
+        appendBitmapText: alignLeftRight(
+          priceGroupTotal.name,
+          `${priceGroupTotal.count} / ${formatNumber(priceGroupTotal.total, currency)}`,
+          printer.printWidth,
+        ),
+      };
+    }),
+  );
+  c.push({
+    appendBitmapText: alignLeftRight(
+      'Total: ',
+      `${sumBy(priceGroupTotals, ({ count }) => count)} / ${formatNumber(
+        sumBy(priceGroupTotals, ({ total }) => total),
+        currency,
+      )}`,
+      printer.printWidth,
+    ),
+  });
   addHeader(c, 'Discount Totals', printer.printWidth);
-  const discountTotals = finalizedDiscountSummary(periodDiscounts, discounts);
   c.push(
     ...discountTotals.breakdown.map(discountTotal => ({
       appendBitmapText: alignLeftRight(
@@ -177,7 +264,6 @@ export const periodReport = async ({ billPeriod, database, printer, organization
   c.push(divider(printer.printWidth));
 
   addHeader(c, 'Payment Totals', printer.printWidth);
-  const paymentTotals = paymentSummary(periodPayments, paymentTypes);
   c.push(
     ...paymentTotals.breakdown.map(paymentTotal => ({
       appendBitmapText: alignLeftRight(
@@ -195,55 +281,42 @@ export const periodReport = async ({ billPeriod, database, printer, organization
     ),
   });
 
-  addHeader(c, 'Voids', printer.printWidth);
-  const voidTotal = sumBy(periodItemVoidsAndCancels, 'itemPrice') + sumBy(billModifierItemVoids, 'modifierItemPrice');
-  // dont include modifier items in the count as these are cancelled as part od the item.
-  const voidCount = periodItemVoidsAndCancels.length;
-  c.push({
-    appendBitmapText: alignLeftRight(
-      'Total: ',
-      `${voidCount} / ${formatNumber(voidTotal, currency)}`,
-      printer.printWidth,
-    ),
-  });
-
   addHeader(c, 'Complimentary Totals', printer.printWidth);
-  const compItems = periodItems.filter(item => item.isComp);
-  const compMods = billModifierItems.filter(mod => mod.isComp);
 
   c.push({
     appendBitmapText: alignLeftRight(
       'Items',
-      `${compItems.length} / ${formatNumber(sumBy(compItems, 'itemPrice'), currency)}`,
+      `${compBillItems.length} / ${formatNumber(sumBy(compBillItems, 'itemPrice'), currency)}`,
       printer.printWidth,
     ),
   });
   c.push({
     appendBitmapText: alignLeftRight(
       'Modifiers',
-      `${compMods.length} / ${formatNumber(sumBy(compMods, 'modifierItemPrice'), currency)}`,
+      `${compBillItemModifierItems.length} / ${formatNumber(
+        sumBy(compBillItemModifierItems, 'modifierItemPrice'),
+        currency,
+      )}`,
       printer.printWidth,
     ),
   });
 
   addHeader(c, 'Totals', printer.printWidth);
-
-  const priceGroupTotals = priceGroupSummmary(periodItems, billModifierItems, priceGroups);
-
-  c.push(
-    ...priceGroupTotals.map(priceGroupTotal => {
-      return {
-        appendBitmapText: alignLeftRight(
-          priceGroupTotal.name,
-          `${priceGroupTotal.count} / ${formatNumber(priceGroupTotal.total, currency)}`,
-          printer.printWidth,
-        ),
-      };
-    }),
-  );
-  const billItemsTotal = sumBy(periodItems, item => getItemPrice(item));
-  const billModifierItemsTotal = sumBy(billModifierItems, mod => getModifierItemPrice(mod));
-  const salesTotal = billItemsTotal + billModifierItemsTotal - discountTotals.total;
+  c.push({ appendBitmapText: alignLeftRight('Number of bills: ', bills.length.toString(), printer.printWidth) });
+  c.push({
+    appendBitmapText: alignLeftRight(
+      'Voids: ',
+      `${voidCount} / ${formatNumber(voidTotal, currency)}`,
+      printer.printWidth,
+    ),
+  });
+  c.push({
+    appendBitmapText: alignLeftRight(
+      'Discounts: ',
+      `${discountTotals.count} / ${formatNumber(discountTotals.total, currency)}`,
+      printer.printWidth,
+    ),
+  });
   c.push({
     appendBitmapText: alignLeftRight('Sales Total: ', formatNumber(salesTotal, currency), printer.printWidth),
   });

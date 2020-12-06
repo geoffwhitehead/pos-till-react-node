@@ -1,6 +1,15 @@
 import { Database, Q } from '@nozbe/watermelondb';
 import { flatten, groupBy, sumBy } from 'lodash';
-import { BillDiscount, BillItem, BillItemModifierItem, BillPayment, Discount, PriceGroup, tableNames } from '../models';
+import {
+  BillDiscount,
+  BillItem,
+  BillItemModifierItem,
+  BillPayment,
+  Discount,
+  PaymentType,
+  PriceGroup,
+  tableNames,
+} from '../models';
 import { CurrencyEnum } from '../models/Organization';
 
 export const getDefaultCashDenominations = (currency: string): number[] => {
@@ -252,7 +261,7 @@ export const transactionSummary = async (params: {
   };
 };
 
-export const paymentSummary = (periodPayments, paymentTypes) => {
+export const paymentSummary = (periodPayments: BillPayment[], paymentTypes: PaymentType[]) => {
   const groupedPayments = groupBy(periodPayments, 'paymentTypeId');
   const paymentTotals = paymentTypes.map(pT => ({
     name: pT.name,
@@ -262,7 +271,7 @@ export const paymentSummary = (periodPayments, paymentTypes) => {
   return { breakdown: paymentTotals, total: sumBy(paymentTotals, 'total'), count: sumBy(paymentTotals, 'count') };
 };
 
-export const finalizedDiscountSummary = (periodBillDiscounts, discounts) => {
+export const finalizedDiscountSummary = (periodBillDiscounts: BillDiscount[], discounts: Discount[]) => {
   const groupedDiscounts = groupBy(periodBillDiscounts, 'discountId');
   const discountTotals = discounts.map(d => ({
     name: d.name,
@@ -274,7 +283,7 @@ export const finalizedDiscountSummary = (periodBillDiscounts, discounts) => {
   return { breakdown: discountTotals, total: sumBy(discountTotals, 'total'), count: sumBy(discountTotals, 'count') };
 };
 
-export const categorySummary = billItems => {
+export const categorySummary = (billItems: BillItem[]) => {
   const groupedBillItems = groupBy(billItems, bI => bI.categoryId);
 
   const totals = Object.keys(groupedBillItems).map(key => ({

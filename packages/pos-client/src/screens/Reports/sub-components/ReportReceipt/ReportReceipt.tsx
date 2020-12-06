@@ -1,134 +1,269 @@
-import React from 'react';
+import { useDatabase } from '@nozbe/watermelondb/hooks';
+import { capitalize, sumBy } from 'lodash';
+import React, { useContext, useEffect, useState } from 'react';
 import { StyleSheet } from 'react-native';
+import { Loading } from '../../../../components/Loading/Loading';
+import { OrganizationContext } from '../../../../contexts/OrganizationContext';
+import { Col, Content, Left, List, ListItem, Right, Row, Separator, Text } from '../../../../core';
+import { BillPeriod } from '../../../../models';
+import { PeriodReportData, periodReportData } from '../../../../services/printer/periodReport';
+import { formatNumber } from '../../../../utils';
+import { RECEIPT_PANEL_BUTTONS_WIDTH, RECEIPT_PANEL_WIDTH } from '../../../../utils/consts';
 import { moderateScale } from '../../../../utils/scaling';
-
-const sumObject: (obj: Record<string, number>) => number = obj =>
-  Object.keys(obj).reduce((acc, id) => acc + obj[id], 0);
-
 interface ReportReceiptProps {
-  onPressPrint: () => void;
-  categories: any;
-  discounts: any;
-  paymentTypes: any;
-  billPeriod: any;
-  bills: any;
+  // onPressPrint: () => void;
+  billPeriod: BillPeriod;
 }
 
 export const ReportReceipt: React.FC<ReportReceiptProps> = ({
-  onPressPrint,
+  // onPressPrint,
   billPeriod,
-  bills,
-  categories,
-  discounts,
-  paymentTypes,
 }) => {
-  // const categoryTotals = billItemsCategoryTotals(bills, categories);
-  // const paymentTotals = totalBillsPaymentBreakdown(bills, paymentTypes);
-  // const discountTotals = discountBreakdownTotals(bills, discounts);
-  // const categoryTotals = useMemo(() => billItemsCategoryTotals(bills, categories), [bills, categories]);
-  // const paymentTotals = useMemo(() => totalBillsPaymentBreakdown(bills, paymentTypes), [bills, paymentTypes]);
-  // const discountTotals = useMemo(() => discountBreakdownTotals(bills, discounts), [bills, discounts]);
-  // const grossSalesTotal = sumObject(categoryTotals);
-  // const discountTotal = sumObject(discountTotals);
-  // const netSalesTotal = grossSalesTotal - discountTotal;
-  // const resolveName: (id: string, collection: Collection<{ _id: string; name: string }>) => string = (id, collection) =>
-  //   collection.find(({ _id }) => _id === id).name;
-  // const mapGroup: (
-  //   group: Record<string, number>,
-  //   nameResolver: (id: string) => string,
-  //   symbol: string,
-  // ) => React.ReactNode[] = (group, nameResolver, symbol) =>
-  //   Object.keys(group).map(id => {
-  //     return (
-  //       <ListItem>
-  //         <Left>
-  //           <Text>{capitalize(nameResolver(id))}</Text>
-  //         </Left>
-  //         <Right>
-  //           <Text>{formatNumber(group[id], symbol)}</Text>
-  //         </Right>
-  //       </ListItem>
-  //     );
-  //   });
-  // return (
-  //   billPeriod && (
-  //     <Col style={styles.rightColumn}>
-  //       <Row>
-  //         <Content>
-  //           <List>
-  //             <Separator bordered>
-  //               <Text>Sales</Text>
-  //             </Separator>
-  //             <ListItem>
-  //               <Left>
-  //                 <Text>Total</Text>
-  //               </Left>
-  //               <Right>
-  //                 <Text>{bills.length.toString()}</Text>
-  //               </Right>
-  //             </ListItem>
-  //             <Separator bordered>
-  //               <Text>Category Totals</Text>
-  //             </Separator>
-  //             {/* {mapGroup(categoryTotals, id => resolveName(id, categories), currencySymbol)} */}
-  //             <Separator bordered>
-  //               <Text>Payment Totals</Text>
-  //             </Separator>
-  //             {/* {mapGroup(paymentTotals, id => resolveName(id, paymentTypes), currencySymbol)} */}
-  //             <Separator bordered>
-  //               <Text>Discount Totals</Text>
-  //             </Separator>
-  //             {/* {mapGroup(discountTotals, id => resolveName(id, discounts), currencySymbol)} */}
-  //             <Separator bordered>
-  //               <Text>Totals</Text>
-  //             </Separator>
-  //             <ListItem>
-  //               <Left>
-  //                 <Text>Gross Sales Total: </Text>
-  //               </Left>
-  //               <Right>
-  //                 {/* <Text>{formatNumber(grossSalesTotal, currencySymbol)}</Text> */}
-  //               </Right>
-  //             </ListItem>
-  //             <ListItem>
-  //               <Left>
-  //                 <Text>Discount Total: </Text>
-  //               </Left>
-  //               <Right>
-  //                 {/* <Text>{formatNumber(discountTotal, currencySymbol)}</Text> */}
-  //               </Right>
-  //             </ListItem>
-  //             <ListItem>
-  //               <Left>
-  //                 <Text>Net Sales Total: </Text>
-  //               </Left>
-  //               <Right>
-  //                 {/* <Text>{formatNumber(netSalesTotal, currencySymbol)}</Text> */}
-  //               </Right>
-  //             </ListItem>
-  //             <ListItem>
-  //               <Left>
-  //                 <Text>Grand Total: </Text>
-  //               </Left>
-  //               <Right>
-  //                 {/* <Text>{formatNumber(sumObject(paymentTotals), currencySymbol)}</Text> */}
-  //               </Right>
-  //             </ListItem>
-  //           </List>
-  //         </Content>
-  //       </Row>
-  //       <Row style={styles.rowPrintButton}>
-  //         <Button style={styles.printButton} block info onPress={onPressPrint}>
-  //           <Text>{billPeriod.closed ? 'Print Z Report' : 'Print X Report'}</Text>
-  //         </Button>
-  //       </Row>
-  //     </Col>
-  //   )
-  // );
+  const database = useDatabase();
+  const {
+    organization: { currency },
+  } = useContext(OrganizationContext);
+
+  const [reportData, setReportData] = useState<PeriodReportData>();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const summary = await periodReportData({ billPeriod, database });
+      setReportData(summary);
+    };
+    fetchData();
+  }, [billPeriod]);
+
+  if (!reportData) {
+    return <Loading />;
+  }
+
+  const {
+    bills,
+    billItems,
+    categories,
+    categoryTotals,
+    modifierTotals,
+    discountTotals,
+    paymentTotals,
+    voidTotal,
+    voidCount,
+    priceGroupTotals,
+    salesTotal,
+    compBillItems,
+    compBillItemModifierItems,
+  } = reportData;
+
+  return (
+    <Col style={styles.rightColumn}>
+      <Row>
+        <Content>
+          <List>
+            <Separator bordered>
+              <Text>Category Totals</Text>
+            </Separator>
+            {categoryTotals.breakdown.map(({ categoryId, count, total }) => {
+              const category = categories.find(c => c.id === categoryId);
+              if (!category) {
+                return null;
+              }
+              return (
+                <ListItem>
+                  <Left>
+                    <Text>{category.name}</Text>
+                  </Left>
+                  <Right style={styles.listItemRight}>
+                    <Text>{`${count} / ${formatNumber(total, currency)}`}</Text>
+                  </Right>
+                </ListItem>
+              );
+            })}
+            <ListItem>
+              <Left>
+                <Text>Total</Text>
+              </Left>
+              <Right style={styles.listItemRight}>
+                <Text>{`${categoryTotals.count} / ${formatNumber(categoryTotals.total, currency)}`}</Text>
+              </Right>
+            </ListItem>
+            <Separator bordered>
+              <Text>Modifier Totals</Text>
+            </Separator>
+            {modifierTotals.breakdown.map(({ modifierName, breakdown, total, count }) => {
+              return (
+                <>
+                  <ListItem itemDivider>
+                    <Left>
+                      <Text>{modifierName}</Text>
+                    </Left>
+                    <Right style={styles.listItemRight}>
+                      <Text>{`${count} / ${formatNumber(total, currency)}`}</Text>
+                    </Right>
+                    <Text></Text>
+                  </ListItem>
+                  {breakdown.map(({ modifierItemName, total, count }) => {
+                    return (
+                      <ListItem>
+                        <Left>
+                          <Text>{modifierItemName}</Text>
+                        </Left>
+                        <Right style={styles.listItemRight}>
+                          <Text>{`${count} / ${formatNumber(total, currency)}`}</Text>
+                        </Right>
+                      </ListItem>
+                    );
+                  })}
+                </>
+              );
+            })}
+            <ListItem>
+              <Left>
+                <Text>Total</Text>
+              </Left>
+              <Right style={styles.listItemRight}>
+                <Text>{`${modifierTotals.count} / ${formatNumber(modifierTotals.total, currency)}`}</Text>
+              </Right>
+            </ListItem>
+            <Separator bordered>
+              <Text>Price Group Totals (excl discounts)</Text>
+            </Separator>
+            {priceGroupTotals.map(({ name, total, count }) => {
+              return (
+                <ListItem>
+                  <Left>
+                    <Text>{name}</Text>
+                  </Left>
+                  <Right style={styles.listItemRight}>
+                    <Text>{`${count} / ${formatNumber(total, currency)}`}</Text>
+                  </Right>
+                </ListItem>
+              );
+            })}
+            <ListItem>
+              <Left>
+                <Text>Total</Text>
+              </Left>
+              <Right style={styles.listItemRight}>
+                <Text>{`${sumBy(priceGroupTotals, ({ count }) => count)} / ${formatNumber(
+                  sumBy(priceGroupTotals, ({ total }) => total),
+                  currency,
+                )}`}</Text>
+              </Right>
+            </ListItem>
+            <Separator bordered>
+              <Text>Discount Totals</Text>
+            </Separator>
+            {discountTotals.breakdown.map(({ name, total, count }) => {
+              return (
+                <ListItem>
+                  <Left>
+                    <Text>{name}</Text>
+                  </Left>
+                  <Right style={styles.listItemRight}>
+                    <Text>{`${count} / ${formatNumber(total, currency)}`}</Text>
+                  </Right>
+                </ListItem>
+              );
+            })}
+            <Separator bordered>
+              <Text>Complimentary Totals</Text>
+            </Separator>
+            <ListItem>
+              <Left>
+                <Text>Items</Text>
+              </Left>
+              <Right style={styles.listItemRight}>
+                <Text>{`${compBillItems.length} / ${formatNumber(sumBy(compBillItems, 'itemPrice'), currency)}`}</Text>
+              </Right>
+            </ListItem>
+            <ListItem>
+              <Left>
+                <Text>Modifiers</Text>
+              </Left>
+              <Right style={styles.listItemRight}>
+                <Text>{`${compBillItemModifierItems.length} / ${formatNumber(
+                  sumBy(compBillItemModifierItems, 'modifierItemPrice'),
+                  currency,
+                )}`}</Text>
+              </Right>
+            </ListItem>
+
+            <Separator bordered>
+              <Text>Payment Totals</Text>
+            </Separator>
+            {paymentTotals.breakdown.map(({ name, total, count }) => {
+              return (
+                <ListItem>
+                  <Left>
+                    <Text>{capitalize(name)}</Text>
+                  </Left>
+                  <Right style={styles.listItemRight}>
+                    <Text>{`${count} / ${formatNumber(total, currency)}`}</Text>
+                  </Right>
+                </ListItem>
+              );
+            })}
+            <ListItem>
+              <Left>
+                <Text>Total</Text>
+              </Left>
+              <Right style={styles.listItemRight}>
+                <Text>{`${paymentTotals.count} / ${formatNumber(paymentTotals.total, currency)}`}</Text>
+              </Right>
+            </ListItem>
+
+            {/* BILLS */}
+            <Separator bordered>
+              <Text>Total</Text>
+            </Separator>
+            <ListItem>
+              <Left>
+                <Text>Number of bills</Text>
+              </Left>
+              <Right style={styles.listItemRight}>
+                <Text>{bills.length.toString()}</Text>
+              </Right>
+            </ListItem>
+            <ListItem>
+              <Left>
+                <Text>Voids</Text>
+              </Left>
+              <Right style={styles.listItemRight}>
+                <Text>{`${voidCount} / ${formatNumber(voidTotal, currency)}`}</Text>
+              </Right>
+            </ListItem>
+            <ListItem>
+              <Left>
+                <Text>Discounts: </Text>
+              </Left>
+              <Right style={styles.listItemRight}>
+                <Text>{`${discountTotals.count} / ${formatNumber(discountTotals.total, currency)}`}</Text>
+              </Right>
+            </ListItem>
+            <ListItem>
+              <Left>
+                <Text>Sales Total: </Text>
+              </Left>
+              <Right style={styles.listItemRight}>
+                <Text>{formatNumber(salesTotal, currency)}</Text>
+              </Right>
+            </ListItem>
+          </List>
+        </Content>
+      </Row>
+    </Col>
+  );
 };
 
 const styles = StyleSheet.create({
-  rightColumn: { width: moderateScale(350), borderLeftWidth: 1, borderLeftColor: 'lightgrey' },
+  rightColumn: {
+    width: moderateScale(RECEIPT_PANEL_WIDTH + RECEIPT_PANEL_BUTTONS_WIDTH),
+    borderLeftWidth: 1,
+    borderLeftColor: 'lightgrey',
+  },
+  listItemRight: {
+    flex: 1,
+  },
   rowPrintButton: { height: 10, padding: 5 },
   printButton: { width: '100%', textAlign: 'center', height: '100%' },
 });

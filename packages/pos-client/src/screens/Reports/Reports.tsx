@@ -32,6 +32,7 @@ import { periodReport } from '../../services/printer/periodReport';
 // import { ReportReceipt } from './sub-components/ReportReceipt/ReportReceipt';
 import { print } from '../../services/printer/printer';
 import { resolveButtonState } from '../../utils/helpers';
+import { ReportReceipt } from './sub-components/ReportReceipt/ReportReceipt';
 
 // const ORG_PASSCODE = '1234'; // TODO: move to an org setting and hash
 interface ReportsInnerProps {
@@ -52,6 +53,7 @@ export const ReportsInner: React.FC<ReportsOuterProps & ReportsInnerProps> = ({
   const { organization } = useContext(OrganizationContext);
   const { receiptPrinter } = useContext(ReceiptPrinterContext);
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedBillPeriod, setSelectedBillPeriod] = useState<BillPeriod>();
 
   const openDrawer = () => navigation.openDrawer();
 
@@ -111,7 +113,7 @@ export const ReportsInner: React.FC<ReportsOuterProps & ReportsInnerProps> = ({
             <List>
               {billPeriods.map(billPeriod => {
                 return (
-                  <ListItem key={billPeriod.id}>
+                  <ListItem key={billPeriod.id} onPress={() => setSelectedBillPeriod(billPeriod)}>
                     <Left>
                       <View style={{ display: 'flex' }}>
                         <Text>{`Opened: ${dayjs(billPeriod.createdAt).format('ddd DD/MM/YYYY HH:mm:ss')}`}</Text>
@@ -170,16 +172,16 @@ export const ReportsInner: React.FC<ReportsOuterProps & ReportsInnerProps> = ({
             {isLoading && <Spinner />}
           </ScrollView>
         </Col>
-        {/* {selectedBillPeriod && (
+        {selectedBillPeriod && (
           <ReportReceipt
             billPeriod={selectedBillPeriod}
-            bills={allBills.filtered('billPeriod._id = $0', selectedBillPeriod._id)}
-            categories={categories}
-            paymentTypes={paymentTypes}
-            discounts={discounts}
-            onPressPrint={() => onPrint(selectedBillPeriod)}
+            // bills={allBills.filtered('billPeriod._id = $0', selectedBillPeriod._id)}
+            // categories={categories}
+            // paymentTypes={paymentTypes}
+            // discounts={discounts}
+            // onPressPrint={() => onPrintPeriodReport(selectedBillPeriod)}
           />
-        )} */}
+        )}
       </Grid>
       {/* </Protected> */}
     </Container>
