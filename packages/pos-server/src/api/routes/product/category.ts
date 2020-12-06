@@ -1,8 +1,7 @@
-import { Router, Request, Response, NextFunction } from 'express';
-import { ProductService } from '../../../services/product';
+import { NextFunction, Request, Response, Router } from 'express';
 import { Container } from 'typedi';
 import { LoggerService } from '../../../loaders/logger';
-import { objectId } from '../../../utils/objectId';
+import { ProductService } from '../../../services/product';
 
 export default (app: Router) => {
     const route = Router();

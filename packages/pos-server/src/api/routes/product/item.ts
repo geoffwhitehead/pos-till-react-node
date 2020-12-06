@@ -1,71 +1,72 @@
-import { Router, Request, Response, NextFunction } from 'express';
-import { Container } from 'typedi';
-import { LoggerService } from '../../../loaders/logger';
-import { ProductService } from '../../../services/product';
-import { objectId } from '../../../utils/objectId';
+import { Router } from 'express';
 
 export default (app: Router) => {
     const route = Router();
     app.use('/items', route);
 
-    route.get('/', async (req: Request, res: Response, next: NextFunction) => {
-        const logger = Container.get('logger') as LoggerService;
-        const { item: itemService } = Container.get('productService') as ProductService;
+    /**
+     * TODO: Since refactoring the service layer these endpoints will need looking at. Mongo has been changed to be more
+     * relational to reflect the sql data structure on the client.
+     */
 
-        logger.debug(`Calling get item endpoint with body: ${JSON.stringify(req.body)}`);
+    // route.get('/', async (req: Request, res: Response, next: NextFunction) => {
+    //     const logger = Container.get('logger') as LoggerService;
+    //     const { item: itemService } = Container.get('productService') as ProductService;
 
-        try {
-            const items = await itemService.findAll();
+    //     logger.debug(`Calling get item endpoint with body: ${JSON.stringify(req.body)}`);
 
-            res.status(200).json({ success: true, data: items });
-        } catch (err) {
-            logger.error(`🔥 error: ${err}`);
-            return next(err);
-        }
-    });
+    //     try {
+    //         const items = await itemService.findAll();
 
-    route.post('/', async (req: Request, res: Response, next: NextFunction) => {
-        const logger = Container.get('logger') as LoggerService;
-        const { item: itemService } = Container.get('productService') as ProductService;
+    //         res.status(200).json({ success: true, data: items });
+    //     } catch (err) {
+    //         logger.error(`🔥 error: ${err}`);
+    //         return next(err);
+    //     }
+    // });
 
-        logger.debug(`Calling create item endpoint with body: ${JSON.stringify(req.body)}`);
+    // route.post('/', async (req: Request, res: Response, next: NextFunction) => {
+    //     const logger = Container.get('logger') as LoggerService;
+    //     const { item: itemService } = Container.get('productService') as ProductService;
 
-        try {
-            const item = await itemService.create(req.body);
-            res.status(200).json({ success: true, data: item });
-        } catch (err) {
-            logger.error(`🔥 error: ${err}`);
-            return next(err);
-        }
-    });
+    //     logger.debug(`Calling create item endpoint with body: ${JSON.stringify(req.body)}`);
 
-    route.put('/:id', async (req: Request, res: Response, next: NextFunction) => {
-        const logger = Container.get('logger') as LoggerService;
-        const { item: itemService } = Container.get('productService') as ProductService;
+    //     try {
+    //         const item = await itemService.create(req.body);
+    //         res.status(200).json({ success: true, data: item });
+    //     } catch (err) {
+    //         logger.error(`🔥 error: ${err}`);
+    //         return next(err);
+    //     }
+    // });
 
-        logger.debug(`Calling update item endpoint with params: ${req.params}, body: ${JSON.stringify(req.body)}`);
+    // route.put('/:id', async (req: Request, res: Response, next: NextFunction) => {
+    //     const logger = Container.get('logger') as LoggerService;
+    //     const { item: itemService } = Container.get('productService') as ProductService;
 
-        try {
-            const item = await itemService.findByIdAndUpdate(req.params.id, req.body);
-            res.status(200).json({ success: true, data: item });
-        } catch (err) {
-            logger.error(`🔥 error: ${err}`);
-            return next(err);
-        }
-    });
+    //     logger.debug(`Calling update item endpoint with params: ${req.params}, body: ${JSON.stringify(req.body)}`);
 
-    route.get('/:id', async (req: Request, res: Response, next: NextFunction) => {
-        const logger = Container.get('logger') as LoggerService;
-        const { item: itemService } = Container.get('productService') as ProductService;
+    //     try {
+    //         const item = await itemService.findByIdAndUpdate(req.params.id, req.body);
+    //         res.status(200).json({ success: true, data: item });
+    //     } catch (err) {
+    //         logger.error(`🔥 error: ${err}`);
+    //         return next(err);
+    //     }
+    // });
 
-        logger.debug(`Calling get item endpoint with params: ${req.params}`);
+    // route.get('/:id', async (req: Request, res: Response, next: NextFunction) => {
+    //     const logger = Container.get('logger') as LoggerService;
+    //     const { item: itemService } = Container.get('productService') as ProductService;
 
-        try {
-            const item = await itemService.findById(req.params.id);
-            res.status(200).json({ success: true, data: item });
-        } catch (err) {
-            logger.error(`🔥 error: ${err}`);
-            return next(err);
-        }
-    });
+    //     logger.debug(`Calling get item endpoint with params: ${req.params}`);
+
+    //     try {
+    //         const item = await itemService.findById(req.params.id);
+    //         res.status(200).json({ success: true, data: item });
+    //     } catch (err) {
+    //         logger.error(`🔥 error: ${err}`);
+    //         return next(err);
+    //     }
+    // });
 };

@@ -120,6 +120,10 @@ export interface UserService {
     findById: (_id: string) => Promise<UserProps>;
 }
 
+/**
+ * TODO: user contains confidential properties such as bearer token and password. Need to seperate these properties out into
+ * auth records so that the user documents dont contain sensitive info. Currently repo layer is filtering them out.
+ */
 export const userService = ({ repositories: { userRepository }, logger }: InjectedDependencies): UserService => {
     const findAll: UserService['findAll'] = async () => await userRepository.findAll();
     const create = async props => {

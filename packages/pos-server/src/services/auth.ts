@@ -264,6 +264,8 @@ export const authService = ({
         }
 
         try {
+            // by using the users password in constructing the bearer token it means if the user ever changes their password any
+            // previous long lived bearer tokens will be immediately invalidated.
             jwt.verify(refreshToken, constructRefreshSecret(config.refreshTokenSecret, password));
         } catch (err) {
             logger.error('Failed to verify refresh token', { ...updatedCtx, err });

@@ -1,7 +1,7 @@
-import { Schema } from 'mongoose';
-import { tenantModel, TenantedModel } from './utils/multiTenant';
 import { Joi } from 'celebrate';
+import { Schema } from 'mongoose';
 import uuid from 'uuid';
+import { TenantedModel, tenantModel } from './utils/multiTenant';
 
 export interface UserProps extends TenantedModel {
     _id?: string;

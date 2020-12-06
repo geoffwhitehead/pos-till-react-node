@@ -49,7 +49,7 @@ const extendAuthorize = async (req, res, next) => {
             logger.debug(err);
 
             // access token expired or token err
-            const authService = Container.get('authService') as AuthService; // TODO: type
+            const authService = Container.get('authService') as AuthService;
 
             const refreshToken = req.headers['x-refresh-token'];
             const response = await authService.refreshTokens({ accessToken, refreshToken });
@@ -71,11 +71,5 @@ const extendAuthorize = async (req, res, next) => {
     }
     next();
 };
-
-// const extendAuthorize = jwt({
-//     secret: config.accessTokenSecret, // The _secret_ to sign the JWTs
-//     userProperty: 'token', // Use req.token to store the JWT
-//     getToken: getTokenFromHeader, // How to extract the JWT from the request
-// });
 
 export default extendAuthorize;

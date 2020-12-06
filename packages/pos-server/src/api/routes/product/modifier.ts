@@ -1,69 +1,71 @@
-import { NextFunction, Request, Response, Router } from 'express';
-import { Container } from 'typedi';
-import { LoggerService } from '../../../loaders/logger';
-import { ProductService } from '../../../services/product';
+import { Router } from 'express';
 
 export default (app: Router) => {
     const route = Router();
     app.use('/modifiers', route);
 
-    route.get('/', async (req: Request, res: Response, next: NextFunction) => {
-        const logger = Container.get('logger') as LoggerService;
-        const { modifier: modifierService } = Container.get('productService') as ProductService;
+    /**
+     * TODO: Since refactoring the service layer these endpoints will need looking at. Mongo has been changed to be more
+     * relational to reflect the sql data structure on the client.
+     */
 
-        logger.debug(`Calling get modifier endpoint with body: ${JSON.stringify(req.body)}`);
+    // route.get('/', async (req: Request, res: Response, next: NextFunction) => {
+    //     const logger = Container.get('logger') as LoggerService;
+    //     const { modifier: modifierService } = Container.get('productService') as ProductService;
 
-        try {
-            const modifiers = await modifierService.findAll();
-            res.status(200).json({ success: true, data: modifiers });
-        } catch (err) {
-            logger.error(`🔥 error: ${err}`);
-            return next(err);
-        }
-    });
+    //     logger.debug(`Calling get modifier endpoint with body: ${JSON.stringify(req.body)}`);
 
-    route.post('/', async (req: Request, res: Response, next: NextFunction) => {
-        const logger = Container.get('logger') as LoggerService;
-        const { modifier: modifierService } = Container.get('productService') as ProductService;
+    //     try {
+    //         const modifiers = await modifierService.findAll();
+    //         res.status(200).json({ success: true, data: modifiers });
+    //     } catch (err) {
+    //         logger.error(`🔥 error: ${err}`);
+    //         return next(err);
+    //     }
+    // });
 
-        logger.debug(`Calling create modifier endpoint with body: ${JSON.stringify(req.body)}`);
+    // route.post('/', async (req: Request, res: Response, next: NextFunction) => {
+    //     const logger = Container.get('logger') as LoggerService;
+    //     const { modifier: modifierService } = Container.get('productService') as ProductService;
 
-        try {
-            const modifier = await modifierService.create(req.body);
-            res.status(200).json({ success: true, data: modifier });
-        } catch (err) {
-            logger.error(`🔥 error: ${err}`);
-            return next(err);
-        }
-    });
+    //     logger.debug(`Calling create modifier endpoint with body: ${JSON.stringify(req.body)}`);
 
-    route.put('/:id', async (req: Request, res: Response, next: NextFunction) => {
-        const logger = Container.get('logger') as LoggerService;
-        const { modifier: modifierService } = Container.get('productService') as ProductService;
+    //     try {
+    //         const modifier = await modifierService.create(req.body);
+    //         res.status(200).json({ success: true, data: modifier });
+    //     } catch (err) {
+    //         logger.error(`🔥 error: ${err}`);
+    //         return next(err);
+    //     }
+    // });
 
-        logger.debug(`Calling update modifier endpoint with params: ${req.params}, body: ${JSON.stringify(req.body)}`);
+    // route.put('/:id', async (req: Request, res: Response, next: NextFunction) => {
+    //     const logger = Container.get('logger') as LoggerService;
+    //     const { modifier: modifierService } = Container.get('productService') as ProductService;
 
-        try {
-            const modifier = await modifierService.findByIdAndUpdate(req.params.id, req.body);
-            res.status(200).json({ success: true, data: modifier });
-        } catch (err) {
-            logger.error(`🔥 error: ${err}`);
-            return next(err);
-        }
-    });
+    //     logger.debug(`Calling update modifier endpoint with params: ${req.params}, body: ${JSON.stringify(req.body)}`);
 
-    route.get('/:id', async (req: Request, res: Response, next: NextFunction) => {
-        const logger = Container.get('logger') as LoggerService;
-        const { modifier: modifierService } = Container.get('productService') as ProductService;
+    //     try {
+    //         const modifier = await modifierService.findByIdAndUpdate(req.params.id, req.body);
+    //         res.status(200).json({ success: true, data: modifier });
+    //     } catch (err) {
+    //         logger.error(`🔥 error: ${err}`);
+    //         return next(err);
+    //     }
+    // });
 
-        logger.debug(`Calling get modifier endpoint with params: ${req.params}`);
+    // route.get('/:id', async (req: Request, res: Response, next: NextFunction) => {
+    //     const logger = Container.get('logger') as LoggerService;
+    //     const { modifier: modifierService } = Container.get('productService') as ProductService;
 
-        try {
-            const modifier = await modifierService.findById(req.params.id);
-            res.status(200).json({ success: true, data: modifier });
-        } catch (err) {
-            logger.error(`🔥 error: ${err}`);
-            return next(err);
-        }
-    });
+    //     logger.debug(`Calling get modifier endpoint with params: ${req.params}`);
+
+    //     try {
+    //         const modifier = await modifierService.findById(req.params.id);
+    //         res.status(200).json({ success: true, data: modifier });
+    //     } catch (err) {
+    //         logger.error(`🔥 error: ${err}`);
+    //         return next(err);
+    //     }
+    // });
 };
