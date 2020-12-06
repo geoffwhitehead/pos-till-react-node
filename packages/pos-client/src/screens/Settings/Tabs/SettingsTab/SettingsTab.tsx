@@ -124,14 +124,14 @@ const SettingsTabInner: React.FC<SettingsTabOuterProps & SettingsTabInnerProps> 
                       touched={touched.receiptPrinterId}
                       name="receiptPrinterId"
                       errors={errors.receiptPrinterId}
+                      style={{
+                        alignItems: 'flex-start',
+                      }}
                     >
                       <Picker
                         mode="dropdown"
-                        iosIcon={<Icon name="arrow-down" />}
-                        style={{ width: undefined }}
+                        iosIcon={<Icon name="chevron-down-outline" />}
                         placeholder="Select receipt printer"
-                        placeholderStyle={{ color: '#bfc6ea' }}
-                        placeholderIconColor="#007aff"
                         selectedValue={receiptPrinterId}
                         onValueChange={handleChange('receiptPrinterId')}
                       >
@@ -147,14 +147,14 @@ const SettingsTabInner: React.FC<SettingsTabOuterProps & SettingsTabInnerProps> 
                       touched={touched.defaultPriceGroupId}
                       name="defaultPriceGroupId"
                       errors={errors.defaultPriceGroupId}
+                      style={{
+                        alignItems: 'flex-start',
+                      }}
                     >
                       <Picker
                         mode="dropdown"
-                        iosIcon={<Icon name="arrow-down" />}
-                        style={{ width: undefined }}
+                        iosIcon={<Icon name="chevron-down-outline" />}
                         placeholder="Select default price group"
-                        placeholderStyle={{ color: '#bfc6ea' }}
-                        placeholderIconColor="#007aff"
                         selectedValue={defaultPriceGroupId}
                         onValueChange={handleChange('defaultPriceGroupId')}
                       >
@@ -164,49 +164,46 @@ const SettingsTabInner: React.FC<SettingsTabOuterProps & SettingsTabInnerProps> 
                       </Picker>
                     </ItemField>
 
-                    <View style={styles.noEditFields}>
-                      <Text style={{ color: 'grey', paddingBottom: 10 }}>
-                        Note: Can only be changed when there are no active bills
-                      </Text>
+                    <Text style={{ color: 'grey', paddingBottom: 10 }}>
+                      Note: Can only be changed when there are no active bills
+                    </Text>
 
-                      <ItemField
-                        label="Max open bills"
-                        touched={touched.maxBills}
-                        name="maxBills"
-                        errors={errors.maxBills}
-                        disabled={hasOpenBills}
-                      >
-                        <Input
-                          onChangeText={handleChange('maxBills')}
-                          onBlur={handleBlur('maxBills')}
-                          value={maxBills.toString()}
-                          disabled={hasOpenBills}
-                        />
-                      </ItemField>
+                    <ItemField
+                      label="Max open bills"
+                      touched={touched.maxBills}
+                      name="maxBills"
+                      errors={errors.maxBills}
+                    >
+                      <Input
+                        onChangeText={handleChange('maxBills')}
+                        onBlur={handleBlur('maxBills')}
+                        value={maxBills.toString()}
+                      />
+                    </ItemField>
 
-                      <ItemField
-                        picker
-                        label="Currency"
-                        touched={touched.currency}
-                        name="currency"
-                        errors={errors.currency}
+                    <ItemField
+                      picker
+                      label="Currency"
+                      touched={touched.currency}
+                      name="currency"
+                      errors={errors.currency}
+                      style={{
+                        alignItems: 'flex-start',
+                      }}
+                    >
+                      <Picker
+                        mode="dropdown"
+                        iosIcon={<Icon name="chevron-down-outline" />}
+                        placeholder="Select currency"
+                        selectedValue={currency}
+                        onValueChange={handleChange('currency')}
+                        enabled={!hasOpenBills}
                       >
-                        <Picker
-                          mode="dropdown"
-                          iosIcon={<Icon name="arrow-down" />}
-                          placeholder="Select currency"
-                          placeholderStyle={{ color: '#bfc6ea' }}
-                          placeholderIconColor="#007aff"
-                          selectedValue={currency}
-                          onValueChange={handleChange('currency')}
-                          enabled={!hasOpenBills}
-                        >
-                          {currencies.map(currency => (
-                            <Picker.Item key={currency.id} label={currency.name} value={currency.id} />
-                          ))}
-                        </Picker>
-                      </ItemField>
-                    </View>
+                        {currencies.map(currency => (
+                          <Picker.Item key={currency.id} label={currency.name} value={currency.id} />
+                        ))}
+                      </Picker>
+                    </ItemField>
                   </Form>
                 </Grid>
               </Content>

@@ -10,7 +10,7 @@ import { ItemField } from '../../../../components/ItemField/ItemField';
 import { Loading } from '../../../../components/Loading/Loading';
 import { ModalContentButton } from '../../../../components/Modal/ModalContentButton';
 import { OrganizationContext } from '../../../../contexts/OrganizationContext';
-import { ActionSheet, Col, Form, Grid, H2, Icon, Input, List, ListItem, Picker, Row, Text } from '../../../../core';
+import { ActionSheet, Col, Form, Grid, H3, Icon, Input, List, ListItem, Picker, Row, Text } from '../../../../core';
 import {
   Category,
   Item as ItemModel,
@@ -225,9 +225,6 @@ const ItemDetailsInner: React.FC<ItemDetailsOuterProps & ItemDetailsInnerProps> 
                         <Input onChangeText={handleChange('name')} onBlur={handleBlur('name')} value={name} />
                       </ItemField>
 
-                      <Text style={styles.text} note>
-                        A shortname will be used on printers where space is restricted.
-                      </Text>
                       <ItemField
                         label="Short Name"
                         touched={touched.shortName}
@@ -247,14 +244,14 @@ const ItemDetailsInner: React.FC<ItemDetailsOuterProps & ItemDetailsInnerProps> 
                         touched={touched.categoryId}
                         name="categoryId"
                         errors={errors.categoryId}
+                        style={{
+                          alignItems: 'flex-start',
+                        }}
                       >
                         <Picker
                           mode="dropdown"
-                          iosIcon={<Icon name="arrow-down" />}
-                          style={{ width: undefined }}
+                          iosIcon={<Icon name="chevron-down-outline" />}
                           placeholder="Select category"
-                          placeholderStyle={{ color: '#bfc6ea' }}
-                          placeholderIconColor="#007aff"
                           selectedValue={categoryId}
                           onValueChange={handleChange('categoryId')}
                         >
@@ -264,28 +261,24 @@ const ItemDetailsInner: React.FC<ItemDetailsOuterProps & ItemDetailsInnerProps> 
                         </Picker>
                       </ItemField>
 
-                      <Text style={styles.text} note>
-                        On storing a bill, this item will be sent to all printers associated with this printer group.
-                      </Text>
-
                       <ItemField
                         picker
                         label="Printer Group"
                         touched={touched.printerGroupId}
                         name="printerGroupId"
                         errors={errors.printerGroupId}
+                        style={{
+                          alignItems: 'flex-start',
+                        }}
                       >
                         <Picker
                           mode="dropdown"
-                          iosIcon={<Icon name="arrow-down" />}
-                          style={{ width: undefined }}
+                          iosIcon={<Icon name="chevron-down-outline" />}
                           placeholder="Select printer group"
-                          placeholderStyle={{ color: '#bfc6ea' }}
-                          placeholderIconColor="#007aff"
                           selectedValue={printerGroupId}
                           onValueChange={handleChange('printerGroupId')}
                         >
-                          {[...printerGroups, { id: '', name: 'None' }].map(({ id, name }) => (
+                          {[...printerGroups, { id: '', name: 'No Selection' }].map(({ id, name }) => (
                             <Picker.Item key={id} label={name} value={id} />
                           ))}
                         </Picker>
@@ -294,10 +287,7 @@ const ItemDetailsInner: React.FC<ItemDetailsOuterProps & ItemDetailsInnerProps> 
                   </Col>
                   <Col style={styles.columnRight}>
                     <Form>
-                      <H2>Price Groups</H2>
-                      <Text style={styles.text} note>
-                        Note: If you leave a price group blank, the item won't exist within that price group.
-                      </Text>
+                      <H3>Price Groups</H3>
                       <FieldArray
                         name="prices"
                         render={() => {
@@ -325,7 +315,7 @@ const ItemDetailsInner: React.FC<ItemDetailsOuterProps & ItemDetailsInnerProps> 
                 </Row>
 
                 <Row style={styles.row}>
-                  <H2 style={{ paddingTop: 20, ...styles.heading }}>Modifiers</H2>
+                  <H3 style={{ paddingTop: 20, ...styles.heading }}>Modifiers</H3>
                 </Row>
                 <Row style={styles.row}>
                   <Col>

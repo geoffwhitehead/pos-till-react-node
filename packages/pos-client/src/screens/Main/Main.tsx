@@ -198,6 +198,8 @@ export const MainWrapped: React.FC<MainOuterProps & MainInnerProps> = ({
             <ReceiptPrinterContext.Provider value={{ receiptPrinter, setReceiptPrinter }}>
               <RecentColorsContext.Provider value={{ recentColors, setRecentColors }}>
                 <LastSyncedAtContext.Provider value={{ lastSyncedAt, setLastSyncedAt }}>
+                  {/* Items and their prices are infrequently changed. Its more performant to perform any sorting and
+                  processing at the top level. */}
                   <ItemPricesContext.Provider value={{ groupedItemPrices, setGroupedItemPrices }}>
                     <ItemsContext.Provider
                       value={{ categoryItems, setCategoryItems, groupedSortedItems, setGroupedSortedItems }}

@@ -1,11 +1,10 @@
 import { Model, Q, Query, tableSchema } from '@nozbe/watermelondb';
 import { action, children, date, lazy, readonly } from '@nozbe/watermelondb/decorators';
 import dayjs from 'dayjs';
-import { Organization, tableNames } from '.';
+import { BillDiscount, Organization, tableNames } from '.';
 import { Bill } from './Bill';
 import { BillItem } from './BillItem';
 import { BillPayment } from './BillPayment';
-import { Discount } from './Discount';
 
 export const billPeriodSchema = tableSchema({
   name: 'bill_periods',
@@ -48,7 +47,7 @@ export class BillPeriod extends Model {
   );
   @lazy periodDiscounts = this.collections
     .get('bill_discounts')
-    .query(Q.on('bills', 'bill_period_id', this.id)) as Query<Discount>;
+    .query(Q.on('bills', 'bill_period_id', this.id)) as Query<BillDiscount>;
   @lazy periodPayments = this.collections.get('bill_payments').query(Q.on('bills', 'bill_period_id', this.id)) as Query<
     BillPayment
   >;

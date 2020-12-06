@@ -75,11 +75,8 @@ const CategoriesTabInner: React.FC<CategoriesTabOuterProps & CategoriesTabInnerP
         <Picker
           mode="dropdown"
           iosHeader="Select a grid size"
-          iosIcon={<Icon name="arrow-down" />}
+          iosIcon={<Icon name="chevron-down-outline" />}
           placeholder="Select a grid size"
-          textStyle={{ color: 'grey' }}
-          placeholderIconColor="#007aff"
-          style={{ width: undefined }}
           selectedValue={organization.categoryGridSize}
           onValueChange={handleUpdateGridSize}
         >

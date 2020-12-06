@@ -70,11 +70,8 @@ export const WrappedSearchHeader: React.FC<SearchHeaderOuterProps & SearchHeader
       <Picker
         mode="dropdown"
         iosHeader="Select a price group"
-        iosIcon={<Icon name="arrow-down" />}
+        iosIcon={<Icon name="chevron-down-outline" />}
         placeholder="Select a price group"
-        textStyle={{ color: 'grey' }}
-        placeholderIconColor="#007aff"
-        style={{ width: undefined }}
         selectedValue={priceGroup.id}
         onValueChange={handleChangePriceGroup}
       >

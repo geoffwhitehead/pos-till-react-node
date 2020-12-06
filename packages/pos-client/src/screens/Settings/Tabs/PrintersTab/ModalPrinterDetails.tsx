@@ -112,14 +112,14 @@ export const ModalPrinterDetails: React.FC<ModalPrinterDetailsOuterProps> = ({
                   touched={touched.emulation}
                   name="emulation"
                   errors={errors.emulation}
+                  style={{
+                    alignItems: 'flex-start',
+                  }}
                 >
                   <Picker
                     mode="dropdown"
-                    iosIcon={<Icon name="arrow-down" />}
-                    style={{ width: undefined }}
+                    iosIcon={<Icon name="chevron-down-outline" />}
                     placeholder="Select emulation"
-                    placeholderStyle={{ color: '#bfc6ea' }}
-                    placeholderIconColor="#007aff"
                     selectedValue={emulation}
                     onValueChange={handleChange('emulation')}
                   >

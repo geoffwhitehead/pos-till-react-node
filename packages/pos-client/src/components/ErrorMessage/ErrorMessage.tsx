@@ -17,5 +17,5 @@ export const ErrorMessage: React.FC<ErrorMessageProps> = ({ name, children, styl
 };
 
 const styles = StyleSheet.create({
-  error: { paddingLeft: 15, paddingRight: 15, paddingTop: 5, paddingBottom: 5, color: 'red' },
+  error: { paddingLeft: 15, paddingRight: 15, color: 'red' },
 });

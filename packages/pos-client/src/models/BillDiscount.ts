@@ -21,6 +21,9 @@ export class BillDiscount extends Model {
   @nochange @field('discount_id') discountId: string;
   @readonly @date('created_at') createdAt: Date;
   @readonly @date('updated_at') updatedAt: Date;
+  /**
+   * Not ideal - prefer amount to be always be generated based on the bill items but its more performant this way for reporting.
+   */
   @field('closing_amount') closingAmount: number;
 
   @immutableRelation('bills', 'bill_id') bill: Relation<Bill>;
