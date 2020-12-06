@@ -1,4 +1,3 @@
-import { StringSchema } from 'yup';
 import { api } from '.';
 
 type PullChangesRequest = {
