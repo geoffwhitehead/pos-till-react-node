@@ -28,7 +28,6 @@ interface ItemDetailsOuterProps {
   item?: ItemModel;
   onClose: () => void;
   database: Database;
-  categories: Category[];
 }
 
 interface ItemDetailsInnerProps {
@@ -365,12 +364,14 @@ const enhance = c =>
           itemModifiers: item.modifiers,
           modifiers: database.collections.get<Modifier>(tableNames.modifiers).query(),
           priceGroups: database.collections.get<PriceGroup>(tableNames.priceGroups).query(),
+          categories: database.collections.get<Category>(tableNames.categories).query(),
         };
       } else {
         return {
           printerGroups: database.collections.get<PrinterGroup>(tableNames.printerGroups).query(),
           modifiers: database.collections.get<Modifier>(tableNames.modifiers).query(),
           priceGroups: database.collections.get<PriceGroup>(tableNames.priceGroups).query(),
+          categories: database.collections.get<Category>(tableNames.categories).query(),
         };
       }
     })(c),

@@ -15,6 +15,16 @@ type UpdateItemProps = {
   prices: { price: number | null; itemPrice: ItemPrice }[];
 };
 
+export const itemSchema = tableSchema({
+  name: 'items',
+  columns: [
+    { name: 'name', type: 'string' },
+    { name: 'short_name', type: 'string' },
+    { name: 'category_id', type: 'string', isIndexed: true },
+    { name: 'printer_group_id', type: 'string' },
+  ],
+});
+
 export class Item extends Model {
   static table = 'items';
 
@@ -93,13 +103,3 @@ export class Item extends Model {
     await this.database.batch(...batched);
   };
 }
-
-export const itemSchema = tableSchema({
-  name: 'items',
-  columns: [
-    { name: 'name', type: 'string' },
-    { name: 'short_name', type: 'string' },
-    { name: 'category_id', type: 'string', isIndexed: true },
-    { name: 'printer_group_id', type: 'string' },
-  ],
-});

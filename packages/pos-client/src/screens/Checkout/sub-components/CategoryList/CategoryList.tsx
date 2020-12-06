@@ -58,7 +58,7 @@ export const CategoriesInner: React.FC<CategoriesOuterProps & CategoriesInnerPro
 
   return (
     <Container>
-      <SearchHeader onChangeText={onSearchHandler} value={searchValue} />
+      <SearchHeader onChangeText={onSearchHandler} value={searchValue} showPriceGroup />
       <ListItem itemHeader first>
         <Text style={{ fontWeight: 'bold' }}>Categories</Text>
       </ListItem>

@@ -9,7 +9,7 @@ interface ItemsTabRowOuterProps {
   isActive: boolean;
   onPressItem: (i: Item) => void;
   title: string;
-  subtitle: string;
+  subtitle?: string;
   index: number;
 }
 
@@ -28,9 +28,11 @@ const ItemsTabRowInner: React.FC<ItemsTabRowOuterProps & ItemsTabRowInnerProps> 
     <ListItem>
       <Left style={styles.item}>
         <Text style={{ alignSelf: 'flex-start' }}>{`${index + 1}: ${title}`}</Text>
-        <Text style={{ alignSelf: 'flex-start' }} note>
-          {subtitle}
-        </Text>
+        {!!subtitle && (
+          <Text style={{ alignSelf: 'flex-start' }} note>
+            {subtitle}
+          </Text>
+        )}
       </Left>
       <Body />
       <Right>

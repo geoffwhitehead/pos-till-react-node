@@ -13,6 +13,7 @@ interface SearchHeaderOuterProps {
   onChangeText: (value: string) => void;
   value: string;
   database: Database;
+  showPriceGroup?: boolean;
 }
 
 interface SearchHeaderInnerProps {
@@ -25,6 +26,7 @@ export const WrappedSearchHeader: React.FC<SearchHeaderOuterProps & SearchHeader
   priceGroups,
   onChangeText,
   value = '',
+  showPriceGroup,
   ...props
 }) => {
   const { priceGroup, setPriceGroup } = useContext(PriceGroupContext);
@@ -64,24 +66,25 @@ export const WrappedSearchHeader: React.FC<SearchHeaderOuterProps & SearchHeader
     <Item {...props} style={styles.searchBar}>
       <Icon name="ios-search" />
       <Input placeholder="Search" onChangeText={onChangeText} value={value} />
-      <Label>
-        <Text style={{ color: 'grey' }}>Price Group: </Text>
-      </Label>
-      <Picker
-        mode="dropdown"
-        iosHeader="Select a price group"
-        iosIcon={<Icon name="chevron-down-outline" />}
-        placeholder="Select a price group"
-        selectedValue={priceGroup.id}
-        onValueChange={handleChangePriceGroup}
-      >
-        {priceGroups.map(({ id, name }) => {
-          return <Picker.Item key={id} label={name} value={id} />;
-        })}
-      </Picker>
-      {/* <Button small danger onPress={onChangePriceGroup}>
-        <Text style={{ fontWeight: 'bold' }}>{`Price Group: ${priceGroup.name}`}</Text>
-      </Button> */}
+      {showPriceGroup && (
+        <Label>
+          <Text style={{ color: 'grey' }}>Price Group: </Text>
+        </Label>
+      )}
+      {showPriceGroup && (
+        <Picker
+          mode="dropdown"
+          iosHeader="Select a price group"
+          iosIcon={<Icon name="chevron-down-outline" />}
+          placeholder="Select a price group"
+          selectedValue={priceGroup.id}
+          onValueChange={handleChangePriceGroup}
+        >
+          {priceGroups.map(({ id, name }) => {
+            return <Picker.Item key={id} label={name} value={id} />;
+          })}
+        </Picker>
+      )}
     </Item>
   );
 };
