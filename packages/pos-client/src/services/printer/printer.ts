@@ -20,6 +20,8 @@ export async function print({ commands, printer, openDrawer = false, onFinished 
   commands.push({ appendCutPaper: StarPRNT.CutPaperAction.PartialCutWithFeed });
   openDrawer && commands.push({ openCashDrawer: 1 });
 
+  console.log('printer', printer);
+
   try {
     await StarPRNT.print(printer.emulation, commands, printer.address);
     onFinished && onFinished(true);

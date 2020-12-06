@@ -164,10 +164,6 @@ const SettingsTabInner: React.FC<SettingsTabOuterProps & SettingsTabInnerProps> 
                       </Picker>
                     </ItemField>
 
-                    <Text style={{ color: 'grey', paddingBottom: 10 }}>
-                      Note: Can only be changed when there are no active bills
-                    </Text>
-
                     <ItemField
                       label="Max open bills"
                       touched={touched.maxBills}
