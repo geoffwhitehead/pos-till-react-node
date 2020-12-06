@@ -42,19 +42,16 @@ export const TransactionListInner: React.FC<TransactionListOuterProps & Transact
   useEffect(() => {
     const sortedBills = bills.sort(sorter);
     setSortedBills(sortedBills);
-    console.log('bills sorted', transactionOrder);
   }, [bills, transactionOrder, transactionGrouping, setSortedBills]);
 
   useEffect(() => {
     const sortedBillsGrouped = groupBy(sortedBills, bill => bill.reference);
     setSortedBillsGrouped(sortedBillsGrouped);
-    console.log('grouped ', transactionGrouping);
   }, [sortedBills, setSortedBillsGrouped, transactionOrder, transactionGrouping]);
 
   const hasNoTransactions = bills.length === 0;
   const isGrouped = transactionGrouping === TransactionGroupingEnum.grouped;
 
-  console.log('sortedBillsGrouped', sortedBillsGrouped);
   return (
     <List>
       <ListItem style={{}}>

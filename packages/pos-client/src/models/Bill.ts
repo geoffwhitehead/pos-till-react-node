@@ -223,7 +223,7 @@ export class Bill extends Model {
     ]);
 
     const createBillItem = () =>
-      this.collections.get<BillItem>('bill_items').prepareCreate(billItem => {
+      this.collections.get<BillItem>(tableNames.billItems).prepareCreate(billItem => {
         billItem.bill.set(this);
         billItem.priceGroup.set(priceGroup);
         billItem.category.set(category);

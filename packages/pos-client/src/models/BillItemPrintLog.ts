@@ -41,7 +41,7 @@ export const billItemPrintLogSchema = tableSchema({
   name: 'bill_item_print_logs',
   columns: [
     { name: 'bill_item_id', type: 'string', isIndexed: true },
-    { name: 'bill_id', type: 'string' },
+    { name: 'bill_id', type: 'string', isIndexed: true },
     { name: 'printer_id', type: 'string' },
     { name: 'status', type: 'string' },
     { name: 'created_at', type: 'number' },

@@ -96,21 +96,16 @@ const CategoryItemsInner: React.FC<CategoryItemsListOuterProps & CategoryItemsLi
   }, [groupedItemPrices, categoryItems, priceGroup]);
 
   useEffect(() => {
-    const filteredItems = Object.entries(selectableItems).reduce((acc, [key, items]) => {
-      /**
-       * items is sorted, key represents the first letter of the items in this group.
-       * The whole group can be excluded to improve performance if this check fails.
-       */
+    if (!searchValue || searchValue.length === 0) {
+      return setItemsToDisplay(selectableItems);
+    }
 
-      const includeGroup = searchFilter(key, searchValue);
-
-      if (!includeGroup) {
-        return acc;
-      }
-
+    const filteredItems = Object.entries(selectableItems).reduce((acc, [firstLetter, items]) => {
       return {
         ...acc,
-        [key]: items.filter(item => searchFilter(item.name, searchValue)),
+        [firstLetter]: items.filter(item => {
+          return searchFilter(item.name, searchValue);
+        }),
       };
     }, {});
     setItemsToDisplay(filteredItems);

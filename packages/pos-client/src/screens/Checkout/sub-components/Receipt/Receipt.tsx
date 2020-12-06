@@ -296,8 +296,8 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
 
   const { totalDiscount, total, totalPayable, balance } = summary;
 
-  const requiresPrepTime =
-    priceGroups.some(priceGroup => priceGroup.isPrepTimeRequired) && itemsRequiringPrepTimeCount > 0;
+  // const requiresPrepTime =
+  //   priceGroups.some(priceGroup => priceGroup.isPrepTimeRequired) && itemsRequiringPrepTimeCount > 0;
   const dateString = bill.prepAt ? dayjs(bill.prepAt).format('h:mm A') : '';
   const isCallButtonDisabled = incompleteBillCallPrintLogs > 0;
   const hasDiscount = totalDiscount > 0;

@@ -165,7 +165,7 @@ export const ReportReceiptInner: React.FC<ReportReceiptInnerProps & ReportReceip
             </Separator>
             {discountTotals.breakdown.map(({ name, total, count }) => {
               return (
-                <ListItem>
+                <ListItem key={name}>
                   <Left>
                     <Text>{name}</Text>
                   </Left>
@@ -203,7 +203,7 @@ export const ReportReceiptInner: React.FC<ReportReceiptInnerProps & ReportReceip
             </Separator>
             {paymentTotals.breakdown.map(({ name, total, count }) => {
               return (
-                <ListItem>
+                <ListItem key={name}>
                   <Left>
                     <Text>{capitalize(name)}</Text>
                   </Left>
