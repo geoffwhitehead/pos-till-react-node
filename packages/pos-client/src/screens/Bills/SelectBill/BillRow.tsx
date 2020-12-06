@@ -1,7 +1,7 @@
 import { Database } from '@nozbe/watermelondb';
 import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import withObservables from '@nozbe/with-observables';
-import dayjs from 'dayjs';
+import dayjs, { Dayjs } from 'dayjs';
 import React, { useContext, useEffect, useState } from 'react';
 import { StyleSheet } from 'react-native';
 import { OrganizationContext } from '../../../contexts/OrganizationContext';
@@ -54,6 +54,10 @@ export const WrappedBillRow: React.FC<BillRowInnerProps & BillRowOuterProps> = (
   const {
     organization: { currency },
   } = useContext(OrganizationContext);
+  const [lastCalledAt, setLastCalledAt] = useState<Dayjs>();
+  const [hasUnstoredItems, setHasUnstoredItems] = useState(false);
+  const [hasPrintErrors, sethasPrintErrors] = useState(false);
+  const [hasPendingPrints, setHasPendingPrints] = useState(false);
 
   useEffect(() => {
     const summary = async () => {
@@ -69,13 +73,42 @@ export const WrappedBillRow: React.FC<BillRowInnerProps & BillRowOuterProps> = (
     summary();
   }, [chargableBillItems, billDiscounts, billPayments, discounts]);
 
-  const combinedLogs = [...overviewPrintLogs, ...overviewBillCallPrintLogs];
-  const hasUnstoredItems = combinedLogs.some(l => l.status === PrintStatus.pending);
-  const hasPrintErrors = combinedLogs.some(l => l.status === PrintStatus.errored);
-  const hasPendingPrints = combinedLogs.some(l => l.status === PrintStatus.processing);
+  useEffect(() => {
+    const lastCalledAt =
+      billCallLogs.length > 0 &&
+      billCallLogs.reduce((out, log) => {
+        const date = dayjs(log.createdAt);
+        if (date.isAfter(out)) {
+          return date;
+        }
+        return out;
+      }, dayjs(billCallLogs[0].createdAt));
+
+    setLastCalledAt(lastCalledAt);
+  }, [billCallLogs]);
+
+  useEffect(() => {
+    const combinedLogs = [...overviewPrintLogs, ...overviewBillCallPrintLogs];
+    const hasUnstoredItems = combinedLogs.some(l => l.status === PrintStatus.pending);
+    setHasUnstoredItems(hasUnstoredItems);
+  }, [overviewPrintLogs, overviewBillCallPrintLogs]);
+
+  useEffect(() => {
+    const combinedLogs = [...overviewPrintLogs, ...overviewBillCallPrintLogs];
+    const hasPrintErrors = combinedLogs.some(l => l.status === PrintStatus.errored);
+
+    sethasPrintErrors(hasPrintErrors);
+  }, [overviewPrintLogs, overviewBillCallPrintLogs]);
+
+  useEffect(() => {
+    const combinedLogs = [...overviewPrintLogs, ...overviewBillCallPrintLogs];
+    const hasPendingPrints = combinedLogs.some(l => l.status === PrintStatus.processing);
+
+    setHasPendingPrints(hasPendingPrints);
+  }, [overviewPrintLogs, overviewBillCallPrintLogs]);
+
   const rowText = bill.reference;
 
-  // const balanceText = summary ? `Balance: ${formatNumber(summary.balance, currency)}` : '...';
   const totalText = summary ? `${formatNumber(summary.totalPayable, currency)}` : '...';
 
   const hasUnsentItems = !hasPrintErrors && hasUnstoredItems;
@@ -94,16 +127,6 @@ export const WrappedBillRow: React.FC<BillRowInnerProps & BillRowOuterProps> = (
     : hasPendingPrintItems
     ? 'ios-print'
     : null;
-
-  const lastCalledAt =
-    billCallLogs.length > 0 &&
-    billCallLogs.reduce((out, log) => {
-      const date = dayjs(log.createdAt);
-      if (date.isAfter(out)) {
-        return date;
-      }
-      return out;
-    }, dayjs(billCallLogs[0].createdAt));
 
   return (
     <ListItem noIndent style={styles.openBill} key={bill.id} onPress={() => onSelectBill(bill)}>

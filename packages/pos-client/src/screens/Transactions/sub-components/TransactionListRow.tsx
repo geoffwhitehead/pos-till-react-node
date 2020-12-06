@@ -42,6 +42,8 @@ const TransactionListRowInner: React.FC<TransactionListRowOuterProps & Transacti
   const database = useDatabase();
 
   useEffect(() => {
+    console.log('trans: fetching summary ', bill.reference);
+
     const fetchSummary = async () => {
       const summary = await transactionSummary({ chargableBillItems, billDiscounts, billPayments, database });
       setSummary(summary);
@@ -55,6 +57,7 @@ const TransactionListRowInner: React.FC<TransactionListRowOuterProps & Transacti
   const keyedPaymentTypes = keyBy(paymentTypes, type => type.id);
   const hasDiscount = summary.discountTotal > 0;
 
+  console.log('trans: render bill ', bill.reference);
   return (
     <ListItem {...props} noIndent style={isSelected ? styles.selected : {}} onPress={() => onSelectBill(bill)}>
       <Left

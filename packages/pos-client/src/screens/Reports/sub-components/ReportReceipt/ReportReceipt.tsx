@@ -1,4 +1,5 @@
 import { useDatabase } from '@nozbe/watermelondb/hooks';
+import withObservables from '@nozbe/with-observables';
 import { capitalize, sumBy } from 'lodash';
 import React, { useContext, useEffect, useState } from 'react';
 import { StyleSheet } from 'react-native';
@@ -10,29 +11,37 @@ import { PeriodReportData, periodReportData } from '../../../../services/printer
 import { formatNumber } from '../../../../utils';
 import { RECEIPT_PANEL_BUTTONS_WIDTH, RECEIPT_PANEL_WIDTH } from '../../../../utils/consts';
 import { moderateScale } from '../../../../utils/scaling';
-interface ReportReceiptProps {
+interface ReportReceiptInnerProps {
+  // onPressPrint: () => void;
+  closedBillsCount: number;
+}
+
+interface ReportReceiptOuterProps {
   // onPressPrint: () => void;
   billPeriod: BillPeriod;
 }
 
-export const ReportReceipt: React.FC<ReportReceiptProps> = ({
+export const ReportReceiptInner: React.FC<ReportReceiptInnerProps & ReportReceiptOuterProps> = ({
   // onPressPrint,
   billPeriod,
+  closedBillsCount,
 }) => {
-  const database = useDatabase();
   const {
     organization: { currency },
   } = useContext(OrganizationContext);
+
+  const database = useDatabase();
 
   const [reportData, setReportData] = useState<PeriodReportData>();
 
   useEffect(() => {
     const fetchData = async () => {
+      console.log('---recalc');
       const summary = await periodReportData({ billPeriod, database });
       setReportData(summary);
     };
     fetchData();
-  }, [billPeriod]);
+  }, [billPeriod, closedBillsCount]);
 
   if (!reportData) {
     return <Loading />;
@@ -54,6 +63,7 @@ export const ReportReceipt: React.FC<ReportReceiptProps> = ({
     compBillItemModifierItems,
   } = reportData;
 
+  console.log('closedBillsCount', closedBillsCount);
   return (
     <Col style={styles.rightColumn}>
       <Row>
@@ -68,7 +78,7 @@ export const ReportReceipt: React.FC<ReportReceiptProps> = ({
                 return null;
               }
               return (
-                <ListItem>
+                <ListItem key={categoryId}>
                   <Left>
                     <Text>{category.name}</Text>
                   </Left>
@@ -92,7 +102,7 @@ export const ReportReceipt: React.FC<ReportReceiptProps> = ({
             {modifierTotals.breakdown.map(({ modifierName, breakdown, total, count }) => {
               return (
                 <>
-                  <ListItem itemDivider>
+                  <ListItem itemDivider key={modifierName}>
                     <Left>
                       <Text>{modifierName}</Text>
                     </Left>
@@ -103,7 +113,7 @@ export const ReportReceipt: React.FC<ReportReceiptProps> = ({
                   </ListItem>
                   {breakdown.map(({ modifierItemName, total, count }) => {
                     return (
-                      <ListItem>
+                      <ListItem key={modifierName + modifierItemName}>
                         <Left>
                           <Text>{modifierItemName}</Text>
                         </Left>
@@ -129,7 +139,7 @@ export const ReportReceipt: React.FC<ReportReceiptProps> = ({
             </Separator>
             {priceGroupTotals.map(({ name, total, count }) => {
               return (
-                <ListItem>
+                <ListItem key={name}>
                   <Left>
                     <Text>{name}</Text>
                   </Left>
@@ -254,6 +264,13 @@ export const ReportReceipt: React.FC<ReportReceiptProps> = ({
     </Col>
   );
 };
+
+const enhance = c =>
+  withObservables<ReportReceiptOuterProps, ReportReceiptInnerProps>(['billPeriod'], ({ billPeriod }) => ({
+    closedBillsCount: billPeriod.bills.observeCount(),
+  }))(c);
+
+export const ReportReceipt = enhance(ReportReceiptInner);
 
 const styles = StyleSheet.create({
   rightColumn: {

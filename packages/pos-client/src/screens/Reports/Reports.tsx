@@ -100,9 +100,15 @@ export const ReportsInner: React.FC<ReportsOuterProps & ReportsInnerProps> = ({
     }
   };
 
+  const handleOnOpen = () => {
+    // perf: keeping this open will cause it to keep recalculating as changes are made
+    setSelectedBillPeriod(null);
+    openDrawer();
+  };
+
   return (
     <Container>
-      <SidebarHeader title="Reports" onOpen={openDrawer} />
+      <SidebarHeader title="Reports" onOpen={handleOnOpen} />
       {/* <Protected code={ORG_PASSCODE} navigation={navigation}> */}
       <Grid>
         <Col>

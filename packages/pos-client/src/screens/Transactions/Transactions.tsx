@@ -23,15 +23,20 @@ export const TransactionsInner: React.FC<TransactionsOuterProps & TransactionsIn
   closedBills,
 }) => {
   const [selectedBill, setSelectedBill] = useState<Bill | null>(null);
-  const selectBillHandler = (b: Bill) => setSelectedBill(b);
+
+  const handleOnOpen = () => {
+    // perf: keeping this open will cause it to keep recalculating as changes are made
+    setSelectedBill(null);
+    navigation.openDrawer();
+  };
 
   return (
     <Container>
-      <SidebarHeader title="Transactions" onOpen={() => navigation.openDrawer()} />
+      <SidebarHeader title="Transactions" onOpen={handleOnOpen} />
       <Grid>
         <Col>
           <Content>
-            <TransactionList bills={closedBills} selectedBill={selectedBill} onSelectBill={selectBillHandler} />
+            <TransactionList bills={closedBills} selectedBill={selectedBill} onSelectBill={setSelectedBill} />
           </Content>
         </Col>
         {selectedBill && (
