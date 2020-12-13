@@ -48,8 +48,8 @@ const enhance = component =>
     ({ bill, priceGroup }) => ({
       bill,
       priceGroup,
-      billItems: bill.billItems,
-      billItemsCount: bill.billItemsExclVoids.observeCount(),
+      billItems: priceGroup.billItems,
+      billItemsCount: priceGroup.billItemsExclVoids.observeCount(),
       // billItemPrintLogs: bill.billItemStatusLogs.observeWithColumns(['status']),
       // billItems: bill.billItems,
       // priceGroupToDisplay: bill.priceGroupsToDisplay

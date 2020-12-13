@@ -72,10 +72,6 @@ export const ReceiptItemsInner: React.FC<ReceiptItemsOuterProps & ReceiptItemsIn
   const onRemoveBillDiscount = async (billDiscount: BillDiscount) => database.action(() => billDiscount.void());
   const onRemoveBillPayment = async (billPayment: BillPayment) => database.action(() => billPayment.void());
 
-  // const removeNoPrint = async (item: BillItem) => {
-  //   await database.action(() => item.voidNoPrint());
-  // };
-
   const onMakeComplimentary = async (billItem: BillItem, values: ModifyReason) => {
     await database.action(() => billItem.makeComp(values));
     onCloseModalHandler();
@@ -155,7 +151,7 @@ export const ReceiptItemsInner: React.FC<ReceiptItemsOuterProps & ReceiptItemsIn
           paymentTypes={paymentTypes}
         />
       </List>
-      <Modal style={{ width: 500 }} onClose={onCloseModalHandler} isOpen={isReasonModalOpen}>
+      <Modal onClose={onCloseModalHandler} isOpen={isReasonModalOpen}>
         <ModalReason
           onClose={onCloseModalHandler}
           onComplete={values => {
@@ -170,7 +166,7 @@ export const ReceiptItemsInner: React.FC<ReceiptItemsOuterProps & ReceiptItemsIn
           title={capitalize(selectedBillItem?.itemName)}
         />
       </Modal>
-      <Modal style={{ width: 500 }} onClose={onCloseModalHandler} isOpen={isPrintMessageModalOpen}>
+      <Modal onClose={onCloseModalHandler} isOpen={isPrintMessageModalOpen}>
         <Formik
           initialValues={{ printMessage }}
           validationSchema={Yup.object().shape({
@@ -196,7 +192,7 @@ export const ReceiptItemsInner: React.FC<ReceiptItemsOuterProps & ReceiptItemsIn
                 <Form>
                   <ItemField
                     label="Print Message"
-                    touched={touched.printMessage as boolean}
+                    touched={!!touched.printMessage}
                     name="printMessage"
                     errors={errors.printMessage}
                   >

@@ -1,6 +1,15 @@
-import { Model, tableSchema } from '@nozbe/watermelondb';
-import { action, field } from '@nozbe/watermelondb/decorators';
-import { Organization } from '.';
+import { Model, Q, Query, tableSchema } from '@nozbe/watermelondb';
+import { action, children, field, lazy } from '@nozbe/watermelondb/decorators';
+import { BillItem, Organization } from '.';
+
+export const priceGroupSchema = tableSchema({
+  name: 'price_groups',
+  columns: [
+    { name: 'name', type: 'string' },
+    { name: 'short_name', type: 'string' },
+    { name: 'is_prep_time_required', type: 'boolean' },
+  ],
+});
 
 export class PriceGroup extends Model {
   static table = 'price_groups';
@@ -13,6 +22,10 @@ export class PriceGroup extends Model {
   @field('short_name') shortName: string;
   @field('is_prep_time_required') isPrepTimeRequired: boolean;
 
+  @children('bill_items') billItems: Query<BillItem>;
+
+  @lazy billItemsExclVoids = this.billItems.extend(Q.where('is_voided', Q.notEq(true)));
+
   @action updatePriceGroup = async (values: { name: string; shortName: string; isPrepTimeRequired: boolean }) => {
     await this.update(record => Object.assign(record, values));
   };
@@ -24,12 +37,3 @@ export class PriceGroup extends Model {
     }
   };
 }
-
-export const priceGroupSchema = tableSchema({
-  name: 'price_groups',
-  columns: [
-    { name: 'name', type: 'string' },
-    { name: 'short_name', type: 'string' },
-    { name: 'is_prep_time_required', type: 'boolean' },
-  ],
-});
