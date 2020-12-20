@@ -11,6 +11,7 @@ type ItemFieldProps = {
   picker?: boolean;
   disabled?: boolean;
   styleLabel?: Object;
+  type?: 'fixedLabel' | 'stackedLabel';
   // textColor?: string
 };
 
@@ -21,18 +22,23 @@ export const ItemField: React.FC<ItemFieldProps> = ({
   name,
   label,
   children,
+  type = 'stackedLabel',
   style = {},
   disabled = false,
   styleLabel = {},
 }) => {
+  const props = {
+    [type]: true,
+  };
+
   return (
     <>
       <Item
         disabled={disabled}
         picker={picker}
-        stackedLabel
         style={style}
         error={touched && (errors?.length > 0 || errors)}
+        {...props}
       >
         <Label style={styleLabel}>{label}</Label>
         {children}

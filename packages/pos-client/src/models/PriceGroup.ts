@@ -1,6 +1,6 @@
 import { Model, Q, Query, tableSchema } from '@nozbe/watermelondb';
 import { action, children, field, lazy } from '@nozbe/watermelondb/decorators';
-import { BillItem, Organization } from '.';
+import { BillItem, ItemPrice, Organization } from '.';
 
 export const priceGroupSchema = tableSchema({
   name: 'price_groups',
@@ -16,6 +16,7 @@ export class PriceGroup extends Model {
 
   static associations = {
     bill_items: { type: 'has_many', foreignKey: 'price_group_id' },
+    item_prices: { type: 'has_many', foreignKey: 'price_group_id' },
   };
 
   @field('name') name: string;
@@ -23,6 +24,7 @@ export class PriceGroup extends Model {
   @field('is_prep_time_required') isPrepTimeRequired: boolean;
 
   @children('bill_items') billItems: Query<BillItem>;
+  @children('item_prices') itemPrices: Query<ItemPrice>;
 
   @lazy billItemsExclVoids = this.billItems.extend(Q.where('is_voided', Q.notEq(true)));
 

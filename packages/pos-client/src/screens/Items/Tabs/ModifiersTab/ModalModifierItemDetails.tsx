@@ -186,7 +186,7 @@ export const ModalModifierItemDetailsInner: React.FC<ModalModifierItemDetailsOut
                           <Input
                             onChangeText={handleChange(`prices[${index}].price`)}
                             onBlur={handleBlur(`prices[${index}].price`)}
-                            value={price.toString()}
+                            value={price}
                           />
                         </ItemField>
                       );

@@ -24,7 +24,7 @@ interface ItemsInnerProps {
 }
 
 const ItemsInner: React.FC<ItemsInnerProps & ItemsOuterProps> = ({ navigation, categories }) => {
-  const [selectedCategory, setSelectedCategory] = useState<Category>(categories[0]);
+  const [selectedCategory, setSelectedCategory] = useState<Category>(categories[0] || null);
 
   if (!categories) {
     return <Loading />;
@@ -53,6 +53,7 @@ const ItemsInner: React.FC<ItemsInnerProps & ItemsOuterProps> = ({ navigation, c
             </Picker>
           </ListItem>
           {selectedCategory && <ItemsTab category={selectedCategory} />}
+          {!selectedCategory && <Text>Select a category to show items...</Text>}
         </Tab>
         <Tab heading="Categories">
           <CategoriesTab />
@@ -60,7 +61,7 @@ const ItemsInner: React.FC<ItemsInnerProps & ItemsOuterProps> = ({ navigation, c
         <Tab heading="Modifiers">
           <ModifiersTab />
         </Tab>
-        <Tab heading="Price Groups">
+        <Tab heading="Prices">
           <PriceGroupsTab />
         </Tab>
       </Tabs>
@@ -75,6 +76,9 @@ const styles = StyleSheet.create({
 
 export const Items = withDatabase<{}>(
   withObservables<ItemsOuterProps, ItemsInnerProps>([], ({ database }) => ({
-    categories: database.collections.get<Category>(tableNames.categories).query(),
+    categories: database.collections
+      .get<Category>(tableNames.categories)
+      .query()
+      .observeWithColumns(['name']),
   }))(ItemsInner),
 );

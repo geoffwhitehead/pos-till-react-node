@@ -48,8 +48,7 @@ const generateItemSchema = (shortNameLength: number) =>
       .required('Required'),
     shortName: Yup.string()
       .min(2, 'Too Short')
-      .max(shortNameLength, 'Too Long')
-      .required('Required'),
+      .max(shortNameLength, 'Too Long'),
     categoryId: Yup.string()
       .min(2, 'Too Short')
       .max(50, 'Too Long')

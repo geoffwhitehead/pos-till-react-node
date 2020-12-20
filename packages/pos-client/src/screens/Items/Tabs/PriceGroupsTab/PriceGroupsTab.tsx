@@ -1,15 +1,17 @@
 import { Database } from '@nozbe/watermelondb';
 import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import withObservables from '@nozbe/with-observables';
-import React, { useContext, useState } from 'react';
+import { sortBy } from 'lodash';
+import React, { useContext, useMemo, useState } from 'react';
 import { ScrollView } from 'react-native';
 import { Loading } from '../../../../components/Loading/Loading';
 import { Modal } from '../../../../components/Modal/Modal';
 import { OrganizationContext } from '../../../../contexts/OrganizationContext';
-import { ActionSheet, Body, Button, Icon, Left, List, ListItem, Right, Text, View } from '../../../../core';
-import { PriceGroup, tableNames } from '../../../../models';
+import { ActionSheet, Button, Container, Icon, Left, List, ListItem, Right, Text } from '../../../../core';
+import { Category, Item, PriceGroup, tableNames } from '../../../../models';
 import { commonStyles } from '../../../Settings/Tabs/styles';
 import { PriceGroupDetails } from './PriceGroupDetails';
+import { PriceGroupItemsModal } from './PriceGroupItemsModal';
 
 interface PriceGroupsTabOuterProps {
   database: Database;
@@ -17,20 +19,34 @@ interface PriceGroupsTabOuterProps {
 
 interface PriceGroupsTabInnerProps {
   priceGroups: PriceGroup[];
+  items: Item[];
+  categories: Category[];
 }
 
 const PriceGroupsTabInner: React.FC<PriceGroupsTabOuterProps & PriceGroupsTabInnerProps> = ({
   database,
   priceGroups,
+  items,
+  categories,
 }) => {
   const [selectedPriceGroup, setSelectedPriceGroup] = useState<PriceGroup>();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isPricesModalOpen, setIsPricesModalOpen] = useState(false);
   const { organization } = useContext(OrganizationContext);
 
   const onCancelHandler = () => {
     setSelectedPriceGroup(null);
     setIsModalOpen(false);
   };
+
+  const onCancelPricesHandler = () => {
+    setSelectedPriceGroup(null);
+    setIsPricesModalOpen(false);
+  };
+
+  const sortedItems = useMemo(() => {
+    return sortBy(items, item => item.name.toLowerCase());
+  }, [items]);
 
   const onDelete = async (priceGroup: PriceGroup) => {
     await database.action(() => priceGroup.remove(organization));
@@ -53,11 +69,18 @@ const PriceGroupsTabInner: React.FC<PriceGroupsTabOuterProps & PriceGroupsTabInn
     setSelectedPriceGroup(priceGroup);
     setIsModalOpen(true);
   };
+
+  const onSelectPrices = priceGroup => {
+    setSelectedPriceGroup(priceGroup);
+    setIsPricesModalOpen(true);
+  };
+
   if (!priceGroups) {
     return <Loading />;
   }
+
   return (
-    <View>
+    <Container>
       <List>
         <ListItem itemDivider>
           <Left>
@@ -74,11 +97,19 @@ const PriceGroupsTabInner: React.FC<PriceGroupsTabOuterProps & PriceGroupsTabInn
           {priceGroups.map(priceGroup => {
             const isSelected = priceGroup === selectedPriceGroup;
             return (
-              <ListItem key={priceGroup.id} noIndent style={isSelected ? commonStyles.selectedRow : {}}>
+              <ListItem
+                key={priceGroup.id}
+                onPress={() => setSelectedPriceGroup(priceGroup)}
+                noIndent
+                style={isSelected ? commonStyles.selectedRow : {}}
+              >
                 <Left>
                   <Text>{priceGroup.name}</Text>
                 </Left>
-                <Body></Body>
+
+                <Button style={{ marginRight: 10 }} bordered info small onPress={() => onSelectPrices(priceGroup)}>
+                  <Text>Bulk Edit Prices</Text>
+                </Button>
 
                 <Button
                   style={{ marginRight: 10 }}
@@ -98,17 +129,40 @@ const PriceGroupsTabInner: React.FC<PriceGroupsTabOuterProps & PriceGroupsTabInn
           })}
         </ScrollView>
       </List>
-      <Modal isOpen={isModalOpen} onClose={onCancelHandler} style={{ maxWidth: 800 }}>
+
+      <Modal isOpen={isModalOpen} onClose={onCancelHandler}>
         <PriceGroupDetails priceGroup={selectedPriceGroup} onClose={onCancelHandler} />
       </Modal>
-    </View>
+
+      <Modal isOpen={isPricesModalOpen} onClose={onCancelPricesHandler}>
+        {selectedPriceGroup && (
+          <PriceGroupItemsModal
+            categories={categories}
+            priceGroup={selectedPriceGroup}
+            onClose={onCancelPricesHandler}
+            sortedItems={sortedItems}
+          />
+        )}
+      </Modal>
+    </Container>
   );
 };
 
 const enhance = c =>
   withDatabase<any>(
     withObservables<PriceGroupsTabOuterProps, PriceGroupsTabInnerProps>([], ({ database }) => ({
-      priceGroups: database.collections.get<PriceGroup>(tableNames.priceGroups).query(),
+      priceGroups: database.collections
+        .get<PriceGroup>(tableNames.priceGroups)
+        .query()
+        .observeWithColumns(['name']),
+      categories: database.collections
+        .get<Category>(tableNames.categories)
+        .query()
+        .observeWithColumns(['name']),
+      items: database.collections
+        .get<Item>(tableNames.items)
+        .query()
+        .observeWithColumns(['name']),
     }))(c),
   );
 
