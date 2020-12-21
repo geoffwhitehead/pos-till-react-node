@@ -3,14 +3,14 @@ import withObservables from '@nozbe/with-observables';
 import { capitalize, sumBy } from 'lodash';
 import React, { useContext, useEffect, useState } from 'react';
 import { StyleSheet } from 'react-native';
-import { Loading } from '../../../../components/Loading/Loading';
-import { OrganizationContext } from '../../../../contexts/OrganizationContext';
-import { Col, Content, Left, List, ListItem, Right, Row, Separator, Text } from '../../../../core';
-import { BillPeriod } from '../../../../models';
-import { PeriodReportData, periodReportData } from '../../../../services/printer/periodReport';
-import { formatNumber } from '../../../../utils';
-import { RECEIPT_PANEL_BUTTONS_WIDTH, RECEIPT_PANEL_WIDTH } from '../../../../utils/consts';
-import { moderateScale } from '../../../../utils/scaling';
+import { Loading } from '../../../../../components/Loading/Loading';
+import { OrganizationContext } from '../../../../../contexts/OrganizationContext';
+import { Col, Content, Left, List, ListItem, Right, Row, Separator, Text } from '../../../../../core';
+import { BillPeriod } from '../../../../../models';
+import { PeriodReportData, periodReportData } from '../../../../../services/printer/periodReport';
+import { formatNumber } from '../../../../../utils';
+import { RECEIPT_PANEL_BUTTONS_WIDTH, RECEIPT_PANEL_WIDTH } from '../../../../../utils/consts';
+import { moderateScale } from '../../../../../utils/scaling';
 interface ReportReceiptInnerProps {
   // onPressPrint: () => void;
   closedBillsCount: number;
@@ -36,7 +36,6 @@ export const ReportReceiptInner: React.FC<ReportReceiptInnerProps & ReportReceip
 
   useEffect(() => {
     const fetchData = async () => {
-      console.log('---recalc');
       const summary = await periodReportData({ billPeriod, database });
       setReportData(summary);
     };
@@ -63,7 +62,6 @@ export const ReportReceiptInner: React.FC<ReportReceiptInnerProps & ReportReceip
     compBillItemModifierItems,
   } = reportData;
 
-  console.log('closedBillsCount', closedBillsCount);
   return (
     <Col style={styles.rightColumn}>
       <Row>

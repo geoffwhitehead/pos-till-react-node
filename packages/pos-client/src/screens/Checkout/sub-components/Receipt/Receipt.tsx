@@ -408,6 +408,7 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
             onConfirm={handleSetPrepTime}
             value={bill.prepAt}
             title="Please select a preperation time"
+            mode="time"
           />
         </Col>
       </Row>

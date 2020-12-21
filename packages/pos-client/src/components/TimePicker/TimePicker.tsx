@@ -9,6 +9,7 @@ type TimePickerProps = {
   onCancel: () => void;
   value?: Date;
   title?: string;
+  mode: 'date' | 'time' | 'datetime';
 };
 
 export const TimePicker: React.FC<TimePickerProps> = ({
@@ -17,13 +18,14 @@ export const TimePicker: React.FC<TimePickerProps> = ({
   isVisible,
   value,
   title = 'Pick a date / time',
+  mode,
 }) => {
   return (
     <View>
       <DateTimePickerModal
         headerTextIOS={title}
         isVisible={isVisible}
-        mode="time"
+        mode={mode}
         onConfirm={onConfirm}
         onCancel={onCancel}
         date={value ? dayjs(value).toDate() : undefined}

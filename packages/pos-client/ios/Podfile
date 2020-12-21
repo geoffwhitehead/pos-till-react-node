@@ -42,16 +42,18 @@ target 'Positive' do
   pod 'RNStarPrnt', :path => '../node_modules/react-native-star-prnt'
 
   
-  target 'PositiveTests' do
-    inherit! :search_paths
-    # Pods for testing
-  end
+  pod 'RNSVG', :path => '../node_modules/react-native-svg'
+
+  # target 'PositiveTests' do
+  #   inherit! :search_paths
+  #   # Pods for testing
+  # end
   use_native_modules!
 end
-target 'Positive-tvOS' do
-  # Pods for Positive-tvOS
-  target 'Positive-tvOSTests' do
-    inherit! :search_paths
-    # Pods for testing
-  end
-end
+# target 'Positive-tvOS' do
+#   # Pods for Positive-tvOS
+#   target 'Positive-tvOSTests' do
+#     inherit! :search_paths
+#     # Pods for testing
+#   end
+# end

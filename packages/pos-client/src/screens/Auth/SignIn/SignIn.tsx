@@ -48,6 +48,7 @@ export const SignInInner: React.FC<SignInOuterProps & SignInInnerProps> = ({ nav
     unlink();
     navigation.navigate('SignIn');
   };
+
   return (
     <Container style={styles.container}>
       <StatusBar barStyle="light-content" />
