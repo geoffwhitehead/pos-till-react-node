@@ -11,6 +11,7 @@ import { AuthContext } from '../../../contexts/AuthContext';
 import { Button, Container, Form, Icon, Input, Text } from '../../../core';
 import { AuthStackParamList } from '../../../navigators/AuthNavigator';
 import { colors } from '../../../theme';
+import { resolveButtonState } from '../../../utils/helpers';
 import { moderateScale } from '../../../utils/scaling';
 
 const SignupSchema = Yup.object().shape({
@@ -80,7 +81,7 @@ type FormValues = {
 };
 
 export const SignUp: React.FC<SignUpProps> = ({ navigation, route }) => {
-  const { signUp } = React.useContext(AuthContext);
+  const { signUp, isSignUpLoading } = React.useContext(AuthContext);
   const [page, setPage] = useState(1);
 
   const initialValues: FormValues = {
@@ -352,7 +353,13 @@ export const SignUp: React.FC<SignUpProps> = ({ navigation, route }) => {
                 </Form>
                 <KeyboardAvoidingView style={styles.navButtons}>
                   {page > 1 && (
-                    <Button full info onPress={handlePrevious} style={{ flexGrow: 1 }}>
+                    <Button
+                      full
+                      disabled={isSignUpLoading}
+                      {...resolveButtonState(isSignUpLoading, 'info')}
+                      onPress={handlePrevious}
+                      style={{ flexGrow: 1 }}
+                    >
                       <Icon name="arrow-back-outline" />
                     </Button>
                   )}
@@ -362,7 +369,13 @@ export const SignUp: React.FC<SignUpProps> = ({ navigation, route }) => {
                     </Button>
                   )}
                   {page === 3 && (
-                    <Button full info onPress={handleSubmit} style={{ flexGrow: 3, marginLeft: 5 }}>
+                    <Button
+                      disabled={isSignUpLoading}
+                      {...resolveButtonState(isSignUpLoading, 'info')}
+                      full
+                      onPress={handleSubmit}
+                      style={{ flexGrow: 3, marginLeft: 5 }}
+                    >
                       <Text>Sign Up</Text>
                     </Button>
                   )}

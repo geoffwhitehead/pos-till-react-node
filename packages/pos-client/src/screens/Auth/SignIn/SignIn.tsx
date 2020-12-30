@@ -8,13 +8,12 @@ import React, { useContext, useEffect, useRef, useState } from 'react';
 import { KeyboardAvoidingView, StatusBar, StyleSheet } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { AuthContext } from '../../../contexts/AuthContext';
-import { Button, Container, Form, Input, Item, Label, Text } from '../../../core';
+import { Button, Container, Form, Input, Item, Label, Spinner, Text } from '../../../core';
 import { Organization, tableNames } from '../../../models';
 import { AuthStackParamList } from '../../../navigators/AuthNavigator';
 import { colors } from '../../../theme';
-import { areYouSure } from '../../../utils/helpers';
+import { areYouSure, resolveButtonState } from '../../../utils/helpers';
 import { moderateScale } from '../../../utils/scaling';
-
 interface SignInOuterProps {
   navigation: StackNavigationProp<AuthStackParamList, 'SignIn'>;
   route: RouteProp<AuthStackParamList, 'SignIn'>;
@@ -42,7 +41,7 @@ export const SignInInner: React.FC<SignInOuterProps & SignInInnerProps> = ({ nav
     }
   }, [organizations]);
 
-  const { signIn, unlink } = useContext(AuthContext);
+  const { signIn, unlink, isSignInLoading } = useContext(AuthContext);
 
   const handleUnlink = () => {
     unlink();
@@ -75,7 +74,13 @@ export const SignInInner: React.FC<SignInOuterProps & SignInInnerProps> = ({ nav
 
               <Input style={styles.text} value={password} onChangeText={setPassword} secureTextEntry />
             </Item>
-            <Button info full style={styles.button} onPress={() => signIn({ email, password })}>
+            <Button
+              {...resolveButtonState(isSignInLoading, 'info')}
+              full
+              disabled={isSignInLoading}
+              style={styles.button}
+              onPress={() => signIn({ email, password })}
+            >
               <Text>Sign in</Text>
             </Button>
             {!organization && (
@@ -103,6 +108,7 @@ export const SignInInner: React.FC<SignInOuterProps & SignInInnerProps> = ({ nav
                 * This terminal is currently linked with {organization.name}.
               </Text>
             )}
+            {isSignInLoading && <Spinner />}
           </Form>
         </KeyboardAvoidingView>
       </ScrollView>

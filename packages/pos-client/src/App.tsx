@@ -15,7 +15,31 @@ import { SplashScreen } from './screens/SplashScreen/SplashScreen';
 import { drawerTheme } from './theme';
 import { toast } from './utils/toast';
 
-export const App = () => {
+type ReducerState = {
+  isSignout: boolean;
+  accessToken: string;
+  refreshToken: string;
+  organizationId: string;
+  userId: string;
+  isLoading: boolean;
+  isSignInLoading: boolean;
+  isSignUpLoading: boolean;
+};
+
+type RestoreTokenActionProps = Pick<ReducerState, 'accessToken' | 'refreshToken' | 'organizationId' | 'userId'>;
+type SignInSuccessActionProps = Pick<ReducerState, 'accessToken' | 'refreshToken' | 'organizationId' | 'userId'>;
+
+type ReducerAction =
+  | ({ type: 'RESTORE_TOKEN' } & RestoreTokenActionProps)
+  | { type: 'SIGN_IN_REQUEST' }
+  | ({ type: 'SIGN_IN_SUCCESS' } & SignInSuccessActionProps)
+  | { type: 'SIGN_IN_FAILED' }
+  | { type: 'SIGN_UP_REQUEST' }
+  | { type: 'SIGN_UP_SUCCESS' }
+  | { type: 'SIGN_UP_FAILED' }
+  | { type: 'SIGN_OUT' };
+
+export const App: React.FC<{}> = () => {
   // if (env === 'local') {
   //   const whyDidYouRender = require('@welldone-software/why-did-you-render');
   //   whyDidYouRender(React, {
@@ -23,49 +47,76 @@ export const App = () => {
   //   });
   // }
 
-  const [state, dispatch] = React.useReducer(
-    (prevState, action) => {
-      switch (action.type) {
-        case 'RESTORE_TOKEN':
-          return {
-            ...prevState,
-            accessToken: action.accessToken,
-            refreshToken: action.refreshToken,
-            organizationId: action.organizationId,
-            userId: action.userId,
-            isLoading: false,
-          };
-        case 'SIGN_IN':
-          return {
-            ...prevState,
-            isSignout: false,
-            accessToken: action.accessToken,
-            refreshToken: action.refreshToken,
-            organizationId: action.organizationId,
-            userId: action.userId,
-            isLoading: false,
-          };
-        case 'SIGN_OUT':
-          return {
-            ...prevState,
-            isSignout: true,
-            accessToken: null,
-            refreshToken: null,
-            organizationId: null,
-            userId: null,
-            isLoading: false,
-          };
-      }
-    },
-    {
-      isLoading: true,
-      isSignout: false,
-      accessToken: null,
-      refreshToken: null,
-      organizationId: null,
-      userId: null,
-    },
-  );
+  const reducer = (state: ReducerState, action: ReducerAction) => {
+    switch (action.type) {
+      case 'RESTORE_TOKEN':
+        return {
+          ...state,
+          accessToken: action.accessToken,
+          refreshToken: action.refreshToken,
+          organizationId: action.organizationId,
+          userId: action.userId,
+          isLoading: false,
+        };
+      case 'SIGN_IN_SUCCESS':
+        return {
+          ...state,
+          isSignout: false,
+          accessToken: action.accessToken,
+          refreshToken: action.refreshToken,
+          organizationId: action.organizationId,
+          userId: action.userId,
+          isLoading: false,
+          isSignInLoading: false,
+        };
+      case 'SIGN_IN_REQUEST':
+        return {
+          ...state,
+          isSignInLoading: true,
+        };
+      case 'SIGN_IN_FAILED':
+        return {
+          ...state,
+          isSignInLoading: false,
+        };
+
+      case 'SIGN_UP_REQUEST':
+        return {
+          ...state,
+          isSignUpLoading: true,
+        };
+      case 'SIGN_UP_SUCCESS':
+        return {
+          ...state,
+          isSignUpLoading: false,
+        };
+      case 'SIGN_UP_FAILED':
+        return {
+          ...state,
+          isSignUpLoading: false,
+        };
+      case 'SIGN_OUT':
+        return {
+          ...state,
+          isSignout: true,
+          accessToken: null,
+          refreshToken: null,
+          organizationId: null,
+          userId: null,
+          isLoading: false,
+        };
+    }
+  };
+  const [state, dispatch] = React.useReducer(reducer, {
+    isLoading: true,
+    isSignout: false,
+    accessToken: null,
+    refreshToken: null,
+    organizationId: null,
+    userId: null,
+    isSignInLoading: false,
+    isSignUpLoading: false,
+  });
 
   React.useEffect(() => {
     const bootstrapAsync = async () => {
@@ -139,6 +190,7 @@ export const App = () => {
     () => ({
       signIn: async (params: SignInParams) => {
         try {
+          dispatch({ type: 'SIGN_IN_REQUEST' });
           const response = await signIn(params);
 
           if (response.data.success) {
@@ -155,11 +207,12 @@ export const App = () => {
               userId,
             });
 
-            dispatch({ type: 'SIGN_IN', accessToken, refreshToken, organizationId, userId });
+            dispatch({ type: 'SIGN_IN_SUCCESS', accessToken, refreshToken, organizationId, userId });
           } else {
             throw new Error('Sign in failed');
           }
         } catch (err) {
+          dispatch({ type: 'SIGN_IN_FAILED' });
           toast({ message: 'Failed to sign in' });
         }
       },
@@ -173,6 +226,8 @@ export const App = () => {
       signUp: async (bodyData: SignUpParams) => {
         // TODO: handle errors
         try {
+          dispatch({ type: 'SIGN_UP_REQUEST' });
+
           const response = await signUp(bodyData);
           if (response.data.success) {
             const accessToken = response.headers['authorization'];
@@ -184,12 +239,14 @@ export const App = () => {
               userId: response.data.data.userId,
             });
             toast({ message: 'Successfully signed up, please login.', type: 'success' });
+            dispatch({ type: 'SIGN_UP_SUCCESS' });
+
             return { success: true };
           } else {
-            toast({ message: `Sign up failed` });
-            return { success: false };
+            throw new Error('Sign up failed');
           }
         } catch (err) {
+          dispatch({ type: 'SIGN_UP_FAILED' });
           toast({ message: `Sign up failed` });
           return { success: false };
         }
@@ -207,7 +264,7 @@ export const App = () => {
     [],
   );
 
-  const { isLoading, refreshToken, accessToken, userId, organizationId } = state;
+  const { isLoading, refreshToken, accessToken, userId, organizationId, isSignInLoading, isSignUpLoading } = state;
 
   if (isLoading) {
     // We haven't finished checking for the token yet
@@ -218,7 +275,7 @@ export const App = () => {
     <Root>
       <DatabaseProvider database={database}>
         <NavigationContainer theme={drawerTheme}>
-          <AuthContext.Provider value={authContext}>
+          <AuthContext.Provider value={{ ...authContext, isSignInLoading, isSignUpLoading }}>
             {!accessToken || !refreshToken || !organizationId || !userId ? (
               <AuthNavigator />
             ) : (

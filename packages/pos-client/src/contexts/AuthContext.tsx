@@ -5,10 +5,16 @@ type AuthContextProps = {
   signOut: () => void;
   signUp: (data: any) => Promise<{ success: boolean }>;
   unlink: () => any;
+  isSignUpLoading: boolean;
+  isSignInLoading: boolean;
 };
 export const AuthContext = React.createContext<AuthContextProps>({
-  signIn: async data => {},
+  signIn: async () => {},
   signOut: () => {},
-  signUp: async data => {},
+  signUp: async () => {
+    return { success: false };
+  },
   unlink: () => {},
+  isSignInLoading: false,
+  isSignUpLoading: false,
 });
