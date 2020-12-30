@@ -2,6 +2,7 @@ import React from 'react';
 import { View } from 'react-native';
 import { Button, Container, H3, Icon, Text } from '../../core';
 import { colors } from '../../theme';
+import { resolveButtonState } from '../../utils/helpers';
 import { moderateScale } from '../../utils/scaling';
 
 enum ModalSizes {
@@ -46,14 +47,28 @@ export const ModalContentButton: React.FC<ModalContentButtonProps> = ({
       <View style={styles.heading}>
         <H3 style={{ color: 'white' }}>{title}</H3>
         <View style={styles.buttons}>
-          <Button light disabled={isSecondaryDisabled} onPress={onPressSecondaryButton}>
+          <Button
+            {...resolveButtonState(isSecondaryDisabled, 'light')}
+            disabled={isSecondaryDisabled}
+            onPress={onPressSecondaryButton}
+          >
             <Text>{secondaryButtonText}</Text>
           </Button>
-          <Button success style={styles.buttonSpacingLeft} disabled={isPrimaryDisabled} onPress={onPressPrimaryButton}>
+          <Button
+            style={styles.buttonSpacingLeft}
+            {...resolveButtonState(isPrimaryDisabled, 'success')}
+            disabled={isPrimaryDisabled}
+            onPress={onPressPrimaryButton}
+          >
             <Text>{primaryButtonText}</Text>
           </Button>
           {onPressDelete && (
-            <Button style={styles.buttonSpacingLeft} danger disabled={isDeleteDisabled} onPress={onPressDelete}>
+            <Button
+              style={styles.buttonSpacingLeft}
+              {...resolveButtonState(isDeleteDisabled, 'danger')}
+              disabled={isDeleteDisabled}
+              onPress={onPressDelete}
+            >
               <Icon name="ios-trash" />
             </Button>
           )}

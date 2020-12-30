@@ -389,7 +389,7 @@ export const SignUp: React.FC<SignUpProps> = ({ navigation, route }) => {
   );
 };
 
-SignUp.whyDidYouRender = true;
+// SignUp.whyDidYouRender = true;
 const styles = StyleSheet.create({
   content: {
     width: moderateScale(300),

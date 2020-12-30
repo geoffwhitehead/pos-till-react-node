@@ -10,6 +10,7 @@ import { ModalContentButton } from '../../../../components/Modal/ModalContentBut
 import { Form, Icon, Input, Label, List, ListItem, Picker, Text, View } from '../../../../core';
 import { database } from '../../../../database';
 import { Category, Item, ItemPrice, PriceGroup } from '../../../../models';
+import { moderateScale } from '../../../../utils/scaling';
 import { commonStyles } from '../../../Settings/Tabs/styles';
 
 type PriceGroupItemsOuterProps = {
@@ -50,8 +51,10 @@ export const PriceGroupItemsModalInner: React.FC<PriceGroupItemsInnerProps & Pri
 }) => {
   const [loading, setLoading] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<Category>(categories[0] || null);
+  const [pricesUpdatedSucessfully, setPricesUpdatedSucessfully] = useState(false);
 
   const updatePrices = async (values: FormValues) => {
+    setPricesUpdatedSucessfully(false);
     setLoading(true);
     const toUpdate = values.sortedItemPrices.filter(({ itemPrice, price }) => itemPrice.price !== parseInt(price));
 
@@ -64,6 +67,7 @@ export const PriceGroupItemsModalInner: React.FC<PriceGroupItemsInnerProps & Pri
 
     await database.action(() => database.batch(...batched));
     setLoading(false);
+    setPricesUpdatedSucessfully(true);
   };
 
   const keyedItemPrices = useMemo(() => {
@@ -89,6 +93,11 @@ export const PriceGroupItemsModalInner: React.FC<PriceGroupItemsInnerProps & Pri
 
   const title = `${capitalize(priceGroup.name)}: Edit Prices`;
 
+  const handleCategoryChange = category => {
+    setSelectedCategory(category);
+    setPricesUpdatedSucessfully(false);
+  };
+
   return (
     <Formik initialValues={initialValues} validationSchema={schema} onSubmit={updatePrices} enableReinitialize={true}>
       {({ handleChange, handleBlur, handleSubmit, errors, touched, values }) => {
@@ -105,6 +114,7 @@ export const PriceGroupItemsModalInner: React.FC<PriceGroupItemsInnerProps & Pri
             size="small"
           >
             <>
+              {pricesUpdatedSucessfully && <Text style={styles.pricesUpdatedText}>Prices updated successfully</Text>}
               <ListItem itemDivider style={styles.categoryPickerItem}>
                 <Label>
                   <Text style={styles.categoryPickerText}>Category: </Text>
@@ -115,7 +125,7 @@ export const PriceGroupItemsModalInner: React.FC<PriceGroupItemsInnerProps & Pri
                   iosIcon={<Icon name="chevron-down-outline" />}
                   placeholder="Select a category"
                   selectedValue={selectedCategory}
-                  onValueChange={c => setSelectedCategory(c)}
+                  onValueChange={handleCategoryChange}
                 >
                   {categories.map(category => {
                     return <Picker.Item key={category.id} label={category.name} value={category} />;
@@ -132,27 +142,23 @@ export const PriceGroupItemsModalInner: React.FC<PriceGroupItemsInnerProps & Pri
                         render={() => {
                           return sortedItemPrices.map(({ item, itemPrice, price }, index) => {
                             return (
-                              <ListItem key={itemPrice.id}>
-                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                  <Text style={{ paddingRight: 20 }}>{index + 1}</Text>
-                                  <ItemField
-                                    label={capitalize(item.name)}
-                                    touched={touched.sortedItemPrices && touched.sortedItemPrices[index]?.price}
-                                    name={`sortedItemPrices[${index}].price`}
-                                    errors={errors.sortedItemPrices && errors.sortedItemPrices[index]}
-                                    type="fixedLabel"
-                                    style={{
-                                      borderBottomWidth: 0,
-                                    }}
-                                  >
-                                    <Input
-                                      onChangeText={handleChange(`sortedItemPrices[${index}].price`)}
-                                      onBlur={handleBlur(`sortedItemPrices[${index}].price`)}
-                                      value={price}
-                                    />
-                                  </ItemField>
-                                </View>
-                              </ListItem>
+                              <View key={itemPrice.id} style={styles.listItem}>
+                                <Text style={styles.listItemLeftText}>{index + 1}</Text>
+                                <ItemField
+                                  label={capitalize(item.name)}
+                                  touched={touched.sortedItemPrices && touched.sortedItemPrices[index]?.price}
+                                  name={`sortedItemPrices[${index}].price`}
+                                  errors={errors.sortedItemPrices && errors.sortedItemPrices[index]}
+                                  type="fixedLabel"
+                                  style={styles.itemField}
+                                >
+                                  <Input
+                                    onChangeText={handleChange(`sortedItemPrices[${index}].price`)}
+                                    onBlur={handleBlur(`sortedItemPrices[${index}].price`)}
+                                    value={price}
+                                  />
+                                </ItemField>
+                              </View>
                             );
                           });
                         }}
@@ -172,6 +178,21 @@ export const PriceGroupItemsModalInner: React.FC<PriceGroupItemsInnerProps & Pri
 const styles = StyleSheet.create({
   categoryPickerItem: { paddingLeft: 15 },
   categoryPickerText: { color: 'grey' },
+  listItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderBottomColor: 'whitesmoke',
+    borderBottomWidth: 1,
+  },
+  itemField: {
+    borderBottomWidth: 0,
+  },
+  listItemLeftText: { paddingRight: 20 },
+  pricesUpdatedText: {
+    color: 'green',
+    paddingTop: moderateScale(15),
+    paddingBottom: moderateScale(15),
+  },
 });
 
 const enhance = c =>
