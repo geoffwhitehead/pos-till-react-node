@@ -1,23 +1,16 @@
 import React from 'react';
 import { StyleSheet } from 'react-native';
 import { Body, Left, ListItem, Right, Text } from '../../../core';
-import { Bill, BillPeriod } from '../../../models';
 import { fontSizes } from '../../../theme';
 
 interface BillRowEmptyProps {
   reference: number;
-  onSelectBill: (b: Bill) => void;
-  billPeriod: BillPeriod;
+  onCreateSelectBill: (reference: number) => void;
 }
 
-export const BillRowEmpty: React.FC<BillRowEmptyProps> = ({ onSelectBill, reference, billPeriod }) => {
-  const createBill = async () => {
-    const bill = await billPeriod.createBill({ reference });
-    onSelectBill(bill);
-  };
-
+export const BillRowEmpty: React.FC<BillRowEmptyProps> = ({ onCreateSelectBill, reference }) => {
   return (
-    <ListItem noIndent style={styles.closedBill} key={reference} onPress={createBill}>
+    <ListItem noIndent style={styles.closedBill} key={reference} onPress={() => onCreateSelectBill(reference)}>
       <Left>
         <Text style={styles.rowText}>{reference}</Text>
       </Left>

@@ -33,7 +33,6 @@ export const CategoriesInner: React.FC<CategoriesOuterProps & CategoriesInnerPro
   const { organization } = useContext(OrganizationContext);
   const { groupedSortedItems, setCategoryItems } = useContext(ItemsContext);
 
-  console.log('RENDER');
   const onPressCategoryFactory = (params: { category: Category; priceGroup: PriceGroup }) => () => {
     const { category, priceGroup } = params;
     setCategoryItems(groupedSortedItems[category.id]);
@@ -170,4 +169,4 @@ const styles = StyleSheet.create({
     textShadowOffset: { width: -1, height: 1 },
     textShadowRadius: 10,
   },
-} as const);
+});

@@ -5,7 +5,7 @@ import dayjs, { Dayjs } from 'dayjs';
 import React, { useContext, useEffect, useState } from 'react';
 import { StyleSheet } from 'react-native';
 import { OrganizationContext } from '../../../contexts/OrganizationContext';
-import { Body, Icon, Left, ListItem, Right, Text, View } from '../../../core';
+import { Badge, Left, ListItem, Right, Text, View } from '../../../core';
 import {
   Bill,
   BillCallLog,
@@ -120,30 +120,25 @@ export const WrappedBillRow: React.FC<BillRowInnerProps & BillRowOuterProps> = (
     : hasPendingPrintItems
     ? 'Printing'
     : null;
-  const iconName = hasPrintErrors
-    ? 'ios-warning'
-    : hasUnsentItems
-    ? 'ios-warning'
-    : hasPendingPrintItems
-    ? 'ios-print'
-    : null;
+  const badgeType = hasPrintErrors ? 'danger' : hasUnsentItems ? 'warning' : hasPendingPrintItems ? 'info' : null;
 
   return (
     <ListItem noIndent style={styles.openBill} key={bill.id} onPress={() => onSelectBill(bill)}>
       <Left>
         <Text style={styles.rowText}>{rowText}</Text>
         <View>
+          {badgeType && (
+            <Badge {...{ badgeType }} style={{ marginBottom: 5 }}>
+              <Text note style={{ color: 'white' }}>
+                {text}
+              </Text>
+            </Badge>
+          )}
           <Text note>{`Opened: ${dayjs(bill.createdAt).format('h:mm a')}`}</Text>
           <Text note>{`Last Called: ${lastCalledAt ? lastCalledAt.format('h:mm a') : ''}`}</Text>
         </View>
       </Left>
 
-      <Body>
-        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          {iconName && <Icon active name={iconName} style={styles.iconStyle} />}
-          {text && <Text note>{text}</Text>}
-        </View>
-      </Body>
       <Right>
         <Text style={styles.totalText}>{totalText}</Text>
       </Right>

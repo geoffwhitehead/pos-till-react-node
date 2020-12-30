@@ -24,6 +24,7 @@ import { PriceGroup, priceGroupSchema } from './PriceGroup';
 import { Printer, printerSchema } from './Printer';
 import { PrinterGroup, printerGroupSchema } from './PrinterGroup';
 import { PrinterGroupPrinter, printerGroupPrinterSchema } from './PrinterGroupPrinter';
+import { TablePlanElement, tablePlanElementSchema } from './TablePlanElement';
 
 type TableNames = {
   paymentTypes: string;
@@ -51,6 +52,7 @@ type TableNames = {
   billItemPrintLogs: string;
   billCallLogs: string;
   billCallPrintLogs: string;
+  tablePlanElement: string;
 };
 
 export const tableNames: TableNames = {
@@ -79,6 +81,7 @@ export const tableNames: TableNames = {
   billItemPrintLogs: billItemPrintLogSchema.name,
   billCallLogs: billCallLogSchema.name,
   billCallPrintLogs: billCallPrintLogSchema.name,
+  tablePlanElement: tablePlanElementSchema.name,
 };
 
 export const schemas: Record<string, TableSchema> = {
@@ -107,6 +110,7 @@ export const schemas: Record<string, TableSchema> = {
   printerGroupPrinterSchema,
   billCallLogSchema,
   billCallPrintLogSchema,
+  tablePlanElementSchema,
 };
 
 export const models: Record<string, typeof Model> = {
@@ -135,6 +139,7 @@ export const models: Record<string, typeof Model> = {
   PrinterGroupPrinter,
   BillCallLog,
   BillCallPrintLog,
+  TablePlanElement,
 };
 
 export {
@@ -163,4 +168,5 @@ export {
   PrinterGroupPrinter,
   BillCallLog,
   BillCallPrintLog,
+  TablePlanElement,
 };
