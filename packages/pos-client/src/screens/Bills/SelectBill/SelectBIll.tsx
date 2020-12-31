@@ -1,6 +1,6 @@
 import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import withObservables from '@nozbe/with-observables';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useMemo, useState } from 'react';
 import { ScrollView } from 'react-native';
 import { SwitchSelector } from '../../../components/SwitchSelector/SwitchSelector';
 import { CurrentBillContext } from '../../../contexts/CurrentBillContext';
@@ -33,14 +33,14 @@ export const SelectBillInner: React.FC<SelectBillOuterProps & SelectBillInnerPro
   billPeriod,
   tablePlanElements,
 }) => {
+  console.log('tablePlanElements', tablePlanElements);
   const { setCurrentBill } = useContext(CurrentBillContext);
   const { organization } = useContext(OrganizationContext);
-  const [bills, setBills] = useState<(Bill | null)[]>([]);
   const [isFilterOpenSelected, setIsFilterOpenSelected] = useState(0);
   const [isEditing, setIsEditing] = useState(false);
   const [selectedElement, setSelectedElement] = useState<TableElement>();
 
-  useEffect(() => {
+  const bills: (Bill | null)[] = useMemo(() => {
     const filterOpenOnly = bill => (isFilterOpenSelected ? !!bill : true);
 
     const billsArr = openBills.reduce((acc, bill) => {
@@ -48,7 +48,7 @@ export const SelectBillInner: React.FC<SelectBillOuterProps & SelectBillInnerPro
       return [...acc];
     }, Array(organization.maxBills).fill(null));
 
-    setBills(billsArr.filter(filterOpenOnly));
+    return billsArr.filter(filterOpenOnly);
   }, [openBills, isFilterOpenSelected]);
 
   const _onSelectBill = (bill: Bill) => {
@@ -59,6 +59,11 @@ export const SelectBillInner: React.FC<SelectBillOuterProps & SelectBillInnerPro
   const handleCreateSelectBill = async (reference: number) => {
     const bill = await billPeriod.createBill({ reference });
     _onSelectBill(bill);
+  };
+
+  const handleDeleteSelectedTableElement = async () => {
+    await database.action(() => selectedElement.tablePlanElement?.markAsDeleted());
+    setSelectedElement(null);
   };
 
   const handleSelectElement = (el: TableElement) => {
@@ -89,11 +94,21 @@ export const SelectBillInner: React.FC<SelectBillOuterProps & SelectBillInnerPro
       </Item>
       <Grid>
         <Col>
-          <TableViewer tableElements={tablePlanElements} onSelectElement={handleSelectElement} />
+          <TableViewer
+            tableElements={tablePlanElements}
+            onSelectElement={handleSelectElement}
+            selectedElement={selectedElement}
+          />
         </Col>
         <Col style={{ width: 400 }}>
           {isEditing && !selectedElement && <Text style={{ padding: 15 }}>Select a table element to edit...</Text>}
-          {isEditing && selectedElement && <TableElementForm {...selectedElement} maxBills={organization.maxBills} />}
+          {isEditing && selectedElement && (
+            <TableElementForm
+              {...selectedElement}
+              maxBills={organization.maxBills}
+              onDelete={handleDeleteSelectedTableElement}
+            />
+          )}
 
           {!isEditing && (
             <List>

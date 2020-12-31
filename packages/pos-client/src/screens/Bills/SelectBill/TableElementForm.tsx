@@ -20,6 +20,7 @@ type TableElementFormOuterProps = {
   x: number;
   y: number;
   maxBills: number;
+  onDelete: () => void;
 };
 
 const validationSchema = (maxBills: number) =>
@@ -45,6 +46,7 @@ export const TableElementForm: React.FC<TableElementFormInnerProps & TableElemen
   x,
   y,
   maxBills,
+  onDelete,
 }) => {
   const database = useDatabase();
 
@@ -90,13 +92,18 @@ export const TableElementForm: React.FC<TableElementFormInnerProps & TableElemen
         }, [x, y]);
 
         return (
-          <View>
+          <View style={{ borderColor: 'lightgrey', borderLeftWidth: 1, height: '100%' }}>
             <Item style={{ backgroundColor: 'whitesmoke', padding: 5 }}>
-              <Right>
+              <Right style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
                 <Button success small iconLeft onPress={handleSubmit}>
                   <Icon name="ios-add-circle-outline" />
                   <Text>Save</Text>
                 </Button>
+                {tablePlanElement && (
+                  <Button danger small onPress={onDelete} style={{ marginLeft: 5 }}>
+                    <Icon name="ios-trash" />
+                  </Button>
+                )}
               </Right>
             </Item>
             <Form style={commonStyles.form}>
@@ -131,7 +138,7 @@ export const TableElementForm: React.FC<TableElementFormInnerProps & TableElemen
                   onValueChange={handleChange('type')}
                 >
                   {Object.keys(TablePlanElementTypes).map(type => (
-                    <Picker.Item key={type} label={type} value={TablePlanElementTypes[type]} />
+                    <Picker.Item key={type} label={TablePlanElementTypes[type]} value={type} />
                   ))}
                 </Picker>
               </ItemField>
