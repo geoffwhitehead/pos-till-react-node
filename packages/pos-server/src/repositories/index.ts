@@ -13,6 +13,7 @@ import { priceGroupRepository, PriceGroupRepository } from './priceGroupReposito
 import { printerGroupPrinterRepository, PrinterGroupPrinterRepository } from './printerGroupPrinterRepository';
 import { PrinterGroupRepository, printerGroupRepository } from './printerGroupRepository';
 import { printerRepository, PrinterRepository } from './printerRepository';
+import { tablePlanElementRepository, TablePlanElementRepository } from './tablePlanElementRepository';
 import { userRepository, UserRepository } from './userRepository';
 
 export interface RepositoryService {
@@ -31,6 +32,7 @@ export interface RepositoryService {
     printerGroupRepository: PrinterGroupRepository;
     printerGroupPrinterRepository: PrinterGroupPrinterRepository;
     paymentTypeRepository: PaymentTypeRepository;
+    tablePlanElementRepository: TablePlanElementRepository;
 }
 
 export interface InjectedRepositoryDependencies {
@@ -50,6 +52,7 @@ export interface InjectedRepositoryDependencies {
         PrinterGroupModel: typeof Models.PrinterGroup;
         PrinterGroupPrinterModel: typeof Models.PrinterGroupPrinter;
         PaymentTypeModel: typeof Models.PaymentType;
+        TablePlanElementModel: typeof Models.TablePlanElement;
     };
 }
 
@@ -70,6 +73,7 @@ export const registerRepositories = (): RepositoryService => {
         PrinterGroupModel: Models.PrinterGroup,
         PrinterGroupPrinterModel: Models.PrinterGroupPrinter,
         PaymentTypeModel: Models.PaymentType,
+        TablePlanElementModel: Models.TablePlanElement,
     };
 
     const repositories = [
@@ -132,6 +136,10 @@ export const registerRepositories = (): RepositoryService => {
         {
             name: 'paymentTypeRepository',
             repo: paymentTypeRepository,
+        },
+        {
+            name: 'tablePlanElementRepository',
+            repo: tablePlanElementRepository,
         },
     ];
 

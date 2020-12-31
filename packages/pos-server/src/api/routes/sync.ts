@@ -15,10 +15,12 @@ import { PRICE_GROUP_COLLECTION_NAME } from '../../models/PriceGroup';
 import { PRINTER_COLLECTION_NAME } from '../../models/Printer';
 import { PRINTER_GROUP_COLLECTION_NAME } from '../../models/PrinterGroup';
 import { PRINTER_GROUP_PRINTER_COLLECTION_NAME } from '../../models/PrinterGroupPrinter';
+import { TABLE_PLAN_ELEMENT_COLLECTION_NAME } from '../../models/TablePlanElement';
 import { Changes } from '../../services';
 import { OrganizationService } from '../../services/organization';
 import { PrinterService } from '../../services/printer';
 import { ProductService } from '../../services/product';
+import { TablePlanService } from '../../services/tablePlan';
 import { fromClientChanges } from '../../utils/sync';
 
 type SyncRequest = Request & { body: { lastPulledAt: Date; changes: Changes } };
@@ -39,6 +41,7 @@ export default (app: Router) => {
         const printerService = Container.get('printerService') as PrinterService;
         // const printerGroupService = Container.get('printerGroupService') as PrinterService;
         const organizationService = Container.get('organizationService') as OrganizationService;
+        const tablePlanService = Container.get('tablePlanService') as TablePlanService;
 
         const { lastPulledAt: lastPulledAtUnix, schemaVersion, migration = null } = req.query;
 
@@ -52,6 +55,7 @@ export default (app: Router) => {
             priceGroupChanges,
             printerChanges,
             organizationChanges,
+            tablePlanChanges,
         ] = await Promise.all([
             categoryService.pullChanges({ lastPulledAt, schemaVersion, migration }),
             itemService.pullChanges({ lastPulledAt, schemaVersion, migration }),
@@ -60,6 +64,7 @@ export default (app: Router) => {
             priceGroupService.pullChanges({ lastPulledAt, schemaVersion, migration }),
             printerService.pullChanges({ lastPulledAt, schemaVersion, migration }),
             organizationService.pullChanges({ lastPulledAt, schemaVersion, migration }),
+            tablePlanService.pullChanges({ lastPulledAt, schemaVersion, migration }),
         ]);
 
         const changes = {
@@ -70,6 +75,7 @@ export default (app: Router) => {
             ...priceGroupChanges,
             ...printerChanges,
             ...organizationChanges,
+            ...tablePlanChanges,
         };
         const timestamp = getUnixTime(new Date());
         return res.status(200).json({ changes, timestamp });
@@ -85,6 +91,7 @@ export default (app: Router) => {
         } = Container.get('productService') as ProductService;
         const printerService = Container.get('printerService') as PrinterService;
         const organizationService = Container.get('organizationService') as OrganizationService;
+        const tablePlanService = Container.get('tablePlanService') as TablePlanService;
 
         const { lastPulledAt: lastPulledAtUnix, changes: unparsedChanges } = req.body;
 
@@ -134,6 +141,10 @@ export default (app: Router) => {
                 organizationService.pushChanges({
                     lastPulledAt,
                     changes: deconstructChanges(changes, ORGANIZATION_COLLECTION_NAME),
+                }),
+                tablePlanService.pushChanges({
+                    lastPulledAt,
+                    changes: deconstructChanges(changes, TABLE_PLAN_ELEMENT_COLLECTION_NAME),
                 }),
             ]);
 

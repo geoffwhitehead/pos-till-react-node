@@ -7,6 +7,7 @@ import { MailerService } from './mailer';
 import { organizationService } from './organization';
 import { printerService } from './printer';
 import { productService } from './product';
+import { tablePlanService } from './tablePlan';
 import { userService } from './user';
 
 export interface InjectedDependencies {
@@ -79,6 +80,7 @@ export enum Services {
     productService = 'productService',
     printerService = 'printerService',
     organizationService = 'organizationService',
+    tablePlan = 'tablePlanService',
 }
 
 type Service = { name: string; service: any }; // TODO: figure out how to tpye thiss
@@ -102,6 +104,10 @@ const services = [
     {
         name: 'organizationService',
         service: organizationService,
+    },
+    {
+        name: 'tablePlanService',
+        service: tablePlanService,
     },
 ];
 export const registerServices = (dependencies: InjectedDependencies): Service[] => {

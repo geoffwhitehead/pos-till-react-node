@@ -12,7 +12,9 @@ import { PriceGroup } from './PriceGroup';
 import { Printer } from './Printer';
 import { PrinterGroup } from './PrinterGroup';
 import { PrinterGroupPrinter } from './PrinterGroupPrinter';
+import { TablePlanElement } from './TablePlanElement';
 import { User } from './User';
+
 export default {
     User,
     Discount,
@@ -29,4 +31,5 @@ export default {
     PrinterGroup,
     PrinterGroupPrinter,
     PaymentType,
+    TablePlanElement,
 };

@@ -89,6 +89,7 @@ export const organizationToClient = (organization: OrganizationProps): Organizat
         gracePeriodMinutes: settings.gracePeriodMinutes,
         categoryGridSize: settings.categoryGridSize,
         categoryViewType: settings.categoryViewType,
+
         transactionGrouping: settings.tranactionGrouping,
         transactionOrder: settings.transactionOrder,
         addressLine1: address.line1,
