@@ -33,7 +33,6 @@ export const SelectBillInner: React.FC<SelectBillOuterProps & SelectBillInnerPro
   billPeriod,
   tablePlanElements,
 }) => {
-  console.log('tablePlanElements', tablePlanElements);
   const { setCurrentBill } = useContext(CurrentBillContext);
   const { organization } = useContext(OrganizationContext);
   const [isFilterOpenSelected, setIsFilterOpenSelected] = useState(0);
@@ -98,6 +97,7 @@ export const SelectBillInner: React.FC<SelectBillOuterProps & SelectBillInnerPro
             tableElements={tablePlanElements}
             onSelectElement={handleSelectElement}
             selectedElement={selectedElement}
+            gridSize={organization.billViewPlanGridSize}
           />
         </Col>
         <Col style={{ width: 400 }}>

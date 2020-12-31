@@ -22,6 +22,8 @@ export type OrganizationProps = {
   gracePeriodMinutes: number;
   maxDiscounts: number;
   shortNameLength: number;
+  billViewPlanGridSize: number;
+  billViewType: string;
 };
 
 export enum CategoryViewTypeEnum {
@@ -33,6 +35,11 @@ export enum CurrencyEnum {
   gbp = 'gbp',
   usd = 'usd',
   eur = 'eur',
+}
+
+export enum BillViewTypeEnum {
+  list = 'list',
+  plan = 'plan',
 }
 
 export enum TransactionOrderEnum {
@@ -68,6 +75,8 @@ export class Organization extends Model {
   @field('grace_period_minutes') gracePeriodMinutes: number;
   @field('category_grid_size') categoryGridSize: number;
   @field('category_view_type') categoryViewType: CategoryViewTypeEnum;
+  @field('bill_view_type') billViewType: BillViewTypeEnum;
+  @field('bill_view_plan_grid_size') billViewPlanGridSize: number;
   @field('transaction_order') transactionOrder: TransactionOrderEnum;
   @field('transaction_grouping') transactionGrouping: TransactionGroupingEnum;
 
@@ -108,6 +117,8 @@ export const organizationSchema = tableSchema({
     { name: 'grace_period_minutes', type: 'number' },
     { name: 'category_grid_size', type: 'number' },
     { name: 'category_view_type', type: 'string' },
+    { name: 'bill_view_plan_grid_size', type: 'number' },
+    { name: 'bill_view_type', type: 'string' },
     { name: 'transaction_order', type: 'string' },
     { name: 'transaction_grouping', type: 'string' },
   ],

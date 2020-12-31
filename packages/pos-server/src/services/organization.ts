@@ -1,6 +1,7 @@
 import uuid from 'uuid';
 import { InjectedDependencies, pull, push } from '.';
 import {
+    BillViewTypeEnum,
     CategoryViewTypeEnum,
     CurrencyEnum,
     OrganizationProps,
@@ -36,6 +37,8 @@ export type OrganizationClientProps = {
     categoryViewType: CategoryViewTypeEnum;
     transactionGrouping: TransactionGroupingEnum;
     transactionOrder: TransactionOrderEnum;
+    billViewPlanGridSize: number;
+    billViewType: BillViewTypeEnum;
 };
 
 export const organizationFromClient = (organization: OrganizationClientProps): OrganizationProps => {
@@ -59,6 +62,8 @@ export const organizationFromClient = (organization: OrganizationClientProps): O
             categoryViewType: organization.categoryViewType,
             tranactionGrouping: organization.transactionGrouping,
             transactionOrder: organization.transactionOrder,
+            billViewPlanGridSize: organization.billViewPlanGridSize,
+            billViewType: organization.billViewType,
         },
         address: {
             line1: organization.addressLine1,
@@ -80,7 +85,7 @@ export const organizationToClient = (organization: OrganizationProps): Organizat
         email,
         phone,
         vat,
-        defaultPriceGroupId: settings.defaultPriceGroupId,
+        defaultPriceGroupId: settings.defaultPriceGroupId || undefined,
         receiptPrinterId: settings.receiptPrinterId,
         currency: settings.currency,
         maxBills: settings.maxBills,
@@ -89,7 +94,8 @@ export const organizationToClient = (organization: OrganizationProps): Organizat
         gracePeriodMinutes: settings.gracePeriodMinutes,
         categoryGridSize: settings.categoryGridSize,
         categoryViewType: settings.categoryViewType,
-
+        billViewPlanGridSize: settings.billViewPlanGridSize,
+        billViewType: settings.billViewType,
         transactionGrouping: settings.tranactionGrouping,
         transactionOrder: settings.transactionOrder,
         addressLine1: address.line1,

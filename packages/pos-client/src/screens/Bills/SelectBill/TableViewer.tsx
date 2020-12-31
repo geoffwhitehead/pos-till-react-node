@@ -28,6 +28,7 @@ type TableViewerProps = {
   selectedElement: TableElement;
   tableElements: TablePlanElement[];
   onSelectElement: (el: TableElement) => void;
+  gridSize: number;
 };
 
 export type TableElement = {
@@ -36,10 +37,14 @@ export type TableElement = {
   tablePlanElement?: TablePlanElement;
 };
 
-const gridSize = 10;
 const GRID_SPACING = 4;
 
-export const TableViewer: React.FC<TableViewerProps> = ({ selectedElement, tableElements, onSelectElement }) => {
+export const TableViewer: React.FC<TableViewerProps> = ({
+  gridSize,
+  selectedElement,
+  tableElements,
+  onSelectElement,
+}) => {
   const groupedByXY = useMemo(() => {
     const groupedByX = groupBy(tableElements, el => el.posX);
     const groupedByPosition = Object.entries(groupedByX).reduce((out, [key, groupX]) => {
@@ -50,7 +55,6 @@ export const TableViewer: React.FC<TableViewerProps> = ({ selectedElement, table
     }, {} as Dictionary<Dictionary<TablePlanElement>>);
     return groupedByPosition;
   }, [tableElements]);
-  console.log('selectedElement', selectedElement);
 
   const determineElement = (el: TablePlanElement) => {
     console.log('Type ', el.type);

@@ -32,6 +32,8 @@ export interface OrganizationSettings {
     categoryViewType?: CategoryViewTypeEnum;
     tranactionGrouping?: TransactionGroupingEnum;
     transactionOrder?: TransactionOrderEnum;
+    billViewPlanGridSize?: number;
+    billViewType?: BillViewTypeEnum;
 }
 
 export const ORGANIZATION_COLLECTION_NAME = 'organizations';
@@ -49,6 +51,11 @@ export const OrganizationValidation = {
         postcode: Joi.string(),
     }),
 };
+
+export enum BillViewTypeEnum {
+    list = 'list',
+    plan = 'plan',
+}
 
 export enum TransactionOrderEnum {
     descending = 'descending',
@@ -101,6 +108,15 @@ const OrganizationSettingsSchema: Schema<OrganizationSettings> = new Schema({
         type: String,
         enum: Object.values(CategoryViewTypeEnum),
         default: CategoryViewTypeEnum.grid,
+    },
+    billViewPlanGridSize: {
+        type: Number,
+        default: 15,
+    },
+    billViewType: {
+        type: String,
+        enum: Object.values(BillViewTypeEnum),
+        default: BillViewTypeEnum.plan,
     },
     transactionOrder: {
         type: String,
