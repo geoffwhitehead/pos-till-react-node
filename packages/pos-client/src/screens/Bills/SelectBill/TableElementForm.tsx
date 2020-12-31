@@ -1,5 +1,6 @@
 import { useDatabase } from '@nozbe/watermelondb/hooks';
 import { Formik } from 'formik';
+import { inRange } from 'lodash';
 import React, { useEffect } from 'react';
 import * as Yup from 'yup';
 import { ItemField } from '../../../components/ItemField/ItemField';
@@ -18,13 +19,20 @@ type TableElementFormOuterProps = {
   tablePlanElement?: TablePlanElement;
   x: number;
   y: number;
+  maxBills: number;
 };
 
-const validationSchema = Yup.object().shape({
-  billReference: Yup.string(),
-  type: Yup.string().required(),
-  rotation: Yup.string().required(),
-});
+const validationSchema = (maxBills: number) =>
+  Yup.object().shape({
+    billReference: Yup.string().test('billReference', `Bill reference must be between 1 and ${maxBills}`, value => {
+      const ref = parseInt(value);
+      if (inRange(ref, 0 + 1, maxBills + 1)) {
+        return true;
+      }
+    }),
+    type: Yup.string().required(),
+    rotation: Yup.string().required(),
+  });
 
 type FormValues = {
   billReference: string;
@@ -36,6 +44,7 @@ export const TableElementForm: React.FC<TableElementFormInnerProps & TableElemen
   tablePlanElement,
   x,
   y,
+  maxBills,
 }) => {
   const database = useDatabase();
 
@@ -72,7 +81,7 @@ export const TableElementForm: React.FC<TableElementFormInnerProps & TableElemen
   };
 
   return (
-    <Formik initialValues={initialValues} validationSchema={validationSchema} onSubmit={onSave}>
+    <Formik initialValues={initialValues} validationSchema={validationSchema(maxBills)} onSubmit={onSave}>
       {({ handleChange, handleBlur, resetForm, handleSubmit, setFieldValue, errors, touched, values }) => {
         const { billReference, rotation, type } = values;
 

@@ -77,7 +77,6 @@ export const SelectBillInner: React.FC<SelectBillOuterProps & SelectBillInnerPro
     }
   };
 
-  console.log('selectedElement', selectedElement);
   return (
     <>
       <Item style={{ backgroundColor: 'whitesmoke', padding: 5 }}>
@@ -94,7 +93,7 @@ export const SelectBillInner: React.FC<SelectBillOuterProps & SelectBillInnerPro
         </Col>
         <Col style={{ width: 400 }}>
           {isEditing && !selectedElement && <Text style={{ padding: 15 }}>Select a table element to edit...</Text>}
-          {isEditing && selectedElement && <TableElementForm {...selectedElement} />}
+          {isEditing && selectedElement && <TableElementForm {...selectedElement} maxBills={organization.maxBills} />}
 
           {!isEditing && (
             <List>
