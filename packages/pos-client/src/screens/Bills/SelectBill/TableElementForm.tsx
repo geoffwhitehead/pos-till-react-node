@@ -25,12 +25,17 @@ type TableElementFormOuterProps = {
 
 const validationSchema = (maxBills: number) =>
   Yup.object().shape({
-    billReference: Yup.string().test('billReference', `Bill reference must be between 1 and ${maxBills}`, value => {
-      const ref = parseInt(value);
-      if (inRange(ref, 0 + 1, maxBills + 1)) {
-        return true;
-      }
-    }),
+    billReference: Yup.string()
+      .test('billReference', `Bill reference must be between 1 and ${maxBills}`, value => {
+        if (!value || value.length === 0) {
+          return true;
+        }
+        const ref = parseInt(value);
+        if (inRange(ref, 0 + 1, maxBills + 1)) {
+          return true;
+        }
+      })
+      .nullable(),
     type: Yup.string().required(),
     rotation: Yup.string().required(),
   });
@@ -52,7 +57,7 @@ export const TableElementForm: React.FC<TableElementFormInnerProps & TableElemen
 
   const initialValues = tablePlanElement
     ? {
-        billReference: tablePlanElement.billReference.toString(),
+        billReference: tablePlanElement.billReference?.toString() || '',
         type: tablePlanElement.type,
         rotation: tablePlanElement.rotation.toString(),
       }

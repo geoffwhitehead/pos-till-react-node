@@ -1,6 +1,7 @@
 import { Dictionary, groupBy, keyBy, times } from 'lodash';
 import React, { useMemo } from 'react';
 import { StyleSheet } from 'react-native';
+import { TouchableOpacity } from 'react-native-gesture-handler';
 import FurnArmchair from '../../../assets/armchair.svg';
 import FurnChair from '../../../assets/chair.svg';
 import FurnCoffeeTable from '../../../assets/coffee-table.svg';
@@ -111,30 +112,14 @@ export const TableViewer: React.FC<TableViewerProps> = ({ selectedElement, table
 
               return (
                 <Col key={`${row}-${column}`} style={{ ...styles.col, ...selectedStyles }}>
-                  {el && SVG && (
-                    <SVG
-                      width={'100%'}
-                      height={'100%'}
-                      onPress={() => {
-                        onSelectElement({ x: row, y: column, tablePlanElement: el });
-                      }}
-                    />
-                    // <Button
-                    //   style={{ ...styles.button, backgroundColor: 'pink' }}
-                    //   onPress={() => {
-                    //     onSelectElement({ x: row, y: column, tablePlanElement: el });
-                    //   }}
-                    // />
-                  )}
-                  {!el && (
-                    <Button
-                      light
-                      style={{ ...styles.button, backgroundColor: 'white' }}
-                      onPress={() => {
-                        onSelectElement({ x: row, y: column });
-                      }}
-                    />
-                  )}
+                  <TouchableOpacity
+                    onPress={() => {
+                      onSelectElement({ x: row, y: column, tablePlanElement: el || null });
+                    }}
+                  >
+                    {el && SVG && <SVG width="100%" height="100%" rotation={3} />}
+                    {!el && <Button light style={{ ...styles.button, backgroundColor: 'white' }} />}
+                  </TouchableOpacity>
                 </Col>
               );
             })}
