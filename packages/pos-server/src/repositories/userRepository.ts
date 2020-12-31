@@ -34,9 +34,10 @@ export const userRepository = ({ models: { UserModel } }: InjectedRepositoryDepe
             const findOneFull = async props => {
                 const tenantId = Container.get('organizationId') as string;
                 const user = await UserModel({ tenantId }).findOne(props);
-                console.log('user', user);
-                console.log('props', props);
-                return user.toObject();
+                if (user) {
+                    return user.toObject();
+                }
+                return null;
             };
             const findById = async id => clean(await _findById(id));
             return {

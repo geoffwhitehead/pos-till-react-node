@@ -23,6 +23,8 @@ export const useSync = () => {
         duration: 5000,
         type: 'danger',
       });
+      setIsSyncing(false);
+
       return { success: false };
     }
     return { success: true };

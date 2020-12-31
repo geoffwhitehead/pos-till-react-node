@@ -256,12 +256,12 @@ export const authService = ({
 
         const user = await userRepository.findOneFull({ _id: refreshUserId });
 
-        const { firstName, lastName, email, _id, password } = user;
-
         if (!user) {
             logger.error('User not found in db', updatedCtx);
             return { success: false };
         }
+
+        const { firstName, lastName, email, _id, password } = user;
 
         try {
             // by using the users password in constructing the bearer token it means if the user ever changes their password any
