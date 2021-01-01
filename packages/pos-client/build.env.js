@@ -1,1 +1,1 @@
-export default "local";
+export default "production";

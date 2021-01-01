@@ -81,6 +81,12 @@ export class Bill extends Model {
   @children('bill_items') billItems: Query<BillItem>;
   @children('bill_call_logs') billCallLogs: Query<BillCallLog>;
 
+  @lazy billItemsByPriceGroup = (priceGroupId: string) =>
+    this.billItems.extend(Q.where('price_group_id', Q.eq(priceGroupId)));
+
+  @lazy billItemsByPriceGroupNoVoids = (priceGroupId: string) =>
+    this.billItems.extend(Q.and(Q.where('price_group_id', Q.eq(priceGroupId)), Q.where('is_voided', Q.notEq(true))));
+
   @lazy _billModifierItems = this.collections
     .get<BillItemModifierItem>('bill_item_modifier_items')
     .query(Q.on('bill_items', 'bill_id', this.id)) as Query<BillItemModifierItem>;

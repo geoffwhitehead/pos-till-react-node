@@ -8,7 +8,7 @@ import { Col, Container, Grid } from '../../core';
 import { CheckoutItemNavigator } from '../../navigators/CheckoutItemNavigator';
 import { SidebarDrawerStackParamList } from '../../navigators/SidebarNavigator';
 import { RECEIPT_PANEL_BUTTONS_WIDTH, RECEIPT_PANEL_WIDTH } from '../../utils/consts';
-import { SelectBill } from '../Bills/SelectBill/SelectBIll';
+import { SelectBill } from '../Bills/SelectBill/SelectBill';
 import { CompleteBill } from './sub-components/CompleteBill/CompleteBill';
 import { Payments } from './sub-components/Payments/Payments';
 import { Receipt } from './sub-components/Receipt/Receipt';

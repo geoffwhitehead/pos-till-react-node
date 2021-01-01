@@ -3,7 +3,7 @@ import { SidebarHeader } from '../../components/SidebarHeader/SidebarHeader';
 import { BillPeriodContext } from '../../contexts/BillPeriodContext';
 import { Container } from '../../core';
 import { sidebarRoutes } from '../../navigators/SidebarNavigator';
-import { SelectBill } from './SelectBill/SelectBIll';
+import { SelectBill } from './SelectBill/SelectBill';
 
 export const Bills = ({ navigation }) => {
   const openDrawer = () => navigation.openDrawer();

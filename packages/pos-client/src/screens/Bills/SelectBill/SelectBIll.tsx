@@ -1,4 +1,3 @@
-import { Button, Col, Footer, Grid, Icon, Item, List, ListItem, Right, Text } from ', View../../../core';
 import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import withObservables from '@nozbe/with-observables';
 import React, { useContext, useMemo, useState } from 'react';
@@ -6,6 +5,7 @@ import { ScrollView } from 'react-native';
 import { SwitchSelector } from '../../../components/SwitchSelector/SwitchSelector';
 import { CurrentBillContext } from '../../../contexts/CurrentBillContext';
 import { OrganizationContext } from '../../../contexts/OrganizationContext';
+import { Button, Col, Footer, Grid, Icon, Item, List, ListItem, Right, Text } from '../../../core';
 import { database } from '../../../database';
 import { Bill, BillPeriod, tableNames, TablePlanElement } from '../../../models';
 import { BillRow } from './BillRow';
@@ -149,7 +149,7 @@ export const SelectBillInner: React.FC<SelectBillOuterProps & SelectBillInnerPro
 };
 
 export const enhance = c =>
-  withDatabase<{}>(
+  withDatabase<any>(
     withObservables<SelectBillOuterProps, SelectBillInnerProps>(['billPeriod'], ({ billPeriod }) => ({
       billPeriod,
       openBills: billPeriod.openBills,
