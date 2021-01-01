@@ -1,11 +1,7 @@
 <?xml version="1.0"?>
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:svgjs="http://svgjs.com/svgjs" version="1.1" width="512" height="512" x="0" y="0" viewBox="0 0 20.969 20.969" style="enable-background:new 0 0 512 512" xml:space="preserve" class=""><g>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:svgjs="http://svgjs.com/svgjs" version="1.1" width="512" height="512" x="0" y="0" viewBox="0 0 297 297" style="enable-background:new 0 0 512 512" xml:space="preserve" class=""><g transform="matrix(1.1,0,0,1.1,-14.850000000000165,-109.84999923706077)">
 <g xmlns="http://www.w3.org/2000/svg">
-	<g id="c112_-">
-		<rect x="0" y="6.504" width="20.969" height="7.961" fill="#606060" data-original="#000000" style="" class=""/>
-	</g>
-	<g id="Capa_1_45_">
-	</g>
+	<path d="M294.088,99.52c-1.865-1.865-4.395-2.913-7.032-2.913L9.955,96.62c-5.491,0-9.942,4.451-9.943,9.943L0,190.448   c0,2.638,1.047,5.168,2.912,7.032c1.865,1.865,4.394,2.913,7.033,2.913l277.1-0.016c5.491,0,9.942-4.451,9.943-9.943L297,106.552   C297,103.914,295.953,101.384,294.088,99.52z" fill="#a2a2a2" data-original="#000000" style="" class=""/>
 </g>
 <g xmlns="http://www.w3.org/2000/svg">
 </g>

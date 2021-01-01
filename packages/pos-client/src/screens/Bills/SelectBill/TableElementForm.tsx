@@ -1,7 +1,7 @@
 import { useDatabase } from '@nozbe/watermelondb/hooks';
 import { Formik } from 'formik';
 import { inRange } from 'lodash';
-import React, { useEffect } from 'react';
+import React from 'react';
 import * as Yup from 'yup';
 import { ItemField } from '../../../components/ItemField/ItemField';
 import { Button, Form, Icon, Input, Item, Picker, Right, Text, View } from '../../../core';
@@ -92,9 +92,9 @@ export const TableElementForm: React.FC<TableElementFormInnerProps & TableElemen
       {({ handleChange, handleBlur, resetForm, handleSubmit, setFieldValue, errors, touched, values }) => {
         const { billReference, rotation, type } = values;
 
-        useEffect(() => {
-          resetForm({ values: initialValues });
-        }, [x, y]);
+        // useEffect(() => {
+        //   resetForm({ values: initialValues });
+        // }, [x, y]);
 
         return (
           <View style={{ borderColor: 'lightgrey', borderLeftWidth: 1, height: '100%' }}>

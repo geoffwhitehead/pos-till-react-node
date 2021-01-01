@@ -98,6 +98,7 @@ export const SelectBillInner: React.FC<SelectBillOuterProps & SelectBillInnerPro
             onSelectElement={handleSelectElement}
             selectedElement={selectedElement}
             gridSize={organization.billViewPlanGridSize}
+            openBills={openBills}
           />
         </Col>
         <Col style={{ width: 400 }}>
@@ -152,7 +153,10 @@ export const enhance = c =>
     withObservables<SelectBillOuterProps, SelectBillInnerProps>(['billPeriod'], ({ billPeriod }) => ({
       billPeriod,
       openBills: billPeriod.openBills,
-      tablePlanElements: database.collections.get<TablePlanElement>(tableNames.tablePlanElement).query(),
+      tablePlanElements: database.collections
+        .get<TablePlanElement>(tableNames.tablePlanElement)
+        .query()
+        .observeWithColumns(['bill_reference', 'type', 'rotation']),
     }))(c),
   );
 

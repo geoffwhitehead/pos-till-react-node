@@ -43,6 +43,10 @@ const settingsSchema = Yup.object().shape({
     .min(1, 'Too Low')
     .max(100, 'Too High')
     .required('Required'),
+  tablePlannerGridSize: Yup.number()
+    .min(5, 'Too Low')
+    .max(40, 'Too High')
+    .required('Required'),
 });
 
 const currencies = [
@@ -61,7 +65,7 @@ const SettingsTabInner: React.FC<SettingsTabOuterProps & SettingsTabInnerProps> 
   openBills,
   priceGroups,
 }) => {
-  const { organization, setOrganization } = useContext(OrganizationContext);
+  const { organization } = useContext(OrganizationContext);
   const { setReceiptPrinter } = useContext(ReceiptPrinterContext);
   const [loading, setLoading] = useState(false);
   const database = useDatabase();
@@ -75,7 +79,8 @@ const SettingsTabInner: React.FC<SettingsTabOuterProps & SettingsTabInnerProps> 
     defaultPriceGroupId: organization.defaultPriceGroupId,
     receiptPrinterId: organization.receiptPrinterId,
     currency: organization.currency,
-    maxBills: organization.maxBills,
+    maxBills: organization.maxBills.toString(),
+    tablePlannerGridSize: organization.billViewPlanGridSize.toString(),
   };
 
   const updateOrganization = async values => {
@@ -94,6 +99,7 @@ const SettingsTabInner: React.FC<SettingsTabOuterProps & SettingsTabInnerProps> 
         org.receiptPrinter.set(receiptPrinter);
         org.currency = values.currency;
         org.maxBills = parseInt(values.maxBills);
+        org.billViewPlanGridSize = parseInt(values.tablePlannerGridSize);
       }),
     );
 
@@ -108,7 +114,7 @@ const SettingsTabInner: React.FC<SettingsTabOuterProps & SettingsTabInnerProps> 
         onSubmit={values => updateOrganization(values)}
       >
         {({ handleChange, handleBlur, handleSubmit, errors, touched, values }) => {
-          const { defaultPriceGroupId, receiptPrinterId, currency, maxBills } = values;
+          const { defaultPriceGroupId, receiptPrinterId, currency, maxBills, tablePlannerGridSize } = values;
 
           const hasOpenBills = openBills.length > 0;
 
@@ -170,10 +176,19 @@ const SettingsTabInner: React.FC<SettingsTabOuterProps & SettingsTabInnerProps> 
                       name="maxBills"
                       errors={errors.maxBills}
                     >
+                      <Input onChangeText={handleChange('maxBills')} onBlur={handleBlur('maxBills')} value={maxBills} />
+                    </ItemField>
+
+                    <ItemField
+                      label="Table planner grid size"
+                      touched={touched.tablePlannerGridSize}
+                      name="tablePlannerGridSize"
+                      errors={errors.tablePlannerGridSize}
+                    >
                       <Input
-                        onChangeText={handleChange('maxBills')}
-                        onBlur={handleBlur('maxBills')}
-                        value={maxBills.toString()}
+                        onChangeText={handleChange('tablePlannerGridSize')}
+                        onBlur={handleBlur('tablePlannerGridSize')}
+                        value={tablePlannerGridSize}
                       />
                     </ItemField>
 

@@ -2,6 +2,7 @@ import { Dictionary, groupBy, keyBy, times } from 'lodash';
 import React, { useMemo } from 'react';
 import { StyleSheet } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
+import Animated from 'react-native-reanimated';
 import FurnArmchair from '../../../assets/armchair.svg';
 import FurnChair from '../../../assets/chair.svg';
 import FurnCoffeeTable from '../../../assets/coffee-table.svg';
@@ -19,16 +20,22 @@ import FurnSofa from '../../../assets/sofa.svg';
 import Table2Round from '../../../assets/table2-col.svg';
 import Table4 from '../../../assets/table4-col.svg';
 import Table4Square from '../../../assets/table4-sq-col.svg';
-import { default as BlockGrey, default as BlockWallGrey } from '../../../assets/wall-grey.svg';
-import { Button, Col, Grid, Row } from '../../../core';
-import { TablePlanElement } from '../../../models';
+import BlockWallCenter from '../../../assets/wall-center.svg';
+import BlockWallCorner from '../../../assets/wall-corner.svg';
+import BlockWallSquare from '../../../assets/wall-square.svg';
+import BlockWall from '../../../assets/wall.svg';
+import BlockWindow from '../../../assets/window.svg';
+import { Button, Col, Grid, Row, Text } from '../../../core';
+import { Bill, TablePlanElement } from '../../../models';
 import { TablePlanElementTypes } from '../../../models/TablePlanElement';
+import { fontSizes } from '../../../theme';
 
 type TableViewerProps = {
   selectedElement: TableElement;
   tableElements: TablePlanElement[];
   onSelectElement: (el: TableElement) => void;
   gridSize: number;
+  openBills: Bill[];
 };
 
 export type TableElement = {
@@ -44,6 +51,7 @@ export const TableViewer: React.FC<TableViewerProps> = ({
   selectedElement,
   tableElements,
   onSelectElement,
+  openBills,
 }) => {
   const groupedByXY = useMemo(() => {
     const groupedByX = groupBy(tableElements, el => el.posX);
@@ -56,20 +64,29 @@ export const TableViewer: React.FC<TableViewerProps> = ({
     return groupedByPosition;
   }, [tableElements]);
 
+  const keyedOpenBills = useMemo(() => {
+    return keyBy(openBills, bill => bill.reference);
+  }, [openBills]);
+
   const determineElement = (el: TablePlanElement) => {
-    console.log('Type ', el.type);
     const typeLabel = TablePlanElementTypes[el.type];
     switch (typeLabel) {
-      case TablePlanElementTypes['block:wallgrey']:
-        return BlockWallGrey;
+      case TablePlanElementTypes['block:wall']:
+        return BlockWall;
+      case TablePlanElementTypes['block:window']:
+        return BlockWindow;
+      case TablePlanElementTypes['block:wall:center']:
+        return BlockWallCenter;
+      case TablePlanElementTypes['block:wall:corner']:
+        return BlockWallCorner;
+      case TablePlanElementTypes['block:wall:square']:
+        return BlockWallSquare;
       case TablePlanElementTypes['table:4:square']:
         return Table4Square;
       case TablePlanElementTypes['table:2:round']:
         return Table2Round;
       case TablePlanElementTypes['table:4']:
         return Table4;
-      case TablePlanElementTypes['block:grey']:
-        return BlockGrey;
       case TablePlanElementTypes['furniture:armchair']:
         return FurnArmchair;
       case TablePlanElementTypes['furniture:coffeetable']:
@@ -113,7 +130,9 @@ export const TableViewer: React.FC<TableViewerProps> = ({
               const SVG = el ? determineElement(el) : null;
               const isSelected = selectedElement && selectedElement.y === column && selectedElement.x === row;
               const selectedStyles = isSelected ? styles.selected : {};
-
+              const rotation = `${el?.rotation || 0}deg`;
+              const bill = el?.billReference ? keyedOpenBills[el.billReference] : null;
+              const color = el?.billReference ? (bill ? 'seagreen' : 'white') : 'white';
               return (
                 <Col key={`${row}-${column}`} style={{ ...styles.col, ...selectedStyles }}>
                   <TouchableOpacity
@@ -121,8 +140,19 @@ export const TableViewer: React.FC<TableViewerProps> = ({
                       onSelectElement({ x: row, y: column, tablePlanElement: el || null });
                     }}
                   >
-                    {el && SVG && <SVG width="100%" height="100%" rotation={3} />}
-                    {!el && <Button light style={{ ...styles.button, backgroundColor: 'white' }} />}
+                    {el && SVG && (
+                      <Animated.View
+                        style={{
+                          justifyContent: 'center',
+                          transform: [{ rotate: rotation }],
+                          backgroundColor: color,
+                        }}
+                      >
+                        <SVG width="100%" height="100%" />
+                        {el.billReference && <Text style={styles.referenceText}>{el.billReference}</Text>}
+                      </Animated.View>
+                    )}
+                    {(!el || !SVG) && <Button light style={{ ...styles.button, backgroundColor: 'white' }} />}
                   </TouchableOpacity>
                 </Col>
               );
@@ -154,13 +184,17 @@ const styles = StyleSheet.create({
     height: '100%',
     width: '100%',
   },
-  buttonText: {
+  referenceText: {
     width: '100%',
     textAlign: 'center',
-
+    position: 'absolute',
+    zIndex: 10,
+    color: 'white',
     textShadowColor: 'rgba(0, 0, 0, 0.75)',
     textShadowOffset: { width: -1, height: 1 },
     textShadowRadius: 10,
+    alignSelf: 'center',
+    fontSize: fontSizes[6],
   },
   selected: {
     borderColor: 'red',

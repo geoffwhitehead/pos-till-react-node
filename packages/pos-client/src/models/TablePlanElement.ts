@@ -9,12 +9,16 @@ export type TablePlanElementProps = {
   rotation: number;
 };
 
+// wall color: #A2A2A2
 export enum TablePlanElementTypes {
   'table:4:square' = 'Table: 4 Square',
   'table:2:round' = 'Table: 2 Round',
   'table:4' = 'Table: 4',
-  'block:grey' = 'Block: Grey',
-  'block:wallgrey' = 'Block: Wall Grey',
+  'block:wall' = 'Block: Wall',
+  'block:wall:corner' = 'Block: Wall Corner',
+  'block:wall:center' = 'Block: Wall Center',
+  'block:wall:square' = 'Block: Wall Square',
+  'block:window' = 'Block: Window',
   'furniture:armchair' = 'Furniture: Armchair',
   'furniture:coffeetable' = 'Furniture: Coffee Table',
   'furniture:cupboard' = 'Furniture: Cupboard',
@@ -33,13 +37,9 @@ export enum TablePlanElementTypes {
 
 export enum TablePlanElementRotations {
   '0 Degrees' = '0',
-  '45 Degrees' = '45',
   '90 Degrees' = '90',
-  '135 Degrees' = '135',
   '180 Degrees' = '180',
-  '225 Degrees' = '225',
   '270 Degrees' = '270',
-  '315 Degrees' = '315',
 }
 
 export class TablePlanElement extends Model {

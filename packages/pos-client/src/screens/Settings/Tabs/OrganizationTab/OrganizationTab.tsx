@@ -109,7 +109,12 @@ export const OrganizationTab: React.FC<OrganizationTabProps> = () => {
                   </ItemField>
 
                   <ItemField label="Email" touched={touched.email} name="email" errors={errors.email}>
-                    <Input onChangeText={handleChange('email')} onBlur={handleBlur('email')} value={email} />
+                    <Input
+                      disabled={true}
+                      onChangeText={handleChange('email')}
+                      onBlur={handleBlur('email')}
+                      value={email}
+                    />
                   </ItemField>
 
                   <ItemField label="Phone" touched={touched.phone} name="phone" errors={errors.phone}>
