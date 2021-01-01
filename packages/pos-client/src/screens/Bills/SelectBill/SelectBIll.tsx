@@ -81,11 +81,16 @@ export const SelectBillInner: React.FC<SelectBillOuterProps & SelectBillInnerPro
     }
   };
 
+  const handleEditorState = () => {
+    setIsEditing(!isEditing);
+    setSelectedElement(null);
+  };
+
   return (
     <>
       <Item style={{ backgroundColor: 'whitesmoke', padding: 5 }}>
         <Right>
-          <Button small success={isEditing} info={!isEditing} onPress={() => setIsEditing(!isEditing)}>
+          <Button small success={isEditing} info={!isEditing} onPress={handleEditorState}>
             {!isEditing && <Icon name="ios-build-outline" />}
             {isEditing && <Icon name="checkmark" />}
           </Button>
@@ -99,6 +104,7 @@ export const SelectBillInner: React.FC<SelectBillOuterProps & SelectBillInnerPro
             selectedElement={selectedElement}
             gridSize={organization.billViewPlanGridSize}
             openBills={openBills}
+            isEditing={isEditing}
           />
         </Col>
         <Col style={{ width: 400 }}>

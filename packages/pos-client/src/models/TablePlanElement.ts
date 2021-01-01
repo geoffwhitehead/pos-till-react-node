@@ -11,6 +11,31 @@ export type TablePlanElementProps = {
 
 // wall color: #A2A2A2
 export enum TablePlanElementTypes {
+  'table:4:square' = 'table:4:square',
+  'table:2:round' = 'table:2:round',
+  'table:4' = 'table:4',
+  'block:wall' = 'block:wall',
+  'block:wall:corner' = 'block:wall:corner',
+  'block:wall:center' = 'block:wall:center',
+  'block:wall:square' = 'block:wall:square',
+  'block:window' = 'block:window',
+  'furniture:armchair' = 'furniture:armchair',
+  'furniture:coffeetable' = 'furniture:coffeetable',
+  'furniture:cupboard' = 'furniture:cupboard',
+  'furniture:door' = 'furniture:door',
+  'furniture:extractor' = 'furniture:extractor',
+  'furniture:plant1' = 'furniture:plant1',
+  'furniture:plant2' = 'furniture:plant2',
+  'furniture:plant3' = 'furniture:plant3',
+  'furniture:plant4' = 'furniture:plant4',
+  'furniture:chair' = 'furniture:chair',
+  'furniture:drawers' = 'furniture:drawers',
+  'furniture:sink' = 'furniture:sink',
+  'furniture:sofacorner' = 'furniture:sofacorner',
+  'furniture:sofa' = 'furniture:sofa',
+}
+
+export enum TablePlanElementTypeLabels {
   'table:4:square' = 'Table: 4 Square',
   'table:2:round' = 'Table: 2 Round',
   'table:4' = 'Table: 4',

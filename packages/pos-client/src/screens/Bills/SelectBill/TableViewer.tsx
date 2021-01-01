@@ -36,6 +36,7 @@ type TableViewerProps = {
   onSelectElement: (el: TableElement) => void;
   gridSize: number;
   openBills: Bill[];
+  isEditing: boolean;
 };
 
 export type TableElement = {
@@ -44,14 +45,40 @@ export type TableElement = {
   tablePlanElement?: TablePlanElement;
 };
 
+const elementMap = {
+  [TablePlanElementTypes['block:wall']]: BlockWall,
+  [TablePlanElementTypes['block:window']]: BlockWindow,
+  [TablePlanElementTypes['block:wall:center']]: BlockWallCenter,
+  [TablePlanElementTypes['block:wall:corner']]: BlockWallCorner,
+  [TablePlanElementTypes['block:wall:square']]: BlockWallSquare,
+  [TablePlanElementTypes['table:4:square']]: Table4Square,
+  [TablePlanElementTypes['table:2:round']]: Table2Round,
+  [TablePlanElementTypes['table:4']]: Table4,
+  [TablePlanElementTypes['furniture:armchair']]: FurnArmchair,
+  [TablePlanElementTypes['furniture:coffeetable']]: FurnCoffeeTable,
+  [TablePlanElementTypes['furniture:cupboard']]: FurnCupboard,
+  [TablePlanElementTypes['furniture:door']]: FurnDoor,
+  [TablePlanElementTypes['furniture:extractor']]: FurnExtractor,
+  [TablePlanElementTypes['furniture:plant1']]: FurnPlant1,
+  [TablePlanElementTypes['furniture:plant2']]: FurnPlant2,
+  [TablePlanElementTypes['furniture:plant3']]: FurnPlant3,
+  [TablePlanElementTypes['furniture:plant4']]: FurnPlant4,
+  [TablePlanElementTypes['furniture:chair']]: FurnChair,
+  [TablePlanElementTypes['furniture:drawers']]: FurnDrawers,
+  [TablePlanElementTypes['furniture:sink']]: FurnSink,
+  [TablePlanElementTypes['furniture:sofa']]: FurnSofa,
+  [TablePlanElementTypes['furniture:sofacorner']]: FurnSofaCorner,
+};
+
 const GRID_SPACING = 4;
 
-export const TableViewer: React.FC<TableViewerProps> = ({
+export const TableViewerInner: React.FC<TableViewerProps> = ({
   gridSize,
   selectedElement,
   tableElements,
   onSelectElement,
   openBills,
+  isEditing,
 }) => {
   const groupedByXY = useMemo(() => {
     const groupedByX = groupBy(tableElements, el => el.posX);
@@ -68,71 +95,22 @@ export const TableViewer: React.FC<TableViewerProps> = ({
     return keyBy(openBills, bill => bill.reference);
   }, [openBills]);
 
-  const determineElement = (el: TablePlanElement) => {
-    const typeLabel = TablePlanElementTypes[el.type];
-    switch (typeLabel) {
-      case TablePlanElementTypes['block:wall']:
-        return BlockWall;
-      case TablePlanElementTypes['block:window']:
-        return BlockWindow;
-      case TablePlanElementTypes['block:wall:center']:
-        return BlockWallCenter;
-      case TablePlanElementTypes['block:wall:corner']:
-        return BlockWallCorner;
-      case TablePlanElementTypes['block:wall:square']:
-        return BlockWallSquare;
-      case TablePlanElementTypes['table:4:square']:
-        return Table4Square;
-      case TablePlanElementTypes['table:2:round']:
-        return Table2Round;
-      case TablePlanElementTypes['table:4']:
-        return Table4;
-      case TablePlanElementTypes['furniture:armchair']:
-        return FurnArmchair;
-      case TablePlanElementTypes['furniture:coffeetable']:
-        return FurnCoffeeTable;
-      case TablePlanElementTypes['furniture:cupboard']:
-        return FurnCupboard;
-      case TablePlanElementTypes['furniture:door']:
-        return FurnDoor;
-      case TablePlanElementTypes['furniture:extractor']:
-        return FurnExtractor;
-      case TablePlanElementTypes['furniture:plant1']:
-        return FurnPlant1;
-      case TablePlanElementTypes['furniture:plant2']:
-        return FurnPlant2;
-      case TablePlanElementTypes['furniture:plant3']:
-        return FurnPlant3;
-      case TablePlanElementTypes['furniture:plant4']:
-        return FurnPlant4;
-      case TablePlanElementTypes['furniture:chair']:
-        return FurnChair;
-      case TablePlanElementTypes['furniture:drawers']:
-        return FurnDrawers;
-      case TablePlanElementTypes['furniture:sink']:
-        return FurnSink;
-      case TablePlanElementTypes['furniture:sofacorner']:
-        return FurnSofaCorner;
-      case TablePlanElementTypes['furniture:sofa']:
-        return FurnSofa;
-      default:
-        return null;
-    }
-  };
-
   return (
     <Grid style={styles.grid}>
       {times(gridSize, row => {
         return (
           <Row key={row} style={styles.row}>
             {times(gridSize, column => {
+              // TODO: refactor these
               const el = groupedByXY?.[row]?.[column];
-              const SVG = el ? determineElement(el) : null;
+              const SVG = el ? elementMap[el.type] : null;
               const isSelected = selectedElement && selectedElement.y === column && selectedElement.x === row;
               const selectedStyles = isSelected ? styles.selected : {};
               const rotation = `${el?.rotation || 0}deg`;
               const bill = el?.billReference ? keyedOpenBills[el.billReference] : null;
               const color = el?.billReference ? (bill ? 'seagreen' : 'white') : 'white';
+              const shouldRenderButton = isEditing && (!el || !SVG);
+              const shouldRenderSVG = el && SVG;
               return (
                 <Col key={`${row}-${column}`} style={{ ...styles.col, ...selectedStyles }}>
                   <TouchableOpacity
@@ -140,20 +118,19 @@ export const TableViewer: React.FC<TableViewerProps> = ({
                       onSelectElement({ x: row, y: column, tablePlanElement: el || null });
                     }}
                   >
-                    {el && SVG && (
+                    {shouldRenderSVG && (
                       <Animated.View
                         style={{
-                          justifyContent: 'center',
                           transform: [{ rotate: rotation }],
                           backgroundColor: color,
-                          borderRadius: 5,
+                          ...styles.svgView,
                         }}
                       >
                         <SVG width="100%" height="100%" />
                         {el.billReference && <Text style={styles.referenceText}>{el.billReference}</Text>}
                       </Animated.View>
                     )}
-                    {(!el || !SVG) && <Button light style={{ ...styles.button, backgroundColor: 'white' }} />}
+                    {shouldRenderButton && <Button light style={{ ...styles.button, backgroundColor: 'white' }} />}
                   </TouchableOpacity>
                 </Col>
               );
@@ -164,6 +141,8 @@ export const TableViewer: React.FC<TableViewerProps> = ({
     </Grid>
   );
 };
+
+export const TableViewer = React.memo(TableViewerInner);
 
 const styles = StyleSheet.create({
   grid: {
@@ -199,5 +178,9 @@ const styles = StyleSheet.create({
   },
   selected: {
     borderColor: 'red',
+  },
+  svgView: {
+    justifyContent: 'center',
+    borderRadius: 5,
   },
 });
