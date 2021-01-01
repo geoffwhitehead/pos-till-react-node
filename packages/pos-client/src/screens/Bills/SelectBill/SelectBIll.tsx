@@ -5,9 +5,11 @@ import { ScrollView } from 'react-native';
 import { SwitchSelector } from '../../../components/SwitchSelector/SwitchSelector';
 import { CurrentBillContext } from '../../../contexts/CurrentBillContext';
 import { OrganizationContext } from '../../../contexts/OrganizationContext';
-import { Button, Col, Footer, Grid, Icon, Item, List, ListItem, Right, Text } from '../../../core';
+import { Button, Col, Footer, Grid, Icon, Item, List, Text } from '../../../core';
 import { database } from '../../../database';
 import { Bill, BillPeriod, tableNames, TablePlanElement } from '../../../models';
+import { BillViewTypeEnum } from '../../../models/Organization';
+import { moderateScale } from '../../../utils/scaling';
 import { BillRow } from './BillRow';
 import { BillRowEmpty } from './BillRowEmpty';
 import { TableElementForm } from './TableElementForm';
@@ -86,28 +88,75 @@ export const SelectBillInner: React.FC<SelectBillOuterProps & SelectBillInnerPro
     setSelectedElement(null);
   };
 
+  const shouldRenderPlanView = organization.billViewType === BillViewTypeEnum.plan;
+
+  const onChangeViewType = async value => {
+    await database.action(() => organization.update(record => (record.billViewType = value)));
+  };
+
+  console.log('asd ', organization.billViewType);
   return (
     <>
-      <Item style={{ backgroundColor: 'whitesmoke', padding: 5 }}>
-        <Right>
-          <Button small success={isEditing} info={!isEditing} onPress={handleEditorState}>
+      <Item
+        style={{
+          backgroundColor: 'whitesmoke',
+          paddingTop: 5,
+          paddingBottom: 5,
+          flexDirection: 'row',
+          justifyContent: 'flex-end',
+          alignItems: 'center',
+          alignContent: 'center',
+        }}
+      >
+        {!isEditing && (
+          <SwitchSelector
+            options={[
+              { label: 'Plan', value: BillViewTypeEnum.plan },
+              { label: 'List', value: BillViewTypeEnum.list },
+            ]}
+            initial={organization.billViewType}
+            onPress={onChangeViewType}
+            style={{ width: moderateScale(250), marginRight: 5 }}
+          />
+        )}
+        {!isEditing && (
+          <SwitchSelector
+            options={[
+              { label: 'Show All', value: 0 },
+              { label: 'Show Open', value: 1 },
+            ]}
+            initial={isFilterOpenSelected}
+            onPress={value => setIsFilterOpenSelected(value as number)}
+            style={{ width: moderateScale(250), marginRight: 5 }}
+          />
+        )}
+        {shouldRenderPlanView && (
+          <Button
+            style={{ alignSelf: 'center', marginRight: 5 }}
+            small
+            success={isEditing}
+            info={!isEditing}
+            onPress={handleEditorState}
+          >
             {!isEditing && <Icon name="ios-build-outline" />}
             {isEditing && <Icon name="checkmark" />}
           </Button>
-        </Right>
+        )}
       </Item>
       <Grid>
-        <Col>
-          <TableViewer
-            tableElements={tablePlanElements}
-            onSelectElement={handleSelectElement}
-            selectedElement={selectedElement}
-            gridSize={organization.billViewPlanGridSize}
-            openBills={openBills}
-            isEditing={isEditing}
-          />
-        </Col>
-        <Col style={{ width: 400 }}>
+        {shouldRenderPlanView && (
+          <Col>
+            <TableViewer
+              tableElements={tablePlanElements}
+              onSelectElement={handleSelectElement}
+              selectedElement={selectedElement}
+              gridSize={organization.billViewPlanGridSize}
+              openBills={openBills}
+              isEditing={isEditing}
+            />
+          </Col>
+        )}
+        <Col style={{ width: shouldRenderPlanView ? moderateScale(500) : '100%' }}>
           {isEditing && !selectedElement && <Text style={{ padding: 15 }}>Select a table element to edit...</Text>}
           {isEditing && selectedElement && (
             <TableElementForm
@@ -118,19 +167,8 @@ export const SelectBillInner: React.FC<SelectBillOuterProps & SelectBillInnerPro
           )}
 
           {!isEditing && (
-            <List>
-              <ListItem itemHeader first>
-                <SwitchSelector
-                  options={[
-                    { label: 'Show All', value: 0 },
-                    { label: 'Show Open', value: 1 },
-                  ]}
-                  initial={isFilterOpenSelected}
-                  onPress={value => setIsFilterOpenSelected(value as number)}
-                  style={{ paddingRight: 10 }}
-                />
-              </ListItem>
-              <ScrollView>
+            <ScrollView>
+              <List>
                 {bills.map((bill, index) => {
                   return bill ? (
                     <BillRow key={bill.id} bill={bill} onSelectBill={_onSelectBill} />
@@ -142,8 +180,8 @@ export const SelectBillInner: React.FC<SelectBillOuterProps & SelectBillInnerPro
                     />
                   );
                 })}
-              </ScrollView>
-            </List>
+              </List>
+            </ScrollView>
           )}
         </Col>
       </Grid>
