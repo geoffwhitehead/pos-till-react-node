@@ -128,7 +128,7 @@ export const WrappedBillRow: React.FC<BillRowInnerProps & BillRowOuterProps> = (
         <Text style={styles.rowText}>{rowText}</Text>
         <View>
           {badgeType && (
-            <Badge {...{ badgeType }} style={{ marginBottom: 5 }}>
+            <Badge {...{ [badgeType]: true }} style={{ marginBottom: 5 }}>
               <Text note style={{ color: 'white' }}>
                 {text}
               </Text>

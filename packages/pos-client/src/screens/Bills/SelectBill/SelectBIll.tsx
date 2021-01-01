@@ -1,3 +1,4 @@
+import { Button, Col, Footer, Grid, Icon, Item, List, ListItem, Right, Text } from ', View../../../core';
 import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import withObservables from '@nozbe/with-observables';
 import React, { useContext, useMemo, useState } from 'react';
@@ -5,7 +6,6 @@ import { ScrollView } from 'react-native';
 import { SwitchSelector } from '../../../components/SwitchSelector/SwitchSelector';
 import { CurrentBillContext } from '../../../contexts/CurrentBillContext';
 import { OrganizationContext } from '../../../contexts/OrganizationContext';
-import { Button, Col, Footer, Grid, Icon, Item, List, ListItem, Right, Text } from '../../../core';
 import { database } from '../../../database';
 import { Bill, BillPeriod, tableNames, TablePlanElement } from '../../../models';
 import { BillRow } from './BillRow';
@@ -85,9 +85,9 @@ export const SelectBillInner: React.FC<SelectBillOuterProps & SelectBillInnerPro
     <>
       <Item style={{ backgroundColor: 'whitesmoke', padding: 5 }}>
         <Right>
-          <Button info small iconLeft onPress={() => setIsEditing(!isEditing)}>
-            <Icon name="ios-build-outline" />
-            <Text>Toggle Edit View</Text>
+          <Button small success={isEditing} info={!isEditing} onPress={() => setIsEditing(!isEditing)}>
+            {!isEditing && <Icon name="ios-build-outline" />}
+            {isEditing && <Icon name="checkmark" />}
           </Button>
         </Right>
       </Item>

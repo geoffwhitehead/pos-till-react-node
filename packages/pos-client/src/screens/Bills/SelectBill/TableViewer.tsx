@@ -146,6 +146,7 @@ export const TableViewer: React.FC<TableViewerProps> = ({
                           justifyContent: 'center',
                           transform: [{ rotate: rotation }],
                           backgroundColor: color,
+                          borderRadius: 5,
                         }}
                       >
                         <SVG width="100%" height="100%" />
