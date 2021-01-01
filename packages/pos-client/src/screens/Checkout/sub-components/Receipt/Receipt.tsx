@@ -32,6 +32,7 @@ import { buttons, fonts, spacing } from '../../../../theme';
 import { formatNumber, minimalBillSummary, MinimalBillSummary } from '../../../../utils';
 import { RECEIPT_PANEL_BUTTONS_WIDTH } from '../../../../utils/consts';
 import { paddingHelper, resolveButtonState } from '../../../../utils/helpers';
+import { moderateScale } from '../../../../utils/scaling';
 import { ReceiptItems } from './ReceiptItems';
 
 interface ReceiptInnerProps {
@@ -338,25 +339,29 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
           </Col>
         )}
         <Col style={styles.colummMain}>
-          <Row style={styles.rowOpenTime}>
-            <View style={styles.columnsTimes}>
-              <Text note>Open</Text>
+          <Row style={styles.rowDetails}>
+            <View style={styles.billDetail}>
+              <Text style={styles.detailLabel} note>
+                Open
+              </Text>
               <Text style={styles.textTimes}>
                 {dayjs(bill.createdAt)
                   .format('DD/MM/YYYY h:mm a')
                   .toString()}
               </Text>
             </View>
-          </Row>
-          <Row style={styles.rowTimes}>
-            <Col style={styles.columnsTimes}>
-              <Text note>Prep</Text>
+            <View style={styles.billDetail}>
+              <Text style={styles.detailLabel} note>
+                Prep
+              </Text>
               <Text style={styles.textTimes}>{dateString}</Text>
-            </Col>
-            <Col style={styles.columnsTimes}>
-              <Text note>Bill</Text>
+            </View>
+            <View style={styles.billDetail}>
+              <Text style={styles.detailLabel} note>
+                Bill
+              </Text>
               <Text style={styles.textTimes}>{bill.reference}</Text>
-            </Col>
+            </View>
           </Row>
           <Row style={styles.itemsRow}>
             <ReceiptItems
@@ -444,20 +449,26 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     justifyContent: 'center',
   },
-  textTimes: { fontWeight: 'bold', paddingTop: spacing[4] },
-  columnsTimes: {
+  textTimes: { fontWeight: 'bold' },
+  billDetail: {
     ...paddingHelper(spacing[2], spacing[4]),
     display: 'flex',
-    flexDirection: 'column',
+    flexDirection: 'row',
     justifyContent: 'center',
   },
   columnsOptions: { ...paddingHelper(spacing[2], spacing[4]), justifyContent: 'flex-end', alignContent: 'flex-end' },
-  rowTimes: { backgroundColor: 'ivory', borderLeftWidth: 1, borderLeftColor: 'lightgrey', flex: 0 },
-  rowOpenTime: {
+  rowDetails: {
+    ...paddingHelper(spacing[4], spacing[0]),
     backgroundColor: 'ivory',
     borderLeftWidth: 1,
     borderColor: 'lightgrey',
+    flexDirection: 'column',
+    alignItems: 'flex-start',
     flex: 0,
+  },
+  detailLabel: {
+    minWidth: moderateScale(75),
+    alignSelf: 'center',
   },
   itemsRow: { borderLeftWidth: 1, borderLeftColor: 'lightgrey' },
   subTotalRow: {
