@@ -1,6 +1,6 @@
 import { Schema } from 'mongoose';
-import { tenantlessModel } from './utils/multiTenant';
 import uuid from 'uuid';
+import { tenantModel } from './utils/multiTenant';
 
 export interface PaymentTypeProps {
     _id?: string;
@@ -26,9 +26,9 @@ const PaymentTypeSchema: Schema<PaymentTypeProps> = new Schema(
             default: 10,
         },
     },
-    { collection: PAYMENT_TYPE_COLLECTION_NAME },
+    { timestamps: true, collection: PAYMENT_TYPE_COLLECTION_NAME },
 );
 
-const PaymentType = tenantlessModel<PaymentTypeProps>('PaymentType', PaymentTypeSchema);
+const PaymentType = tenantModel<PaymentTypeProps>('PaymentType', PaymentTypeSchema);
 
 export { PaymentType };

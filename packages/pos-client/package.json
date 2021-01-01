@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "android": "react-native run-android",
-    "dev:ios": "yarn set:local && react-native run-ios --simulator='iPad Pro (12.9-inch) (4th generation)'",
-    "dev:ios:device": "yarn set:production && react-native run-ios --device='iPad 12.9'",
+    "dev:ios": "react-native run-ios --simulator='iPad Pro (12.9-inch) (4th generation)'",
+    "dev:ios:device": "react-native run-ios --device='iPad 12.9'",
     "dev:app": "concurrently \"yarn start\" \"yarn dev:ios\"",
     "pod": "cd ./ios && pod install && cd .. ",
     "start": "react-native start",

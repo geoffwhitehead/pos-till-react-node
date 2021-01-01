@@ -78,7 +78,6 @@ export const organizationFromClient = (organization: OrganizationClientProps): O
 export const organizationToClient = (organization: OrganizationProps): OrganizationClientProps => {
     const { _id, name, email, phone, vat, address, settings = {} } = organization;
 
-    console.log('organization', organization);
     return {
         id: _id,
         name,
@@ -137,9 +136,10 @@ export const organizationService = ({
             deleted: [],
         };
 
-        // dont push payment type changes
-
-        await push(organizationRepository, _changes, lastPulledAt);
+        await Promise.all([
+            push(organizationRepository, _changes, lastPulledAt),
+            push(paymentTypeRepository, changes[PAYMENT_TYPE_COLLECTION_NAME], lastPulledAt),
+        ]);
     };
 
     const seed = async () => {

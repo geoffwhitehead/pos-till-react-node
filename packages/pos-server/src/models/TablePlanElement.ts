@@ -66,7 +66,7 @@ const TablePlanElementSchema: Schema<TablePlanElementProps> = new Schema(
             default: 0,
         },
     },
-    { timestamps: false, collection: TABLE_PLAN_ELEMENT_COLLECTION_NAME },
+    { timestamps: true, collection: TABLE_PLAN_ELEMENT_COLLECTION_NAME },
 );
 
 const TablePlanElement = tenantModel<TablePlanElementProps>('TablePlanElement', TablePlanElementSchema);

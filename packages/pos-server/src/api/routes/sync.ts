@@ -11,6 +11,7 @@ import { MODIFIER_COLLECTION_NAME } from '../../models/Modifier';
 import { MODIFIER_ITEM_COLLECTION_NAME } from '../../models/ModifierItem';
 import { MODIFIER_ITEM_PRICE_COLLECTION_NAME } from '../../models/ModifierItemPrice';
 import { ORGANIZATION_COLLECTION_NAME } from '../../models/Organization';
+import { PAYMENT_TYPE_COLLECTION_NAME } from '../../models/PaymentType';
 import { PRICE_GROUP_COLLECTION_NAME } from '../../models/PriceGroup';
 import { PRINTER_COLLECTION_NAME } from '../../models/Printer';
 import { PRINTER_GROUP_COLLECTION_NAME } from '../../models/PrinterGroup';
@@ -39,7 +40,6 @@ export default (app: Router) => {
             priceGroup: priceGroupService,
         } = Container.get('productService') as ProductService;
         const printerService = Container.get('printerService') as PrinterService;
-        // const printerGroupService = Container.get('printerGroupService') as PrinterService;
         const organizationService = Container.get('organizationService') as OrganizationService;
         const tablePlanService = Container.get('tablePlanService') as TablePlanService;
 
@@ -140,7 +140,10 @@ export default (app: Router) => {
                 }),
                 organizationService.pushChanges({
                     lastPulledAt,
-                    changes: deconstructChanges(changes, ORGANIZATION_COLLECTION_NAME),
+                    changes: {
+                        ...deconstructChanges(changes, ORGANIZATION_COLLECTION_NAME),
+                        ...deconstructChanges(changes, PAYMENT_TYPE_COLLECTION_NAME),
+                    },
                 }),
                 tablePlanService.pushChanges({
                     lastPulledAt,

@@ -91,7 +91,7 @@ export const repository = <T, U>({
             timestamp
                 ? {
                       createdAt: {
-                          $gte: timestamp,
+                          $gt: timestamp,
                       },
                   }
                 : {},
@@ -100,22 +100,14 @@ export const repository = <T, U>({
         return cleanDocs(created);
     };
     const updatedSince = async (timestamp: Date) => {
-        const updated = await model(tenanted && getTenant()).find(
-            timestamp
-                ? {
-                      createdAt: {
-                          $lt: timestamp,
-                      },
-                      updatedAt: {
-                          $gte: timestamp,
-                      },
-                  }
-                : {
-                      createdAt: {
-                          $lt: timestamp,
-                      },
-                  },
-        );
+        const updated = await model(tenanted && getTenant()).find({
+            createdAt: {
+                $lt: timestamp,
+            },
+            updatedAt: {
+                $gt: timestamp,
+            },
+        });
 
         return cleanDocs(updated);
     };
