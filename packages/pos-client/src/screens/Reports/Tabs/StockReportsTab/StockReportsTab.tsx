@@ -24,8 +24,6 @@ type StockReportsTabOuterProps = {
   database: Database;
 };
 
-// const printStockReport = ()
-
 export const StockReportsTabInner: React.FC<StockReportsTabOuterProps & StockReportsTabInnerProps> = ({
   categories,
 }) => {
@@ -60,7 +58,7 @@ export const StockReportsTabInner: React.FC<StockReportsTabOuterProps & StockRep
     setIsGraphLoading(true);
     const startDateUnix =
       dayjs(startDate)
-        //   .startOf('day')
+        .startOf('day')
         .unix() * 1000;
 
     const endDateUnix =
