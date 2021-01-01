@@ -1,9 +1,11 @@
 import { capitalize, keyBy } from 'lodash';
 import React, { useContext } from 'react';
+import { StyleSheet } from 'react-native';
 import { OrganizationContext } from '../../../../../contexts/OrganizationContext';
 import { Left, ListItem, Right, Separator, Text } from '../../../../../core';
 import { BillPayment, PaymentType } from '../../../../../models';
 import { formatNumber } from '../../../../../utils';
+import { ITEM_SPACING } from '../../../../../utils/consts';
 
 interface PaymentsBreakdownProps {
   payments: BillPayment[];
@@ -33,7 +35,7 @@ const PaymentsBreakdown: React.FC<PaymentsBreakdownProps> = ({ payments, readonl
         .map(payment => {
           const paymentType = keyedPaymentTypes[payment.paymentTypeId];
           return (
-            <ListItem key={payment.id} onPress={() => !readonly && onSelect(payment)}>
+            <ListItem key={payment.id} onPress={() => !readonly && onSelect(payment)} style={styles.listItem}>
               <Left>
                 <Text>{`Payment: ${capitalize(paymentType.name)}`}</Text>
               </Left>
@@ -48,3 +50,10 @@ const PaymentsBreakdown: React.FC<PaymentsBreakdownProps> = ({ payments, readonl
 };
 
 export { PaymentsBreakdown };
+
+const styles = StyleSheet.create({
+  listItem: {
+    paddingTop: ITEM_SPACING,
+    paddingBottom: ITEM_SPACING,
+  },
+});

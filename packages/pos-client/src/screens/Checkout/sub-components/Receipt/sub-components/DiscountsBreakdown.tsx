@@ -1,9 +1,11 @@
 import { capitalize } from 'lodash';
 import { Left, ListItem, Right, Separator, Text } from 'native-base';
 import React, { useContext } from 'react';
+import { StyleSheet } from 'react-native';
 import { OrganizationContext } from '../../../../../contexts/OrganizationContext';
 import { BillDiscount } from '../../../../../models';
 import { DiscountBreakdownProps as DiscountsBreakdownCalculationProps, formatNumber } from '../../../../../utils';
+import { ITEM_SPACING } from '../../../../../utils/consts';
 
 interface DiscountBreakdownProps {
   discountBreakdown: DiscountsBreakdownCalculationProps[];
@@ -36,7 +38,11 @@ export const DiscountsBreakdown: React.FC<DiscountBreakdownProps> = ({
       {discountBreakdown.map(breakdown => {
         const billDiscount = billDiscounts.find(({ id }) => id === breakdown.billDiscountId);
         return (
-          <ListItem key={breakdown.billDiscountId} onPress={() => !readonly && onSelect(billDiscount)}>
+          <ListItem
+            key={breakdown.billDiscountId}
+            onPress={() => !readonly && onSelect(billDiscount)}
+            style={styles.listItem}
+          >
             <Left>
               <Text>{discountText(breakdown)}</Text>
             </Left>
@@ -49,3 +55,10 @@ export const DiscountsBreakdown: React.FC<DiscountBreakdownProps> = ({
     </>
   );
 };
+
+const styles = StyleSheet.create({
+  listItem: {
+    paddingTop: ITEM_SPACING,
+    paddingBottom: ITEM_SPACING,
+  },
+});

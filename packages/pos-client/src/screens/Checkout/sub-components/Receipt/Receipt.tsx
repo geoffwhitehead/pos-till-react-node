@@ -10,7 +10,7 @@ import { Loading } from '../../../../components/Loading/Loading';
 import { TimePicker } from '../../../../components/TimePicker/TimePicker';
 import { OrganizationContext } from '../../../../contexts/OrganizationContext';
 import { ReceiptPrinterContext } from '../../../../contexts/ReceiptPrinterContext';
-import { ActionSheet, Button, Col, Grid, Icon, Row, Spinner, Text } from '../../../../core';
+import { ActionSheet, Button, Col, Grid, Icon, Row, Spinner, Text, View } from '../../../../core';
 import {
   Bill,
   BillCallLog,
@@ -31,7 +31,7 @@ import { receiptBill } from '../../../../services/printer/receiptBill';
 import { buttons, fonts, spacing } from '../../../../theme';
 import { formatNumber, minimalBillSummary, MinimalBillSummary } from '../../../../utils';
 import { RECEIPT_PANEL_BUTTONS_WIDTH } from '../../../../utils/consts';
-import { resolveButtonState } from '../../../../utils/helpers';
+import { paddingHelper, resolveButtonState } from '../../../../utils/helpers';
 import { ReceiptItems } from './ReceiptItems';
 
 interface ReceiptInnerProps {
@@ -41,7 +41,6 @@ interface ReceiptInnerProps {
   discounts: Discount[];
   billModifierItemsCount: number;
   itemsRequiringPrepTimeCount: number;
-  priceGroups: PriceGroup[];
   incompleteBillCallPrintLogs: number;
 }
 
@@ -65,7 +64,6 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
   discounts,
   itemsRequiringPrepTimeCount,
   billModifierItemsCount,
-  priceGroups,
   incompleteBillCallPrintLogs,
   hideFunctionButtons,
 }) => {
@@ -340,32 +338,26 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
           </Col>
         )}
         <Col style={styles.colummMain}>
+          <Row style={styles.rowOpenTime}>
+            <View style={styles.columnsTimes}>
+              <Text note>Open</Text>
+              <Text style={styles.textTimes}>
+                {dayjs(bill.createdAt)
+                  .format('DD/MM/YYYY h:mm a')
+                  .toString()}
+              </Text>
+            </View>
+          </Row>
           <Row style={styles.rowTimes}>
             <Col style={styles.columnsTimes}>
               <Text note>Prep</Text>
               <Text style={styles.textTimes}>{dateString}</Text>
             </Col>
             <Col style={styles.columnsTimes}>
-              <Text note>Open</Text>
-              <Text style={styles.textTimes}>
-                {dayjs(bill.createdAt)
-                  .format('DD/MM/YY h:mm')
-                  .toString()}
-              </Text>
+              <Text note>Bill</Text>
+              <Text style={styles.textTimes}>{bill.reference}</Text>
             </Col>
           </Row>
-          {/* <Row style={{ height: 45 }}>
-            <Col>
-              <Button full info onPress={onStore}>
-                <Text style={{ fontWeight: 'bold' }}>Bill: {bill.reference || '-'}</Text>
-              </Button>
-            </Col>
-            <Col>
-              <Button full warning>
-               
-              </Button>
-            </Col>
-          </Row> */}
           <Row style={styles.itemsRow}>
             <ReceiptItems
               bill={bill}
@@ -376,9 +368,11 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
             />
           </Row>
           <Row style={styles.subTotalRow}>
+            <Text>{`Subtotal: ${formatNumber(total, currency)}`}</Text>
+
             {hasDiscount && <Text>{`Discount: ${formatNumber(0 - totalDiscount, currency)}`}</Text>}
 
-            <Text>{`Total: ${formatNumber(total, currency)}`}</Text>
+            <Text>{`Total: ${formatNumber(totalPayable, currency)}`}</Text>
             {isComplete && (
               <Text>{`Change Due: ${formatNumber(
                 Math.abs(billPayments.find(payment => payment.isChange).amount),
@@ -451,18 +445,31 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   textTimes: { fontWeight: 'bold', paddingTop: spacing[4] },
-  columnsTimes: { padding: spacing[4], display: 'flex', flexDirection: 'column', justifyContent: 'center' },
-  rowTimes: { backgroundColor: '#fcf6ae', borderLeftWidth: 1, borderLeftColor: 'lightgrey', flex: 0 },
+  columnsTimes: {
+    ...paddingHelper(spacing[2], spacing[4]),
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+  },
+  columnsOptions: { ...paddingHelper(spacing[2], spacing[4]), justifyContent: 'flex-end', alignContent: 'flex-end' },
+  rowTimes: { backgroundColor: 'ivory', borderLeftWidth: 1, borderLeftColor: 'lightgrey', flex: 0 },
+  rowOpenTime: {
+    backgroundColor: 'ivory',
+    borderLeftWidth: 1,
+    borderColor: 'lightgrey',
+    flex: 0,
+  },
   itemsRow: { borderLeftWidth: 1, borderLeftColor: 'lightgrey' },
   subTotalRow: {
-    backgroundColor: '#fcf6ae',
+    backgroundColor: 'ivory',
     flex: 0,
     borderTopColor: 'lightgrey',
     borderTopWidth: 1,
     flexDirection: 'column',
-    padding: spacing[4],
+    ...paddingHelper(spacing[5], spacing[4]),
     borderLeftWidth: 1,
     borderLeftColor: 'lightgrey',
+    color: 'white',
   },
   printRow: {
     height: buttons.medium,

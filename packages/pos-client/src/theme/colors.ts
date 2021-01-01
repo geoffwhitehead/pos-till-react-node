@@ -11,4 +11,5 @@ export const colors = {
   txtLightGrey: '#B1B2B5',
   highlightBlue: '#2FA8F6',
   highlightGrey: '#565A69',
+  receiptYellow: '#fcf6ae',
 };

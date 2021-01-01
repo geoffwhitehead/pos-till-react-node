@@ -105,7 +105,17 @@ export const receiptBill = async (
 
   addHeader(c, 'Totals', printer.printWidth);
   c.push({
-    appendBitmapText: alignLeftRight('Net total: ', formatNumber(summary.totalPayable, currency), printer.printWidth),
+    appendBitmapText: alignLeftRight('Subtotal: ', formatNumber(summary.total, currency), printer.printWidth),
+  });
+  c.push({
+    appendBitmapText: alignLeftRight(
+      'Total Discount: ',
+      formatNumber(summary.totalDiscount, currency),
+      printer.printWidth,
+    ),
+  });
+  c.push({
+    appendBitmapText: alignLeftRight('Total: ', formatNumber(summary.totalPayable, currency), printer.printWidth),
   });
   c.push({
     appendBitmapText: alignLeftRight('Paid: ', formatNumber(summary.totalPayments, currency), printer.printWidth),

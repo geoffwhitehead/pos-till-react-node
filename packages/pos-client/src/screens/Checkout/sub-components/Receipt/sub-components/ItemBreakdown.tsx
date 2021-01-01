@@ -7,6 +7,7 @@ import { BillItem, BillItemModifierItem } from '../../../../../models';
 import { BillItemPrintLog, PrintStatus, PrintType } from '../../../../../models/BillItemPrintLog';
 import { CurrencyEnum } from '../../../../../models/Organization';
 import { formatNumber } from '../../../../../utils';
+import { ITEM_SPACING } from '../../../../../utils/consts';
 
 interface ItemBreakdownInnerProps {
   billItemModifierItems: BillItemModifierItem[];
@@ -69,16 +70,17 @@ const ItemBreakdownInner: React.FC<ItemBreakdownOuterProps & ItemBreakdownInnerP
   const isChargable = !(billItem.isComp || billItem.isVoided);
   const itemDisplayPrice = formatNumber(isChargable ? billItem.itemPrice : 0, currency);
   const isDisabled = readonly || printStatus === PrintStatus.processing;
+  const statusStyles = printStatus ? styles[printStatus] : {};
 
   return (
     <ListItem
-      style={printStatus ? styles[printStatus] : {}}
+      style={{ ...statusStyles, ...styles.listItem }}
       noIndent
       key={billItem.id}
       disabled={isDisabled}
       onPress={() => onSelect(billItem)}
     >
-      <Left>
+      <Left style={{ padding: 0 }}>
         <View>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <Text style={style}>{`${capitalize(billItem.itemName)}`}</Text>
@@ -151,5 +153,9 @@ const styles = StyleSheet.create({
   },
   comp: {
     color: 'grey',
+  },
+  listItem: {
+    paddingTop: ITEM_SPACING,
+    paddingBottom: ITEM_SPACING,
   },
 });

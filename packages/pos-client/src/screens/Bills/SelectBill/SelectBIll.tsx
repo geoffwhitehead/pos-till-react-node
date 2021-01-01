@@ -133,8 +133,8 @@ export const SelectBillInner: React.FC<SelectBillOuterProps & SelectBillInnerPro
         {shouldRenderPlanView && (
           <Button
             style={{ alignSelf: 'center', marginRight: 5 }}
-            small
             success={isEditing}
+            small
             info={!isEditing}
             onPress={handleEditorState}
           >
