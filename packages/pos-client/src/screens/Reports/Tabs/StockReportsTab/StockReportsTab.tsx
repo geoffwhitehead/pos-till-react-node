@@ -3,18 +3,21 @@ import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import { useDatabase } from '@nozbe/watermelondb/hooks';
 import withObservables from '@nozbe/with-observables';
 import dayjs from 'dayjs';
-import { groupBy } from 'lodash';
+import { groupBy, maxBy, truncate } from 'lodash';
 import React, { useContext, useEffect, useState } from 'react';
 import { StyleSheet } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
-import { VictoryBar, VictoryChart, VictoryTheme } from 'victory-native';
+import { VictoryAxis, VictoryBar, VictoryChart, VictoryTheme } from 'victory-native';
+import { SwitchSelector } from '../../../../components/SwitchSelector/SwitchSelector';
 import { TimePicker } from '../../../../components/TimePicker/TimePicker';
 import { OrganizationContext } from '../../../../contexts/OrganizationContext';
 import { ReceiptPrinterContext } from '../../../../contexts/ReceiptPrinterContext';
-import { Button, Form, Icon, Item, Label, Left, ListItem, Picker, Right, Spinner, Text, View } from '../../../../core';
-import { BillItem, Category, tableNames } from '../../../../models';
+import { Button, Form, Icon, Item, Label, ListItem, Picker, Spinner, Text, View } from '../../../../core';
+import { BillItem, Category, PriceGroup, tableNames } from '../../../../models';
 import { print } from '../../../../services/printer/printer';
 import { stockReport } from '../../../../services/printer/stockReport';
+import { colors } from '../../../../theme';
+import { moderateScale } from '../../../../utils/scaling';
 
 type StockReportsTabInnerProps = {
   categories: Category[];
@@ -23,6 +26,16 @@ type StockReportsTabInnerProps = {
 type StockReportsTabOuterProps = {
   database: Database;
 };
+
+enum SortTypeEnum {
+  /**
+   * Note: notice asc / desc are reversed. For some reason in Victory ascending will go
+   * from the highest to the lowest value.
+   */
+  'ascending' = 'descending',
+  'descending' = 'ascending',
+  'alphabetical' = 'alphabetical',
+}
 
 export const StockReportsTabInner: React.FC<StockReportsTabOuterProps & StockReportsTabInnerProps> = ({
   categories,
@@ -37,6 +50,8 @@ export const StockReportsTabInner: React.FC<StockReportsTabOuterProps & StockRep
   const [isLoading, setIsLoading] = useState(false);
   const [isGraphLoading, setIsGraphLoading] = useState(false);
   const [graphData, setGraphData] = useState([]);
+  const [sortType, setSortType] = useState<SortTypeEnum>(SortTypeEnum.alphabetical);
+  const [yPadding, setYPadding] = useState(100);
 
   const handleConfirm = date => {
     visibleDatePicker === 'start' ? setStartDate(date) : setEndDate(date);
@@ -54,7 +69,6 @@ export const StockReportsTabInner: React.FC<StockReportsTabOuterProps & StockRep
   };
 
   const fetchGraphData = async () => {
-    console.log('FETCHING GRAPH DATA');
     setIsGraphLoading(true);
     const startDateUnix =
       dayjs(startDate)
@@ -66,15 +80,12 @@ export const StockReportsTabInner: React.FC<StockReportsTabOuterProps & StockRep
         .endOf('day')
         .unix() * 1000;
 
-    console.log('startDateUnix ', startDateUnix);
-    console.log('endDateUnix ', endDateUnix);
     const billItems = await database.collections
       .get<BillItem>(tableNames.billItems)
       .query(
         Q.and(
           Q.where('category_id', Q.eq(selectedCategory.id)),
           Q.where('is_voided', Q.notEq(true)),
-          //   Q.where('created_at', Q.gte(startDateUnix)),
           Q.where('created_at', Q.lte(endDateUnix)),
         ),
       )
@@ -83,14 +94,22 @@ export const StockReportsTabInner: React.FC<StockReportsTabOuterProps & StockRep
 
     const grouped = groupBy(billItems, billItem => billItem.itemId);
 
-    const data = Object.values(grouped).map(billItems => {
+    console.log('grouped', grouped);
+    const data = Object.values(grouped).map((billItems, i) => {
+      const itemName = truncate(billItems[0].itemName, { length: 50 });
       return {
-        x: billItems[0].itemName,
+        x: `${itemName} (${i})`,
         y: billItems.length,
+        label: billItems.length,
+        name: itemName,
       };
     });
-
+    const pixelsPerChar = 7;
+    const graphPadding = (maxBy(data, el => el.x.length).x.length + 5) * pixelsPerChar;
+    const labelPadding = 20;
     console.log('DATA ', data);
+    console.log('graphPadding ', graphPadding);
+    setYPadding(graphPadding + labelPadding);
     setGraphData(data);
     setIsGraphLoading(false);
   };
@@ -103,30 +122,29 @@ export const StockReportsTabInner: React.FC<StockReportsTabOuterProps & StockRep
 
   const handlePressStartDate = () => setVisibleDatePicker('start');
   const handlePressEndDate = () => setVisibleDatePicker('end');
-
+  const chartHeight = 200 + 20 * graphData.length;
   return (
-    <View>
+    <>
       <ListItem itemHeader first>
-        <Text style={{ fontWeight: 'bold' }}>Stock Reports</Text>
+        <Text style={{ fontWeight: 'bold' }}>Item Sales over range</Text>
       </ListItem>
-      <ListItem style={{ flexDirection: 'row' }}>
-        <Left>
-          <Form style={{ width: 400 }}>
-            <Item stackedLabel style={{ borderBottomWidth: 0 }} onPress={handlePressStartDate}>
-              <Label>Start Date</Label>
-              <Text style={styles.dateLabel}>{`${dayjs(startDate).format('DD/MM/YYYY')}`}</Text>
-            </Item>
-            <Item stackedLabel style={{ borderBottomWidth: 0 }} onPress={handlePressEndDate}>
-              <Label>End Date</Label>
-              <Text style={styles.dateLabel}>{`${dayjs(endDate).format('DD/MM/YYYY')}`}</Text>
-            </Item>
-          </Form>
-        </Left>
-        <Right>
-          <Button small style={{ margin: 10, alignSelf: 'flex-end' }} onPress={onPrintStockReport}>
-            <Text>Print Report</Text>
-          </Button>
-        </Right>
+      <ListItem style={{ flexDirection: 'row', width: '100%' }}>
+        <Form style={{ flexDirection: 'row' }}>
+          <Item stackedLabel style={{ borderBottomWidth: 0, width: moderateScale(200) }} onPress={handlePressStartDate}>
+            <Label>Start Date</Label>
+            <Text style={styles.dateLabel}>{`${dayjs(startDate).format('DD/MM/YYYY')}`}</Text>
+          </Item>
+          <Item stackedLabel style={{ borderBottomWidth: 0, width: moderateScale(200) }} onPress={handlePressEndDate}>
+            <Label>End Date</Label>
+            <Text style={styles.dateLabel}>{`${dayjs(endDate).format('DD/MM/YYYY')}`}</Text>
+          </Item>
+        </Form>
+        <Button small style={{ margin: 10, alignSelf: 'flex-end' }} onPress={onPrintStockReport}>
+          <Text>Print Report</Text>
+        </Button>
+      </ListItem>
+      <ListItem itemHeader first>
+        <Text style={{ fontWeight: 'bold' }}>Item Sales over range by category</Text>
       </ListItem>
       <ListItem itemDivider style={styles.categoryPickerItem}>
         <Label>
@@ -144,26 +162,55 @@ export const StockReportsTabInner: React.FC<StockReportsTabOuterProps & StockRep
             return <Picker.Item key={category.id} label={category.name} value={category} />;
           })}
         </Picker>
+        <SwitchSelector
+          options={[
+            { label: 'Alpha', value: SortTypeEnum.alphabetical },
+            { label: 'Ascending', value: SortTypeEnum.ascending },
+            { label: 'Descending', value: SortTypeEnum.descending },
+          ]}
+          initial={sortType}
+          onPress={value => setSortType(value as SortTypeEnum)}
+          style={{ width: moderateScale(400), marginRight: 5 }}
+        />
       </ListItem>
       {isGraphLoading && <Spinner />}
       {!isGraphLoading && graphData.length === 0 && <Text style={{ padding: 10 }}>No data in this date range... </Text>}
       {!isGraphLoading && graphData.length > 0 && (
         <ScrollView>
           <VictoryChart
-            height={1000}
-            padding={{ left: 120, right: 50, top: 50 }}
+            height={chartHeight}
+            padding={{ left: yPadding, top: 50, right: 50, bottom: 50 }}
             theme={VictoryTheme.material}
             horizontal
-            domainPadding={{ x: 15 }}
+            domainPadding={{ x: 20 }}
+            animate={{
+              duration: 500,
+              onLoad: { duration: 250 },
+            }}
           >
             <VictoryBar
-              barWidth={3}
-              alignment="start"
+              sortKey={sortType === SortTypeEnum.alphabetical ? 'name' : ['y', 'name']}
+              sortOrder={sortType === SortTypeEnum.alphabetical ? SortTypeEnum.ascending : sortType}
+              barWidth={15}
+              alignment="middle"
               style={{
-                data: { stroke: '#c43a31' },
+                data: { fill: colors.highlightBlue },
                 parent: { border: '1px solid #ccc' },
               }}
               data={graphData}
+            />
+            <VictoryAxis
+              dependentAxis
+              label={`Items sold (${dayjs(startDate).format('DD/MM/YYYY')} - ${dayjs(endDate).format('DD/MM/YYYY')})`}
+              style={{
+                axisLabel: { padding: 30 },
+              }}
+            />
+            <VictoryAxis
+              label="Item"
+              style={{
+                axisLabel: { padding: yPadding - 20 },
+              }}
             />
           </VictoryChart>
         </ScrollView>
@@ -186,12 +233,12 @@ export const StockReportsTabInner: React.FC<StockReportsTabOuterProps & StockRep
           mode="date"
         />
       </View>
-    </View>
+    </>
   );
 };
 
 const styles = StyleSheet.create({
-  categoryPickerItem: { paddingLeft: 15 },
+  categoryPickerItem: { paddingLeft: 15, backgroundColor: 'white', justifyContent: 'flex-end' },
   categoryPickerText: { color: 'grey' },
   dateLabel: { alignSelf: 'flex-start', paddingTop: 10 },
 });
@@ -200,6 +247,7 @@ const enhance = c =>
   withDatabase<any>(
     withObservables<StockReportsTabOuterProps, StockReportsTabInnerProps>([], ({ database }) => ({
       categories: database.collections.get<Category>(tableNames.categories).query(),
+      priceGroups: database.collections.get<PriceGroup>(tableNames.priceGroups).query(),
     }))(c),
   );
 
