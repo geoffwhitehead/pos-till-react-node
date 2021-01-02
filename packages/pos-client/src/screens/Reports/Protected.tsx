@@ -13,11 +13,14 @@ const InputPasscode: React.FC<{ value: string; onChange: any }> = ({ value, onCh
     </View>
   );
 };
-export const Protected: React.FC<{ code: string; navigation }> = ({ children, code, navigation }) => {
+
+type ProtectedProps = { code: string; navigation: any; isDisabled?: boolean };
+
+export const Protected: React.FC<ProtectedProps> = ({ children, code, navigation, isDisabled }) => {
   const [passcode, setPasscode] = useState('');
   navigation.addListener('focus', () => setPasscode(''));
 
-  return passcode === code ? children : <InputPasscode value={passcode} onChange={setPasscode} />;
+  return passcode === code || isDisabled ? children : <InputPasscode value={passcode} onChange={setPasscode} />;
 };
 
 const styles = StyleSheet.create({

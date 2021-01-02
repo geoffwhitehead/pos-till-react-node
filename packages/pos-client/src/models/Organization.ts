@@ -24,6 +24,8 @@ export type OrganizationProps = {
   shortNameLength: number;
   billViewPlanGridSize: number;
   billViewType: string;
+  accessPin: string;
+  accessPinEnabled: boolean;
 };
 
 export enum CategoryViewTypeEnum {
@@ -79,6 +81,8 @@ export class Organization extends Model {
   @field('bill_view_plan_grid_size') billViewPlanGridSize: number;
   @field('transaction_order') transactionOrder: TransactionOrderEnum;
   @field('transaction_grouping') transactionGrouping: TransactionGroupingEnum;
+  @field('access_pin') accessPin: string;
+  @field('access_pin_enabled') accessPinEnabled: boolean;
 
   @relation('price_groups', 'default_price_group_id') defaultPriceGroup: Relation<PriceGroup>;
   @relation('printers', 'receipt_printer_id') receiptPrinter: Relation<Printer>;
@@ -121,5 +125,7 @@ export const organizationSchema = tableSchema({
     { name: 'bill_view_type', type: 'string' },
     { name: 'transaction_order', type: 'string' },
     { name: 'transaction_grouping', type: 'string' },
+    { name: 'access_pin', type: 'string' },
+    { name: 'access_pin_enabled', type: 'boolean' },
   ],
 });

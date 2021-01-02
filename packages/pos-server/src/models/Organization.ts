@@ -34,6 +34,8 @@ export interface OrganizationSettings {
     transactionOrder?: TransactionOrderEnum;
     billViewPlanGridSize?: number;
     billViewType?: BillViewTypeEnum;
+    accessPin?: string;
+    accessPinEnabled?: boolean;
 }
 
 export const ORGANIZATION_COLLECTION_NAME = 'organizations';
@@ -127,6 +129,14 @@ const OrganizationSettingsSchema: Schema<OrganizationSettings> = new Schema({
         type: String,
         enum: Object.values(TransactionGroupingEnum),
         default: TransactionGroupingEnum.ungrouped,
+    },
+    accessPin: {
+        type: String,
+        default: '5555',
+    },
+    accessPinEnabled: {
+        type: Boolean,
+        default: false,
     },
 });
 

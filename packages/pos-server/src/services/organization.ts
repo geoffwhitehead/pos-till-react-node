@@ -39,6 +39,8 @@ export type OrganizationClientProps = {
     transactionOrder: TransactionOrderEnum;
     billViewPlanGridSize: number;
     billViewType: BillViewTypeEnum;
+    accessPin: string;
+    accessPinEnabled: boolean;
 };
 
 export const organizationFromClient = (organization: OrganizationClientProps): OrganizationProps => {
@@ -64,6 +66,8 @@ export const organizationFromClient = (organization: OrganizationClientProps): O
             transactionOrder: organization.transactionOrder,
             billViewPlanGridSize: organization.billViewPlanGridSize,
             billViewType: organization.billViewType,
+            accessPin: organization.accessPin,
+            accessPinEnabled: organization.accessPinEnabled,
         },
         address: {
             line1: organization.addressLine1,
@@ -97,6 +101,8 @@ export const organizationToClient = (organization: OrganizationProps): Organizat
         billViewType: settings.billViewType,
         transactionGrouping: settings.tranactionGrouping,
         transactionOrder: settings.transactionOrder,
+        accessPin: settings.accessPin,
+        accessPinEnabled: settings.accessPinEnabled,
         addressLine1: address.line1,
         addressLine2: address.line2,
         addressCity: address.city,
