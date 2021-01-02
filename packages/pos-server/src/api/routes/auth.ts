@@ -43,7 +43,6 @@ export default (app: Router) => {
 
             logger.debug('Calling Sign-Up endpoint with body: %o', req.body);
             try {
-                console.log('product.category', productService.category);
                 const response = await authService.signUp(req.body);
                 if (response.success) {
                     res.set('authorization', 'Bearer ' + response.accessToken);

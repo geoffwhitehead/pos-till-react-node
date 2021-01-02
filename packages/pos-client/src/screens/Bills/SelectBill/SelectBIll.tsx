@@ -1,7 +1,7 @@
 import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import withObservables from '@nozbe/with-observables';
 import React, { useContext, useMemo, useState } from 'react';
-import { ScrollView } from 'react-native';
+import { ScrollView, StyleSheet } from 'react-native';
 import { SwitchSelector } from '../../../components/SwitchSelector/SwitchSelector';
 import { CurrentBillContext } from '../../../contexts/CurrentBillContext';
 import { OrganizationContext } from '../../../contexts/OrganizationContext';
@@ -94,20 +94,9 @@ export const SelectBillInner: React.FC<SelectBillOuterProps & SelectBillInnerPro
     await database.action(() => organization.update(record => (record.billViewType = value)));
   };
 
-  console.log('asd ', organization.billViewType);
   return (
     <>
-      <Item
-        style={{
-          backgroundColor: 'whitesmoke',
-          paddingTop: 5,
-          paddingBottom: 5,
-          flexDirection: 'row',
-          justifyContent: 'flex-end',
-          alignItems: 'center',
-          alignContent: 'center',
-        }}
-      >
+      <Item style={styles.controlsItem}>
         {!isEditing && (
           <SwitchSelector
             options={[
@@ -116,7 +105,7 @@ export const SelectBillInner: React.FC<SelectBillOuterProps & SelectBillInnerPro
             ]}
             initial={organization.billViewType}
             onPress={onChangeViewType}
-            style={{ width: moderateScale(250), marginRight: 5 }}
+            style={styles.switch}
           />
         )}
         {!isEditing && (
@@ -127,17 +116,11 @@ export const SelectBillInner: React.FC<SelectBillOuterProps & SelectBillInnerPro
             ]}
             initial={isFilterOpenSelected}
             onPress={value => setIsFilterOpenSelected(value as number)}
-            style={{ width: moderateScale(250), marginRight: 5 }}
+            style={styles.switch}
           />
         )}
         {shouldRenderPlanView && (
-          <Button
-            style={{ alignSelf: 'center', marginRight: 5 }}
-            success={isEditing}
-            small
-            info={!isEditing}
-            onPress={handleEditorState}
-          >
+          <Button style={styles.editPlanButton} success={isEditing} small info={!isEditing} onPress={handleEditorState}>
             {!isEditing && <Icon name="ios-build-outline" />}
             {isEditing && <Icon name="checkmark" />}
           </Button>
@@ -192,6 +175,22 @@ export const SelectBillInner: React.FC<SelectBillOuterProps & SelectBillInnerPro
   );
 };
 
+const styles = StyleSheet.create({
+  controlsItem: {
+    backgroundColor: 'whitesmoke',
+    paddingTop: 5,
+    paddingBottom: 5,
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    alignContent: 'center',
+  },
+  switch: {
+    width: moderateScale(250),
+    marginRight: 5,
+  },
+  editPlanButton: { alignSelf: 'center', marginRight: 5 },
+});
 export const enhance = c =>
   withDatabase<any>(
     withObservables<SelectBillOuterProps, SelectBillInnerProps>(['billPeriod'], ({ billPeriod }) => ({

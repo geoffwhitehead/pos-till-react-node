@@ -169,24 +169,27 @@ export const MainWrapped: React.FC<MainOuterProps & MainInnerProps> = ({
       const defaultPriceGroup = priceGroups.find(({ id }) => id === organization.defaultPriceGroupId);
       const [firstPriceGroup] = priceGroups;
 
-      // // TODO: replace this with seeding organization correctly
-      // const createDefaultPriceGroup = async () =>
-      //   await database.action(() =>
-      //     database.collections
-      //       .get<PriceGroup>(tableNames.priceGroups)
-      //       .create(record =>
-      //         Object.assign(record, { name: 'Default', shortName: 'Default', isPrepTimeRequired: false }),
-      //       ),
-      //   );
+      // TODO: This shouldnt be needed as a default price group is created on org create.
+      const createDefaultPriceGroup = async () =>
+        await database.action(() =>
+          database.collections
+            .get<PriceGroup>(tableNames.priceGroups)
+            .create(record =>
+              Object.assign(record, { name: 'Default', shortName: 'Default', isPrepTimeRequired: false }),
+            ),
+        );
 
-      // if (!firstPriceGroup) {
-      //   createDefaultPriceGroup();
-      // }
+      if (!firstPriceGroup) {
+        createDefaultPriceGroup();
+      }
 
       setPriceGroup(defaultPriceGroup || firstPriceGroup || null);
     }
   }, [priceGroups, organization, setPriceGroup]);
 
+  console.log('billPeriod', billPeriod);
+  console.log('priceGroup', priceGroup);
+  console.log('organization', organization);
   if (!billPeriod || !priceGroup || !organization) {
     return <Loading />;
   }

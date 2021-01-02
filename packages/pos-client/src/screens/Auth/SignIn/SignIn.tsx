@@ -7,6 +7,7 @@ import LottieView from 'lottie-react-native';
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { KeyboardAvoidingView, StatusBar, StyleSheet } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
+import envKey from '../../../../build.env';
 import { AuthContext } from '../../../contexts/AuthContext';
 import { Button, Container, Form, Input, Item, Label, Spinner, Text } from '../../../core';
 import { Organization, tableNames } from '../../../models';
@@ -14,6 +15,7 @@ import { AuthStackParamList } from '../../../navigators/AuthNavigator';
 import { colors } from '../../../theme';
 import { areYouSure, resolveButtonState } from '../../../utils/helpers';
 import { moderateScale } from '../../../utils/scaling';
+
 interface SignInOuterProps {
   navigation: StackNavigationProp<AuthStackParamList, 'SignIn'>;
   route: RouteProp<AuthStackParamList, 'SignIn'>;
@@ -24,10 +26,15 @@ interface SignInInnerProps {
   organizations: Organization[];
 }
 
+const initialValues = {
+  email: envKey === 'local' ? 'dev@dev.dev' : '',
+  password: envKey === 'local' ? 'devdevdev' : '',
+};
+
 export const SignInInner: React.FC<SignInOuterProps & SignInInnerProps> = ({ navigation, route, organizations }) => {
   const [organization, setOrganization] = useState<Organization | null>();
-  const [email, setEmail] = useState('geoff1012@gmail.com');
-  const [password, setPassword] = useState('geoffgeoff');
+  const [email, setEmail] = useState(initialValues.email);
+  const [password, setPassword] = useState(initialValues.password);
   const animation = useRef();
 
   useEffect(() => {
@@ -81,7 +88,8 @@ export const SignInInner: React.FC<SignInOuterProps & SignInInnerProps> = ({ nav
               style={styles.button}
               onPress={() => signIn({ email, password })}
             >
-              <Text>Sign in</Text>
+              {!isSignInLoading && <Text>Sign in</Text>}
+              {isSignInLoading && <Spinner color="white" />}
             </Button>
             {!organization && (
               <Button
@@ -108,7 +116,6 @@ export const SignInInner: React.FC<SignInOuterProps & SignInInnerProps> = ({ nav
                 * This terminal is currently linked with {organization.name}.
               </Text>
             )}
-            {isSignInLoading && <Spinner />}
           </Form>
         </KeyboardAvoidingView>
       </ScrollView>
@@ -130,7 +137,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.darkBlue,
   },
   form: {
-    width: moderateScale(300),
+    width: moderateScale(500),
   },
   signin: {
     display: 'flex',
@@ -139,7 +146,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     alignContent: 'center',
 
-    marginTop: moderateScale(50),
+    marginTop: moderateScale(100),
   },
   button: {
     marginLeft: moderateScale(15),

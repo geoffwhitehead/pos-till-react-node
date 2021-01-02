@@ -392,7 +392,7 @@ export const SignUp: React.FC<SignUpProps> = ({ navigation, route }) => {
 // SignUp.whyDidYouRender = true;
 const styles = StyleSheet.create({
   content: {
-    width: moderateScale(300),
+    width: moderateScale(500),
   },
   form: {
     paddingTop: moderateScale(30),
