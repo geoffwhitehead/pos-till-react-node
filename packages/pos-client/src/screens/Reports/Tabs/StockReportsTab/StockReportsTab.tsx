@@ -17,10 +17,12 @@ import { BillItem, Category, PriceGroup, tableNames } from '../../../../models';
 import { print } from '../../../../services/printer/printer';
 import { stockReport } from '../../../../services/printer/stockReport';
 import { colors } from '../../../../theme';
+import { resolveButtonState } from '../../../../utils/helpers';
 import { moderateScale } from '../../../../utils/scaling';
 
 type StockReportsTabInnerProps = {
   categories: Category[];
+  priceGroups: PriceGroup[];
 };
 
 type StockReportsTabOuterProps = {
@@ -37,13 +39,16 @@ enum SortTypeEnum {
   'alphabetical' = 'alphabetical',
 }
 
+const LABEL_PADDING = 20;
+
 export const StockReportsTabInner: React.FC<StockReportsTabOuterProps & StockReportsTabInnerProps> = ({
   categories,
+  priceGroups,
 }) => {
   const [startDate, setStartDate] = useState(dayjs(dayjs().subtract(7, 'day')).toDate());
   const [endDate, setEndDate] = useState(dayjs().toDate());
   const [visibleDatePicker, setVisibleDatePicker] = useState<'start' | 'end'>();
-  const [selectedCategory, setSelectedCategory] = useState(categories[0]);
+  const [selectedCategory, setSelectedCategory] = useState<Category | null>(categories[0]);
   const database = useDatabase();
   const { receiptPrinter } = useContext(ReceiptPrinterContext);
   const { organization } = useContext(OrganizationContext);
@@ -52,6 +57,7 @@ export const StockReportsTabInner: React.FC<StockReportsTabOuterProps & StockRep
   const [graphData, setGraphData] = useState([]);
   const [sortType, setSortType] = useState<SortTypeEnum>(SortTypeEnum.alphabetical);
   const [yPadding, setYPadding] = useState(100);
+  const [selectedPriceGroup, setSelectedPriceGroup] = useState<PriceGroup>(null);
 
   const handleConfirm = date => {
     visibleDatePicker === 'start' ? setStartDate(date) : setEndDate(date);
@@ -68,7 +74,14 @@ export const StockReportsTabInner: React.FC<StockReportsTabOuterProps & StockRep
     setIsLoading(false);
   };
 
-  const fetchGraphData = async () => {
+  type fetchGraphDataProps = {
+    selectedCategory: Category;
+    startDate: Date;
+    endDate: Date;
+    selectedPriceGroup: PriceGroup | null;
+  };
+
+  const fetchGraphData = async ({ selectedCategory, startDate, endDate, selectedPriceGroup }: fetchGraphDataProps) => {
     setIsGraphLoading(true);
     const startDateUnix =
       dayjs(startDate)
@@ -84,9 +97,11 @@ export const StockReportsTabInner: React.FC<StockReportsTabOuterProps & StockRep
       .get<BillItem>(tableNames.billItems)
       .query(
         Q.and(
-          Q.where('category_id', Q.eq(selectedCategory.id)),
+          Q.where('category_id', selectedCategory ? Q.eq(selectedCategory.id) : Q.notEq(null)),
           Q.where('is_voided', Q.notEq(true)),
+          Q.where('created_at', Q.gte(startDateUnix)),
           Q.where('created_at', Q.lte(endDateUnix)),
+          Q.where('price_group_id', selectedPriceGroup ? Q.eq(selectedPriceGroup.id) : Q.notEq(null)),
         ),
       )
       .fetch();
@@ -104,21 +119,22 @@ export const StockReportsTabInner: React.FC<StockReportsTabOuterProps & StockRep
         name: itemName,
       };
     });
-    const pixelsPerChar = 7;
-    const graphPadding = (maxBy(data, el => el.x.length).x.length + 5) * pixelsPerChar;
-    const labelPadding = 20;
-    console.log('DATA ', data);
-    console.log('graphPadding ', graphPadding);
-    setYPadding(graphPadding + labelPadding);
+    if (data.length) {
+      const pixelsPerChar = 7;
+      const graphPadding = (maxBy(data, el => el.x.length).x.length + 5) * pixelsPerChar;
+      setYPadding(graphPadding + LABEL_PADDING);
+    } else {
+      setYPadding(100);
+    }
     setGraphData(data);
     setIsGraphLoading(false);
   };
 
   useEffect(() => {
-    if (selectedCategory && startDate && endDate) {
-      fetchGraphData();
+    if (startDate && endDate) {
+      fetchGraphData({ selectedCategory, startDate, endDate, selectedPriceGroup });
     }
-  }, [selectedCategory, startDate, endDate]);
+  }, [selectedCategory, startDate, endDate, selectedPriceGroup]);
 
   const handlePressStartDate = () => setVisibleDatePicker('start');
   const handlePressEndDate = () => setVisibleDatePicker('end');
@@ -139,14 +155,35 @@ export const StockReportsTabInner: React.FC<StockReportsTabOuterProps & StockRep
             <Text style={styles.dateLabel}>{`${dayjs(endDate).format('DD/MM/YYYY')}`}</Text>
           </Item>
         </Form>
-        <Button small style={{ margin: 10, alignSelf: 'flex-end' }} onPress={onPrintStockReport}>
+        <Button
+          small
+          style={{ margin: 10, alignSelf: 'flex-end' }}
+          onPress={onPrintStockReport}
+          disabled={isLoading}
+          {...resolveButtonState(isLoading, 'info')}
+        >
           <Text>Print Report</Text>
         </Button>
       </ListItem>
-      <ListItem itemHeader first>
-        <Text style={{ fontWeight: 'bold' }}>Item Sales over range by category</Text>
-      </ListItem>
       <ListItem itemDivider style={styles.categoryPickerItem}>
+        <Label>
+          <Text style={styles.categoryPickerText}>Price Group: </Text>
+        </Label>
+        <Picker
+          mode="dropdown"
+          iosHeader="Select a price group"
+          iosIcon={<Icon name="chevron-down-outline" />}
+          placeholder="Select a price group"
+          selectedValue={selectedPriceGroup}
+          onValueChange={pg => setSelectedPriceGroup(pg)}
+        >
+          {[
+            <Picker.Item key="all-pricegroups" label="All" value={null} />,
+            ...priceGroups.map(priceGroup => {
+              return <Picker.Item key={priceGroup.id} label={priceGroup.name} value={priceGroup} />;
+            }),
+          ]}
+        </Picker>
         <Label>
           <Text style={styles.categoryPickerText}>Category: </Text>
         </Label>
@@ -158,9 +195,12 @@ export const StockReportsTabInner: React.FC<StockReportsTabOuterProps & StockRep
           selectedValue={selectedCategory}
           onValueChange={c => setSelectedCategory(c)}
         >
-          {categories.map(category => {
-            return <Picker.Item key={category.id} label={category.name} value={category} />;
-          })}
+          {[
+            <Picker.Item key="all-categories" label="All" value={null} />,
+            ...categories.map(category => {
+              return <Picker.Item key={category.id} label={category.name} value={category} />;
+            }),
+          ]}
         </Picker>
         <SwitchSelector
           options={[
@@ -174,7 +214,7 @@ export const StockReportsTabInner: React.FC<StockReportsTabOuterProps & StockRep
         />
       </ListItem>
       {isGraphLoading && <Spinner />}
-      {!isGraphLoading && graphData.length === 0 && <Text style={{ padding: 10 }}>No data in this date range... </Text>}
+      {!isGraphLoading && graphData.length === 0 && <Text style={{ padding: 10 }}>No results found... </Text>}
       {!isGraphLoading && graphData.length > 0 && (
         <ScrollView>
           <VictoryChart
@@ -203,13 +243,13 @@ export const StockReportsTabInner: React.FC<StockReportsTabOuterProps & StockRep
               dependentAxis
               label={`Items sold (${dayjs(startDate).format('DD/MM/YYYY')} - ${dayjs(endDate).format('DD/MM/YYYY')})`}
               style={{
-                axisLabel: { padding: 30 },
+                axisLabel: { padding: 30, fontWeight: 'bold' },
               }}
             />
             <VictoryAxis
               label="Item"
               style={{
-                axisLabel: { padding: yPadding - 20 },
+                axisLabel: { padding: yPadding - LABEL_PADDING, fontWeight: 'bold' },
               }}
             />
           </VictoryChart>
