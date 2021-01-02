@@ -30,7 +30,11 @@ const extendAuthorize = async (req, res, next) => {
 
     const logger = Container.get('logger') as Logger;
 
+    logger.info('extend auth middleware');
+
     if (!unprotectedRoutes.some(route => route.url === url && route.method === method)) {
+        logger.info('protected route');
+
         const accessToken = getTokenFromHeader(req);
         if (!accessToken) {
             res.status(401).json('Unauthorized');
@@ -69,6 +73,8 @@ const extendAuthorize = async (req, res, next) => {
             Container.set('userId', response.data._id);
         }
     }
+    logger.info('unprotected route');
+
     next();
 };
 
