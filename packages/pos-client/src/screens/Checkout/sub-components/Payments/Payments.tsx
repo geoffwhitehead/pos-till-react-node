@@ -111,15 +111,16 @@ const PaymentsInner: React.FC<PaymentOuterProps & PaymentInnerProps> = ({
         </Row>
         <Row style={styles.row}>
           <Col style={styles.buttonColumn}>
+            <Label style={styles.columnLabel}>Discounts</Label>
             {discounts.map(discount => {
               return (
                 <Button
                   key={discount.id}
                   full
                   onPress={() => addDiscount(discount)}
-                  style={{ ...styles.button, backgroundColor: 'purple' }}
+                  style={{ ...styles.discountButton, backgroundColor: 'goldenrod' }}
                 >
-                  <Text>{discount.name}</Text>
+                  <Text style={styles.buttonText}>{discount.name}</Text>
                 </Button>
               );
             })}
@@ -127,8 +128,8 @@ const PaymentsInner: React.FC<PaymentOuterProps & PaymentInnerProps> = ({
           <Col style={styles.denomButtonColumn}>
             {denominations.map(amt => {
               return (
-                <Button key={amt} full bordered style={styles.button} onPress={() => addPayment(cashType, amt)}>
-                  <Text>{`${formatNumber(amt, currency)}`}</Text>
+                <Button key={amt} full info style={styles.button} onPress={() => addPayment(cashType, amt)}>
+                  <Text style={styles.buttonText}>{`${formatNumber(amt, currency)}`}</Text>
                 </Button>
               );
             })}
@@ -137,13 +138,12 @@ const PaymentsInner: React.FC<PaymentOuterProps & PaymentInnerProps> = ({
             {paymentTypes.map(paymentType => {
               return (
                 <Button
-                  large
                   full
                   key={paymentType.id}
-                  style={styles.button}
+                  style={{ ...styles.button, backgroundColor: 'seagreen' }}
                   onPress={() => addPayment(paymentType, parseFloat(value))}
                 >
-                  <Text>{capitalize(paymentType.name)}</Text>
+                  <Text style={styles.buttonText}>{capitalize(paymentType.name)}</Text>
                 </Button>
               );
             })}
@@ -200,15 +200,26 @@ const styles = StyleSheet.create({
   denomButtonColumn: {
     flexDirection: 'column',
     padding: moderateScale(5),
-    paddingLeft: moderateScale(80),
+    // paddingLeft: moderateScale(80),
     flex: 1,
     alignItems: 'stretch',
   },
   button: {
-    marginBottom: moderateScale(5),
+    marginBottom: moderateScale(10),
     textAlign: 'center',
     alignContent: 'center',
-    // height: '100%',
+    flex: 1,
+  },
+  discountButton: {
+    marginBottom: moderateScale(10),
+    textAlign: 'center',
+    alignContent: 'center',
+  },
+  buttonText: {
+    textShadowColor: 'rgba(0, 0, 0, 0.75)',
+    textShadowOffset: { width: -1, height: 1 },
+    textShadowRadius: 10,
   },
   col: { padding: 0 },
+  columnLabel: { padding: 10, color: 'grey', width: '100%', textAlign: 'center' },
 });
