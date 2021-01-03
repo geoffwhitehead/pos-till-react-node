@@ -10,7 +10,7 @@ import {
   Printer,
 } from '../../models';
 import { billSummary, BillSummary, formatNumber, getItemPrice, getModifierItemPrice } from '../../utils';
-import { addHeader, alignCenter, alignLeftRight, alignRight, divider } from './helpers';
+import { addHeader, alignCenter, alignLeftRight, divider } from './helpers';
 import { receiptTempate } from './template';
 
 const modPrefix = ' -';
@@ -71,8 +71,6 @@ export const receiptBill = async (
     printItemsGroup(stdGroup);
   });
 
-  c.push({ appendBitmapText: alignRight(`Total: ${formatNumber(summary.total, currency)}`, printer.printWidth) });
-
   const compItems = summary.itemsBreakdown.filter(({ item }) => item.isComp);
   compItems.length && addHeader(c, 'Complimentary Items', printer.printWidth);
   printItemsGroup(compItems);
@@ -107,13 +105,14 @@ export const receiptBill = async (
   c.push({
     appendBitmapText: alignLeftRight('Subtotal: ', formatNumber(summary.total, currency), printer.printWidth),
   });
-  c.push({
-    appendBitmapText: alignLeftRight(
-      'Total Discount: ',
-      formatNumber(summary.totalDiscount, currency),
-      printer.printWidth,
-    ),
-  });
+  billDiscounts.length &&
+    c.push({
+      appendBitmapText: alignLeftRight(
+        'Total Discount: ',
+        formatNumber(summary.totalDiscount, currency),
+        printer.printWidth,
+      ),
+    });
   c.push({
     appendBitmapText: alignLeftRight('Total: ', formatNumber(summary.totalPayable, currency), printer.printWidth),
   });

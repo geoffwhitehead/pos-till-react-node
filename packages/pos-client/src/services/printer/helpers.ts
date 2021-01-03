@@ -1,3 +1,5 @@
+import { ceil, floor } from 'lodash';
+
 export const alignLeftRight = (left: string, right: string = '', receiptWidth: number, rightWidth = 12) => {
   const leftWidth = Math.max(receiptWidth - rightWidth, 0);
   const lines = Math.ceil(left.length / leftWidth);
@@ -28,4 +30,13 @@ export const addHeader = (c: any[], header: string, printWidth: number): void =>
   c.push({ appendBitmapText: ' ' });
   c.push({ appendBitmapText: header });
   c.push(divider(printWidth));
+};
+
+export const subHeader = (header: string, receiptWidth: number, symbol: string = '-') => {
+  const rem = (receiptWidth - header.length) / 2;
+  const left = symbol.repeat(ceil(rem));
+  const right = symbol.repeat(floor(rem));
+  const str = `${left}${header}${right}`;
+  console.log('str ', str);
+  return str;
 };

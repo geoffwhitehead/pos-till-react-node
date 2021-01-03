@@ -1,16 +1,17 @@
 import dayjs, { Dayjs } from 'dayjs';
-import { capitalize, flatten, groupBy, keyBy } from 'lodash';
+import { capitalize, Dictionary, flatten, groupBy, keyBy } from 'lodash';
 import {
   Bill,
   BillCallPrintLog,
   BillItem,
   BillItemModifierItem,
   BillItemPrintLog,
+  Category,
   PriceGroup,
   Printer,
 } from '../../models';
 import { PrintType } from '../../models/BillItemPrintLog';
-import { alignCenter, alignLeftRightSingle, starDivider } from './helpers';
+import { alignCenter, alignLeftRightSingle, starDivider, subHeader } from './helpers';
 
 const MOD_PREFIX = '- ';
 const REF_NAME = 'Table';
@@ -43,8 +44,11 @@ export const kitchenReceipt = async (p: {
   priceGroups: PriceGroup[];
   reference: string;
   prepTime?: Dayjs;
+  categories: Category[];
 }): Promise<{ billItemPrintLogs: BillItemPrintLog[]; printer: Printer; commands: any[] }[]> => {
-  const { billItems, printers, priceGroups, reference, prepTime, billItemPrintLogs } = p;
+  const { billItems, printers, priceGroups, reference, prepTime, billItemPrintLogs, categories } = p;
+
+  const keyedCategories = keyBy(categories, category => category.id);
 
   const populatedItems = await Promise.all(
     billItems.map(async billItem => {
@@ -84,6 +88,7 @@ export const kitchenReceipt = async (p: {
         prepTime,
         reference,
         printer: keyedPrinters[printerId],
+        keyedCategories,
       };
     });
   });
@@ -93,39 +98,6 @@ export const kitchenReceipt = async (p: {
   const billPrintCommands = flattenedPrintCommands.map(generateBillItemCommands);
 
   return billPrintCommands;
-
-  // const recieptGroupings = flatten(
-  //   printers.map(printer => {
-  //     // filter by items that are allocated to this printer
-  //     const filteredItemsByPrinter = populatedItems.filter(bI => bI.printers.includes(printer));
-
-  //     // split the item based on price group. A seperate receipt will be sent per price group
-  //     const groupedByPriceGroup = priceGroups.map(priceGroup => {
-  //       return {
-  //         printer,
-  //         priceGroup,
-  //         itemsToPrint: filteredItemsByPrinter.filter(itemGroup => itemGroup.billItem.priceGroupId === priceGroup.id),
-  //       };
-  //     });
-
-  //     // filter out any printer groups that dont have any allocated items
-  //     const filteredGroups = groupedByPriceGroup.filter(group => group.itemsToPrint.length);
-
-  //     return filteredGroups;
-  //   }),
-  // );
-
-  // generate an array of all the receipts that will need to be sent out
-  // const printCommands = recieptGroupings.map(grp =>
-  //   generatePrintCommands({
-  //     ...grp,
-  //     itemsToPrint: grp.itemsToPrint.map(grp => omit(grp, 'printers')), // disard printers and use from grouping
-  //     prepTime,
-  //     reference,
-  //   }),
-  // );
-
-  // return printCommands;
 };
 
 const generateBillCallCommands = (p: { printer: Printer; reference: number; billCallPrintLog: BillCallPrintLog }) => {
@@ -149,8 +121,9 @@ const generateBillItemCommands = (p: {
   printer: Printer;
   prepTime?: Dayjs;
   reference: string;
+  keyedCategories: Dictionary<Category>;
 }) => {
-  const { itemsToPrint, priceGroup, printer, prepTime, reference } = p;
+  const { itemsToPrint, priceGroup, printer, prepTime, reference, keyedCategories } = p;
 
   let c = [];
 
@@ -186,27 +159,34 @@ const generateBillItemCommands = (p: {
     printMessage: group[0].billItem.printMessage,
   }));
 
-  quantifiedItems.map(({ quantity, billItem, mods, isVoided, printMessage }) => {
-    if (isVoided) {
-      c.push({
-        appendBitmapText: alignLeftRightSingle(
-          `${('VOID ' + capitalize(billItem.itemShortName)).slice(0, printer.printWidth)}`,
-          quantity.toString(),
-          printer.printWidth,
-        ),
+  const groupedByCategory = groupBy(quantifiedItems, group => group.billItem.categoryId);
+  Object.entries(groupedByCategory).map(([categoryId, quantifiedItems]) => {
+    const categoryShortName = keyedCategories[categoryId]?.shortName;
+
+    categoryShortName && c.push({ appendBitmapText: subHeader(categoryShortName.toUpperCase(), printer.printWidth) });
+
+    quantifiedItems.map(({ quantity, billItem, mods, isVoided, printMessage }) => {
+      if (isVoided) {
+        c.push({
+          appendBitmapText: alignLeftRightSingle(
+            `${('VOID ' + capitalize(billItem.itemShortName)).slice(0, printer.printWidth)}`,
+            quantity.toString(),
+            printer.printWidth,
+          ),
+        });
+      } else {
+        c.push({
+          appendBitmapText: alignLeftRightSingle(`${billItem.itemShortName}`, quantity.toString(), printer.printWidth),
+        });
+      }
+      mods.map(mod => {
+        c.push({ appendBitmapText: MOD_PREFIX + capitalize(mod.modifierItemShortName) });
       });
-    } else {
-      c.push({
-        appendBitmapText: alignLeftRightSingle(`${billItem.itemShortName}`, quantity.toString(), printer.printWidth),
-      });
-    }
-    mods.map(mod => {
-      c.push({ appendBitmapText: MOD_PREFIX + capitalize(mod.modifierItemShortName) });
+      printMessage &&
+        c.push({
+          appendBitmapText: printMessage,
+        });
     });
-    printMessage &&
-      c.push({
-        appendBitmapText: printMessage,
-      });
   });
 
   return {

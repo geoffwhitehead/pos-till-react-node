@@ -1,7 +1,7 @@
-import { alignCenter, alignLeftRight } from './helpers';
-import { StarPRNT } from 'react-native-star-prnt';
 import dayjs from 'dayjs';
+import { StarPRNT } from 'react-native-star-prnt';
 import { Organization } from '../../models';
+import { alignCenter, alignLeftRight } from './helpers';
 
 const date = dayjs().format('DD/MM/YYYY');
 const time = dayjs().format('HH:mm');
@@ -15,7 +15,7 @@ export const receiptTempate = (commands: any[], organization: Organization, prin
     { appendFontStyle: 'B' },
     { appendBitmapText: alignCenter(name, printWidth) },
     { appendBitmapText: alignCenter(addressLine1, printWidth) },
-    { appendBitmapText: alignCenter(addressLine2, printWidth) },
+    addressLine2 && { appendBitmapText: alignCenter(addressLine2, printWidth) },
     { appendBitmapText: alignCenter(addressCity, printWidth) },
     { appendBitmapText: alignCenter(addressCounty, printWidth) },
     { appendBitmapText: alignCenter(addressPostcode, printWidth) },
