@@ -1,5 +1,6 @@
 import uuid from 'uuid';
 import { InjectedDependencies, pull, push } from '.';
+import { PRINT_CATEGORY_COLLECTION_NAME } from '../models/PrintCategory';
 import { PrinterProps, PRINTER_COLLECTION_NAME } from '../models/Printer';
 import { PrinterGroupProps, PRINTER_GROUP_COLLECTION_NAME } from '../models/PrinterGroup';
 import { PRINTER_GROUP_PRINTER_COLLECTION_NAME } from '../models/PrinterGroupPrinter';
@@ -14,20 +15,22 @@ export type PrinterService = CommonServiceFns<PrinterProps> & {
 };
 
 export const printerService = ({
-    repositories: { printerRepository, printerGroupRepository, printerGroupPrinterRepository },
+    repositories: { printerRepository, printerGroupRepository, printerGroupPrinterRepository, printCategoryRepository },
     logger,
 }: InjectedDependencies): PrinterService => {
     const pullChanges = async ({ lastPulledAt }) => {
-        const [printerGroups, printerGroupPrinters, printers] = await Promise.all([
+        const [printerGroups, printerGroupPrinters, printers, printCategories] = await Promise.all([
             pull(printerGroupRepository, lastPulledAt),
             pull(printerGroupPrinterRepository, lastPulledAt),
             pull(printerRepository, lastPulledAt),
+            pull(printCategoryRepository, lastPulledAt),
         ]);
 
         return toClientChanges({
             [PRINTER_GROUP_COLLECTION_NAME]: printerGroups,
             [PRINTER_GROUP_PRINTER_COLLECTION_NAME]: printerGroupPrinters,
             [PRINTER_COLLECTION_NAME]: printers,
+            [PRINT_CATEGORY_COLLECTION_NAME]: printCategories,
         });
     };
 
@@ -36,6 +39,7 @@ export const printerService = ({
             push(printerGroupRepository, changes[PRINTER_GROUP_COLLECTION_NAME], lastPulledAt),
             push(printerGroupPrinterRepository, changes[PRINTER_GROUP_PRINTER_COLLECTION_NAME], lastPulledAt),
             push(printerRepository, changes[PRINTER_COLLECTION_NAME], lastPulledAt),
+            push(printCategoryRepository, changes[PRINT_CATEGORY_COLLECTION_NAME], lastPulledAt),
         ]);
     };
 

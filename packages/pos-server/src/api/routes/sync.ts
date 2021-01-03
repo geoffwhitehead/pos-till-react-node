@@ -13,6 +13,7 @@ import { MODIFIER_ITEM_PRICE_COLLECTION_NAME } from '../../models/ModifierItemPr
 import { ORGANIZATION_COLLECTION_NAME } from '../../models/Organization';
 import { PAYMENT_TYPE_COLLECTION_NAME } from '../../models/PaymentType';
 import { PRICE_GROUP_COLLECTION_NAME } from '../../models/PriceGroup';
+import { PRINT_CATEGORY_COLLECTION_NAME } from '../../models/PrintCategory';
 import { PRINTER_COLLECTION_NAME } from '../../models/Printer';
 import { PRINTER_GROUP_COLLECTION_NAME } from '../../models/PrinterGroup';
 import { PRINTER_GROUP_PRINTER_COLLECTION_NAME } from '../../models/PrinterGroupPrinter';
@@ -136,6 +137,7 @@ export default (app: Router) => {
                         ...deconstructChanges(changes, PRINTER_COLLECTION_NAME),
                         ...deconstructChanges(changes, PRINTER_GROUP_COLLECTION_NAME),
                         ...deconstructChanges(changes, PRINTER_GROUP_PRINTER_COLLECTION_NAME),
+                        ...deconstructChanges(changes, PRINT_CATEGORY_COLLECTION_NAME),
                     },
                 }),
                 organizationService.pushChanges({

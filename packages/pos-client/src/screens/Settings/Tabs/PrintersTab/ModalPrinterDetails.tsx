@@ -136,7 +136,7 @@ export const ModalPrinterDetails: React.FC<ModalPrinterDetailsOuterProps> = ({
                     onBlur={handleBlur('isPrepTimeRequired')}
                   />
                   <Body>
-                    <Text>Will this printer receive bill calls?</Text>
+                    <Text>Receive bill calls</Text>
                   </Body>
                 </ListItem>
               </Form>

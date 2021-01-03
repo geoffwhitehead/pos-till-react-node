@@ -26,7 +26,13 @@ export type OrganizationProps = {
   billViewType: string;
   accessPin: string;
   accessPinEnabled: boolean;
+  printItemGrouping: string;
 };
+
+export enum PrintItemGroupingEnum {
+  printCategory = 'printCategory',
+  category = 'category',
+}
 
 export enum CategoryViewTypeEnum {
   list = 'list',
@@ -83,6 +89,7 @@ export class Organization extends Model {
   @field('transaction_grouping') transactionGrouping: TransactionGroupingEnum;
   @field('access_pin') accessPin: string;
   @field('access_pin_enabled') accessPinEnabled: boolean;
+  @field('print_item_grouping') printItemGrouping: PrintItemGroupingEnum;
 
   @relation('price_groups', 'default_price_group_id') defaultPriceGroup: Relation<PriceGroup>;
   @relation('printers', 'receipt_printer_id') receiptPrinter: Relation<Printer>;
@@ -127,5 +134,6 @@ export const organizationSchema = tableSchema({
     { name: 'transaction_grouping', type: 'string' },
     { name: 'access_pin', type: 'string' },
     { name: 'access_pin_enabled', type: 'boolean' },
+    { name: 'print_item_grouping', type: 'string' },
   ],
 });

@@ -1,3 +1,4 @@
+import { withDatabase } from '@nozbe/watermelondb/DatabaseProvider';
 import { useDatabase } from '@nozbe/watermelondb/hooks';
 import withObservables from '@nozbe/with-observables';
 import { Formik } from 'formik';
@@ -10,8 +11,8 @@ import { ModalContentButton } from '../../../../components/Modal/ModalContentBut
 import { ModalColorPickerContent } from '../../../../components/ModalColorPicker/ModalColorPicker';
 import { OrganizationContext } from '../../../../contexts/OrganizationContext';
 import { RecentColorsContext } from '../../../../contexts/RecentColorsContext';
-import { Form, Input } from '../../../../core';
-import { Category, tableNames } from '../../../../models';
+import { Form, Icon, Input, Label, Picker } from '../../../../core';
+import { Category, PrintCategory, tableNames } from '../../../../models';
 import { colors } from '../../../../theme';
 import { moderateScale } from '../../../../utils/scaling';
 
@@ -21,7 +22,8 @@ type ModalCategoryDetailsOuterProps = {
 };
 
 type ModalCategoryDetailsInnerProps = {
-  itemsCount?: number;
+  itemsCount: number;
+  printCategories: PrintCategory[];
 };
 
 type FormValues = {
@@ -30,6 +32,7 @@ type FormValues = {
   backgroundColor: string;
   textColor: string;
   positionIndex: string;
+  printCategoryId: string;
 };
 
 const generateCategorySchema = (shortNameLength: number) =>
@@ -48,17 +51,20 @@ const generateCategorySchema = (shortNameLength: number) =>
       .length(7, 'Incorrect length')
       .required(),
     positionIndex: Yup.number().required(),
+    printCategoryId: Yup.string().notRequired(),
   });
 
 export const ModalCategoryDetailsInner: React.FC<ModalCategoryDetailsOuterProps & ModalCategoryDetailsInnerProps> = ({
   category,
   onClose,
   itemsCount,
+  printCategories,
 }) => {
   const { organization } = useContext(OrganizationContext);
   const { recentColors, setRecentColors } = useContext(RecentColorsContext);
   const database = useDatabase();
 
+  console.log('printCategories', printCategories);
   const [loading, setLoading] = useState(false);
 
   const categorySchema = generateCategorySchema(organization.shortNameLength);
@@ -92,6 +98,7 @@ export const ModalCategoryDetailsInner: React.FC<ModalCategoryDetailsOuterProps 
     backgroundColor: category?.backgroundColor || colors.highlightBlue,
     textColor: category?.textColor || '#ffffff',
     positionIndex: category?.positionIndex.toString() || '0',
+    printCategoryId: category?.printCategoryId || '',
   };
 
   const onDelete = async () => {
@@ -106,7 +113,7 @@ export const ModalCategoryDetailsInner: React.FC<ModalCategoryDetailsOuterProps 
       onSubmit={values => update(values, category)}
     >
       {({ handleChange, handleBlur, handleSubmit, errors, touched, values }) => {
-        const { shortName, name, backgroundColor, textColor, positionIndex } = values;
+        const { shortName, name, backgroundColor, textColor, positionIndex, printCategoryId } = values;
 
         const title = category ? `${capitalize(category.name)}` : 'New Category';
 
@@ -177,6 +184,30 @@ export const ModalCategoryDetailsInner: React.FC<ModalCategoryDetailsOuterProps 
                   setGlobalRecentColors={setRecentColors}
                 />
               </ItemField>
+
+              <Label>Use this category instead when grouping items to send to printers</Label>
+              <ItemField
+                picker
+                label="Print Category"
+                touched={touched.printCategoryId}
+                name="printCategoryId"
+                errors={errors.printCategoryId}
+                style={{
+                  alignItems: 'flex-start',
+                }}
+              >
+                <Picker
+                  mode="dropdown"
+                  iosIcon={<Icon name="chevron-down-outline" />}
+                  placeholder="Select print category (optional)"
+                  selectedValue={printCategoryId}
+                  onValueChange={handleChange('emulation')}
+                >
+                  {printCategories.map(printCategory => (
+                    <Picker.Item key={printCategory.id} label={printCategory.name} value={printCategory.id} />
+                  ))}
+                </Picker>
+              </ItemField>
             </Form>
           </ModalContentButton>
         );
@@ -186,12 +217,18 @@ export const ModalCategoryDetailsInner: React.FC<ModalCategoryDetailsOuterProps 
 };
 
 const enhance = c =>
-  withObservables<ModalCategoryDetailsOuterProps, ModalCategoryDetailsInnerProps>(['category'], ({ category }) => {
-    return {
-      category,
-      itemsCount: category.items.observeCount(),
-    };
-  })(c);
+  withDatabase<any>(
+    withObservables<ModalCategoryDetailsOuterProps, ModalCategoryDetailsInnerProps>(
+      ['category'],
+      ({ category, database }) => {
+        return {
+          category,
+          itemsCount: category.items.observeCount(),
+          printCategories: database.collections.get<PrintCategory>(tableNames.printCategories).query(),
+        };
+      },
+    )(c),
+  );
 
 export const ModalCategoryDetails = enhance(ModalCategoryDetailsInner);
 

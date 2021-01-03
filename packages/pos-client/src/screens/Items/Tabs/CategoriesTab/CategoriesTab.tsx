@@ -8,7 +8,7 @@ import { Modal } from '../../../../components/Modal/Modal';
 import { SearchBar } from '../../../../components/SearchBar/SearchBar';
 import { OrganizationContext } from '../../../../contexts/OrganizationContext';
 import { Container, Footer, Icon, Label, List, Picker, Text } from '../../../../core';
-import { Category } from '../../../../models';
+import { Category, tableNames } from '../../../../models';
 import { MAX_GRID_SIZE } from '../../../../utils/consts';
 import { moderateScale } from '../../../../utils/scaling';
 import { CategoryRow } from './CategoryRow';
@@ -113,7 +113,7 @@ const CategoriesTabInner: React.FC<CategoriesTabOuterProps & CategoriesTabInnerP
 
 export const CategoriesTab = withDatabase(
   withObservables<CategoriesTabOuterProps, CategoriesTabInnerProps>([], ({ database }) => ({
-    categories: database.collections.get<Category>('categories').query(),
+    categories: database.collections.get<Category>(tableNames.categories).query(),
   }))(CategoriesTabInner),
 );
 

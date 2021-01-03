@@ -9,6 +9,7 @@ import { ModifierItemPrice } from './ModifierItemPrice';
 import { Organization } from './Organization';
 import { PaymentType } from './PaymentType';
 import { PriceGroup } from './PriceGroup';
+import { PrintCategory } from './PrintCategory';
 import { Printer } from './Printer';
 import { PrinterGroup } from './PrinterGroup';
 import { PrinterGroupPrinter } from './PrinterGroupPrinter';
@@ -32,4 +33,5 @@ export default {
     PrinterGroupPrinter,
     PaymentType,
     TablePlanElement,
+    PrintCategory,
 };

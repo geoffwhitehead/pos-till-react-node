@@ -7,6 +7,7 @@ export class Category extends Model {
 
   static associations = {
     items: { type: 'has_many', foreignKey: 'category_id' },
+    print_categories: { type: 'belongs_to', key: 'print_category_id' },
   };
 
   @children('items') items: Query<Item>;
@@ -17,6 +18,7 @@ export class Category extends Model {
   @field('text_color') textColor: string;
 
   @field('position_index') positionIndex: number;
+  @field('print_category_id') printCategoryId: string;
 }
 
 export const categorySchema = tableSchema({
@@ -27,5 +29,6 @@ export const categorySchema = tableSchema({
     { name: 'background_color', type: 'string' },
     { name: 'text_color', type: 'string' },
     { name: 'position_index', type: 'number' },
+    { name: 'print_category_id', type: 'number', isOptional: true },
   ],
 });

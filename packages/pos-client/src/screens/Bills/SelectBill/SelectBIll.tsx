@@ -197,7 +197,7 @@ export const enhance = c =>
       billPeriod,
       openBills: billPeriod.openBills,
       tablePlanElements: database.collections
-        .get<TablePlanElement>(tableNames.tablePlanElement)
+        .get<TablePlanElement>(tableNames.tablePlanElements)
         .query()
         .observeWithColumns(['bill_reference', 'type', 'rotation']),
     }))(c),

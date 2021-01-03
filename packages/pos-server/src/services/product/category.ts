@@ -7,11 +7,6 @@ export type CategoryService = CommonServiceFns<CategoryProps> & {
     seed: () => Promise<{ categories: CategoryProps[] }>;
 };
 
-export type CategoryClientProps = {
-    name: string;
-    short_name: string;
-};
-
 export const categoryService = ({
     repositories: { categoryRepository },
     logger,

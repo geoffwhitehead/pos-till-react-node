@@ -10,6 +10,7 @@ import { ModifierRepository, modifierRepository } from './modifierRepository';
 import { organizationRepository, OrganizationRepository } from './organizationRepository';
 import { paymentTypeRepository, PaymentTypeRepository } from './paymentTypeRepository';
 import { priceGroupRepository, PriceGroupRepository } from './priceGroupRepository';
+import { printCategoryRepository, PrintCategoryRepository } from './printCategoryRepository';
 import { printerGroupPrinterRepository, PrinterGroupPrinterRepository } from './printerGroupPrinterRepository';
 import { PrinterGroupRepository, printerGroupRepository } from './printerGroupRepository';
 import { printerRepository, PrinterRepository } from './printerRepository';
@@ -33,6 +34,7 @@ export interface RepositoryService {
     printerGroupPrinterRepository: PrinterGroupPrinterRepository;
     paymentTypeRepository: PaymentTypeRepository;
     tablePlanElementRepository: TablePlanElementRepository;
+    printCategoryRepository: PrintCategoryRepository;
 }
 
 export interface InjectedRepositoryDependencies {
@@ -53,6 +55,7 @@ export interface InjectedRepositoryDependencies {
         PrinterGroupPrinterModel: typeof Models.PrinterGroupPrinter;
         PaymentTypeModel: typeof Models.PaymentType;
         TablePlanElementModel: typeof Models.TablePlanElement;
+        PrintCategoryModel: typeof Models.PrintCategory;
     };
 }
 
@@ -74,6 +77,7 @@ export const registerRepositories = (): RepositoryService => {
         PrinterGroupPrinterModel: Models.PrinterGroupPrinter,
         PaymentTypeModel: Models.PaymentType,
         TablePlanElementModel: Models.TablePlanElement,
+        PrintCategoryModel: Models.PrintCategory,
     };
 
     const repositories = [
@@ -140,6 +144,10 @@ export const registerRepositories = (): RepositoryService => {
         {
             name: 'tablePlanElementRepository',
             repo: tablePlanElementRepository,
+        },
+        {
+            name: 'printCategoryRepository',
+            repo: printCategoryRepository,
         },
     ];
 

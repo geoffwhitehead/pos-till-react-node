@@ -36,6 +36,7 @@ export interface OrganizationSettings {
     billViewType?: BillViewTypeEnum;
     accessPin?: string;
     accessPinEnabled?: boolean;
+    printerItemGrouping?: PrintItemGroupingEnum;
 }
 
 export const ORGANIZATION_COLLECTION_NAME = 'organizations';
@@ -53,6 +54,11 @@ export const OrganizationValidation = {
         postcode: Joi.string(),
     }),
 };
+
+export enum PrintItemGroupingEnum {
+    printCategory = 'printCategory',
+    category = 'category',
+}
 
 export enum BillViewTypeEnum {
     list = 'list',
@@ -137,6 +143,11 @@ const OrganizationSettingsSchema: Schema<OrganizationSettings> = new Schema({
     accessPinEnabled: {
         type: Boolean,
         default: false,
+    },
+    printItemGrouping: {
+        type: String,
+        enum: Object.values(PrintItemGroupingEnum),
+        default: PrintItemGroupingEnum.printCategory,
     },
 });
 

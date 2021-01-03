@@ -9,6 +9,7 @@ export interface CategoryProps {
     backgroundColor?: string;
     textColor?: string;
     positionIndex?: number;
+    printCategoryId?: string;
 }
 
 export const CATEGORY_COLLECTION_NAME = 'categories';
@@ -26,7 +27,6 @@ const CategorySchema: Schema<CategoryProps> = new Schema(
         },
         shortName: {
             type: String,
-            default: 10,
         },
         backgroundColor: {
             type: String,
@@ -39,6 +39,7 @@ const CategorySchema: Schema<CategoryProps> = new Schema(
         positionIndex: {
             type: Number,
         },
+        printCategoryId: { type: String, ref: 'PrintCategory', required: false },
     },
     { timestamps: true, collection: CATEGORY_COLLECTION_NAME },
 );

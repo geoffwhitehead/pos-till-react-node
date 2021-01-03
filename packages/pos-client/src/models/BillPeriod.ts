@@ -17,12 +17,12 @@ export const billPeriodSchema = tableSchema({
 export class BillPeriod extends Model {
   static table = 'bill_periods';
 
-  @readonly @date('created_at') createdAt: Date;
-  @date('closed_at') closedAt: Date;
-
   static associations = {
     bills: { type: 'has_many', foreignKey: 'bill_period_id' },
   };
+
+  @readonly @date('created_at') createdAt: Date;
+  @date('closed_at') closedAt: Date;
 
   @children('bills') bills: Query<Bill>;
 
