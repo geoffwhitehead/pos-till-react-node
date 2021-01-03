@@ -90,7 +90,7 @@ export const ModalCategoryDetailsInner: React.FC<ModalCategoryDetailsOuterProps 
     name: category?.name || '',
     shortName: category?.shortName || '',
     backgroundColor: category?.backgroundColor || colors.highlightBlue,
-    textColor: category?.textColor || 'white',
+    textColor: category?.textColor || '#ffffff',
     positionIndex: category?.positionIndex.toString() || '0',
   };
 

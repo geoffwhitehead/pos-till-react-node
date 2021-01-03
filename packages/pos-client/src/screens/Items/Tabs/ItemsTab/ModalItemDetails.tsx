@@ -22,12 +22,14 @@ import {
   tableNames,
 } from '../../../../models';
 import { styles } from '../../../../styles';
+import { moderateScale } from '../../../../utils/scaling';
 import { ModifierRow } from './ModifierRow';
 
 interface ItemDetailsOuterProps {
   item?: ItemModel;
   onClose: () => void;
   database: Database;
+  category: Category;
 }
 
 interface ItemDetailsInnerProps {
@@ -74,6 +76,7 @@ const ItemDetailsInner: React.FC<ItemDetailsOuterProps & ItemDetailsInnerProps> 
   modifiers = [],
   itemModifiers,
   database,
+  category,
 }) => {
   if (!priceGroups) {
     return <Loading />;
@@ -175,7 +178,7 @@ const ItemDetailsInner: React.FC<ItemDetailsOuterProps & ItemDetailsInnerProps> 
   const initialValues = {
     name: item?.name || '',
     shortName: item?.shortName || '',
-    categoryId: item?.categoryId || '',
+    categoryId: item?.categoryId || category?.id || '',
     printerGroupId: item?.printerGroupId || '',
     prices: priceGroups.map(priceGroup => {
       /**
@@ -214,10 +217,10 @@ const ItemDetailsInner: React.FC<ItemDetailsOuterProps & ItemDetailsInnerProps> 
             onPressDelete={() => areYouSure(handleDelete, item)}
             size="medium"
           >
-            <ScrollView>
-              <Grid>
-                <Row>
-                  <Col style={styles.columnLeft}>
+            <Grid>
+              <Row>
+                <Col style={styles.columnLeft}>
+                  <ScrollView>
                     <Form>
                       <ItemField label="Name" touched={touched.name} name="name" errors={errors.name}>
                         <Input onChangeText={handleChange('name')} onBlur={handleBlur('name')} value={name} />
@@ -282,10 +285,12 @@ const ItemDetailsInner: React.FC<ItemDetailsOuterProps & ItemDetailsInnerProps> 
                         </Picker>
                       </ItemField>
                     </Form>
-                  </Col>
-                  <Col style={styles.columnRight}>
-                    <Form>
-                      <H3>Price Groups</H3>
+                  </ScrollView>
+                </Col>
+                <Col style={styles.columnRight}>
+                  <Form>
+                    <H3>Price Groups</H3>
+                    <ScrollView>
                       <FieldArray
                         name="prices"
                         render={() => {
@@ -308,29 +313,33 @@ const ItemDetailsInner: React.FC<ItemDetailsOuterProps & ItemDetailsInnerProps> 
                           });
                         }}
                       />
-                    </Form>
-                  </Col>
-                </Row>
+                    </ScrollView>
+                  </Form>
+                </Col>
+              </Row>
 
-                <Row style={styles.row}>
-                  <H3 style={{ paddingTop: 20, ...styles.heading }}>Modifiers</H3>
-                </Row>
-                <Row style={styles.row}>
-                  <Col>
+              <Row style={{ height: moderateScale(80) }}>
+                <H3 style={{ paddingTop: 20, ...styles.heading }}>Modifiers</H3>
+              </Row>
+              <Row style={styles.row}>
+                <Col>
+                  <ListItem itemDivider>
+                    <Text>Assigned</Text>
+                  </ListItem>
+                  <ScrollView>
                     <List>
-                      <ListItem itemDivider>
-                        <Text>Assigned</Text>
-                      </ListItem>
                       {selectedModifiers.map(m => (
                         <ModifierRow isLeft key={m.id} modifier={m} onSelect={m => setAssignedModifiers(m)} />
                       ))}
                     </List>
-                  </Col>
-                  <Col>
+                  </ScrollView>
+                </Col>
+                <Col>
+                  <ListItem itemDivider>
+                    <Text>Available</Text>
+                  </ListItem>
+                  <ScrollView>
                     <List>
-                      <ListItem itemDivider>
-                        <Text>Available</Text>
-                      </ListItem>
                       {modifiers
                         .filter(m => !selectedModifiers.includes(m))
                         .map(m => (
@@ -341,10 +350,10 @@ const ItemDetailsInner: React.FC<ItemDetailsOuterProps & ItemDetailsInnerProps> 
                           />
                         ))}
                     </List>
-                  </Col>
-                </Row>
-              </Grid>
-            </ScrollView>
+                  </ScrollView>
+                </Col>
+              </Row>
+            </Grid>
           </ModalContentButton>
         );
       }}

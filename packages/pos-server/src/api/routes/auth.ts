@@ -1,15 +1,3 @@
-// import { Router } from 'express';
-// import { login, changePassword } from '../../controllers/auth';
-// import { create } from '../../controllers/user';
-
-// const router = Router();
-
-// router.route('/login').post(login);
-// router.route('/register').post(create); // TODO: just route to user create until org structure in place
-// router.route('/change-password').post(changePassword);
-
-// export default router;
-
 import { celebrate, Joi } from 'celebrate';
 import { NextFunction, Request, Response, Router } from 'express';
 import { Container } from 'typedi';
@@ -22,8 +10,6 @@ import { OrganizationService } from '../../services/organization';
 import { PrinterService } from '../../services/printer';
 import { ProductService } from '../../services/product';
 import { getTokenFromHeader } from '../middlewares/extendAuthorize';
-
-// import middlewares from '../middlewares';
 
 export default (app: Router) => {
     const route = Router();

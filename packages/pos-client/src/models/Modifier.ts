@@ -52,8 +52,14 @@ export class Modifier extends Model {
       modifierItemPrice.prepareMarkAsDeleted(),
     );
     const itemModifiersToDelete = itemModifiers.map(itemModifier => itemModifier.prepareMarkAsDeleted());
+    const modifierToDelete = this.prepareMarkAsDeleted();
 
-    const batched = [...modifierItemsToDelete, ...modifierItemPricesToDelete, ...itemModifiersToDelete];
+    const batched = [
+      ...modifierItemsToDelete,
+      ...modifierItemPricesToDelete,
+      ...itemModifiersToDelete,
+      modifierToDelete,
+    ];
 
     await this.batch(...batched);
   };

@@ -41,6 +41,11 @@ const ModifierTabInner: React.FC<ModifiersTabOuterProps & ModifiersTabInnerProps
     setSelectedModifier(modifier);
   };
 
+  const handleCreate = () => {
+    setSelectedModifier(null);
+    setModalOpen(true);
+  };
+
   return (
     <Container>
       <Grid>
@@ -49,11 +54,7 @@ const ModifierTabInner: React.FC<ModifiersTabOuterProps & ModifiersTabInnerProps
             <Separator style={styles.separator} bordered>
               <Text>Modifiers</Text>
             </Separator>
-            <SearchBar
-              value={searchValue}
-              onPressCreate={() => setModalOpen(true)}
-              onSearch={value => setSearchValue(value)}
-            />
+            <SearchBar value={searchValue} onPressCreate={handleCreate} onSearch={value => setSearchValue(value)} />
             <ScrollView>
               <List>
                 {modifiers

@@ -35,6 +35,11 @@ const ModifierItemsInner: React.FC<ModifierItemsOuterProps & ModifierItemsInnerP
     setSelectedModifierItem(null);
   };
 
+  const handleAdd = () => {
+    setModalOpen(true);
+    setSelectedModifierItem(null);
+  };
+
   return (
     <>
       {modifierItems.length === 0 && (
@@ -54,7 +59,7 @@ const ModifierItemsInner: React.FC<ModifierItemsOuterProps & ModifierItemsInnerP
           </ListItem>
         );
       })}
-      <Button full info iconLeft onPress={() => setModalOpen(true)}>
+      <Button full info iconLeft onPress={handleAdd}>
         <Icon name="ios-add-circle-outline" />
         <Text>Add</Text>
       </Button>

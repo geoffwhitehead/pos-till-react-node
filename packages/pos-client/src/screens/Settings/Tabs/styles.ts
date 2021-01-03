@@ -1,4 +1,7 @@
-export const commonStyles = {
+import { StyleSheet } from 'react-native';
+import { moderateScale } from '../../../utils/scaling';
+
+export const commonStyles = StyleSheet.create({
   heading: {
     marginTop: 40,
     marginBottom: 20,
@@ -11,7 +14,7 @@ export const commonStyles = {
     marginBottom: 2,
     textAlign: 'left',
   },
-  content: { padding: 15, width: 500 },
+  content: { padding: 15, width: moderateScale(500) },
   form: { width: 400 },
   selectedRow: { backgroundColor: '#cde1f9' },
   indent: {
@@ -33,4 +36,4 @@ export const commonStyles = {
     marginTop: 10,
     marginBottom: 10,
   },
-} as const;
+});

@@ -4,7 +4,7 @@ import { useDatabase } from '@nozbe/watermelondb/hooks';
 import withObservables from '@nozbe/with-observables';
 import { Formik } from 'formik';
 import React, { useContext, useState } from 'react';
-import { StyleSheet } from 'react-native';
+import { ScrollView, StyleSheet } from 'react-native';
 import * as Yup from 'yup';
 import { HeaderButtonBar } from '../../../../components/HeaderButtonBar/HeaderButtonBar';
 import { ItemField } from '../../../../components/ItemField/ItemField';
@@ -12,7 +12,7 @@ import { Loading } from '../../../../components/Loading/Loading';
 import { AuthContext } from '../../../../contexts/AuthContext';
 import { OrganizationContext } from '../../../../contexts/OrganizationContext';
 import { ReceiptPrinterContext } from '../../../../contexts/ReceiptPrinterContext';
-import { Button, Container, Content, Footer, Form, Grid, Icon, Input, Picker, Text, View } from '../../../../core';
+import { Button, Container, Footer, Form, Icon, Input, Picker, Text, View } from '../../../../core';
 import { Bill, BillPeriod, PriceGroup, Printer, tableNames } from '../../../../models';
 import { areYouSure } from '../../../../utils/helpers';
 import { moderateScale } from '../../../../utils/scaling';
@@ -121,103 +121,96 @@ const SettingsTabInner: React.FC<SettingsTabOuterProps & SettingsTabInnerProps> 
           return (
             <Container>
               <HeaderButtonBar onPressPrimary={handleSubmit} primaryText="Save Changes"></HeaderButtonBar>
-              <Content style={commonStyles.content}>
-                <Grid>
-                  <Form>
-                    <ItemField
-                      picker
-                      label="Receipt Printer"
-                      touched={touched.receiptPrinterId}
-                      name="receiptPrinterId"
-                      errors={errors.receiptPrinterId}
-                      style={{
-                        alignItems: 'flex-start',
-                      }}
+              <ScrollView style={commonStyles.content}>
+                <Form>
+                  <ItemField
+                    picker
+                    label="Receipt Printer"
+                    touched={touched.receiptPrinterId}
+                    name="receiptPrinterId"
+                    errors={errors.receiptPrinterId}
+                    style={{
+                      alignItems: 'flex-start',
+                    }}
+                  >
+                    <Picker
+                      mode="dropdown"
+                      iosIcon={<Icon name="chevron-down-outline" />}
+                      placeholder="Select receipt printer"
+                      selectedValue={receiptPrinterId}
+                      onValueChange={handleChange('receiptPrinterId')}
                     >
-                      <Picker
-                        mode="dropdown"
-                        iosIcon={<Icon name="chevron-down-outline" />}
-                        placeholder="Select receipt printer"
-                        selectedValue={receiptPrinterId}
-                        onValueChange={handleChange('receiptPrinterId')}
-                      >
-                        {printers.map(printer => (
-                          <Picker.Item key={printer.id} label={printer.name} value={printer.id} />
-                        ))}
-                      </Picker>
-                    </ItemField>
+                      {printers.map(printer => (
+                        <Picker.Item key={printer.id} label={printer.name} value={printer.id} />
+                      ))}
+                    </Picker>
+                  </ItemField>
 
-                    <ItemField
-                      picker
-                      label="Default Price Group"
-                      touched={touched.defaultPriceGroupId}
-                      name="defaultPriceGroupId"
-                      errors={errors.defaultPriceGroupId}
-                      style={{
-                        alignItems: 'flex-start',
-                      }}
+                  <ItemField
+                    picker
+                    label="Default Price Group"
+                    touched={touched.defaultPriceGroupId}
+                    name="defaultPriceGroupId"
+                    errors={errors.defaultPriceGroupId}
+                    style={{
+                      alignItems: 'flex-start',
+                    }}
+                  >
+                    <Picker
+                      mode="dropdown"
+                      iosIcon={<Icon name="chevron-down-outline" />}
+                      placeholder="Select default price group"
+                      selectedValue={defaultPriceGroupId}
+                      onValueChange={handleChange('defaultPriceGroupId')}
                     >
-                      <Picker
-                        mode="dropdown"
-                        iosIcon={<Icon name="chevron-down-outline" />}
-                        placeholder="Select default price group"
-                        selectedValue={defaultPriceGroupId}
-                        onValueChange={handleChange('defaultPriceGroupId')}
-                      >
-                        {priceGroups.map(priceGroup => (
-                          <Picker.Item key={priceGroup.id} label={priceGroup.name} value={priceGroup.id} />
-                        ))}
-                      </Picker>
-                    </ItemField>
+                      {priceGroups.map(priceGroup => (
+                        <Picker.Item key={priceGroup.id} label={priceGroup.name} value={priceGroup.id} />
+                      ))}
+                    </Picker>
+                  </ItemField>
 
-                    <ItemField
-                      label="Max open bills"
-                      touched={touched.maxBills}
-                      name="maxBills"
-                      errors={errors.maxBills}
-                    >
-                      <Input onChangeText={handleChange('maxBills')} onBlur={handleBlur('maxBills')} value={maxBills} />
-                    </ItemField>
+                  <ItemField label="Max open bills" touched={touched.maxBills} name="maxBills" errors={errors.maxBills}>
+                    <Input onChangeText={handleChange('maxBills')} onBlur={handleBlur('maxBills')} value={maxBills} />
+                  </ItemField>
 
-                    <ItemField
-                      label="Table planner grid size"
-                      touched={touched.tablePlannerGridSize}
-                      name="tablePlannerGridSize"
-                      errors={errors.tablePlannerGridSize}
-                    >
-                      <Input
-                        onChangeText={handleChange('tablePlannerGridSize')}
-                        onBlur={handleBlur('tablePlannerGridSize')}
-                        value={tablePlannerGridSize}
-                      />
-                    </ItemField>
+                  <ItemField
+                    label="Table planner grid size"
+                    touched={touched.tablePlannerGridSize}
+                    name="tablePlannerGridSize"
+                    errors={errors.tablePlannerGridSize}
+                  >
+                    <Input
+                      onChangeText={handleChange('tablePlannerGridSize')}
+                      onBlur={handleBlur('tablePlannerGridSize')}
+                      value={tablePlannerGridSize}
+                    />
+                  </ItemField>
 
-                    <ItemField
-                      picker
-                      label="Currency"
-                      touched={touched.currency}
-                      name="currency"
-                      errors={errors.currency}
-                      style={{
-                        alignItems: 'flex-start',
-                      }}
+                  <ItemField
+                    picker
+                    label="Currency"
+                    touched={touched.currency}
+                    name="currency"
+                    errors={errors.currency}
+                    style={{
+                      alignItems: 'flex-start',
+                    }}
+                  >
+                    <Picker
+                      mode="dropdown"
+                      iosIcon={<Icon name="chevron-down-outline" />}
+                      placeholder="Select currency"
+                      selectedValue={currency}
+                      onValueChange={handleChange('currency')}
+                      enabled={!hasOpenBills}
                     >
-                      <Picker
-                        mode="dropdown"
-                        iosIcon={<Icon name="chevron-down-outline" />}
-                        placeholder="Select currency"
-                        selectedValue={currency}
-                        onValueChange={handleChange('currency')}
-                        enabled={!hasOpenBills}
-                      >
-                        {currencies.map(currency => (
-                          <Picker.Item key={currency.id} label={currency.name} value={currency.id} />
-                        ))}
-                      </Picker>
-                    </ItemField>
-                  </Form>
-                </Grid>
-              </Content>
+                      {currencies.map(currency => (
+                        <Picker.Item key={currency.id} label={currency.name} value={currency.id} />
+                      ))}
+                    </Picker>
+                  </ItemField>
+                </Form>
+              </ScrollView>
               <Footer>
                 <View style={{ display: 'flex', flexDirection: 'row', padding: 5 }}>
                   <Button style={{ marginRight: 10 }} onPress={() => areYouSure(signOut)}>
@@ -251,6 +244,9 @@ export const SettingsTab = enhance(SettingsTabInner);
 const styles = StyleSheet.create({
   errorLabel: {
     color: 'red',
+  },
+  form: {
+    width: moderateScale(400),
   },
   row: {
     padding: 5,

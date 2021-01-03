@@ -6,7 +6,7 @@ import React, { useState } from 'react';
 import * as Yup from 'yup';
 import { ItemField } from '../../../../components/ItemField/ItemField';
 import { ModalContentButton } from '../../../../components/Modal/ModalContentButton';
-import { Form, Input } from '../../../../core';
+import { ActionSheet, Form, Input } from '../../../../core';
 import { Modifier, tableNames } from '../../../../models';
 import { commonStyles } from '../../../Settings/Tabs/styles';
 
@@ -25,13 +25,13 @@ const modifierSchema = Yup.object().shape({
     .required('Required'),
   // minItems: Yup.number().min(0, 'Must be a positive number'),
   minItems: Yup.number()
-    .positive('Must be positive')
+    .moreThan(-1)
     .required('This field is required.')
     .when(['maxItems'], (maxItems, schema) => {
       return schema.max(maxItems);
     }),
   maxItems: Yup.number()
-    .positive('Must be positive')
+    .moreThan(0)
     .required('This field is required.'),
 });
 
@@ -39,6 +39,21 @@ type FormValues = {
   name: string;
   minItems: string;
   maxItems: string;
+};
+
+const areYouSure = fn => {
+  const options = ['Remove', 'Cancel'];
+
+  ActionSheet.show(
+    {
+      options,
+      destructiveButtonIndex: 0,
+      title: 'Remove this modifier. Are you sure?',
+    },
+    index => {
+      index === 0 && fn();
+    },
+  );
 };
 
 export const ModalModifierDetailsInner: React.FC<ModalModifierDetailsOuterProps & ModalModifierDetailsInnerProps> = ({
@@ -101,7 +116,7 @@ export const ModalModifierDetailsInner: React.FC<ModalModifierDetailsOuterProps 
             title={title}
             isPrimaryDisabled={loading}
             isDeleteDisabled={itemsCount > 0}
-            onPressDelete={onDelete}
+            onPressDelete={() => areYouSure(onDelete)}
             size="small"
           >
             <Form style={commonStyles.form}>
@@ -125,7 +140,6 @@ export const ModalModifierDetailsInner: React.FC<ModalModifierDetailsOuterProps 
 const enhance = c =>
   withObservables<ModalModifierDetailsOuterProps, ModalModifierDetailsInnerProps>(['modifier'], ({ modifier }) => {
     return {
-      modifier,
       itemsCount: modifier.itemModifiers.observeCount(),
     };
   })(c);

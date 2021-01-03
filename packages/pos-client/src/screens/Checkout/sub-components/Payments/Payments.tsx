@@ -201,11 +201,14 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     padding: moderateScale(5),
     paddingLeft: moderateScale(80),
+    flex: 1,
+    alignItems: 'stretch',
   },
   button: {
     marginBottom: moderateScale(5),
     textAlign: 'center',
     alignContent: 'center',
+    // height: '100%',
   },
   col: { padding: 0 },
 });
