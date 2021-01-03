@@ -201,7 +201,7 @@ export const ModalCategoryDetailsInner: React.FC<ModalCategoryDetailsOuterProps 
                   iosIcon={<Icon name="chevron-down-outline" />}
                   placeholder="Select print category (optional)"
                   selectedValue={printCategoryId}
-                  onValueChange={handleChange('emulation')}
+                  onValueChange={handleChange('printCategoryId')}
                 >
                   {printCategories.map(printCategory => (
                     <Picker.Item key={printCategory.id} label={printCategory.name} value={printCategory.id} />

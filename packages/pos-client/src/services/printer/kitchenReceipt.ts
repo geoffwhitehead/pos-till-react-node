@@ -8,9 +8,11 @@ import {
   BillItemPrintLog,
   Category,
   PriceGroup,
+  PrintCategory,
   Printer,
 } from '../../models';
 import { PrintType } from '../../models/BillItemPrintLog';
+import { PrintItemGroupingEnum } from '../../models/Organization';
 import { alignCenter, alignLeftRightSingle, starDivider, subHeader } from './helpers';
 
 const MOD_PREFIX = '- ';
@@ -45,10 +47,23 @@ export const kitchenReceipt = async (p: {
   reference: string;
   prepTime?: Dayjs;
   categories: Category[];
+  printCategories: PrintCategory[];
+  printItemGrouping: PrintItemGroupingEnum;
 }): Promise<{ billItemPrintLogs: BillItemPrintLog[]; printer: Printer; commands: any[] }[]> => {
-  const { billItems, printers, priceGroups, reference, prepTime, billItemPrintLogs, categories } = p;
+  const {
+    billItems,
+    printers,
+    priceGroups,
+    reference,
+    prepTime,
+    billItemPrintLogs,
+    categories,
+    printCategories,
+    printItemGrouping,
+  } = p;
 
   const keyedCategories = keyBy(categories, category => category.id);
+  const keyedPrintCategories = keyBy(printCategories, printCategory => printCategory.id);
 
   const populatedItems = await Promise.all(
     billItems.map(async billItem => {
@@ -89,6 +104,8 @@ export const kitchenReceipt = async (p: {
         reference,
         printer: keyedPrinters[printerId],
         keyedCategories,
+        keyedPrintCategories,
+        groupByPrintCategory: printItemGrouping === PrintItemGroupingEnum.printCategory,
       };
     });
   });
@@ -122,8 +139,19 @@ const generateBillItemCommands = (p: {
   prepTime?: Dayjs;
   reference: string;
   keyedCategories: Dictionary<Category>;
+  keyedPrintCategories: Dictionary<PrintCategory>;
+  groupByPrintCategory: boolean;
 }) => {
-  const { itemsToPrint, priceGroup, printer, prepTime, reference, keyedCategories } = p;
+  const {
+    itemsToPrint,
+    priceGroup,
+    printer,
+    prepTime,
+    reference,
+    keyedCategories,
+    keyedPrintCategories,
+    groupByPrintCategory,
+  } = p;
 
   let c = [];
 
@@ -159,11 +187,21 @@ const generateBillItemCommands = (p: {
     printMessage: group[0].billItem.printMessage,
   }));
 
-  const groupedByCategory = groupBy(quantifiedItems, group => group.billItem.categoryId);
-  Object.entries(groupedByCategory).map(([categoryId, quantifiedItems]) => {
-    const categoryShortName = keyedCategories[categoryId]?.shortName;
+  const groupedByCategory = groupBy(quantifiedItems, group => {
+    if (groupByPrintCategory) {
+      const category = keyedCategories[group.billItem.categoryId];
+      return keyedPrintCategories[category.printCategoryId];
+    } else {
+      return group.billItem.categoryId;
+    }
+  });
 
-    categoryShortName && c.push({ appendBitmapText: subHeader(categoryShortName.toUpperCase(), printer.printWidth) });
+  Object.entries(groupedByCategory).map(([categoryId, quantifiedItems]) => {
+    const categoryShortName = groupByPrintCategory
+      ? keyedPrintCategories[categoryId]?.shortName
+      : keyedCategories[categoryId]?.shortName;
+
+    c.push({ appendBitmapText: subHeader(categoryShortName?.toUpperCase() || 'OTHER', printer.printWidth) });
 
     quantifiedItems.map(({ quantity, billItem, mods, isVoided, printMessage }) => {
       if (isVoided) {

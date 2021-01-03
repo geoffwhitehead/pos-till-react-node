@@ -21,6 +21,7 @@ import {
   Discount,
   PaymentType,
   PriceGroup,
+  PrintCategory,
   Printer,
   tableNames,
 } from '../../../../models';
@@ -115,7 +116,7 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
       const ids = billItemsPrintLogs.map(log => log.billItemId);
 
       // fetch all the bill items associated with the print logs, the printers, and the price groups.
-      const [billItems, printers, priceGroups, categories] = await Promise.all([
+      const [billItems, printers, priceGroups, categories, printCategories] = await Promise.all([
         database.collections
           .get<BillItem>(tableNames.billItems)
           .query(Q.where('id', Q.oneOf(ids)))
@@ -132,6 +133,10 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
           .get<Category>(tableNames.categories)
           .query()
           .fetch(),
+        database.collections
+          .get<PrintCategory>(tableNames.printCategories)
+          .query()
+          .fetch(),
       ]);
 
       // this will generate the print commands to fire off to all the printers.
@@ -143,6 +148,8 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
         reference: bill.reference.toString(),
         prepTime: bill.prepAt ? dayjs(bill.prepAt) : null,
         categories,
+        printCategories,
+        printItemGrouping: organization.printItemGrouping,
       });
 
       const toPrintCallLogs = await kitchenCall({
