@@ -106,7 +106,7 @@ export const organizationToClient = (organization: OrganizationProps): Organizat
         transactionOrder: settings.transactionOrder,
         accessPin: settings.accessPin,
         accessPinEnabled: settings.accessPinEnabled,
-        printItemGrouping: settings.printerItemGrouping,
+        printItemGrouping: settings.printItemGrouping,
         addressLine1: address.line1,
         addressLine2: address.line2,
         addressCity: address.city,
