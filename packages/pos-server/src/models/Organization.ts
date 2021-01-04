@@ -36,7 +36,7 @@ export interface OrganizationSettings {
     billViewType?: BillViewTypeEnum;
     accessPin?: string;
     accessPinEnabled?: boolean;
-    printerItemGrouping?: PrintItemGroupingEnum;
+    printItemGrouping?: PrintItemGroupingEnum;
 }
 
 export const ORGANIZATION_COLLECTION_NAME = 'organizations';

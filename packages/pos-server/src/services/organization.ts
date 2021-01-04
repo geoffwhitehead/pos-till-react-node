@@ -6,6 +6,7 @@ import {
     CurrencyEnum,
     OrganizationProps,
     ORGANIZATION_COLLECTION_NAME,
+    PrintItemGroupingEnum,
     TransactionGroupingEnum,
     TransactionOrderEnum,
 } from '../models/Organization';
@@ -41,6 +42,7 @@ export type OrganizationClientProps = {
     billViewType: BillViewTypeEnum;
     accessPin: string;
     accessPinEnabled: boolean;
+    printItemGrouping: PrintItemGroupingEnum;
 };
 
 export const organizationFromClient = (organization: OrganizationClientProps): OrganizationProps => {
@@ -68,6 +70,7 @@ export const organizationFromClient = (organization: OrganizationClientProps): O
             billViewType: organization.billViewType,
             accessPin: organization.accessPin,
             accessPinEnabled: organization.accessPinEnabled,
+            printItemGrouping: organization.printItemGrouping,
         },
         address: {
             line1: organization.addressLine1,
@@ -103,6 +106,7 @@ export const organizationToClient = (organization: OrganizationProps): Organizat
         transactionOrder: settings.transactionOrder,
         accessPin: settings.accessPin,
         accessPinEnabled: settings.accessPinEnabled,
+        printItemGrouping: settings.printerItemGrouping,
         addressLine1: address.line1,
         addressLine2: address.line2,
         addressCity: address.city,
