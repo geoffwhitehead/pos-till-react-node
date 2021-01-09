@@ -79,6 +79,10 @@ export const WrappedSearchHeader: React.FC<SearchHeaderOuterProps & SearchHeader
           placeholder="Select a price group"
           selectedValue={priceGroup.id}
           onValueChange={handleChangePriceGroup}
+          textStyle={{
+            paddingLeft: 0,
+            paddingRight: 0,
+          }}
         >
           {priceGroups.map(({ id, name }) => {
             return <Picker.Item key={id} label={name} value={id} />;

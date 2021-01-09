@@ -141,6 +141,10 @@ export const TableElementForm: React.FC<TableElementFormInnerProps & TableElemen
                   placeholder="Select type"
                   selectedValue={type}
                   onValueChange={handleChange('type')}
+                  textStyle={{
+                    paddingLeft: 0,
+                    paddingRight: 0,
+                  }}
                 >
                   {Object.keys(TablePlanElementTypes).map(type => (
                     <Picker.Item key={type} label={TablePlanElementTypes[type]} value={type} />
@@ -164,6 +168,10 @@ export const TableElementForm: React.FC<TableElementFormInnerProps & TableElemen
                   placeholder="Select rotation"
                   selectedValue={rotation}
                   onValueChange={handleChange('rotation')}
+                  textStyle={{
+                    paddingLeft: 0,
+                    paddingRight: 0,
+                  }}
                 >
                   {Object.keys(TablePlanElementRotations).map(rotation => (
                     <Picker.Item key={rotation} label={rotation} value={TablePlanElementRotations[rotation]} />

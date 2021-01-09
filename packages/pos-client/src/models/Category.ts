@@ -1,5 +1,6 @@
-import { Model, Query, tableSchema } from '@nozbe/watermelondb';
-import { children, field, nochange } from '@nozbe/watermelondb/decorators';
+import { Model, Query, Relation, tableSchema } from '@nozbe/watermelondb';
+import { children, field, nochange, relation } from '@nozbe/watermelondb/decorators';
+import { PrintCategory } from '.';
 import { Item } from './Item';
 
 export class Category extends Model {
@@ -11,12 +12,12 @@ export class Category extends Model {
   };
 
   @children('items') items: Query<Item>;
+  @relation('print_categories', 'print_category_id') printCategory: Relation<PrintCategory>;
 
   @nochange @field('name') name: string;
   @field('short_name') shortName: string;
   @field('background_color') backgroundColor: string;
   @field('text_color') textColor: string;
-
   @field('position_index') positionIndex: number;
   @field('print_category_id') printCategoryId: string;
 }
@@ -29,6 +30,6 @@ export const categorySchema = tableSchema({
     { name: 'background_color', type: 'string' },
     { name: 'text_color', type: 'string' },
     { name: 'position_index', type: 'number' },
-    { name: 'print_category_id', type: 'number', isOptional: true },
+    { name: 'print_category_id', type: 'string', isOptional: true },
   ],
 });

@@ -122,6 +122,10 @@ export const ModalPrinterDetails: React.FC<ModalPrinterDetailsOuterProps> = ({
                     placeholder="Select emulation"
                     selectedValue={emulation}
                     onValueChange={handleChange('emulation')}
+                    textStyle={{
+                      paddingLeft: 0,
+                      paddingRight: 0,
+                    }}
                   >
                     {Object.keys(Emulations).map(emulation => (
                       <Picker.Item key={emulation} label={emulation} value={emulation} />

@@ -139,6 +139,10 @@ const SettingsTabInner: React.FC<SettingsTabOuterProps & SettingsTabInnerProps> 
                       placeholder="Select receipt printer"
                       selectedValue={receiptPrinterId}
                       onValueChange={handleChange('receiptPrinterId')}
+                      textStyle={{
+                        paddingLeft: 0,
+                        paddingRight: 0,
+                      }}
                     >
                       {printers.map(printer => (
                         <Picker.Item key={printer.id} label={printer.name} value={printer.id} />
@@ -162,6 +166,10 @@ const SettingsTabInner: React.FC<SettingsTabOuterProps & SettingsTabInnerProps> 
                       placeholder="Select default price group"
                       selectedValue={defaultPriceGroupId}
                       onValueChange={handleChange('defaultPriceGroupId')}
+                      textStyle={{
+                        paddingLeft: 0,
+                        paddingRight: 0,
+                      }}
                     >
                       {priceGroups.map(priceGroup => (
                         <Picker.Item key={priceGroup.id} label={priceGroup.name} value={priceGroup.id} />
@@ -203,6 +211,10 @@ const SettingsTabInner: React.FC<SettingsTabOuterProps & SettingsTabInnerProps> 
                       selectedValue={currency}
                       onValueChange={handleChange('currency')}
                       enabled={!hasOpenBills}
+                      textStyle={{
+                        paddingLeft: 0,
+                        paddingRight: 0,
+                      }}
                     >
                       {currencies.map(currency => (
                         <Picker.Item key={currency.id} label={currency.name} value={currency.id} />

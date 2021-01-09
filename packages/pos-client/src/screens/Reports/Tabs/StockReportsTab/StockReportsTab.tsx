@@ -176,6 +176,10 @@ export const StockReportsTabInner: React.FC<StockReportsTabOuterProps & StockRep
           placeholder="Select a price group"
           selectedValue={selectedPriceGroup}
           onValueChange={pg => setSelectedPriceGroup(pg)}
+          textStyle={{
+            paddingLeft: 0,
+            paddingRight: 0,
+          }}
         >
           {[
             <Picker.Item key="all-pricegroups" label="All" value={null} />,
@@ -194,6 +198,10 @@ export const StockReportsTabInner: React.FC<StockReportsTabOuterProps & StockRep
           placeholder="Select a category"
           selectedValue={selectedCategory}
           onValueChange={c => setSelectedCategory(c)}
+          textStyle={{
+            paddingLeft: 0,
+            paddingRight: 0,
+          }}
         >
           {[
             <Picker.Item key="all-categories" label="All" value={null} />,

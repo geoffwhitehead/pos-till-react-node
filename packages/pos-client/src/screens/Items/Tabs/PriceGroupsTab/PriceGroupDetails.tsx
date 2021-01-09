@@ -126,7 +126,13 @@ export const PriceGroupDetails: React.FC<PriceGroupDetailsProps> = ({ priceGroup
                   <Input onChangeText={handleChange('name')} onBlur={handleBlur('name')} value={name} />
                 </ItemField>
 
-                <ItemField label="Short Name" touched={touched.shortName} name="shortName" errors={errors.shortName}>
+                <ItemField
+                  label="Short Name"
+                  touched={touched.shortName}
+                  name="shortName"
+                  errors={errors.shortName}
+                  description="Used on printers where space is restricted"
+                >
                   <Input onChangeText={handleChange('shortName')} onBlur={handleBlur('shortName')} value={shortName} />
                 </ItemField>
 

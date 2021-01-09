@@ -12,7 +12,7 @@ import { Category, tableNames } from '../../../../models';
 import { MAX_GRID_SIZE } from '../../../../utils/consts';
 import { moderateScale } from '../../../../utils/scaling';
 import { CategoryRow } from './CategoryRow';
-import { ModalCategoryDetails, ModalCategoryDetailsInner } from './ModalCategoryDetails';
+import { ModalCategoryDetails } from './ModalCategoryDetails';
 
 interface CategoriesTabOuterProps {
   database?: Database;
@@ -79,6 +79,10 @@ const CategoriesTabInner: React.FC<CategoriesTabOuterProps & CategoriesTabInnerP
           placeholder="Select a grid size"
           selectedValue={organization.categoryGridSize}
           onValueChange={handleUpdateGridSize}
+          textStyle={{
+            paddingLeft: 0,
+            paddingRight: 0,
+          }}
         >
           {options.map(({ label, value }) => {
             return <Picker.Item key={value} label={label} value={value} />;
@@ -101,11 +105,7 @@ const CategoriesTabInner: React.FC<CategoriesTabOuterProps & CategoriesTabInnerP
         >{`Categories: ${categories.length} / ${maxCategories}`}</Text>
       </Footer>
       <Modal isOpen={modalOpen} onClose={onCloseHandler}>
-        {selectedCategory ? (
-          <ModalCategoryDetails category={selectedCategory} onClose={onCloseHandler} />
-        ) : (
-          <ModalCategoryDetailsInner category={selectedCategory} onClose={onCloseHandler} />
-        )}
+        <ModalCategoryDetails category={selectedCategory} onClose={onCloseHandler} />
       </Modal>
     </Container>
   );

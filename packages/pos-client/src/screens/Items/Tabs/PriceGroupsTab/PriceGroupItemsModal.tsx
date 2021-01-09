@@ -126,6 +126,10 @@ export const PriceGroupItemsModalInner: React.FC<PriceGroupItemsInnerProps & Pri
                   placeholder="Select a category"
                   selectedValue={selectedCategory}
                   onValueChange={handleCategoryChange}
+                  textStyle={{
+                    paddingLeft: 0,
+                    paddingRight: 0,
+                  }}
                 >
                   {categories.map(category => {
                     return <Picker.Item key={category.id} label={category.name} value={category} />;

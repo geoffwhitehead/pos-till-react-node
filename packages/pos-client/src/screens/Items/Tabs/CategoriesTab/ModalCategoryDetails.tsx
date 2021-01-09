@@ -11,7 +11,7 @@ import { ModalContentButton } from '../../../../components/Modal/ModalContentBut
 import { ModalColorPickerContent } from '../../../../components/ModalColorPicker/ModalColorPicker';
 import { OrganizationContext } from '../../../../contexts/OrganizationContext';
 import { RecentColorsContext } from '../../../../contexts/RecentColorsContext';
-import { Form, Icon, Input, Label, Picker } from '../../../../core';
+import { Form, Icon, Input, Picker } from '../../../../core';
 import { Category, PrintCategory, tableNames } from '../../../../models';
 import { colors } from '../../../../theme';
 import { moderateScale } from '../../../../utils/scaling';
@@ -22,7 +22,7 @@ type ModalCategoryDetailsOuterProps = {
 };
 
 type ModalCategoryDetailsInnerProps = {
-  itemsCount: number;
+  itemsCount?: number;
   printCategories: PrintCategory[];
 };
 
@@ -63,29 +63,33 @@ export const ModalCategoryDetailsInner: React.FC<ModalCategoryDetailsOuterProps 
   const { organization } = useContext(OrganizationContext);
   const { recentColors, setRecentColors } = useContext(RecentColorsContext);
   const database = useDatabase();
-
-  console.log('printCategories', printCategories);
+  console.log('printCategories ', printCategories);
   const [loading, setLoading] = useState(false);
 
   const categorySchema = generateCategorySchema(organization.shortNameLength);
 
   const update = async (values: FormValues, category: Category) => {
+    console.log('values', values);
     setLoading(true);
+    const printCategory = printCategories.find(pC => pC.id === values.printCategoryId);
+    console.log('printCategory', printCategory);
     if (category) {
       await database.action(() =>
-        category.update(record =>
-          Object.assign(record, { ...omit(values, 'name'), positionIndex: parseInt(values.positionIndex) }),
-        ),
+        category.update(record => {
+          printCategory && record.printCategory.set(printCategory);
+          Object.assign(record, { ...omit(values, 'name'), positionIndex: parseInt(values.positionIndex, 10) });
+        }),
       );
     } else {
       const categoryCollection = database.collections.get<Category>(tableNames.categories);
       await database.action(() =>
-        categoryCollection.create(record =>
+        categoryCollection.create(record => {
+          printCategory && record.printCategory.set(printCategory);
           Object.assign(record, {
             ...values,
             positionIndex: parseInt(values.positionIndex),
-          }),
-        ),
+          });
+        }),
       );
     }
     setLoading(false);
@@ -126,7 +130,7 @@ export const ModalCategoryDetailsInner: React.FC<ModalCategoryDetailsOuterProps 
             title={title}
             isPrimaryDisabled={loading}
             size="small"
-            isDeleteDisabled={category && itemsCount > 0}
+            isDeleteDisabled={!category || itemsCount > 0}
             onPressDelete={onDelete}
           >
             <Form>
@@ -136,7 +140,13 @@ export const ModalCategoryDetailsInner: React.FC<ModalCategoryDetailsOuterProps 
                 </ItemField>
               )}
 
-              <ItemField label="Short Name" touched={touched.shortName} name="shortName" errors={errors.shortName}>
+              <ItemField
+                label="Short Name"
+                touched={touched.shortName}
+                name="shortName"
+                errors={errors.shortName}
+                description="Used on printers where space is restricted"
+              >
                 <Input onChangeText={handleChange('shortName')} onBlur={handleBlur('shortName')} value={shortName} />
               </ItemField>
 
@@ -185,7 +195,6 @@ export const ModalCategoryDetailsInner: React.FC<ModalCategoryDetailsOuterProps 
                 />
               </ItemField>
 
-              <Label>Use this category instead when grouping items to send to printers</Label>
               <ItemField
                 picker
                 label="Print Category"
@@ -195,6 +204,7 @@ export const ModalCategoryDetailsInner: React.FC<ModalCategoryDetailsOuterProps 
                 style={{
                   alignItems: 'flex-start',
                 }}
+                description="Optional category to group by when sending to printers."
               >
                 <Picker
                   mode="dropdown"
@@ -202,6 +212,10 @@ export const ModalCategoryDetailsInner: React.FC<ModalCategoryDetailsOuterProps 
                   placeholder="Select print category (optional)"
                   selectedValue={printCategoryId}
                   onValueChange={handleChange('printCategoryId')}
+                  textStyle={{
+                    paddingLeft: 0,
+                    paddingRight: 0,
+                  }}
                 >
                   {printCategories.map(printCategory => (
                     <Picker.Item key={printCategory.id} label={printCategory.name} value={printCategory.id} />
@@ -221,11 +235,18 @@ const enhance = c =>
     withObservables<ModalCategoryDetailsOuterProps, ModalCategoryDetailsInnerProps>(
       ['category'],
       ({ category, database }) => {
-        return {
-          category,
-          itemsCount: category.items.observeCount(),
-          printCategories: database.collections.get<PrintCategory>(tableNames.printCategories).query(),
-        };
+        console.log('category ', category);
+        if (category) {
+          return {
+            category,
+            itemsCount: category.items.observeCount(),
+            printCategories: database.collections.get<PrintCategory>(tableNames.printCategories).query(),
+          };
+        } else {
+          return {
+            printCategories: database.collections.get<PrintCategory>(tableNames.printCategories).query(),
+          };
+        }
       },
     )(c),
   );

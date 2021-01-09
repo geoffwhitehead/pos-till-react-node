@@ -4,6 +4,7 @@ import withObservables from '@nozbe/with-observables';
 import { FieldArray, Formik } from 'formik';
 import { capitalize, keyBy } from 'lodash';
 import React, { useContext, useEffect, useState } from 'react';
+import { StyleSheet } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import * as Yup from 'yup';
 import { ItemField } from '../../../../components/ItemField/ItemField';
@@ -21,10 +22,8 @@ import {
   PrinterGroup,
   tableNames,
 } from '../../../../models';
-import { styles } from '../../../../styles';
-import { moderateScale } from '../../../../utils/scaling';
+import { styles as commonStyles } from '../../../../styles';
 import { ModifierRow } from './ModifierRow';
-
 interface ItemDetailsOuterProps {
   item?: ItemModel;
   onClose: () => void;
@@ -215,13 +214,15 @@ const ItemDetailsInner: React.FC<ItemDetailsOuterProps & ItemDetailsInnerProps> 
             onPressSecondaryButton={onClose}
             secondaryButtonText="Cancel"
             onPressDelete={() => areYouSure(handleDelete, item)}
-            size="medium"
+            // size="medium"
           >
             <Grid>
               <Row>
-                <Col style={styles.columnLeft}>
+                <Col style={styles.column}>
                   <ScrollView>
                     <Form>
+                      <H3 style={styles.heading}>Details</H3>
+
                       <ItemField label="Name" touched={touched.name} name="name" errors={errors.name}>
                         <Input onChangeText={handleChange('name')} onBlur={handleBlur('name')} value={name} />
                       </ItemField>
@@ -231,6 +232,7 @@ const ItemDetailsInner: React.FC<ItemDetailsOuterProps & ItemDetailsInnerProps> 
                         touched={touched.shortName}
                         name="shortName"
                         errors={errors.shortName}
+                        description="Used on printers where space is restricted"
                       >
                         <Input
                           onChangeText={handleChange('shortName')}
@@ -255,6 +257,10 @@ const ItemDetailsInner: React.FC<ItemDetailsOuterProps & ItemDetailsInnerProps> 
                           placeholder="Select category"
                           selectedValue={categoryId}
                           onValueChange={handleChange('categoryId')}
+                          textStyle={{
+                            paddingLeft: 0,
+                            paddingRight: 0,
+                          }}
                         >
                           {categories.map(({ id, name }) => (
                             <Picker.Item key={id} label={name} value={id} />
@@ -278,6 +284,10 @@ const ItemDetailsInner: React.FC<ItemDetailsOuterProps & ItemDetailsInnerProps> 
                           placeholder="Select printer group"
                           selectedValue={printerGroupId}
                           onValueChange={handleChange('printerGroupId')}
+                          textStyle={{
+                            paddingLeft: 0,
+                            paddingRight: 0,
+                          }}
                         >
                           {[...printerGroups, { id: '', name: 'No Selection' }].map(({ id, name }) => (
                             <Picker.Item key={id} label={name} value={id} />
@@ -287,9 +297,9 @@ const ItemDetailsInner: React.FC<ItemDetailsOuterProps & ItemDetailsInnerProps> 
                     </Form>
                   </ScrollView>
                 </Col>
-                <Col style={styles.columnRight}>
+                <Col style={styles.column}>
                   <Form>
-                    <H3>Price Groups</H3>
+                    <H3 style={styles.heading}>Prices</H3>
                     <ScrollView>
                       <FieldArray
                         name="prices"
@@ -316,41 +326,40 @@ const ItemDetailsInner: React.FC<ItemDetailsOuterProps & ItemDetailsInnerProps> 
                     </ScrollView>
                   </Form>
                 </Col>
-              </Row>
-
-              <Row style={{ height: moderateScale(80) }}>
-                <H3 style={{ paddingTop: 20, ...styles.heading }}>Modifiers</H3>
-              </Row>
-              <Row style={styles.row}>
-                <Col>
-                  <ListItem itemDivider>
-                    <Text>Assigned</Text>
-                  </ListItem>
-                  <ScrollView>
-                    <List>
-                      {selectedModifiers.map(m => (
-                        <ModifierRow isLeft key={m.id} modifier={m} onSelect={m => setAssignedModifiers(m)} />
-                      ))}
-                    </List>
-                  </ScrollView>
-                </Col>
-                <Col>
-                  <ListItem itemDivider>
-                    <Text>Available</Text>
-                  </ListItem>
-                  <ScrollView>
-                    <List>
-                      {modifiers
-                        .filter(m => !selectedModifiers.includes(m))
-                        .map(m => (
-                          <ModifierRow
-                            key={m.id}
-                            modifier={m}
-                            onSelect={m => setSelectedModifiers([...selectedModifiers, m])}
-                          />
-                        ))}
-                    </List>
-                  </ScrollView>
+                <Col style={{ ...styles.column, ...styles.modifierRow }}>
+                  <H3 style={styles.heading}>Modifiers</H3>
+                  <Row style={commonStyles.row}>
+                    <Col>
+                      <ListItem itemDivider>
+                        <Text>Assigned</Text>
+                      </ListItem>
+                      <ScrollView>
+                        <List>
+                          {selectedModifiers.map(m => (
+                            <ModifierRow isLeft key={m.id} modifier={m} onSelect={m => setAssignedModifiers(m)} />
+                          ))}
+                        </List>
+                      </ScrollView>
+                    </Col>
+                    <Col>
+                      <ListItem itemDivider>
+                        <Text>Available</Text>
+                      </ListItem>
+                      <ScrollView>
+                        <List>
+                          {modifiers
+                            .filter(m => !selectedModifiers.includes(m))
+                            .map(m => (
+                              <ModifierRow
+                                key={m.id}
+                                modifier={m}
+                                onSelect={m => setSelectedModifiers([...selectedModifiers, m])}
+                              />
+                            ))}
+                        </List>
+                      </ScrollView>
+                    </Col>
+                  </Row>
                 </Col>
               </Row>
             </Grid>
@@ -360,6 +369,12 @@ const ItemDetailsInner: React.FC<ItemDetailsOuterProps & ItemDetailsInnerProps> 
     </Formik>
   );
 };
+
+const styles = StyleSheet.create({
+  column: { padding: 10 },
+  heading: { paddingBottom: 20 },
+  modifierRow: { flexGrow: 2 },
+});
 
 const enhance = c =>
   withDatabase<any>(

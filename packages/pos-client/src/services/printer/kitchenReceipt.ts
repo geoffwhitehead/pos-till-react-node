@@ -105,7 +105,6 @@ export const kitchenReceipt = async (p: {
         printer: keyedPrinters[printerId],
         keyedCategories,
         keyedPrintCategories,
-        groupByPrintCategory: printItemGrouping === PrintItemGroupingEnum.printCategory,
       };
     });
   });
@@ -140,18 +139,8 @@ const generateBillItemCommands = (p: {
   reference: string;
   keyedCategories: Dictionary<Category>;
   keyedPrintCategories: Dictionary<PrintCategory>;
-  groupByPrintCategory: boolean;
 }) => {
-  const {
-    itemsToPrint,
-    priceGroup,
-    printer,
-    prepTime,
-    reference,
-    keyedCategories,
-    keyedPrintCategories,
-    groupByPrintCategory,
-  } = p;
+  const { itemsToPrint, priceGroup, printer, prepTime, reference, keyedCategories, keyedPrintCategories } = p;
 
   let c = [];
 
@@ -188,18 +177,17 @@ const generateBillItemCommands = (p: {
   }));
 
   const groupedByCategory = groupBy(quantifiedItems, group => {
-    if (groupByPrintCategory) {
-      const category = keyedCategories[group.billItem.categoryId];
-      return keyedPrintCategories[category.printCategoryId];
-    } else {
-      return group.billItem.categoryId;
-    }
+    const category = keyedCategories[group.billItem.categoryId];
+    // Note: if the user has provided a print category to group by use this.
+    return category.printCategoryId || category.id;
   });
 
   Object.entries(groupedByCategory).map(([categoryId, quantifiedItems]) => {
-    const categoryShortName = groupByPrintCategory
-      ? keyedPrintCategories[categoryId]?.shortName
-      : keyedCategories[categoryId]?.shortName;
+    const printCategory = keyedPrintCategories[categoryId]?.shortName;
+    const category = keyedCategories[categoryId]?.shortName;
+
+    // Note: use the print category if defined otherwise default to standard category id
+    const categoryShortName = printCategory || category;
 
     c.push({ appendBitmapText: subHeader(categoryShortName?.toUpperCase() || 'OTHER', printer.printWidth) });
 
