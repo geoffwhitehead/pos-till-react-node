@@ -6,6 +6,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { groupBy, times } from 'lodash';
 import React, { useContext, useState } from 'react';
 import { ScrollView, StyleSheet } from 'react-native';
+import { Modal } from '../../../../components/Modal/Modal';
 import { SearchHeader } from '../../../../components/SearchHeader/SearchHeader';
 import { ItemsContext } from '../../../../contexts/ItemsContext';
 import { OrganizationContext } from '../../../../contexts/OrganizationContext';
@@ -16,6 +17,7 @@ import { CategoryViewTypeEnum } from '../../../../models/Organization';
 import { CheckoutItemStackParamList } from '../../../../navigators/CheckoutItemNavigator';
 import { fontSizes } from '../../../../theme';
 import { GRID_SPACING } from '../../../../utils/consts';
+import { EditDisplayModal } from './sub-components/EditDisplayModal/EditDisplayModal';
 
 interface CategoriesInnerProps {
   categories: Category[];
@@ -32,13 +34,34 @@ export const CategoriesInner: React.FC<CategoriesOuterProps & CategoriesInnerPro
   const { priceGroup } = useContext(PriceGroupContext);
   const { organization } = useContext(OrganizationContext);
   const { groupedSortedItems, setCategoryItems } = useContext(ItemsContext);
+  const [isEditing, setIsEditing] = useState(false);
+  const [modalOpen, setModalOpen] = useState<boolean>(false);
+  const [selectedCategory, setSelectedCategory] = useState<Category>();
+  const [selectedPositionIndex, setSelectedPositionIndex] = useState<number>();
 
   const onPressCategoryFactory = (params: { category: Category; priceGroup: PriceGroup }) => () => {
     const { category, priceGroup } = params;
-    setCategoryItems(groupedSortedItems[category.id]);
-    navigation.navigate('CategoryItemsList', {
-      priceGroupId: priceGroup.id,
-    });
+    if (isEditing) {
+      setSelectedCategory(category);
+      setSelectedPositionIndex(category.positionIndex);
+      setModalOpen(true);
+    } else {
+      setCategoryItems(groupedSortedItems[category.id]);
+      navigation.navigate('CategoryItemsList', {
+        priceGroupId: priceGroup.id,
+      });
+    }
+  };
+
+  const onCloseHandler = () => {
+    setModalOpen(false);
+    setSelectedCategory(null);
+    setSelectedPositionIndex(null);
+  };
+
+  const handleEmptyPosition = (index: number) => {
+    setModalOpen(true);
+    setSelectedPositionIndex(index);
   };
 
   const onSearchHandler = (value: string) => setSearchValue(value);
@@ -55,11 +78,20 @@ export const CategoriesInner: React.FC<CategoriesOuterProps & CategoriesInnerPro
 
   const groupedCategoriesByPosition = groupBy(searchedCategories, category => category.positionIndex);
 
+  const handleSetEditing = () => {
+    setIsEditing(!isEditing);
+  };
   return (
     <Container>
       <SearchHeader onChangeText={onSearchHandler} value={searchValue} showPriceGroup />
-      <ListItem itemHeader first>
+      <ListItem itemHeader first style={styles.itemHeader}>
         <Text style={{ fontWeight: 'bold' }}>Categories</Text>
+        {isGridView && (
+          <Button style={styles.editButton} success={isEditing} small info={!isEditing} onPress={handleSetEditing}>
+            {!isEditing && <Icon name="ios-build-outline" />}
+            {isEditing && <Icon name="checkmark" />}
+          </Button>
+        )}
       </ListItem>
 
       {isListView && (
@@ -110,6 +142,20 @@ export const CategoriesInner: React.FC<CategoriesOuterProps & CategoriesInnerPro
                           </Text>
                         </Button>
                       )}
+                      {isEditing && !category && (
+                        <Button
+                          style={{ ...styles.button, backgroundColor: 'lightgrey' }}
+                          info
+                          onPress={() => handleEmptyPosition(position)}
+                        >
+                          <Text
+                            style={{
+                              ...styles.buttonText,
+                              fontSize: gridSize > 4 ? fontSizes[4] : fontSizes[5],
+                            }}
+                          ></Text>
+                        </Button>
+                      )}
                     </Col>
                   );
                 })}
@@ -118,6 +164,14 @@ export const CategoriesInner: React.FC<CategoriesOuterProps & CategoriesInnerPro
           })}
         </Grid>
       )}
+      <Modal isOpen={modalOpen} onClose={onCloseHandler}>
+        <EditDisplayModal
+          selectedCategory={selectedCategory}
+          onClose={onCloseHandler}
+          categories={categories}
+          selectedPositionIndex={selectedPositionIndex}
+        />
+      </Modal>
     </Container>
   );
 };
@@ -127,7 +181,7 @@ export const Categories = withDatabase<any>(
     categories: database.collections
       .get('categories')
       .query()
-      .observeWithColumns(['position_index']),
+      .observeWithColumns(['position_index', 'backgroundColor', 'textColor']),
   }))(CategoriesInner),
 );
 
@@ -169,4 +223,6 @@ const styles = StyleSheet.create({
     textShadowOffset: { width: -1, height: 1 },
     textShadowRadius: 10,
   },
+  itemHeader: { justifyContent: 'space-between' },
+  editButton: { alignSelf: 'center', marginRight: 5 },
 });

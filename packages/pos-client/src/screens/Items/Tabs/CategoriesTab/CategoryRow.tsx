@@ -2,13 +2,14 @@ import withObservables from '@nozbe/with-observables';
 import React from 'react';
 import { StyleSheet } from 'react-native';
 import { Button, Left, ListItem, Right, Text, View } from '../../../../core';
-import { Category } from '../../../../models';
+import { Category, PrintCategory } from '../../../../models';
 
 type CategoryRowOuterProps = {
   onSelect: (category: Category) => void;
   index: number;
   key: string;
   category: Category;
+  printCategory?: PrintCategory;
 };
 
 type CategoryRowInnerProps = {
@@ -20,6 +21,7 @@ const CategoryRowInner: React.FC<CategoryRowOuterProps & CategoryRowInnerProps> 
   index,
   itemsCount,
   category,
+  printCategory,
   ...props
 }) => {
   return (
@@ -35,7 +37,7 @@ const CategoryRowInner: React.FC<CategoryRowOuterProps & CategoryRowInnerProps> 
           >{`${index + 1}: ${category.name}`}</Text>
         </View>
         <Text style={styles.text} note>{`Assigned: ${itemsCount} Items`}</Text>
-        <Text style={styles.text} note>{`Position Index: ${category.positionIndex}`}</Text>
+        <Text style={styles.text} note>{`Print Category: ${printCategory?.shortName || 'None'}`}</Text>
       </Left>
       <Right>
         <Button bordered info small onPress={() => onSelect(category)} transparent>

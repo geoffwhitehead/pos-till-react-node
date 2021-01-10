@@ -19,11 +19,11 @@ import { moderateScale } from '../../../../utils/scaling';
 type ModalCategoryDetailsOuterProps = {
   onClose: () => void;
   category?: Category;
+  printCategories: PrintCategory[];
 };
 
 type ModalCategoryDetailsInnerProps = {
   itemsCount?: number;
-  printCategories: PrintCategory[];
 };
 
 type FormValues = {
@@ -31,7 +31,6 @@ type FormValues = {
   shortName: string;
   backgroundColor: string;
   textColor: string;
-  positionIndex: string;
   printCategoryId: string;
 };
 
@@ -50,7 +49,6 @@ const generateCategorySchema = (shortNameLength: number) =>
     textColor: Yup.string()
       .length(7, 'Incorrect length')
       .required(),
-    positionIndex: Yup.number().required(),
     printCategoryId: Yup.string().notRequired(),
   });
 
@@ -63,21 +61,18 @@ export const ModalCategoryDetailsInner: React.FC<ModalCategoryDetailsOuterProps 
   const { organization } = useContext(OrganizationContext);
   const { recentColors, setRecentColors } = useContext(RecentColorsContext);
   const database = useDatabase();
-  console.log('printCategories ', printCategories);
   const [loading, setLoading] = useState(false);
 
   const categorySchema = generateCategorySchema(organization.shortNameLength);
 
   const update = async (values: FormValues, category: Category) => {
-    console.log('values', values);
     setLoading(true);
     const printCategory = printCategories.find(pC => pC.id === values.printCategoryId);
-    console.log('printCategory', printCategory);
     if (category) {
       await database.action(() =>
         category.update(record => {
           printCategory && record.printCategory.set(printCategory);
-          Object.assign(record, { ...omit(values, 'name'), positionIndex: parseInt(values.positionIndex, 10) });
+          Object.assign(record, { ...omit(values, 'name') });
         }),
       );
     } else {
@@ -85,10 +80,7 @@ export const ModalCategoryDetailsInner: React.FC<ModalCategoryDetailsOuterProps 
       await database.action(() =>
         categoryCollection.create(record => {
           printCategory && record.printCategory.set(printCategory);
-          Object.assign(record, {
-            ...values,
-            positionIndex: parseInt(values.positionIndex),
-          });
+          Object.assign(record, values);
         }),
       );
     }
@@ -101,7 +93,6 @@ export const ModalCategoryDetailsInner: React.FC<ModalCategoryDetailsOuterProps 
     shortName: category?.shortName || '',
     backgroundColor: category?.backgroundColor || colors.highlightBlue,
     textColor: category?.textColor || '#ffffff',
-    positionIndex: category?.positionIndex.toString() || '0',
     printCategoryId: category?.printCategoryId || '',
   };
 
@@ -117,7 +108,7 @@ export const ModalCategoryDetailsInner: React.FC<ModalCategoryDetailsOuterProps 
       onSubmit={values => update(values, category)}
     >
       {({ handleChange, handleBlur, handleSubmit, errors, touched, values }) => {
-        const { shortName, name, backgroundColor, textColor, positionIndex, printCategoryId } = values;
+        const { shortName, name, backgroundColor, textColor, printCategoryId } = values;
 
         const title = category ? `${capitalize(category.name)}` : 'New Category';
 
@@ -148,19 +139,6 @@ export const ModalCategoryDetailsInner: React.FC<ModalCategoryDetailsOuterProps 
                 description="Used on printers where space is restricted"
               >
                 <Input onChangeText={handleChange('shortName')} onBlur={handleBlur('shortName')} value={shortName} />
-              </ItemField>
-
-              <ItemField
-                label="Grid Position"
-                touched={touched.positionIndex}
-                name="positionIndex"
-                errors={errors.positionIndex}
-              >
-                <Input
-                  onChangeText={handleChange('positionIndex')}
-                  onBlur={handleBlur('positionIndex')}
-                  value={positionIndex}
-                />
               </ItemField>
 
               <ItemField
@@ -240,12 +218,9 @@ const enhance = c =>
           return {
             category,
             itemsCount: category.items.observeCount(),
-            printCategories: database.collections.get<PrintCategory>(tableNames.printCategories).query(),
           };
         } else {
-          return {
-            printCategories: database.collections.get<PrintCategory>(tableNames.printCategories).query(),
-          };
+          return {};
         }
       },
     )(c),
@@ -262,4 +237,4 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   colorPicker: { width: '100%', flex: 0 },
-} as const);
+});
