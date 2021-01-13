@@ -220,7 +220,9 @@ const enhance = c =>
             itemsCount: category.items.observeCount(),
           };
         } else {
-          return {};
+          return {
+            printCategories: database.collections.get<PrintCategory>(tableNames.printCategories).query(),
+          };
         }
       },
     )(c),

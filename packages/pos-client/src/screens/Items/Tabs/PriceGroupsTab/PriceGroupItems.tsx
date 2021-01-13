@@ -118,12 +118,6 @@ export const PriceGroupItemsInner: React.FC<PriceGroupItemsOuterProps & PriceGro
                                 value={price}
                               />
                             </ItemField>
-                            {/* <Left>
-                          <Text>{index}</Text>
-                        </Left>
-                        <Right>
-
-                        </Right> */}
                           </ListItem>
                         );
                       });

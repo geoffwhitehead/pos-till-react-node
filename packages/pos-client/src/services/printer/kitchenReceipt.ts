@@ -1,5 +1,5 @@
 import dayjs, { Dayjs } from 'dayjs';
-import { capitalize, Dictionary, flatten, groupBy, keyBy } from 'lodash';
+import { capitalize, Dictionary, flatten, groupBy, keyBy, sortBy } from 'lodash';
 import {
   Bill,
   BillCallPrintLog,
@@ -17,6 +17,8 @@ import { alignCenter, alignLeftRightSingle, starDivider, subHeader } from './hel
 
 const MOD_PREFIX = '- ';
 const REF_NAME = 'Table';
+
+const timeFormat = 'h:mm a';
 
 export const kitchenCall = async (p: {
   bill: Bill;
@@ -121,7 +123,7 @@ const generateBillCallCommands = (p: { printer: Printer; reference: number; bill
 
   let c = [];
 
-  c.push({ appendBitmapText: alignCenter('IN: ' + dayjs().format('HH:mm'), printer.printWidth) });
+  c.push({ appendBitmapText: alignCenter('IN: ' + dayjs().format(timeFormat), printer.printWidth) });
   c.push({ appendBitmapText: alignCenter('CALL: ' + reference, printer.printWidth) });
 
   return {
@@ -146,8 +148,8 @@ const generateBillItemCommands = (p: {
 
   const pGName = priceGroup.shortName || priceGroup.name;
   c.push({ appendBitmapText: alignCenter(pGName.toUpperCase(), printer.printWidth) });
-  c.push({ appendBitmapText: alignCenter('IN: ' + dayjs().format('HH:mm'), printer.printWidth) });
-  prepTime && c.push({ appendBitmapText: alignCenter('PREP: ' + prepTime.format('HH:mm'), printer.printWidth) });
+  c.push({ appendBitmapText: alignCenter('IN: ' + dayjs().format(timeFormat), printer.printWidth) });
+  prepTime && c.push({ appendBitmapText: alignCenter('PREP: ' + prepTime.format(timeFormat), printer.printWidth) });
   c.push({ appendBitmapText: alignCenter(REF_NAME.toUpperCase() + ': ' + reference, printer.printWidth) });
   c.push(starDivider(printer.printWidth));
 
@@ -182,7 +184,12 @@ const generateBillItemCommands = (p: {
     return category.printCategoryId || category.id;
   });
 
-  Object.entries(groupedByCategory).map(([categoryId, quantifiedItems]) => {
+  sortBy(Object.entries(groupedByCategory), ([categoryId, quantifiedItems]) => {
+    const category = keyedCategories[categoryId];
+    const printCategory = keyedPrintCategories[categoryId];
+
+    return printCategory.displayOrder || category.shortName || 0;
+  }).map(([categoryId, quantifiedItems]) => {
     const printCategory = keyedPrintCategories[categoryId]?.shortName;
     const category = keyedCategories[categoryId]?.shortName;
 

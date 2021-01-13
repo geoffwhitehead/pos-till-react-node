@@ -165,15 +165,6 @@ export const CategoryItems = withDatabase<any>(
     const { priceGroupId } = route.params as CheckoutItemStackParamList['CategoryItemsList'];
     return {
       priceGroup: database.collections.get<PriceGroup>(tableNames.priceGroups).findAndObserve(priceGroupId),
-      // items: category.items.extend(
-      //   Q.on(tableNames.itemPrices, [Q.where('price_group_id', priceGroupId), Q.where('price', Q.notEq(null))]),
-      // ),
-      // prices: database.collections
-      //   .get<ItemPrice>(tableNames.itemPrices)
-      //   .query(
-      //     Q.and(Q.where('price', Q.notEq(null)), Q.where('price_group_id', priceGroupId)),
-      //     Q.on(tableNames.items, Q.where('category_id', category.id)),
-      //   ),
     };
   })(MemoCategoryItemsInner),
 );

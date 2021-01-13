@@ -11,7 +11,6 @@ import { Form, Icon, Input, Label, List, ListItem, Picker, Text, View } from '..
 import { database } from '../../../../database';
 import { Category, Item, ItemPrice, PriceGroup } from '../../../../models';
 import { moderateScale } from '../../../../utils/scaling';
-import { commonStyles } from '../../../Settings/Tabs/styles';
 
 type PriceGroupItemsOuterProps = {
   onClose: () => void;
@@ -115,7 +114,8 @@ export const PriceGroupItemsModalInner: React.FC<PriceGroupItemsInnerProps & Pri
           >
             <>
               {pricesUpdatedSucessfully && <Text style={styles.pricesUpdatedText}>Prices updated successfully</Text>}
-              <ListItem itemDivider style={styles.categoryPickerItem}>
+
+              <ListItem first style={styles.categoryPickerItem}>
                 <Label>
                   <Text style={styles.categoryPickerText}>Category: </Text>
                 </Label>
@@ -126,10 +126,7 @@ export const PriceGroupItemsModalInner: React.FC<PriceGroupItemsInnerProps & Pri
                   placeholder="Select a category"
                   selectedValue={selectedCategory}
                   onValueChange={handleCategoryChange}
-                  textStyle={{
-                    paddingLeft: 0,
-                    paddingRight: 0,
-                  }}
+                  textStyle={styles.pickerText}
                 >
                   {categories.map(category => {
                     return <Picker.Item key={category.id} label={category.name} value={category} />;
@@ -139,7 +136,7 @@ export const PriceGroupItemsModalInner: React.FC<PriceGroupItemsInnerProps & Pri
               {!selectedCategory && <Text>Select a category to show items...</Text>}
               {selectedCategory && (
                 <ScrollView>
-                  <Form style={commonStyles.form}>
+                  <Form>
                     <List>
                       <FieldArray
                         name="prices"
@@ -155,11 +152,13 @@ export const PriceGroupItemsModalInner: React.FC<PriceGroupItemsInnerProps & Pri
                                   errors={errors.sortedItemPrices && errors.sortedItemPrices[index]}
                                   type="fixedLabel"
                                   style={styles.itemField}
+                                  styleLabel={styles.itemFieldLabel}
                                 >
                                   <Input
                                     onChangeText={handleChange(`sortedItemPrices[${index}].price`)}
                                     onBlur={handleBlur(`sortedItemPrices[${index}].price`)}
                                     value={price}
+                                    style={styles.priceInput}
                                   />
                                 </ItemField>
                               </View>
@@ -187,16 +186,28 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderBottomColor: 'whitesmoke',
     borderBottomWidth: 1,
+    justifyContent: 'space-between',
   },
   itemField: {
     borderBottomWidth: 0,
   },
-  listItemLeftText: { paddingRight: 20 },
+  listItemLeftText: { paddingRight: 20, minWidth: moderateScale(50) },
   pricesUpdatedText: {
     color: 'green',
     paddingTop: moderateScale(15),
     paddingBottom: moderateScale(15),
   },
+  priceInput: {
+    alignSelf: 'flex-end',
+    maxWidth: moderateScale(150),
+    textAlign: 'right',
+    paddingRight: 50,
+  },
+  pickerText: {
+    paddingLeft: 0,
+    paddingRight: 0,
+  },
+  itemFieldLabel: { alignSelf: 'center' },
 });
 
 const enhance = c =>

@@ -140,7 +140,9 @@ export const SelectBillInner: React.FC<SelectBillOuterProps & SelectBillInnerPro
           </Col>
         )}
         <Col style={{ width: shouldRenderPlanView ? moderateScale(500) : '100%' }}>
-          {isEditing && !selectedElement && <Text style={{ padding: 15 }}>Select a table element to edit...</Text>}
+          {isEditing && !selectedElement && (
+            <Text style={{ padding: moderateScale(15) }}>Select a table element to edit...</Text>
+          )}
           {isEditing && selectedElement && (
             <TableElementForm
               {...selectedElement}
@@ -148,7 +150,6 @@ export const SelectBillInner: React.FC<SelectBillOuterProps & SelectBillInnerPro
               onDelete={handleDeleteSelectedTableElement}
             />
           )}
-
           {!isEditing && (
             <ScrollView>
               <List>
@@ -184,6 +185,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
     alignItems: 'center',
     alignContent: 'center',
+    minHeight: moderateScale(70),
   },
   switch: {
     width: moderateScale(250),
