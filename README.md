@@ -11,6 +11,7 @@ React native point of sale app.
 ![Screen Prices](/assets/screen-prices.png?raw=true "Screen Prices")
 ![Screen Reports](/assets/screen-reports.png?raw=true "Screen Reports")
 ![Screen Settings](/assets/screen-settings.png?raw=true "Screen Settings")
+![Screen Prep](/assets/screen-prep.png?raw=true "Screen Prep")
 ![Screen Transactions](/assets/screen-transactions.png?raw=true "Screen Transactions")
 
 # Dev notes
