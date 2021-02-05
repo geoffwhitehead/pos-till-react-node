@@ -18,20 +18,45 @@ React native point of sale app.
 
 ## Running on Device
 
-Restoring device:
-connect to mac using official cable.
-power off ipad
-boot into revovery mode: - press volume up then - press and hold power and home button until the recovery screen is shown (power cable). - open finder on mac. The ipad should be shown on the left sidebar under "locations" - press restore button and wait for device to complete the process.
+**Restoring device:**
 
-wireless debugging. - connect device and open xcode. - device should be should in the device list - navigate window -> devices & simulators - find the connected device and tick "connect via network"
+1. connect to mac using official cable.
+2. power off ipad
+3. boot into revovery mode: - press volume up then - press and hold power and home button until the recovery screen is shown (power cable
+4. open finder on mac. The ipad should be shown on the left sidebar under "locations"
+   1. press restore button and wait for device to complete the process.
 
-signing - navigate to the project target. - in the tab navigation click "signing &n capabilities" - set a unique bundle identifier - create a team using apple id.
-device trusting - after signing go to device - `Settings → General → DeviceManagement → <AppName> → Trust`
-building - depending on the device it may be required to alter the target os under general-> deployment info
+**Wireless debugging**
 
-## Deploying (until i get a licence)
+1. connect device and open xcode.
+2. device should be should in the device list
+3. go to navigate window -> devices & simulators - find the connected device and tick "connect via network"
+
+**Signing**
+
+1. navigate to the project target.
+2. in the tab navigation click "signing &n capabilities" - set a unique bundle identifier - create a team using apple id.
+3. device trusting
+   1. after signing go to device - `Settings → General → DeviceManagement → <AppName> → Trust`
+   2. building - depending on the device it may be required to alter the target os under general-> deployment info
+
+## Deploying (no apple developer license)
 
 1. cd /client and run `yarn set:production`
-2. connect device to laptop (use official cable - the cheap ones dont work)
-3. Install altStore / altServer on dev machine
-4.
+2. connect device to laptop (use official cable - the cheap ones dont work). Once it finally detects the ipad (might need to unplug / plugin a few times). Find it in finder -> locations and click trust.
+3. Install altStore / altServer on dev machine (https://altstore.io/faq/)
+   1. Will also need to install the mail plugin. This needs adding and enabling by going into mail -> preferences -> manage plugins.
+4. Once alt store is installed - try to use it. A popup should appear regarding the dev account not being trusted.
+   1. Return to the general tab to find a magical new menu item called device management. Click on this and trust the alt store.
+5. Now alt store is installed you need to get the APK onto the ipad to install. 0. Before doing this make sure the project code signing is setup with a valid account (see running on device above).
+   1. Open xcode and open the project
+   2. Set the scheme to Generic Device (any ios device) and build
+   3. in your list where all your swift files are search for “.app”
+   4. Under the products folder right click your app and select “Show in Finder”
+   5. make a folder on the Desktop named “Payload” and copy your app into it
+   6. right click the folder “Payload” and compress to zip
+   7. after that’s done rename the .zip to .ipa
+6. copy the Payload.ipa file over to the device -> mail / drive / etc
+7. Use altStore -> myApps to navigate to the .ipa file and install.
+8. AltStore has a tendency to crash. Reinstall / try older / newer versions if this is happening.
+9. Make sure to refresh / resign the app atleast every week.
