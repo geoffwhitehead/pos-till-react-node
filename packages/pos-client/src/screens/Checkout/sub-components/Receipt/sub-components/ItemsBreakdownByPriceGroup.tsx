@@ -10,6 +10,7 @@ type ItemsBreakdownByPriceGroupOuterProps = {
   readonly: boolean;
   onSelect: (bI: BillItem) => void;
   priceGroup: PriceGroup;
+  backgroundColor?: string;
 };
 
 type ItemsBreakdownByPriceGroupInnerProps = {
@@ -25,7 +26,7 @@ export const ItemsBreakdownByPriceGroupInner: React.FC<ItemsBreakdownByPriceGrou
 
   return (
     <View {...props}>
-      <ListItem itemDivider first>
+      <ListItem itemDivider first style={{ backgroundColor: priceGroup.color || '#f4f4f4' }}>
         <Text style={{ fontWeight: 'bold' }}>{priceGroup.name}</Text>
         <Text>{` (${billItemsCount} items) `}</Text>
       </ListItem>

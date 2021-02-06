@@ -8,6 +8,7 @@ export const priceGroupSchema = tableSchema({
     { name: 'name', type: 'string' },
     { name: 'short_name', type: 'string' },
     { name: 'is_prep_time_required', type: 'boolean' },
+    { name: 'color', type: 'string', isOptional: true },
   ],
 });
 
@@ -22,6 +23,7 @@ export class PriceGroup extends Model {
   @field('name') name: string;
   @field('short_name') shortName: string;
   @field('is_prep_time_required') isPrepTimeRequired: boolean;
+  @field('color') color: string;
 
   @children('bill_items') billItems: Query<BillItem>;
   @children('item_prices') itemPrices: Query<ItemPrice>;

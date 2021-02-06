@@ -2,10 +2,13 @@ import { useDatabase } from '@nozbe/watermelondb/hooks';
 import { Formik } from 'formik';
 import { capitalize } from 'lodash';
 import React, { useContext, useState } from 'react';
+import { StyleSheet } from 'react-native';
 import * as Yup from 'yup';
 import { ItemField } from '../../../../components/ItemField/ItemField';
 import { ModalContentButton } from '../../../../components/Modal/ModalContentButton';
+import { ModalColorPickerContent } from '../../../../components/ModalColorPicker/ModalColorPicker';
 import { OrganizationContext } from '../../../../contexts/OrganizationContext';
+import { RecentColorsContext } from '../../../../contexts/RecentColorsContext';
 import { Body, CheckBox, Form, Input, ListItem, Text, View } from '../../../../core';
 import {
   Item as ItemModel,
@@ -15,6 +18,7 @@ import {
   PriceGroup,
   tableNames,
 } from '../../../../models';
+import { moderateScale } from '../../../../utils/scaling';
 import { commonStyles } from '../../../Settings/Tabs/styles';
 
 interface PriceGroupDetailsProps {
@@ -32,12 +36,14 @@ const generatePriceGroupDetailsSchema = (shortNameLength: number) =>
       .min(2, 'Too Short')
       .max(shortNameLength, 'Too Long'),
     isPrepTimeRequired: Yup.boolean(),
+    color: Yup.string(),
   });
 
 type FormValues = {
   name: string;
   shortName: string;
   isPrepTimeRequired: boolean;
+  color: string;
 };
 
 export const PriceGroupDetails: React.FC<PriceGroupDetailsProps> = ({ priceGroup, onClose }) => {
@@ -97,6 +103,7 @@ export const PriceGroupDetails: React.FC<PriceGroupDetailsProps> = ({ priceGroup
     name: priceGroup?.name || '',
     shortName: priceGroup?.shortName || '',
     isPrepTimeRequired: priceGroup?.isPrepTimeRequired || false,
+    color: priceGroup?.color || '#f4f4f4',
   };
 
   return (
@@ -106,7 +113,8 @@ export const PriceGroupDetails: React.FC<PriceGroupDetailsProps> = ({ priceGroup
       onSubmit={values => onSave(values, priceGroup)}
     >
       {({ handleChange, handleBlur, handleSubmit, setFieldValue, errors, touched, values }) => {
-        const { name, shortName, isPrepTimeRequired } = values;
+        const { name, shortName, isPrepTimeRequired, color } = values;
+        const { recentColors, setRecentColors } = useContext(RecentColorsContext);
 
         const title = priceGroup ? `${capitalize(priceGroup.name)}` : 'New Price Group';
 
@@ -146,6 +154,22 @@ export const PriceGroupDetails: React.FC<PriceGroupDetailsProps> = ({ priceGroup
                     <Text>Is prep time required</Text>
                   </Body>
                 </ListItem>
+
+                <ItemField
+                  style={styles.colorPickerItem}
+                  label="Color"
+                  touched={touched.color}
+                  name="color"
+                  errors={errors.color}
+                >
+                  <ModalColorPickerContent
+                    style={styles.colorPicker}
+                    onChangeColor={handleChange('backgroundColor')}
+                    colorHex={color}
+                    globalRecentColors={recentColors}
+                    setGlobalRecentColors={setRecentColors}
+                  />
+                </ItemField>
               </Form>
             </View>
           </ModalContentButton>
@@ -154,3 +178,14 @@ export const PriceGroupDetails: React.FC<PriceGroupDetailsProps> = ({ priceGroup
     </Formik>
   );
 };
+
+const styles = StyleSheet.create({
+  colorPickerItem: {
+    flexDirection: 'column',
+    borderBottomWidth: 0,
+    paddingTop: moderateScale(5),
+    paddingBottom: moderateScale(5),
+    alignItems: 'flex-start',
+  },
+  colorPicker: { width: '100%', flex: 0 },
+});

@@ -1,6 +1,6 @@
 import { Schema } from 'mongoose';
-import { tenantModel } from './utils/multiTenant';
 import uuid from 'uuid';
+import { tenantModel } from './utils/multiTenant';
 
 export interface PriceGroupProps {
     _id?: string;
@@ -29,6 +29,10 @@ const PriceGroupSchema: Schema<PriceGroupProps> = new Schema(
         isPrepTimeRequired: {
             type: Boolean,
             default: false,
+        },
+        color: {
+            type: String,
+            required: false,
         },
     },
     { timestamps: true, collection: PRICE_GROUP_COLLECTION_NAME },

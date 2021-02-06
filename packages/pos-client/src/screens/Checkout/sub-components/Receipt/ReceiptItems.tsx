@@ -186,7 +186,7 @@ export const ReceiptItemsInner: React.FC<ReceiptItemsOuterProps & ReceiptItemsIn
                 onPressSecondaryButton={onCloseModalHandler}
                 secondaryButtonText="Cancel"
                 primaryButtonText="Save"
-                title={`${selectedBillItem.itemName}: Add a print message`}
+                title={`${selectedBillItem.itemName}: Print Message`}
                 size="small"
               >
                 <Form>
