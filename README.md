@@ -58,5 +58,9 @@ React native point of sale app.
    7. after that’s done rename the .zip to .ipa
 6. copy the Payload.ipa file over to the device -> mail / drive / etc
 7. Use altStore -> myApps to navigate to the .ipa file and install.
-8. AltStore has a tendency to crash. Reinstall / try older / newer versions if this is happening.
-9. Make sure to refresh / resign the app atleast every week.
+8. Make sure to refresh / resign the app atleast every week.
+
+## AltStore crashes
+
+1. If altstore crashed on loading try a different version.
+2. If altstore crashes when trying to install the app - make sure folder containing the ipa is names Payload / is zipped / has the extension .ipa
