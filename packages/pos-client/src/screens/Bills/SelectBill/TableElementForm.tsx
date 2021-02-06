@@ -89,12 +89,8 @@ export const TableElementForm: React.FC<TableElementFormInnerProps & TableElemen
 
   return (
     <Formik initialValues={initialValues} validationSchema={validationSchema(maxBills)} onSubmit={onSave}>
-      {({ handleChange, handleBlur, resetForm, handleSubmit, setFieldValue, errors, touched, values }) => {
+      {({ handleChange, handleBlur, handleSubmit, errors, touched, values }) => {
         const { billReference, rotation, type } = values;
-
-        // useEffect(() => {
-        //   resetForm({ values: initialValues });
-        // }, [x, y]);
 
         return (
           <View style={{ borderColor: 'lightgrey', borderLeftWidth: 1, height: '100%' }}>
