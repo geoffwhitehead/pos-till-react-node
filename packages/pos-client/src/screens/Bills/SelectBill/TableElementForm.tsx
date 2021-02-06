@@ -76,7 +76,7 @@ export const TableElementForm: React.FC<TableElementFormInnerProps & TableElemen
       rotation: parseInt(values.rotation),
     };
 
-    const tablePlanElementCollection = database.collections.get<TablePlanElement>(tableNames.tablePlanElement);
+    const tablePlanElementCollection = database.collections.get<TablePlanElement>(tableNames.tablePlanElements);
 
     await database.action(() => {
       if (tablePlanElement) {
