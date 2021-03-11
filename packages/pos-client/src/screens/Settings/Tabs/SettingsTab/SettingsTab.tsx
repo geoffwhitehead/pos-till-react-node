@@ -14,6 +14,7 @@ import { OrganizationContext } from '../../../../contexts/OrganizationContext';
 import { ReceiptPrinterContext } from '../../../../contexts/ReceiptPrinterContext';
 import { Button, Container, Footer, Form, Icon, Input, Picker, Text, View } from '../../../../core';
 import { Bill, BillPeriod, PriceGroup, Printer, tableNames } from '../../../../models';
+import { ItemListViewType } from '../../../../models/Organization';
 import { areYouSure } from '../../../../utils/helpers';
 import { moderateScale } from '../../../../utils/scaling';
 import { commonStyles } from '../styles';
@@ -47,6 +48,7 @@ const settingsSchema = Yup.object().shape({
     .min(5, 'Too Low')
     .max(40, 'Too High')
     .required('Required'),
+  itemListViewType: Yup.string().required('Required'),
 });
 
 const currencies = [
@@ -81,6 +83,7 @@ const SettingsTabInner: React.FC<SettingsTabOuterProps & SettingsTabInnerProps> 
     currency: organization.currency,
     maxBills: organization.maxBills.toString(),
     tablePlannerGridSize: organization.billViewPlanGridSize.toString(),
+    itemListViewType: organization.itemListViewType,
   };
 
   const updateOrganization = async values => {
@@ -100,6 +103,7 @@ const SettingsTabInner: React.FC<SettingsTabOuterProps & SettingsTabInnerProps> 
         org.currency = values.currency;
         org.maxBills = parseInt(values.maxBills);
         org.billViewPlanGridSize = parseInt(values.tablePlannerGridSize);
+        org.itemListViewType = values.itemListViewType;
       }),
     );
 
@@ -114,7 +118,14 @@ const SettingsTabInner: React.FC<SettingsTabOuterProps & SettingsTabInnerProps> 
         onSubmit={values => updateOrganization(values)}
       >
         {({ handleChange, handleBlur, handleSubmit, errors, touched, values }) => {
-          const { defaultPriceGroupId, receiptPrinterId, currency, maxBills, tablePlannerGridSize } = values;
+          const {
+            defaultPriceGroupId,
+            receiptPrinterId,
+            currency,
+            maxBills,
+            tablePlannerGridSize,
+            itemListViewType,
+          } = values;
 
           const hasOpenBills = openBills.length > 0;
 
@@ -218,6 +229,33 @@ const SettingsTabInner: React.FC<SettingsTabOuterProps & SettingsTabInnerProps> 
                     >
                       {currencies.map(currency => (
                         <Picker.Item key={currency.id} label={currency.name} value={currency.id} />
+                      ))}
+                    </Picker>
+                  </ItemField>
+
+                  <ItemField
+                    picker
+                    label="Item List View Type"
+                    touched={touched.itemListViewType}
+                    name="itemListViewType"
+                    errors={errors.itemListViewType}
+                    style={{
+                      alignItems: 'flex-start',
+                    }}
+                  >
+                    <Picker
+                      mode="dropdown"
+                      iosIcon={<Icon name="chevron-down-outline" />}
+                      placeholder="Select list view type"
+                      selectedValue={itemListViewType}
+                      onValueChange={handleChange('itemListViewType')}
+                      textStyle={{
+                        paddingLeft: 0,
+                        paddingRight: 0,
+                      }}
+                    >
+                      {Object.values(ItemListViewType).map(listType => (
+                        <Picker.Item key={listType} label={listType} value={listType} /> // TODO update label to be readable
                       ))}
                     </Picker>
                   </ItemField>

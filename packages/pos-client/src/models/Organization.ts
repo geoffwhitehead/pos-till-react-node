@@ -27,6 +27,7 @@ export type OrganizationProps = {
   accessPin: string;
   accessPinEnabled: boolean;
   printItemGrouping: string;
+  itemListViewType: string;
 };
 
 export enum PrintItemGroupingEnum {
@@ -60,6 +61,12 @@ export enum TransactionGroupingEnum {
   ungrouped = 'ungrouped',
 }
 
+// TODO: add to server
+export enum ItemListViewType {
+  listWithHeader = 'listWithHeader',
+  list = 'list',
+  grid = 'grid',
+}
 export class Organization extends Model {
   static table = 'organizations';
 
@@ -90,6 +97,7 @@ export class Organization extends Model {
   @field('access_pin') accessPin: string;
   @field('access_pin_enabled') accessPinEnabled: boolean;
   @field('print_item_grouping') printItemGrouping: PrintItemGroupingEnum;
+  @field('item_list_view_type') itemListViewType: ItemListViewType;
 
   @relation('price_groups', 'default_price_group_id') defaultPriceGroup: Relation<PriceGroup>;
   @relation('printers', 'receipt_printer_id') receiptPrinter: Relation<Printer>;
@@ -135,5 +143,6 @@ export const organizationSchema = tableSchema({
     { name: 'access_pin', type: 'string' },
     { name: 'access_pin_enabled', type: 'boolean' },
     { name: 'print_item_grouping', type: 'string' },
+    { name: 'item_list_view_type', type: 'string' },
   ],
 });

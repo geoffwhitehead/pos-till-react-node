@@ -14,6 +14,7 @@ import { ItemsContext } from '../../../../contexts/ItemsContext';
 import { OrganizationContext } from '../../../../contexts/OrganizationContext';
 import { Button, Left, List, ListItem, Text, View } from '../../../../core';
 import { Item, ItemPrice, Modifier, PriceGroup, tableNames } from '../../../../models';
+import { ItemListViewType } from '../../../../models/Organization';
 import { CheckoutItemStackParamList } from '../../../../navigators/CheckoutItemNavigator';
 import { CategoryItemRow } from './sub-components/CategoryItemRow';
 import { ModifierList } from './sub-components/ModifierList/ModifierList';
@@ -48,7 +49,7 @@ const CategoryItemsInner: React.FC<CategoryItemsListOuterProps & CategoryItemsLi
   const [itemsToDisplay, setItemsToDisplay] = useState<Dictionary<Item[]>>({});
 
   const {
-    organization: { currency },
+    organization: { currency, itemListViewType },
   } = useContext(OrganizationContext);
   const { currentBill } = useContext(CurrentBillContext);
 
@@ -111,6 +112,8 @@ const CategoryItemsInner: React.FC<CategoryItemsListOuterProps & CategoryItemsLi
     setItemsToDisplay(filteredItems);
   }, [selectableItems, searchValue]);
 
+  const isListType = itemListViewType === ItemListViewType.list || itemListViewType === ItemListViewType.listWithHeader;
+
   return (
     <>
       <ListItem itemHeader first>
@@ -122,34 +125,38 @@ const CategoryItemsInner: React.FC<CategoryItemsListOuterProps & CategoryItemsLi
       </ListItem>
       <SearchHeader onChangeText={onSearchHandler} value={searchValue} />
       <ScrollView>
-        <List>
-          {Object.entries(itemsToDisplay).map(([key, items]) => {
-            if (items.length === 0) {
-              return null;
-            }
+        {isListType && (
+          <List>
+            {Object.entries(itemsToDisplay).map(([key, items]) => {
+              if (items.length === 0) {
+                return null;
+              }
 
-            return (
-              <View key={`${key}-divider`}>
-                <ListItem itemDivider style={{ backgroundColor: 'lightgrey' }}>
-                  <Text>{key}</Text>
-                </ListItem>
-                {items.map(item => {
-                  const itemPrice = groupedItemPrices[priceGroup.id][item.id];
-                  return (
-                    <CategoryItemRow
-                      key={item.id}
-                      item={item}
-                      itemPrice={itemPrice}
-                      isActive={selectedItem === item}
-                      onPressItem={onSelectItem}
-                      currency={currency}
-                    />
-                  );
-                })}
-              </View>
-            );
-          })}
-        </List>
+              return (
+                <View key={`${key}-divider`}>
+                  {itemListViewType === ItemListViewType.listWithHeader && (
+                    <ListItem itemDivider style={{ backgroundColor: 'lightgrey' }}>
+                      <Text>{key}</Text>
+                    </ListItem>
+                  )}
+                  {items.map(item => {
+                    const itemPrice = groupedItemPrices[priceGroup.id][item.id];
+                    return (
+                      <CategoryItemRow
+                        key={item.id}
+                        item={item}
+                        itemPrice={itemPrice}
+                        isActive={selectedItem === item}
+                        onPressItem={onSelectItem}
+                        currency={currency}
+                      />
+                    );
+                  })}
+                </View>
+              );
+            })}
+          </List>
+        )}
       </ScrollView>
       <Modal onClose={onCancelHandler} isOpen={modalOpen}>
         <ModifierList priceGroup={priceGroup} currentBill={currentBill} onClose={onCancelHandler} item={selectedItem} />
