@@ -240,11 +240,6 @@ export const ReceiptInner: React.FC<ReceiptOuterProps & ReceiptInnerProps> = ({
   };
 
   const handleSetPrepTime = async (date: Date) => {
-    // dont allow the user to selcet a time in the past
-    if (dayjs(date).isBefore(dayjs())) {
-      return;
-    }
-
     await database.action(() =>
       bill.update(record => {
         record.prepAt = date;
