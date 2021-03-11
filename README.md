@@ -16,6 +16,11 @@ React native point of sale app.
 
 # Dev notes
 
+1. running the server locally:
+
+- yarn docker:build to build the containers
+- the dockerfile is configured for production so will need to run yarn docker:packages afterwards to build the dependencies fully.
+
 ## Running on Device
 
 **Restoring device:**
