@@ -61,11 +61,10 @@ export enum TransactionGroupingEnum {
   ungrouped = 'ungrouped',
 }
 
-// TODO: add to server
 export enum ItemListViewType {
   listWithHeader = 'listWithHeader',
   list = 'list',
-  grid = 'grid',
+  // grid = 'grid', // TODO: WIP
 }
 export class Organization extends Model {
   static table = 'organizations';
