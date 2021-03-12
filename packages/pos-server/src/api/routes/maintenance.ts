@@ -14,7 +14,7 @@ export default (app: Router) => {
 
         const organizationService = Container.get('organizationService') as OrganizationService;
         const printerService = Container.get('printerService') as PrinterService;
-        const productService = Container.get('organizationService') as ProductService;
+        const productService = Container.get('productService') as ProductService;
 
         const organizationId = Container.get('organizationId') as string;
 
@@ -22,13 +22,13 @@ export default (app: Router) => {
 
         try {
             await organizationService.seed();
+
             const [{ printerGroups }, { categories }, _, { priceGroups }] = await Promise.all([
                 printerService.seed(),
                 productService.category.seed(),
                 productService.discount.seed(),
                 productService.priceGroup.seed(),
             ]);
-
             const { modifiers } = await productService.modifier.seed({ priceGroups });
 
             await productService.item.seed({
