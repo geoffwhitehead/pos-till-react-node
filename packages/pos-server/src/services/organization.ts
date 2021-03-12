@@ -43,6 +43,7 @@ export type OrganizationClientProps = {
     accessPin: string;
     accessPinEnabled: boolean;
     printItemGrouping: PrintItemGroupingEnum;
+    itemListViewType: string;
 };
 
 export const organizationFromClient = (organization: OrganizationClientProps): OrganizationProps => {
@@ -71,6 +72,7 @@ export const organizationFromClient = (organization: OrganizationClientProps): O
             accessPin: organization.accessPin,
             accessPinEnabled: organization.accessPinEnabled,
             printItemGrouping: organization.printItemGrouping,
+            itemListViewType: organization.itemListViewType,
         },
         address: {
             line1: organization.addressLine1,
@@ -107,6 +109,7 @@ export const organizationToClient = (organization: OrganizationProps): Organizat
         accessPin: settings.accessPin,
         accessPinEnabled: settings.accessPinEnabled,
         printItemGrouping: settings.printItemGrouping,
+        itemListViewType: settings.itemListViewType,
         addressLine1: address.line1,
         addressLine2: address.line2,
         addressCity: address.city,

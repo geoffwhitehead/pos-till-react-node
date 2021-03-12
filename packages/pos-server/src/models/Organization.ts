@@ -37,6 +37,7 @@ export interface OrganizationSettings {
     accessPin?: string;
     accessPinEnabled?: boolean;
     printItemGrouping?: PrintItemGroupingEnum;
+    itemListViewType?: string;
 }
 
 export const ORGANIZATION_COLLECTION_NAME = 'organizations';
@@ -80,6 +81,12 @@ export enum CurrencyEnum {
 }
 
 export enum CategoryViewTypeEnum {
+    list = 'list',
+    grid = 'grid',
+}
+
+export enum ItemListViewType {
+    listWithHeader = 'listWithHeader',
     list = 'list',
     grid = 'grid',
 }
@@ -148,6 +155,11 @@ const OrganizationSettingsSchema: Schema<OrganizationSettings> = new Schema({
         type: String,
         enum: Object.values(PrintItemGroupingEnum),
         default: PrintItemGroupingEnum.printCategory,
+    },
+    ItemListViewType: {
+        type: String,
+        enum: Object.values(ItemListViewType),
+        default: ItemListViewType.list,
     },
 });
 
