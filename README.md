@@ -48,12 +48,7 @@ React native point of sale app.
 ## Deploying (no apple developer license)
 
 1. cd /client and run `yarn set:production`
-2. connect device to laptop (use official cable - the cheap ones dont work). Once it finally detects the ipad (might need to unplug / plugin a few times). Find it in finder -> locations and click trust.
-3. Install altStore / altServer on dev machine (https://altstore.io/faq/)
-   1. Will also need to install the mail plugin. This needs adding and enabling by going into mail -> preferences -> manage plugins.
-4. Once alt store is installed - try to use it. A popup should appear regarding the dev account not being trusted.
-   1. Return to the general tab to find a magical new menu item called device management. Click on this and trust the alt store.
-5. Now alt store is installed you need to get the APK onto the ipad to install. 0. Before doing this make sure the project code signing is setup with a valid account (see running on device above).
+5. Build APK
    1. Open xcode and open the project
    2. Set the scheme to Generic Device (any ios device) and build
    3. in your list where all your swift files are search for “.app”
@@ -62,10 +57,4 @@ React native point of sale app.
    6. right click the folder “Payload” and compress to zip
    7. after that’s done rename the .zip to .ipa
 6. copy the Payload.ipa file over to the device -> mail / drive / etc
-7. Use altStore -> myApps to navigate to the .ipa file and install.
-8. Make sure to refresh / resign the app atleast every week.
-
-## AltStore crashes
-
-1. If altstore crashed on loading try a different version.
-2. If altstore crashes when trying to install the app - make sure folder containing the ipa is names Payload / is zipped / has the extension .ipa
+7. publish ipk to appdb
