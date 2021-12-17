@@ -55,7 +55,7 @@ Note: you might get an error regarding simulator not found. If this is the case 
    1. after signing go to device - `Settings → General → DeviceManagement → <AppName> → Trust`
    2. building - depending on the device it may be required to alter the target os under general-> deployment info
 
-## Deploying with appdb (requires apple developer license OR a pro appdb account for signing)
+## Publishing with appdb (requires apple developer license OR a pro appdb account for signing)
 
 
 1. cd /client and run `yarn set:production`
@@ -69,7 +69,25 @@ Note: you might get an error regarding simulator not found. If this is the case 
    7. after that’s done rename the .zip to .ipa
 3. publish ipk to appdb
 
+## Installing on device via appdb
+1. Link device (required for first time): Install the appdb profile to allow remote access. Access the qr code show in appdb on device to download the profile.
+2. Signing (requires either a dev license or PRO account). If using dev license - the device identity needs to be associated with your apple account. 
+This will list devices linked to your apple account. https://developer.apple.com/account/resources/devices/list
+- You can add the device automatically by trying to build the app on the device - this will prompt to associate device with account.
+- You can add the device manually using the UDID - https://www.igeeksblog.com/how-to-find-iphone-udid-number/
 
+3. Add developer identity to appdb (follow below or related tut found here https://forum.appdb.to/index.php?/topic/4707-tut-how-to-install-any-app-from-appdb-absolutely-for-free/).
+- copy developer identity certificate: Open keychain access -> create new keychain called dev -> go to login keychain -> go to tab "My certificatee" -> there should be 1 cert - copy this -> paste certificate into dev -> export dev keychain (create and note password for later)
+- copy provisioning profile: provisioning profile is found here `~/Library/MobileDevice/Provisioning\ Profiles` -> copy this to same location as exported certificate above.
+- go to appdb
+- go to "Configure features"
+- fill in the form under "Developer certificate and provisioning profiles for non-jailbreak devices" uplodaing the certificate and provisioning profile and providing the password created before
+- save settings.
+
+4. select correct device in appdb
+5. go to install custom app section
+6. click install on the custom app you uploaded previously.
+7. if successful, there should be a popup message on the ipad asking for permission to install the app
 # Screenshots
 
 ![Screen Bills](/assets/screen-bills.png?raw=true "Screen Bills")
