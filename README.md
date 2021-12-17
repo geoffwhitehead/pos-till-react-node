@@ -69,11 +69,11 @@ Note: you might get an error regarding simulator not found. If this is the case 
    1. after signing go to device - `Settings → General → DeviceManagement → <AppName> → Trust`
    2. building - depending on the device it may be required to alter the target os under general-> deployment info
 
-## Deploying (no apple developer license)
+## Deploying with appdb (requires apple developer license OR a pro appdb account for signing)
 
 
 1. cd /client and run `yarn set:production`
-5. Build APK
+2. Build APK
    1. Open xcode and open the project
    2. Set the scheme to Generic Device (any ios device) and build. In 13.1 this is just called any iOS device (arm64) . This step is important otherwise the upload to appdb will fail with the error. "IPA is encrypted (downloaded from AppStore). You should crack it or find cracked version".
    3. in your list where all your swift files are search for “.app”. In xcode 13.1 it can be found under Products -> Positive.
@@ -81,6 +81,4 @@ Note: you might get an error regarding simulator not found. If this is the case 
    5. make a folder on the Desktop named “Payload” and copy your app into it
    6. right click the folder “Payload” and compress to zip
    7. after that’s done rename the .zip to .ipa
-6. copy the Payload.ipa file over to the device -> mail / drive / etc
-OR
-7. publish ipk to appdb
+3. publish ipk to appdb
