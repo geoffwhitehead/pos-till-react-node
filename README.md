@@ -1,19 +1,5 @@
 React native point of sale app.
 
-# Screenshots
-
-![Screen Bills](/assets/screen-bills.png?raw=true "Screen Bills")
-![Screen Categories](/assets/screen-categories.png?raw=true "Screen Categories")
-![Screen Category List](/assets/screen-category-list.png?raw=true "Screen Category List")
-![Screen Items](/assets/screen-items.png?raw=true "Screen Items")
-![Screen Modifier Select](/assets/screen-modifier-select.png?raw=true "Screen Modifier Select")
-![Screen Modifiers](/assets/screen-modifiers.png?raw=true "Screen Modifiers")
-![Screen Prices](/assets/screen-prices.png?raw=true "Screen Prices")
-![Screen Reports](/assets/screen-reports.png?raw=true "Screen Reports")
-![Screen Settings](/assets/screen-settings.png?raw=true "Screen Settings")
-![Screen Prep](/assets/screen-prep.png?raw=true "Screen Prep")
-![Screen Transactions](/assets/screen-transactions.png?raw=true "Screen Transactions")
-
 # Dev notes
 
 tools: heroku is used to host server
@@ -82,3 +68,18 @@ Note: you might get an error regarding simulator not found. If this is the case 
    6. right click the folder “Payload” and compress to zip
    7. after that’s done rename the .zip to .ipa
 3. publish ipk to appdb
+
+
+# Screenshots
+
+![Screen Bills](/assets/screen-bills.png?raw=true "Screen Bills")
+![Screen Categories](/assets/screen-categories.png?raw=true "Screen Categories")
+![Screen Category List](/assets/screen-category-list.png?raw=true "Screen Category List")
+![Screen Items](/assets/screen-items.png?raw=true "Screen Items")
+![Screen Modifier Select](/assets/screen-modifier-select.png?raw=true "Screen Modifier Select")
+![Screen Modifiers](/assets/screen-modifiers.png?raw=true "Screen Modifiers")
+![Screen Prices](/assets/screen-prices.png?raw=true "Screen Prices")
+![Screen Reports](/assets/screen-reports.png?raw=true "Screen Reports")
+![Screen Settings](/assets/screen-settings.png?raw=true "Screen Settings")
+![Screen Prep](/assets/screen-prep.png?raw=true "Screen Prep")
+![Screen Transactions](/assets/screen-transactions.png?raw=true "Screen Transactions")
