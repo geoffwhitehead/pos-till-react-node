@@ -19,6 +19,7 @@ React native point of sale app.
 tools: heroku is used to host server
 db: mongodb - can find srv in heroku
 mongodb compass: for inspecting db. srv in heroku
+cocoapods: for running client
 
 # Running server
 
@@ -31,11 +32,18 @@ mongodb compass: for inspecting db. srv in heroku
 
 Xcode: xcode is required in order to build the app. Its possible to download multiple version from here including the command line tools: https://developer.apple.com/download/all/
 
+Note: Might encounter a few syntax errors in node modules. I cant find the stack overflow link anymore but there are 2 files to update to fix this. One is to update a generic to Class. The other is to simply comment out the contents of a catch statement where its trying to log. If you check the build errors when it fails it shoudl show where the errors are occuring and you can do the above.
 
+build steps
+1. run nvm use from `pos-client/`
+2. yarn
+3. cd into `/ios` and run `pod install` OR run 'yarn pod` from `pos-client/`
+
+init app
 1. `yarn start` to run metro debugger
 2. `yarn dev:ios` to start app. 
-Note: you might get an error regarding simulator not found. If this is the case - check the simulator is installed in xcode (pay attention to version / generation as it needs to match)
-3. can open context menu with cmd+d and select debug to open chrome debugger
+Note: you might get an error regarding simulator not found. If this is the case - check the simulator is installed in xcode (pay attention to version / generation as it needs to match). If outdated, updated the script to target a later ios simulator.
+3. DEBUG: open context menu with cmd+d and select debug to open chrome debugger
 ## Running on Device
 
 **Restoring device:**
