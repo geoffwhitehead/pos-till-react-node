@@ -17,7 +17,7 @@ export const receiptTempate = (commands: any[], organization: Organization, prin
     { appendBitmapText: alignCenter(addressPostcode, printWidth) },
     { appendBitmapText: ' ' },
     {
-      appendBitmapText: alignLeftRight(`Date: ${dayjs().format('DD/MM/YYYY')}`, `Time: ${dayjs().format('HH:mm:ss')}`, printWidth, Math.round(printWidth / 2)),
+      appendBitmapText: alignLeftRight(`Date: ${dayjs().format('DD/MM/YYYY')}`, `Time: ${dayjs().format('HH:mm')}`, printWidth, Math.round(printWidth / 2)),
     },
     { appendBitmapText: ' ' },
     ...commands,
