@@ -3,9 +3,6 @@ import { StarPRNT } from 'react-native-star-prnt';
 import { Organization } from '../../models';
 import { alignCenter, alignLeftRight } from './helpers';
 
-const date = dayjs().format('DD/MM/YYYY');
-const time = dayjs().format('HH:mm');
-
 export const receiptTempate = (commands: any[], organization: Organization, printWidth: number) => {
   const { name, addressLine1, addressLine2, addressCity, addressCounty, addressPostcode } = organization;
   return [
@@ -20,7 +17,7 @@ export const receiptTempate = (commands: any[], organization: Organization, prin
     { appendBitmapText: alignCenter(addressPostcode, printWidth) },
     { appendBitmapText: ' ' },
     {
-      appendBitmapText: alignLeftRight(`Date: ${date}`, `Time: ${time}`, printWidth, Math.round(printWidth / 2)),
+      appendBitmapText: alignLeftRight(`Date: ${dayjs().format('DD/MM/YYYY')}`, `Time: ${dayjs().format('HH:mm:ss')}`, printWidth, Math.round(printWidth / 2)),
     },
     { appendBitmapText: ' ' },
     ...commands,
