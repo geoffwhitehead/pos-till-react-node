@@ -88,6 +88,13 @@ This will list devices linked to your apple account. https://developer.apple.com
 5. go to install custom app section
 6. click install on the custom app you uploaded previously.
 7. if successful, there should be a popup message on the ipad asking for permission to install the app
+
+## Randdom issues
+
+- module map errors.
+Opened xcodeproj instead of .xcworkspace
+
+
 # Screenshots
 
 ![Screen Bills](/assets/screen-bills.png?raw=true "Screen Bills")
