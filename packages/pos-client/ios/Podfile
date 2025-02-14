@@ -1,80 +1,37 @@
-platform :ios, '9.0'
-require_relative '../node_modules/@react-native-community/cli-platform-ios/native_modules'
+platform :ios, '16.0'
 
-post_install do |installer|
-  ## Fix for XCode 12.5
-  find_and_replace("../node_modules/react-native/React/CxxBridge/RCTCxxBridge.mm",
-  "_initializeModules:(NSArray<id<RCTBridgeModule>> *)modules", "_initializeModules:(NSArray<Class> *)modules")
-  find_and_replace("../node_modules/react-native/ReactCommon/turbomodule/core/platform/ios/RCTTurboModuleManager.mm",
-      "RCTBridgeModuleNameForClass(module))", "RCTBridgeModuleNameForClass(Class(module)))")
-end
+require_relative '../node_modules/react-native/scripts/react_native_pods'
 
 target 'Positive' do
-  use_native_modules!
+  # use_frameworks! :linkage => :static
 
-  # Pods for Positive
-  pod 'FBLazyVector', :path => "../node_modules/react-native/Libraries/FBLazyVector"
-  pod 'FBReactNativeSpec', :path => "../node_modules/react-native/Libraries/FBReactNativeSpec"
-  pod 'RCTRequired', :path => "../node_modules/react-native/Libraries/RCTRequired"
-  pod 'RCTTypeSafety', :path => "../node_modules/react-native/Libraries/TypeSafety"
-  pod 'React', :path => '../node_modules/react-native/'
-  pod 'React-Core', :path => '../node_modules/react-native/'
-  pod 'React-CoreModules', :path => '../node_modules/react-native/React/CoreModules'
-  pod 'React-Core/DevSupport', :path => '../node_modules/react-native/'
-  pod 'React-RCTActionSheet', :path => '../node_modules/react-native/Libraries/ActionSheetIOS'
-  pod 'React-RCTAnimation', :path => '../node_modules/react-native/Libraries/NativeAnimation'
-  pod 'React-RCTBlob', :path => '../node_modules/react-native/Libraries/Blob'
-  pod 'React-RCTImage', :path => '../node_modules/react-native/Libraries/Image'
-  pod 'React-RCTLinking', :path => '../node_modules/react-native/Libraries/LinkingIOS'
-  pod 'React-RCTNetwork', :path => '../node_modules/react-native/Libraries/Network'
-  pod 'React-RCTSettings', :path => '../node_modules/react-native/Libraries/Settings'
-  pod 'React-RCTText', :path => '../node_modules/react-native/Libraries/Text'
-  pod 'React-RCTVibration', :path => '../node_modules/react-native/Libraries/Vibration'
-  pod 'React-Core/RCTWebSocket', :path => '../node_modules/react-native/'
+  # Modern autolinking for React Native dependencies
+  use_react_native!(
+    :path => '../node_modules/react-native',
+    :hermes_enabled => true # Change to false if not using Hermes
+  )
 
-  pod 'React-cxxreact', :path => '../node_modules/react-native/ReactCommon/cxxreact'
-  pod 'React-jsi', :modular_headers => true, :path => '../node_modules/react-native/ReactCommon/jsi'
-  pod 'React-jsiexecutor', :path => '../node_modules/react-native/ReactCommon/jsiexecutor'
-  pod 'React-jsinspector', :path => '../node_modules/react-native/ReactCommon/jsinspector'
-  pod 'ReactCommon/jscallinvoker', :path => "../node_modules/react-native/ReactCommon"
-  pod 'ReactCommon/turbomodule/core', :path => "../node_modules/react-native/ReactCommon"
-  pod 'Yoga', :path => '../node_modules/react-native/ReactCommon/yoga'
+  # Third-party dependencies
+  # Uncomment this line if you're not using auto-linking or if auto-linking causes trouble
+  # pod 'WatermelonDB', path: '../node_modules/@nozbe/watermelondb'
 
-  pod 'DoubleConversion', :podspec => '../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec'
-  pod 'glog', :podspec => '../node_modules/react-native/third-party-podspecs/glog.podspec'
-  pod 'Folly', :podspec => '../node_modules/react-native/third-party-podspecs/Folly.podspec'
-  pod 'WatermelonDB', :path => '../node_modules/@nozbe/watermelondb'
+  # WatermelonDB dependency, should not be needed on modern React Native
+  # (please file an issue if this causes issues for you)
+  # pod 'React-jsi', path: '../node_modules/react-native/ReactCommon/jsi', modular_headers: true
 
-  
+  # WatermelonDB dependency
+  pod 'simdjson', path: '../node_modules/@nozbe/simdjson', modular_headers: true
   pod 'RNVectorIcons', :path => '../node_modules/react-native-vector-icons'
   pod 'RNStarPrnt', :path => '../node_modules/react-native-star-prnt'
-
-  
   pod 'RNSVG', :path => '../node_modules/react-native-svg'
-
-  # target 'PositiveTests' do
-  #   inherit! :search_paths
-  #   # Pods for testing
-  # end
-  use_native_modules!
 end
-# target 'Positive-tvOS' do
-#   # Pods for Positive-tvOS
-#   target 'Positive-tvOSTests' do
-#     inherit! :search_paths
-#     # Pods for testing
-#   end
-# end
 
-def find_and_replace(dir, findstr, replacestr)
-  Dir[dir].each do |name|
-      text = File.read(name)
-      replace = text.gsub(findstr,replacestr)
-      if text != replace
-          puts "Fix: " + name
-          File.open(name, "w") { |file| file.puts replace }
-          STDOUT.flush
-      end
+post_install do |installer|
+  # Optionally clean up any specific build settings or add additional tweaks
+  installer.pods_project.targets.each do |target|
+    target.build_configurations.each do |config|
+      config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = "arm64" # Prevent architecture issues on M1 Macs
+      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '16.0'
+    end
   end
-  Dir[dir + '*/'].each(&method(:find_and_replace))
 end
