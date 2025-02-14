@@ -70,11 +70,11 @@ export enum TablePlanElementRotations {
 export class TablePlanElement extends Model {
   static table = 'table_plan_element';
 
-  @field('bill_reference') billReference: number;
-  @field('type') type: string;
-  @field('pos_x') posX: number;
-  @field('pos_y') posY: number;
-  @field('rotation') rotation: number;
+  @field('bill_reference') billReference?: number;
+  @field('type') type!: string;
+  @field('pos_x') posX!: number;
+  @field('pos_y') posY!: number;
+  @field('rotation') rotation!: number;
 }
 
 export const tablePlanElementSchema = tableSchema({

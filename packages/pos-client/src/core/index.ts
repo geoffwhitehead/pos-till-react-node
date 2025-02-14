@@ -24,7 +24,6 @@ export {
   Left,
   List,
   ListItem,
-  Picker,
   Right,
   Row,
   Segment,
@@ -38,3 +37,5 @@ export {
   Toast,
   View,
 } from 'native-base';
+
+export { Picker } from './Picker';

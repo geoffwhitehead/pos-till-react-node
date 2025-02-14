@@ -7,6 +7,6 @@ type PriceGroupContextProps = {
 };
 
 export const PriceGroupContext = React.createContext<PriceGroupContextProps>({
-  setPriceGroup: null,
-  priceGroup: null,
+  setPriceGroup: null as any,
+  priceGroup: null as any,
 });

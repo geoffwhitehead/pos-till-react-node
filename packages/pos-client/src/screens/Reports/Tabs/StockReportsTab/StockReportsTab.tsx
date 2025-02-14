@@ -183,14 +183,12 @@ export const StockReportsTabInner: React.FC<StockReportsTabOuterProps & StockRep
         >
           {[
             <Picker.Item key="all-pricegroups" label="All" value={null} />,
-            ...priceGroups.map(priceGroup => {
-              return <Picker.Item key={priceGroup.id} label={priceGroup.name} value={priceGroup} />;
-            }),
+            ...priceGroups.map(priceGroup => (
+              <Picker.Item key={priceGroup.id} label={priceGroup.name} value={priceGroup} />
+            )),
           ]}
         </Picker>
-        <Label>
-          <Text style={styles.categoryPickerText}>Category: </Text>
-        </Label>
+        <Label style={styles.dateLabel}>Category</Label>
         <Picker
           mode="dropdown"
           iosHeader="Select a category"
@@ -205,9 +203,9 @@ export const StockReportsTabInner: React.FC<StockReportsTabOuterProps & StockRep
         >
           {[
             <Picker.Item key="all-categories" label="All" value={null} />,
-            ...categories.map(category => {
-              return <Picker.Item key={category.id} label={category.name} value={category} />;
-            }),
+            ...categories.map(category => (
+              <Picker.Item key={category.id} label={category.name} value={category} />
+            )),
           ]}
         </Picker>
         <SwitchSelector

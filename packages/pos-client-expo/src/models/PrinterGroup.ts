@@ -2,25 +2,26 @@ import { Model, Q, Query, tableSchema } from '@nozbe/watermelondb';
 import { action, children, field, lazy } from '@nozbe/watermelondb/decorators';
 import { Item, Printer, tableNames } from '.';
 import { PrinterGroupPrinter } from './PrinterGroupPrinter';
+import { ASSOCIATION_TYPES } from './constants';
 
 export class PrinterGroup extends Model {
   static table = 'printer_groups';
 
-  @field('name') name: string;
+  @field('name') name!: string;
 
   static associations = {
-    printer_groups_printers: { type: 'has_many', foreignKey: 'printer_group_id' },
-    items: { type: 'has_many', foreignKey: 'printer_group_id' },
+    printer_groups_printers: { type: ASSOCIATION_TYPES.HAS_MANY, foreignKey: 'printer_group_id' },
+    items: { type: ASSOCIATION_TYPES.HAS_MANY, foreignKey: 'printer_group_id' },
   };
 
-  @children('printer_groups_printers') printerGroupsPrinters: Query<PrinterGroupPrinter>;
-  @children('items') items: Query<Item>;
+  @children('printer_groups_printers') printerGroupsPrinters!: Query<PrinterGroupPrinter>;
+  @children('items') items!: Query<Item>;
 
   @lazy printers = this.collections
     .get('printers')
-    .query(Q.on('printer_groups_printers', 'printer_group_id', this.id)) as Query<Printer>;
+    .query(Q.on('printer_groups_printers', 'printer_group_id', this.id));
 
-  @action updateGroup = async ({ name, printers }: { name: string; printers: Printer[] }) => {
+  @action async updateGroup({ name, printers }: { name: string; printers: Printer[] }) {
     const printerGroupsPrintersCollection = this.database.collections.get<PrinterGroupPrinter>(
       tableNames.printerGroupsPrinters,
     );
@@ -44,21 +45,21 @@ export class PrinterGroup extends Model {
     );
 
     await this.database.action(() => this.database.batch(...batched));
-  };
+  }
 
-  @action remove = async () => {
+  @action async remove() {
     const [printerGroupLinks, items] = await Promise.all([this.printerGroupsPrinters.fetch(), this.items.fetch()]);
     const printerGroupPrintersToDelete = printerGroupLinks.map(pGP => pGP.prepareMarkAsDeleted());
     const itemsToUpdate = items.map(item =>
-      item.prepareUpdate(itemRecord => {
-        itemRecord.printerGroup.set(null);
+      item.prepareUpdate(record => {
+        record.printerGroup.set(null as any);
       }),
     );
 
-    await this.database.action(() => {
-      this.database.batch(...printerGroupPrintersToDelete, ...itemsToUpdate, this.prepareMarkAsDeleted());
-    });
-  };
+    const toDelete = [...printerGroupPrintersToDelete, this.prepareMarkAsDeleted()];
+
+    await this.database.batch(...toDelete, ...itemsToUpdate);
+  }
 }
 
 export const printerGroupSchema = tableSchema({

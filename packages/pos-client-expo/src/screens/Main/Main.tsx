@@ -38,7 +38,7 @@ interface MainInnerProps {
 }
 
 interface MainOuterProps {
-  currentBillPeriod: BillPeriod;
+  // currentBillPeriod: BillPeriod;
   database: Database;
   organizationId: string;
   userId: string;
@@ -197,10 +197,10 @@ export const MainWrapped: React.FC<MainOuterProps & MainInnerProps> = ({
     <OrganizationContext.Provider value={{ organization, setOrganization }}>
       <BillPeriodContext.Provider value={{ billPeriod, setBillPeriod }}>
         <PriceGroupContext.Provider value={{ priceGroup, setPriceGroup }}>
-          <CurrentBillContext.Provider value={{ currentBill, setCurrentBill }}>
-            <ReceiptPrinterContext.Provider value={{ receiptPrinter, setReceiptPrinter }}>
-              <RecentColorsContext.Provider value={{ recentColors, setRecentColors }}>
-                <LastSyncedAtContext.Provider value={{ lastSyncedAt, setLastSyncedAt }}>
+          <CurrentBillContext.Provider value={{ currentBill, setCurrentBill } as any}>
+            <ReceiptPrinterContext.Provider value={{ receiptPrinter, setReceiptPrinter } as any}>
+              <RecentColorsContext.Provider value={{ recentColors, setRecentColors } as any}>
+                <LastSyncedAtContext.Provider value={{ lastSyncedAt, setLastSyncedAt } as any}>
                   {/* TODO: Items and their prices are infrequently changed. Its more performant to perform any sorting and
                   processing is done at the top level. Investigate more thoroughly and perhaps move to local state further down.*/}
                   <ItemPricesContext.Provider value={{ groupedItemPrices, setGroupedItemPrices }}>
@@ -219,18 +219,18 @@ export const MainWrapped: React.FC<MainOuterProps & MainInnerProps> = ({
     </OrganizationContext.Provider>
   );
 };
-export const Main = withDatabase<any>(
+export const Main = withDatabase(
   withObservables<MainOuterProps, MainInnerProps>([], ({ database, organizationId }) => ({
-    priceGroups: database.collections.get<PriceGroup>(tableNames.priceGroups).query(),
+    priceGroups: database.collections.get<PriceGroup>(tableNames.priceGroups).query() as unknown as PriceGroup[],
     items: database.collections
       .get<Item>(tableNames.items)
       .query()
-      .observeWithColumns(['name']),
+      .observeWithColumns(['name']) as unknown as Item[],
     itemPrices: database.collections
       .get<ItemPrice>(tableNames.itemPrices)
       .query(Q.where('price', Q.notEq(null)))
-      .observeWithColumns(['price_group_id']),
-    categories: database.collections.get<Category>(tableNames.categories).query(),
-    organization: database.collections.get<Organization>(tableNames.organizations).findAndObserve(organizationId),
+      .observeWithColumns(['price_group_id']) as unknown as ItemPrice[],
+    categories: database.collections.get<Category>(tableNames.categories).query() as unknown as Category[],
+    organization: database.collections.get<Organization>(tableNames.organizations).findAndObserve(organizationId) as unknown as Organization,
   }))(MainWrapped),
 );

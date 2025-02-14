@@ -1,6 +1,7 @@
-import AsyncStorage from '@react-native-community/async-storage';
+
 import { create } from 'apisauce';
 import { config } from '../../env';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const api = create({
   baseURL: config.BASE_URL,
@@ -9,8 +10,8 @@ const api = create({
 
 api.addMonitor(async response => {
   if (response.ok) {
-    const accessToken = response.headers['authorization'];
-    const refreshToken = response.headers['x-refresh-token'];
+    const accessToken = response?.headers?.['authorization'];
+    const refreshToken = response?.headers?.['x-refresh-token'];
 
     if (accessToken) {
       await AsyncStorage.setItem('accessToken', accessToken);
@@ -24,7 +25,7 @@ api.addMonitor(async response => {
 });
 
 // TODO: refactor this ...
-export const okResponse = response => {
+export const okResponse = (response: any) => {
   if (response.ok && response.data?.success) {
     return response.data.data;
   } else {

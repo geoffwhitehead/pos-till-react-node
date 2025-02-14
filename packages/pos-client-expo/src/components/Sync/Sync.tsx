@@ -8,6 +8,7 @@ import { Loading } from '../Loading/Loading';
 type SyncOuterProps = {
   database: Database;
   organizationId: string;
+  children: React.ReactNode;
 };
 
 type SyncInnerProps = {

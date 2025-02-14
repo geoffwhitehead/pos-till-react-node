@@ -1,6 +1,7 @@
 import { Model, Relation, tableSchema } from '@nozbe/watermelondb';
 import { action, field, relation } from '@nozbe/watermelondb/decorators';
 import { BillPeriod, PriceGroup, Printer, tableNames } from '.';
+import { ASSOCIATION_TYPES } from './constants';
 
 export type OrganizationProps = {
   name: string;
@@ -66,50 +67,60 @@ export enum ItemListViewType {
   list = 'list',
   // grid = 'grid', // TODO: WIP
 }
+
 export class Organization extends Model {
   static table = 'organizations';
 
-  @field('name') name: string;
-  @field('email') email: string;
-  @field('phone') phone: string;
-  @field('vat') vat: string;
-  @field('address_line1') addressLine1: string;
-  @field('address_line2') addressLine2: string;
-  @field('address_city') addressCity: string;
-  @field('address_county') addressCounty: string;
-  @field('address_postcode') addressPostcode: string;
-  @field('default_price_group_id') defaultPriceGroupId: string;
-  @field('receipt_printer_id') receiptPrinterId: string;
-  @field('currency') currency: CurrencyEnum;
-  @field('max_bills') maxBills: number;
-  @field('last_pulled_at') lastPulledAt: string;
-  @field('current_bill_period_id') currentBillPeriodId: string;
-  @field('short_name_length') shortNameLength: number;
-  @field('max_discounts') maxDiscounts: number;
-  @field('grace_period_minutes') gracePeriodMinutes: number;
-  @field('category_grid_size') categoryGridSize: number;
-  @field('category_view_type') categoryViewType: CategoryViewTypeEnum;
-  @field('bill_view_type') billViewType: BillViewTypeEnum;
-  @field('bill_view_plan_grid_size') billViewPlanGridSize: number;
-  @field('transaction_order') transactionOrder: TransactionOrderEnum;
-  @field('transaction_grouping') transactionGrouping: TransactionGroupingEnum;
-  @field('access_pin') accessPin: string;
-  @field('access_pin_enabled') accessPinEnabled: boolean;
-  @field('print_item_grouping') printItemGrouping: PrintItemGroupingEnum;
-  @field('item_list_view_type') itemListViewType: ItemListViewType;
-
-  @relation('price_groups', 'default_price_group_id') defaultPriceGroup: Relation<PriceGroup>;
-  @relation('printers', 'receipt_printer_id') receiptPrinter: Relation<Printer>;
-  @relation('bill_periods', 'current_bill_period_id') currentBillPeriod: Relation<BillPeriod>;
-
-  @action createNewBillPeriod = async () => {
-    const newBillPeriod = this.database.collections.get<BillPeriod>(tableNames.billPeriods).prepareCreate();
-    const orgUpdate = this.prepareUpdate(record => {
-      record.currentBillPeriodId = newBillPeriod.id;
-    });
-
-    await this.database.batch(newBillPeriod, orgUpdate);
+  static associations = {
+    price_groups: { type: ASSOCIATION_TYPES.BELONGS_TO, key: 'default_price_group_id' },
+    printers: { type: ASSOCIATION_TYPES.BELONGS_TO, key: 'receipt_printer_id' },
+    bill_periods: { type: ASSOCIATION_TYPES.BELONGS_TO, key: 'current_bill_period_id' },
   };
+
+  @field('name') name!: string;
+  @field('email') email!: string;
+  @field('phone') phone!: string;
+  @field('vat') vat!: string;
+  @field('address_line1') addressLine1!: string;
+  @field('address_line2') addressLine2!: string;
+  @field('address_city') addressCity!: string;
+  @field('address_county') addressCounty!: string;
+  @field('address_postcode') addressPostcode!: string;
+  @field('default_price_group_id') defaultPriceGroupId!: string;
+  @field('receipt_printer_id') receiptPrinterId!: string;
+  @field('currency') currency!: CurrencyEnum;
+  @field('max_bills') maxBills!: number;
+  @field('last_pulled_at') lastPulledAt!: string;
+  @field('current_bill_period_id') currentBillPeriodId!: string;
+  @field('short_name_length') shortNameLength!: number;
+  @field('max_discounts') maxDiscounts!: number;
+  @field('grace_period_minutes') gracePeriodMinutes!: number;
+  @field('category_grid_size') categoryGridSize!: number;
+  @field('category_view_type') categoryViewType!: CategoryViewTypeEnum;
+  @field('bill_view_type') billViewType!: BillViewTypeEnum;
+  @field('bill_view_plan_grid_size') billViewPlanGridSize!: number;
+  @field('transaction_order') transactionOrder!: TransactionOrderEnum;
+  @field('transaction_grouping') transactionGrouping!: TransactionGroupingEnum;
+  @field('access_pin') accessPin!: string;
+  @field('access_pin_enabled') accessPinEnabled!: boolean;
+  @field('print_item_grouping') printItemGrouping!: PrintItemGroupingEnum;
+  @field('item_list_view_type') itemListViewType!: ItemListViewType;
+
+  @relation('price_groups', 'default_price_group_id') defaultPriceGroup!: Relation<PriceGroup>;
+  @relation('printers', 'receipt_printer_id') receiptPrinter!: Relation<Printer>;
+  @relation('bill_periods', 'current_bill_period_id') currentBillPeriod!: Relation<BillPeriod>;
+
+  @action async createNewBillPeriod() {
+    const billPeriodsCollection = this.collections.get<BillPeriod>(tableNames.billPeriods);
+    const billPeriod = await billPeriodsCollection.create(billPeriod => {
+      // billPeriod.organization.set(this);
+      billPeriod.createdAt = new Date();
+    });
+    await this.update(record => {
+      record.currentBillPeriod.set(billPeriod);
+    });
+    return billPeriod;
+  }
 }
 
 export const organizationSchema = tableSchema({

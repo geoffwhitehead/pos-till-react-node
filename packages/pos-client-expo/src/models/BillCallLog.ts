@@ -1,6 +1,7 @@
 import { Model, Relation, tableSchema } from '@nozbe/watermelondb';
 import { action, date, field, immutableRelation, nochange, readonly } from '@nozbe/watermelondb/decorators';
 import { Bill } from './Bill';
+import { ASSOCIATION_TYPES } from './constants';
 
 export const billCallLogSchema = tableSchema({
   name: 'bill_call_logs',
@@ -15,17 +16,19 @@ export const billCallLogSchema = tableSchema({
 export class BillCallLog extends Model {
   static table = 'bill_call_logs';
 
-  @nochange @field('bill_id') billId: string;
-  @readonly @date('created_at') createdAt: Date;
-  @readonly @date('updated_at') updatedAt: Date;
-  @field('print_message') printMessage: string;
+  @nochange @field('bill_id') billId!: string;
+  @readonly @date('created_at') createdAt!: Date;
+  @readonly @date('updated_at') updatedAt!: Date;
+  @field('print_message') printMessage?: string;
 
-  @immutableRelation('bills', 'bill_id') bill: Relation<Bill>;
+  @immutableRelation('bills', 'bill_id') bill!: Relation<Bill>;
 
   static associations = {
-    bills: { type: 'belongs_to', key: 'bill_id' },
-    bill_call_print_logs: { type: 'has_many', foreignKey: 'bill_call_log_id' },
+    bills: { type: ASSOCIATION_TYPES.BELONGS_TO, key: 'bill_id' },
+    bill_call_print_logs: { type: ASSOCIATION_TYPES.HAS_MANY, foreignKey: 'bill_call_log_id' },
   };
 
-  @action void = async () => await this.destroyPermanently();
+ @action async void() {
+   await this.destroyPermanently();
+ }
 }

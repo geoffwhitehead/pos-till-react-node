@@ -13,8 +13,8 @@ type ItemsContextProps = {
 };
 
 export const ItemsContext = React.createContext<ItemsContextProps>({
-  setGroupedSortedItems: null,
+  setGroupedSortedItems: null as any,
   groupedSortedItems: {},
   categoryItems: {},
-  setCategoryItems: null,
+  setCategoryItems: null as any,
 });

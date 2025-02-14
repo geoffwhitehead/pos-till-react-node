@@ -1,6 +1,7 @@
 import { Model, Query, tableSchema } from '@nozbe/watermelondb';
 import { action, children, field } from '@nozbe/watermelondb/decorators';
 import { PrinterGroupPrinter } from '.';
+import { ASSOCIATION_TYPES } from './constants';
 
 export enum Emulations {
   'StarPRNT' = 'StarPRNT',
@@ -23,25 +24,23 @@ export type PrinterProps = {
 export class Printer extends Model {
   static table = 'printers';
 
-  @field('name') name: string;
-  @field('address') address: string;
-  @field('mac_address') macAddress: string;
-  @field('print_width') printWidth: number;
-  @field('emulation') emulation: Emulations;
-  @field('receives_bill_calls') receivesBillCalls: boolean;
+  @field('name') name!: string;
+  @field('address') address!: string;
+  @field('mac_address') macAddress!: string;
+  @field('print_width') printWidth!: number;
+  @field('emulation') emulation!: Emulations;
+  @field('receives_bill_calls') receivesBillCalls!: boolean;
 
   static associations = {
-    printer_groups_printers: { type: 'has_many', foreignKey: 'printer_id' },
+    printer_groups_printers: { type: ASSOCIATION_TYPES.HAS_MANY, foreignKey: 'printer_id' },
   };
 
-  @children('printer_groups_printers') printerGroupsPrinters: Query<PrinterGroupPrinter>;
+  @children('printer_groups_printers') printerGroupsPrinters!: Query<PrinterGroupPrinter>;
 
-  @action remove = async () => {
+  @action async remove() {
     const printerGroupLinks = await this.printerGroupsPrinters.fetch();
     const printerGroupPrintersToDelete = printerGroupLinks.map(pGP => pGP.prepareMarkAsDeleted());
-
     const toDelete = [...printerGroupPrintersToDelete, this.prepareMarkAsDeleted()];
-
     await this.database.batch(...toDelete);
   };
 }

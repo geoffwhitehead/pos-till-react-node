@@ -7,5 +7,5 @@ type CurrentBillContextProps = {
 };
 export const CurrentBillContext = React.createContext<CurrentBillContextProps>({
   setCurrentBill: () => {},
-  currentBill: null,
+  currentBill: null as any,
 });

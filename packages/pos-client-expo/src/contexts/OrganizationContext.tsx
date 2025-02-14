@@ -7,5 +7,5 @@ type OrganizationContextProps = {
 };
 export const OrganizationContext = React.createContext<OrganizationContextProps>({
   setOrganization: () => {},
-  organization: null,
+  organization: null as any,
 });

@@ -8,5 +8,5 @@ type LastSyncedAtProps = {
 
 export const LastSyncedAtContext = React.createContext<LastSyncedAtProps>({
   setLastSyncedAt: () => {},
-  lastSyncedAt: null,
+  lastSyncedAt: null as any,
 });

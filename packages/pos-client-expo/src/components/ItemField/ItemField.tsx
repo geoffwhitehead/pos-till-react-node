@@ -45,6 +45,7 @@ export const ItemField: React.FC<ItemFieldProps> = ({
         style={{ ...(description ? styles.itemField : styles.itemFieldNoDesc), ...style }}
         error={touched && (errors?.length > 0 || errors)}
         {...props}
+        
       >
         <Label style={styleLabel}>{label}</Label>
         {description && (

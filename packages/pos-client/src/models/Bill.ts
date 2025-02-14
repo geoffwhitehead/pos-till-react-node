@@ -69,11 +69,11 @@ export class Bill extends Model {
   @immutableRelation('bill_periods', 'bill_period_id') billPeriod: Relation<BillPeriod>;
 
   static associations = {
-    bill_periods: { type: 'belongs_to', key: 'bill_period_id' },
-    bill_payments: { type: 'has_many', foreignKey: 'bill_id' },
-    bill_items: { type: 'has_many', foreignKey: 'bill_id' },
-    bill_discounts: { type: 'has_many', foreignKey: 'bill_id' },
-    bill_call_logs: { type: 'has_many', foreignKey: 'bill_id' },
+    bill_periods: { type: 'belongs_to' as const, key: 'bill_period_id' },
+    bill_payments: { type: 'has_many' as const, foreignKey: 'bill_id' },
+    bill_items: { type: 'has_many' as const, foreignKey: 'bill_id' },
+    bill_discounts: { type: 'has_many' as const, foreignKey: 'bill_id' },
+    bill_call_logs: { type: 'has_many' as const, foreignKey: 'bill_id' },
   };
 
   @children('bill_payments') billPayments: Query<BillPayment>;
@@ -190,7 +190,6 @@ export class Bill extends Model {
    * Note: these 2 queries are mainly used in the period report. Once nested joins are available with watermelon
    * they can be moved to the periodReport model to improve performance.
    */
-  @lazy billModifierItemVoids: Query<BillItemModifierItem> = this._billModifierItems.extend(Q.where('is_voided', true));
   @lazy billModifierItemComps: Query<BillItemModifierItem> = this._billModifierItems.extend(
     Q.and(Q.where('is_comp', Q.eq(true)), Q.where('is_voided', Q.notEq(true))),
   );

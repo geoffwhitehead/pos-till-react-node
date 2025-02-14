@@ -12,19 +12,15 @@ const adapter = new SQLiteAdapter({
 export const database = new Database({
   adapter,
   modelClasses: Object.values(models),
-  actionsEnabled: true,
 });
 
 export const resetDatabase = async () => {
   try {
     await database.action(async () => {
       await database.unsafeResetDatabase();
-      return { success: true };
     });
-  } catch (e) {
-    return {
-      success: false,
-      error: e,
-    };
+  } catch (error) {
+    console.error('Error resetting database:', error);
+    throw error;
   }
 };

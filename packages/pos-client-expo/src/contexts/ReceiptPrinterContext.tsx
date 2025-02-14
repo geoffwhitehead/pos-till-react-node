@@ -7,5 +7,5 @@ type ReceiptPrinterContextProps = {
 };
 export const ReceiptPrinterContext = React.createContext<ReceiptPrinterContextProps>({
   setReceiptPrinter: () => {},
-  receiptPrinter: null,
+  receiptPrinter: null as any,
 });

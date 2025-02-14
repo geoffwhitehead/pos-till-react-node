@@ -1,6 +1,7 @@
 import { Model, Query, tableSchema } from '@nozbe/watermelondb';
 import { children, field } from '@nozbe/watermelondb/decorators';
 import { Category } from '.';
+import { ASSOCIATION_TYPES } from './constants';
 
 export type PrintCategoryProps = {
   name: string;
@@ -12,14 +13,14 @@ export class PrintCategory extends Model {
   static table = 'print_categories';
 
   static associations = {
-    categories: { type: 'has_many', foreignKey: 'print_category_id' },
+    categories: { type: ASSOCIATION_TYPES.HAS_MANY, foreignKey: 'print_category_id' },
   };
 
-  @children('categories') categories: Query<Category>;
+  @children('categories') categories!: Query<Category>;
 
-  @field('name') name: string;
-  @field('short_name') shortName: string;
-  @field('display_order') displayOrder: number;
+  @field('name') name!: string;
+  @field('short_name') shortName!: string;
+  @field('display_order') displayOrder!: number;
 }
 
 export const printCategorySchema = tableSchema({

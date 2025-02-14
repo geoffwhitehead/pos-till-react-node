@@ -3,6 +3,7 @@ import { children, field, immutableRelation, lazy, nochange } from '@nozbe/water
 import { BillItem } from './BillItem';
 import { BillItemModifierItem } from './BillItemModifierItem';
 import { Modifier } from './Modifier';
+import { ASSOCIATION_TYPES } from './constants';
 
 export const billItemModifierSchema = tableSchema({
   name: 'bill_item_modifiers',
@@ -16,14 +17,14 @@ export const billItemModifierSchema = tableSchema({
 export class BillItemModifier extends Model {
   static table = 'bill_item_modifiers';
 
-  @nochange @field('bill_item_id') billItemId: string;
-  @nochange @field('modifier_name') modifierName: string;
-  @nochange @field('modifier_id') modifierId: string;
+  @nochange @field('bill_item_id') billItemId!: string;
+  @nochange @field('modifier_name') modifierName!: string;
+  @nochange @field('modifier_id') modifierId!: string;
 
-  @immutableRelation('modifiers', 'modifier_id') modifier: Relation<Modifier>;
-  @immutableRelation('bill_items', 'bill_item_id') billItem: Relation<BillItem>;
+  @immutableRelation('modifiers', 'modifier_id') modifier!: Relation<Modifier>;
+  @immutableRelation('bill_items', 'bill_item_id') billItem!: Relation<BillItem>;
 
-  @children('bill_item_modifier_items') _billItemModifierItems: Query<BillItemModifierItem>;
+  @children('bill_item_modifier_items') _billItemModifierItems!: Query<BillItemModifierItem>;
 
   @lazy billItemModifierItems: Query<BillItemModifierItem> = this._billItemModifierItems.extend(
     Q.where('is_voided', Q.notEq(true)),
@@ -33,8 +34,8 @@ export class BillItemModifier extends Model {
   );
 
   static associations = {
-    bill_items: { type: 'belongs_to', key: 'bill_item_id' },
-    modifiers: { type: 'belongs_to', key: 'modifier_id' },
-    bill_item_modifier_items: { type: 'has_many', key: 'bill_item_modifier_id' },
+    bill_items: { type: ASSOCIATION_TYPES.BELONGS_TO, key: 'bill_item_id' },
+    modifiers: { type: ASSOCIATION_TYPES.BELONGS_TO, key: 'modifier_id' },
+    bill_item_modifier_items: { type: ASSOCIATION_TYPES.HAS_MANY, foreignKey: 'bill_item_modifier_id' },
   };
 }

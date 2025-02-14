@@ -10,6 +10,6 @@ type ItemPricesContextProps = {
 };
 
 export const ItemPricesContext = React.createContext<ItemPricesContextProps>({
-  setGroupedItemPrices: null,
-  groupedItemPrices: {},
+  setGroupedItemPrices: null as any,
+  groupedItemPrices: null as any,
 });

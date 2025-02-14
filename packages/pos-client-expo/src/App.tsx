@@ -1,5 +1,4 @@
-import DatabaseProvider from '@nozbe/watermelondb/DatabaseProvider';
-import type { Database } from '@nozbe/watermelondb';
+import { DatabaseProvider } from '@nozbe/watermelondb/DatabaseProvider';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NavigationContainer } from '@react-navigation/native';
 import decode from 'jwt-decode';
@@ -152,10 +151,13 @@ export const App: React.FC<{}> = () => {
         return;
       }
 
-      api.setHeader('authorization', accessToken);
-      api.setHeader('x-refresh-token', refreshToken);
+      if(accessToken && refreshToken) {
 
-      dispatch({ type: 'RESTORE_TOKEN', accessToken, refreshToken, organizationId, userId });
+        api.setHeader('authorization', accessToken);
+        api.setHeader('x-refresh-token', refreshToken);
+  
+        dispatch({ type: 'RESTORE_TOKEN', accessToken, refreshToken, organizationId, userId });
+      }
       // dispatch({ type: 'SIGN_OUT' });
     };
 
@@ -279,18 +281,26 @@ export const App: React.FC<{}> = () => {
     fonts: {
       regular: {
         fontFamily: 'System',
+        fontWeight: '400',
       },
       medium: {
         fontFamily: 'System',
+        fontWeight: '500',
+      },
+      bold: {
+        fontFamily: 'System',
+        fontWeight: '700',
+      },
+      heavy: {
+        fontFamily: 'System',
+        fontWeight: '900',
       },
       light: {
         fontFamily: 'System',
-      },
-      thin: {
-        fontFamily: 'System',
+        fontWeight: '300',
       },
     },
-  };
+  } as const;
 
   if (isLoading) {
     // We haven't finished checking for the token yet
@@ -299,7 +309,7 @@ export const App: React.FC<{}> = () => {
 
   return (
     <Root>
-      <DatabaseProvider database={database as Database}>
+      <DatabaseProvider database={database}>
         <NavigationContainer theme={drawerTheme}>
           <AuthContext.Provider value={{ ...authContext, isSignInLoading, isSignUpLoading }}>
             {!accessToken || !refreshToken || !organizationId || !userId ? (

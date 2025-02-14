@@ -27,14 +27,6 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    },
-    "plugins": [
-      "expo-secure-store",
-      "expo-file-system",
-      "expo-font",
-      "expo-constants",
-      "expo-splash-screen",
-      "react-native-reanimated"
-    ]
+    }
   }
 }

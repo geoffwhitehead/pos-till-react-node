@@ -5,6 +5,7 @@ import { Category } from './Category';
 import { ItemPrice } from './ItemPrice';
 import { Modifier } from './Modifier';
 import { Printer } from './Printer';
+import { ASSOCIATION_TYPES } from './constants';
 
 type UpdateItemProps = {
   name: string;
@@ -28,24 +29,24 @@ export const itemSchema = tableSchema({
 export class Item extends Model {
   static table = 'items';
 
-  @field('name') name: string;
-  @field('short_name') shortName: string;
-  @field('category_id') categoryId: string;
-  @field('printer_group_id') printerGroupId: string;
+  @field('name') name!: string;
+  @field('short_name') shortName!: string;
+  @field('category_id') categoryId!: string;
+  @field('printer_group_id') printerGroupId!: string;
 
-  @relation('categories', 'category_id') category: Relation<Category>;
-  @relation('printer_groups', 'printer_group_id') printerGroup: Relation<PrinterGroup>;
+  @relation('categories', 'category_id') category!: Relation<Category>;
+  @relation('printer_groups', 'printer_group_id') printerGroup!: Relation<PrinterGroup>;
 
   static associations = {
-    item_modifiers: { type: 'has_many', foreignKey: 'item_id' },
-    modifiers: { type: 'belongs_to', key: 'modifier_id' },
-    categories: { type: 'belongs_to', key: 'category_id' },
-    item_prices: { type: 'has_many', foreignKey: 'item_id' },
-    printer_groups: { type: 'belongs_to', key: 'printer_group_id' },
+    item_modifiers: { type: ASSOCIATION_TYPES.HAS_MANY, foreignKey: 'item_id' },
+    modifiers: { type: ASSOCIATION_TYPES.BELONGS_TO, key: 'modifier_id' },
+    categories: { type: ASSOCIATION_TYPES.BELONGS_TO, key: 'category_id' },
+    item_prices: { type: ASSOCIATION_TYPES.HAS_MANY, foreignKey: 'item_id' },
+    printer_groups: { type: ASSOCIATION_TYPES.BELONGS_TO, key: 'printer_group_id' },
   };
 
-  @children('item_prices') prices: Query<ItemPrice>;
-  @children('item_modifiers') itemModifiers: Query<ItemModifier>;
+  @children('item_prices') prices!: Query<ItemPrice>;
+  @children('item_modifiers') itemModifiers!: Query<ItemModifier>;
 
   @lazy printers = this.collections
     .get('printers')
@@ -54,26 +55,22 @@ export class Item extends Model {
     Modifier
   >;
 
-  @action remove = async () => {
-    const [prices, itemModifiers] = await Promise.all([this.prices.fetch(), this.itemModifiers.fetch()]);
-
-    const itemPricesToDelete = prices.map(price => price.prepareMarkAsDeleted());
+  @action async remove() {
+    const [itemPrices, itemModifiers] = await Promise.all([this.prices.fetch(), this.itemModifiers.fetch()]);
+    const itemPricesToDelete = itemPrices.map(itemPrice => itemPrice.prepareMarkAsDeleted());
     const itemModifiersToDelete = itemModifiers.map(itemModifier => itemModifier.prepareMarkAsDeleted());
-    const itemToDelete = this.prepareMarkAsDeleted();
-
-    const batched = [itemToDelete, ...itemPricesToDelete, ...itemModifiersToDelete];
-
-    await this.database.batch(...batched);
+    const toDelete = [...itemPricesToDelete, ...itemModifiersToDelete, this.prepareMarkAsDeleted()];
+    await this.database.batch(...toDelete);
   };
 
-  @action updateItem = async ({
+  @action async updateItem({
     name,
     shortName,
     categoryId,
     printerGroupId,
     prices,
     selectedModifiers,
-  }: UpdateItemProps) => {
+  }: UpdateItemProps) {
     const itemModifierCollection = this.database.collections.get<ItemModifier>(tableNames.itemModifiers);
 
     const itemModifiers = await this.itemModifiers.fetch();
