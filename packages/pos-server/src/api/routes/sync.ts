@@ -24,6 +24,7 @@ import { PrinterService } from '../../services/printer';
 import { ProductService } from '../../services/product';
 import { TablePlanService } from '../../services/tablePlan';
 import { fromClientChanges } from '../../utils/sync';
+import { AuthorizedRequest } from '../middlewares/extendAuthorize';
 
 type SyncRequest = Request & { body: { lastPulledAt: Date; changes: Changes } };
 
@@ -31,7 +32,7 @@ export default (app: Router) => {
     const route = Router();
     app.use('/sync', route);
 
-    route.get('/', async (req: Request, res: Response, next: NextFunction) => {
+    route.get('/', async (req: AuthorizedRequest, res: Response, next: NextFunction) => {
         const logger = Container.get('logger') as LoggerService;
         const {
             item: itemService,
