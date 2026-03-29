@@ -58,25 +58,37 @@ export default (app: Router) => {
         try {
             const lastPulledAt = lastPulledAtUnix ? fromUnixTime(lastPulledAtUnix) : null;
 
-            const [
-                itemChanges,
-                modifierChanges,
-                categoryChanges,
-                discountChanges,
-                priceGroupChanges,
-                printerChanges,
-                organizationChanges,
-                tablePlanChanges,
-            ] = await Promise.all([
-                categoryService.pullChanges({ lastPulledAt, schemaVersion, migration }),
-                itemService.pullChanges({ lastPulledAt, schemaVersion, migration }),
-                modifierService.pullChanges({ lastPulledAt, schemaVersion, migration }),
-                discountService.pullChanges({ lastPulledAt, schemaVersion, migration }),
-                priceGroupService.pullChanges({ lastPulledAt, schemaVersion, migration }),
-                printerService.pullChanges({ lastPulledAt, schemaVersion, migration }),
-                organizationService.pullChanges({ lastPulledAt, schemaVersion, migration }),
-                tablePlanService.pullChanges({ lastPulledAt, schemaVersion, migration }),
-            ]);
+            logger.info('Sync pull: categories start', { organizationId: req.organizationId });
+            const categoryChanges = await categoryService.pullChanges({ lastPulledAt, schemaVersion, migration });
+            logger.info('Sync pull: categories complete', { organizationId: req.organizationId });
+
+            logger.info('Sync pull: items start', { organizationId: req.organizationId });
+            const itemChanges = await itemService.pullChanges({ lastPulledAt, schemaVersion, migration });
+            logger.info('Sync pull: items complete', { organizationId: req.organizationId });
+
+            logger.info('Sync pull: modifiers start', { organizationId: req.organizationId });
+            const modifierChanges = await modifierService.pullChanges({ lastPulledAt, schemaVersion, migration });
+            logger.info('Sync pull: modifiers complete', { organizationId: req.organizationId });
+
+            logger.info('Sync pull: discounts start', { organizationId: req.organizationId });
+            const discountChanges = await discountService.pullChanges({ lastPulledAt, schemaVersion, migration });
+            logger.info('Sync pull: discounts complete', { organizationId: req.organizationId });
+
+            logger.info('Sync pull: price groups start', { organizationId: req.organizationId });
+            const priceGroupChanges = await priceGroupService.pullChanges({ lastPulledAt, schemaVersion, migration });
+            logger.info('Sync pull: price groups complete', { organizationId: req.organizationId });
+
+            logger.info('Sync pull: printers start', { organizationId: req.organizationId });
+            const printerChanges = await printerService.pullChanges({ lastPulledAt, schemaVersion, migration });
+            logger.info('Sync pull: printers complete', { organizationId: req.organizationId });
+
+            logger.info('Sync pull: organization start', { organizationId: req.organizationId });
+            const organizationChanges = await organizationService.pullChanges({ lastPulledAt, schemaVersion, migration });
+            logger.info('Sync pull: organization complete', { organizationId: req.organizationId });
+
+            logger.info('Sync pull: table plan start', { organizationId: req.organizationId });
+            const tablePlanChanges = await tablePlanService.pullChanges({ lastPulledAt, schemaVersion, migration });
+            logger.info('Sync pull: table plan complete', { organizationId: req.organizationId });
 
             const changes = {
                 ...itemChanges,
