@@ -46,40 +46,64 @@ export default (app: Router) => {
 
         const { lastPulledAt: lastPulledAtUnix, schemaVersion, migration = null } = req.query;
 
-        const lastPulledAt = lastPulledAtUnix ? fromUnixTime(lastPulledAtUnix) : null;
+        logger.info('Sync pull requested', {
+            organizationId: req.organizationId,
+            userId: req.userId,
+            lastPulledAtUnix,
+            schemaVersion,
+            hasMigration: migration !== null,
+        });
 
-        const [
-            itemChanges,
-            modifierChanges,
-            categoryChanges,
-            discountChanges,
-            priceGroupChanges,
-            printerChanges,
-            organizationChanges,
-            tablePlanChanges,
-        ] = await Promise.all([
-            categoryService.pullChanges({ lastPulledAt, schemaVersion, migration }),
-            itemService.pullChanges({ lastPulledAt, schemaVersion, migration }),
-            modifierService.pullChanges({ lastPulledAt, schemaVersion, migration }),
-            discountService.pullChanges({ lastPulledAt, schemaVersion, migration }),
-            priceGroupService.pullChanges({ lastPulledAt, schemaVersion, migration }),
-            printerService.pullChanges({ lastPulledAt, schemaVersion, migration }),
-            organizationService.pullChanges({ lastPulledAt, schemaVersion, migration }),
-            tablePlanService.pullChanges({ lastPulledAt, schemaVersion, migration }),
-        ]);
+        try {
+            const lastPulledAt = lastPulledAtUnix ? fromUnixTime(lastPulledAtUnix) : null;
 
-        const changes = {
-            ...itemChanges,
-            ...modifierChanges,
-            ...categoryChanges,
-            ...discountChanges,
-            ...priceGroupChanges,
-            ...printerChanges,
-            ...organizationChanges,
-            ...tablePlanChanges,
-        };
-        const timestamp = getUnixTime(new Date());
-        return res.status(200).json({ changes, timestamp });
+            const [
+                itemChanges,
+                modifierChanges,
+                categoryChanges,
+                discountChanges,
+                priceGroupChanges,
+                printerChanges,
+                organizationChanges,
+                tablePlanChanges,
+            ] = await Promise.all([
+                categoryService.pullChanges({ lastPulledAt, schemaVersion, migration }),
+                itemService.pullChanges({ lastPulledAt, schemaVersion, migration }),
+                modifierService.pullChanges({ lastPulledAt, schemaVersion, migration }),
+                discountService.pullChanges({ lastPulledAt, schemaVersion, migration }),
+                priceGroupService.pullChanges({ lastPulledAt, schemaVersion, migration }),
+                printerService.pullChanges({ lastPulledAt, schemaVersion, migration }),
+                organizationService.pullChanges({ lastPulledAt, schemaVersion, migration }),
+                tablePlanService.pullChanges({ lastPulledAt, schemaVersion, migration }),
+            ]);
+
+            const changes = {
+                ...itemChanges,
+                ...modifierChanges,
+                ...categoryChanges,
+                ...discountChanges,
+                ...priceGroupChanges,
+                ...printerChanges,
+                ...organizationChanges,
+                ...tablePlanChanges,
+            };
+            const timestamp = getUnixTime(new Date());
+            logger.info('Sync pull completed', {
+                organizationId: req.organizationId,
+                timestamp,
+                changeCollections: Object.keys(changes),
+            });
+            return res.status(200).json({ changes, timestamp });
+        } catch (error) {
+            logger.error('Sync pull failed', {
+                organizationId: req.organizationId,
+                userId: req.userId,
+                lastPulledAtUnix,
+                schemaVersion,
+                error,
+            });
+            return res.status(500).json({ success: false, error: 'Sync pull failed' });
+        }
     });
 
     route.post('/', async (req: SyncRequest, res: Response, next: NextFunction) => {
