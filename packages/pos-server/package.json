@@ -38,7 +38,7 @@
         "date-fns": "^2.16.1",
         "dotenv": "8.2.0",
         "esm": "^3.2.25",
-        "express": "^4.17.1",
+        "express": "^4.17.3",
         "express-basic-auth": "^1.2.0",
         "faker": "^4.1.0",
         "global": "^4.4.0",
